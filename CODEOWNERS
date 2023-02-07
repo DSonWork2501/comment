@@ -1,0 +1,17 @@
+# Config gitlab-ci
+[CODE OWNERS]
+/CODEOWNERS @ttrinh24 @ThanhTH22 @TaiMH @ThoNH4 @TruongNT7
+
+[Config]
+/.env @ttrinh24 @ThanhTH22 @TaiMH
+
+[Gitlab Runner]
+/.gitlab-ci.yml @ttrinh24 @ThanhTH22 @TaiMH
+
+[Docker]
+/.dockerignore @ttrinh24 @ThanhTH22
+/docker-compose.yml @ttrinh24 @ThanhTH22 @TaiMH
+/Dockerfile @ttrinh24 @ThanhTH22 @TaiMH
+
+[Script]
+/script-push-image.sh @ttrinh24 @ThanhTH22 @TaiMH
