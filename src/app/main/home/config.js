@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Error404PageConfig = {
+const HomeConfig = {
 	settings: {
 		layout: {
 			config: {}
@@ -14,4 +14,4 @@ const Error404PageConfig = {
 	]
 };
 
-export default Error404PageConfig;
+export default HomeConfig;

@@ -2,7 +2,7 @@ import FuseUtils from '@fuse/utils/FuseUtils';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 /* eslint-disable camelcase */
-// import history from '@history';
+import history from '@history';
 import connect from '@connect'
 
 class JwtService extends FuseUtils.EventEmitter {
@@ -34,15 +34,6 @@ class JwtService extends FuseUtils.EventEmitter {
 							resolve()
 						}
 					}
-					// else if (err.response && err.response.status && [400, 404, 403, 405].includes(err.response.status)) {
-					// 	this.emit("handleError", err)
-					// 	// this.emit('onAutoLogout', 'Không có quyền truy cập!')
-					// 	// this.setSession(null);
-					// 	// resolve()
-					// } else {
-					// 	this.emit('onAutoLogout', 'Đăng nhập thất bại!')
-					// 	resolve()
-					// }
 					this.emit("handleError", err);
 					reject(err)
 					// throw err
@@ -94,6 +85,9 @@ class JwtService extends FuseUtils.EventEmitter {
 								shortcuts: []
 							}, ...response.data, redirectUrl: "/home"
 						}
+						history.push({
+							pathname: "/home"
+						})
 						resolve(data);
 					} else {
 						reject(response.data);
