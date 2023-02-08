@@ -1,30 +1,19 @@
 import FuseAnimate from '@fuse/core/FuseAnimate';
 import Typography from '@material-ui/core/Typography';
-import React,{useEffect, useState} from 'react';
+import React,{useEffect, } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux'
-import { DialogUpdateUser } from './components'
 import history from '@history'
 
 function HomePage() {
 	const auth = useSelector(({ auth }) => auth)
-	const user = useSelector(({ auth }) => auth.user.user)
-	const [openDlgDep, setOpenDlgDep] = useState(false)
-	const isLogin = auth.user && auth.user.access_token
-
+	const isLogin = auth.user && auth.user.token
+	
 	useEffect(() => {
 		if(!isLogin) {
 			history.push("/login")
 		}
 	}, [isLogin])
-	
-	useEffect(() => {
-		if((user && !user.departmentID)){
-			setOpenDlgDep(true)
-		}else{
-			setOpenDlgDep(false)
-		}
-	}, [user])
 	
 	return (
 		<React.Fragment>
@@ -47,7 +36,6 @@ function HomePage() {
 					</Link>
 				</div>
 			</div>
-			{openDlgDep && <DialogUpdateUser open={openDlgDep} handleClose={() => setOpenDlgDep(false)} />}
 		</React.Fragment>
 	)
 }

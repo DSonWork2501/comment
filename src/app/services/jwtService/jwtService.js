@@ -33,7 +33,7 @@ class JwtService extends FuseUtils.EventEmitter {
 							this.emit('onAutoLogout', 'Đăng nhập thất bại!')
 							resolve()
 						}
-					} 
+					}
 					// else if (err.response && err.response.status && [400, 404, 403, 405].includes(err.response.status)) {
 					// 	this.emit("handleError", err)
 					// 	// this.emit('onAutoLogout', 'Không có quyền truy cập!')
@@ -59,7 +59,6 @@ class JwtService extends FuseUtils.EventEmitter {
 
 		if (!token.access_token) {
 			this.emit('onNoAccessToken');
-
 			return;
 		}
 
@@ -76,41 +75,26 @@ class JwtService extends FuseUtils.EventEmitter {
 
 	signInWithEmailAndPassword = (email, password, type, otp) => {
 		return new Promise((resolve, reject) => {
-			//userType: 1-AccountPayTV; 2-AccountFPT
+
 			connect.live.identity.login(email, password, type, otp)
 				.then(response => {
 					if (response.data.token) {
 						let token = {
 							access_token: response.data.token,
-							refresh_token: response.data.refreshToken
 						}
 						this.setSession(token);
-						// const decoded = jwtDecode(token.access_token);
-						// const permission = decoded && decoded.Permission ? decoded.Permission : []
-						resolve(response.data);
-						// connect.live.user.getById(decoded.userId)
-						// 	.then(resUser => {
-						// 		let data = {
-						// 			...token,
-						// 			role: permission && permission.length > 0 ? permission : ["NewUser"],
-						// 			roleName: resUser.data.data.roleName,
-						// 			user: {
-						// 				...resUser.data.data,
-						// 				redirectUrl: "/"
-						// 			},
-						// 			data: {
-						// 				displayName: resUser.data.data.fullName,
-						// 				photoURL: 'assets/images/avatars/avatar-user.png',
-						// 				email: resUser.data.data.email,
-						// 				settings: {},
-						// 				shortcuts: []
-						// 			}
-						// 		}
-						// resolve(data);
-						// 	})
-						// 	.catch(error => {
-						// 		reject(error)
-						// 	})
+						this.setUser(email);
+
+						const data = {
+							data: {
+								displayName: email, 
+								email: '', 
+								photoURL: 'assets/images/avatars/avatar-user.png',
+								settings: {},
+								shortcuts: []
+							}, ...response.data, redirectUrl: "/home"
+						}
+						resolve(data);
 					} else {
 						reject(response.data);
 					}
@@ -123,10 +107,18 @@ class JwtService extends FuseUtils.EventEmitter {
 	signInWithToken = () => {
 		return new Promise((resolve, reject) => {
 			const getToken = () => new Promise((resolve, reject) => {
+				// let token = this.getAccessToken()
+				// let refreshToken = this.getRefreshToken()
+				// if (token && refreshToken) {
+				// 	resolve({ token, refreshToken })
+				// } else {
+				// 	reject()
+				// }
+
 				let token = this.getAccessToken()
-				let refreshToken = this.getRefreshToken()
-				if (token && refreshToken) {
-					resolve({ token, refreshToken })
+				let user = this.getUser()
+				if (token) {
+					resolve({ token, user })
 				} else {
 					reject()
 				}
@@ -136,32 +128,14 @@ class JwtService extends FuseUtils.EventEmitter {
 				if (value.token) {
 					let token = {
 						access_token: value.token,
-						refresh_token: value.refreshToken
+						// refresh_token: value.refreshToken
 					}
 					this.setSession(token);
-					const decoded = jwtDecode(token.access_token);
-					const permission = decoded && decoded.Permission ? decoded.Permission : []
-					connect.live.user.getById(decoded.userId)
-						.then(resUser => {
-							let data = {
-								...token,
-								role: permission && permission.length > 0 ? permission : ["NewUser"],
-								roleName: (resUser && resUser.data && resUser.data.data && resUser.data.data.roleName) || "",
-								user: resUser ? { ...resUser.data.data, redirectUrl: "/" } : { redirectUrl: "/" },
-								data: {
-									displayName: (resUser && resUser.data && resUser.data.data && resUser.data.data.fullName) || "",
-									photoURL: 'assets/images/avatars/avatar-user.png',
-									email: (resUser && resUser.data && resUser.data.data && resUser.data.data.email) || "",
-									settings: {},
-									shortcuts: []
-								}
-							}
-							resolve(data);
-						})
-						.catch(error => {
-							this.logout();
-							reject(error)
-						})
+					this.setUser(value.user);
+
+					const data = { data: { displayName: value.user, email: '' }, user: value.user, success: true, token: value.token, redirectUrl: "/" }
+					resolve(data);
+
 				} else {
 					this.logout();
 					reject(new Error('Failed to get user info.'));
@@ -225,17 +199,21 @@ class JwtService extends FuseUtils.EventEmitter {
 	setSession = token => {
 		if (token && token.access_token) {
 			localStorage.setItem('jwt_access_token', token.access_token);
-			localStorage.setItem('jwt_refresh_token', token.refresh_token);
+			// localStorage.setItem('jwt_refresh_token', token.refresh_token);
 			axios.defaults.headers.common.Authorization = `Bearer ${token.access_token}`;
 		} else {
 			localStorage.removeItem('jwt_access_token');
-			localStorage.removeItem('jwt_refresh_token');
+			// localStorage.removeItem('jwt_refresh_token');
 			delete axios.defaults.headers.common.Authorization;
 		}
 	};
 
+	setUser = user => {
+		localStorage.setItem('user', user);
+	};
+
 	logout = () => {
-		connect.live.identity.logout()
+		// connect.live.identity.logout()
 		this.setSession(null);
 	};
 
@@ -254,6 +232,9 @@ class JwtService extends FuseUtils.EventEmitter {
 
 	getAccessToken = () => {
 		return window.localStorage.getItem('jwt_access_token');
+	};
+	getUser = () => {
+		return window.localStorage.getItem('user');
 	};
 	getRefreshToken = () => {
 		return window.localStorage.getItem('jwt_refresh_token');

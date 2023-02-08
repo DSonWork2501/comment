@@ -32,7 +32,7 @@ function Logo() {
 
 	return (
 		<div className={clsx(classes.root, 'flex items-center justify-center')}>
-			<Link to="/home"><img className="mr-16" src="assets/images/logos/logo-fpt-play.png" id='wine_manager' alt="rượu vang" /></Link>
+			<Link to="/home"><img className="mr-16" src="assets/images/logos/logo.svg" id='wine_manager' alt="rượu vang" /></Link>
 			{/* <img className="logo-icon" src="assets/images/logos/logo-fpt.png" alt="fpt" /> */}
 			{/* <Typography className="text-28 -mt-4 mx-12 font-light logo-text" color="error" component={Link} to="/main" role="button">
 				<span className={clsx("text-blue-A700 font-extrabold")}>CMS</span>
