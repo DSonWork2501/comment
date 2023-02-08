@@ -4,15 +4,15 @@ import firebaseService from 'app/services/firebaseService';
 import jwtService from 'app/services/jwtService';
 import { setUserData } from './userSlice';
 import { getAppStart } from '@widgets/functions'
-import { KeyStorage } from '@widgets/metadatas'
-import { storage } from '@widgets/functions'
+// import { KeyStorage } from '@widgets/metadatas'
+// import { storage } from '@widgets/functions'
 
 export const submitLogin = ({ email, password, type, otp }) => async dispatch => {
 	return jwtService
 		.signInWithEmailAndPassword(email, password, type, otp)
 		.then(user => {
-			dispatch(setUserData(user));
-			getAppStart(dispatch, !(storage.getStorage(KeyStorage.appStart) || false))
+			dispatch(setUserData({user: email, ...user}));
+			getAppStart(dispatch)
 			return dispatch(loginSuccess());
 		})
 		.catch(error => {

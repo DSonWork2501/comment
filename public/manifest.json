@@ -1,9 +1,9 @@
 {
-  "short_name": "CMS FPT PLAY",
-  "name": "CMS FPT PLAY",
+  "short_name": "Quản lý rượu vang",
+  "name": "Quản lý rượu vang",
   "icons": [
     {
-      "src": "./favicon.ico",
+      "src": "./logo.svg",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     }

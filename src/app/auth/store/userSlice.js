@@ -8,8 +8,6 @@ import { setInitialSettings, setDefaultSettings } from 'app/store/fuse/settingsS
 import auth0Service from 'app/services/auth0Service';
 import firebaseService from 'app/services/firebaseService';
 import jwtService from 'app/services/jwtService';
-import setMetadata from '@widgets/metadatas/AppStart'
-import {getDepartment} from '@widgets/store/departmentSlice'
 export const setUserDataAuth0 = tokenData => async dispatch => {
 	const user = {
 		role: ['admin'],
@@ -84,12 +82,6 @@ export const setUserData = user => async (dispatch, getState) => {
 	};
 
 	dispatch(setUser(user))
-	if(user && user.user && user.user.departmentID){
-		setMetadata(dispatch)
-	}else{
-		dispatch(getDepartment())
-	}
-	
 };
 
 export const updateUserSettings = settings => async (dispatch, getState) => {
