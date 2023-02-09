@@ -111,11 +111,6 @@ export const updateUserShortcuts = shortcuts => async (dispatch, getState) => {
 export const logoutUser = () => async (dispatch, getState) => {
 	const { user } = getState().auth;
 
-	if (!user.role || user.role.length === 0) {
-		// is guest
-		return null;
-	}
-
 	history.push({
 		pathname: '/login'
 	});

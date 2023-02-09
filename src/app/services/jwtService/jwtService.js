@@ -209,6 +209,7 @@ class JwtService extends FuseUtils.EventEmitter {
 	logout = () => {
 		// connect.live.identity.logout()
 		this.setSession(null);
+		this.setUser(null);
 	};
 
 	isAuthTokenValid = access_token => {
