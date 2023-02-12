@@ -1,12 +1,15 @@
-import { CmsButton, CmsButtonGroup, CmsFilter, CmsIconButton, CmsMenu, CmsTextField } from "@widgets/components"
+import { CmsButton, CmsButtonGroup, CmsFilter, CmsIconButton, CmsMenu, CmsSelect, CmsTextField } from "@widgets/components"
 import { FilterOptions } from "@widgets/metadatas"
 import React from "react"
+import { useMemo } from "react"
 import { useEffect } from "react"
+import { useSelector } from "react-redux"
+import { keyStore } from "../common"
 
 function FilterOptionView(
     { filterOptions, search, setSearch, setFilterOptions, resetSearch }
 ) {
-
+    const cateEntities = useSelector(store => store[keyStore].category.entities)
     const [searchValue, setSearchValue] = React.useState(null)
 
     useEffect(() => {
@@ -34,6 +37,8 @@ function FilterOptionView(
         setSearchValue({ ...search, page: 1, limit: 10 })
     }
 
+    const cateData = useMemo(() => cateEntities?.data.map(x => ({ id: x.name, name: x.name })), [cateEntities])
+
     return (
         <CmsFilter
             ftype={filterOptions}
@@ -49,6 +54,13 @@ function FilterOptionView(
                         <div className="w-1/4 space-y-8">
                             <CmsTextField value={searchValue?.search || ''} onChange={event => setSearchValue({ ...searchValue, search: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="sản phẩm..." startText="Tên" isSearch={true} />
                             <CmsTextField value={searchValue?.shortname || ''} onChange={event => setSearchValue({ ...searchValue, shortname: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="" startText="Short Name" isSearch={true} />
+                        </div>
+                        <div className="w-1/4 space-y-8">
+                            <CmsSelect label="Thể Loại" className="" data={[{ id: "", name: "Tất cả" }, ...cateData]} value={searchValue?.cate || ''} onChange={event => setSearchValue({ ...searchValue, cate: event.target.value })} />
+
+                        </div>
+                        <div className="w-1/4 space-y-8">
+
                         </div>
                     </div>
                     <CmsButton label="Tìm" startIcon="search" onClick={onSearchAdvandClick} />

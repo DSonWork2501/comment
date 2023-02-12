@@ -34,7 +34,16 @@ export default {
                 PageNumber : phân trang - vị trí
                 RowsPage : phân trang - số trang
              */
-            getProduct: params => axios.get(`${baseurl}/product/get-product`, { params }),
+            getList: params => axios.get(`${baseurl}/product/get-product`, { params }),
+            insert: entity => axios.post(`${baseurl}/product/insert-product`, entity),
+            update: entity => axios.put(`${baseurl}/product/update-product`, entity),
+            delete: entity => axios.delete(`${baseurl}/product/delete-product`, entity),
+        },
+        category: {
+            getList: params => axios.get(`${baseurl}/product/get-category`, { params }),
+            insert: entity => axios.post(`${baseurl}/product/insert-category`, entity),
+            update: entity => axios.put(`${baseurl}/product/update-category`, entity),
+            delete: entity => axios.delete(`${baseurl}/product/delete-category`, entity),
         }
     },
 }
