@@ -2,7 +2,6 @@ import FuseUtils from '@fuse/utils/FuseUtils';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 /* eslint-disable camelcase */
-import history from '@history';
 import connect from '@connect'
 
 class JwtService extends FuseUtils.EventEmitter {
@@ -20,20 +19,21 @@ class JwtService extends FuseUtils.EventEmitter {
 				return new Promise((resolve, reject) => {
 					// if you ever get an unauthorized response, logout the user
 					// if (err.response && err.response.status && err.response.status === 401 && err.config && !err.config.__isRetryRequest) {
-					if (err.response && err.response.status && err.response.status === 401) {
-						let accessToken = this.getAccessToken()
-						let refreshToken = this.getRefreshToken()
-						if (accessToken && refreshToken) {
-							this.handleRefreshToken().catch(error => {
-								this.setSession(null)
-								reject()
-							})
-						} else {
-							this.setSession(null)
-							this.emit('onAutoLogout', 'Đăng nhập thất bại!')
-							resolve()
-						}
-					}
+						
+					// if (err.response && err.response.status && err.response.status === 401) {
+					// 	let accessToken = this.getAccessToken()
+					// 	let refreshToken = this.getRefreshToken()
+					// 	if (accessToken && refreshToken) {
+					// 		this.handleRefreshToken().catch(error => {
+					// 			this.setSession(null)
+					// 			reject()
+					// 		})
+					// 	} else {
+					// 		this.setSession(null)
+					// 		this.emit('onAutoLogout', 'Đăng nhập thất bại!')
+					// 		resolve()
+					// 	}
+					// }
 					this.emit("handleError", err);
 					reject(err)
 					// throw err
@@ -85,9 +85,7 @@ class JwtService extends FuseUtils.EventEmitter {
 								shortcuts: []
 							}, ...response.data, redirectUrl: "/home"
 						}
-						history.push({
-							pathname: "/home"
-						})
+						
 						resolve(data);
 					} else {
 						reject(response.data);

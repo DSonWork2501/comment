@@ -10,19 +10,8 @@ export default {
             /**
              * @description login
              */
-            login: (email, password, fastlg, otp) => axios.post(`${baseurl}/api/identity/login`, { email, password, fastlg, otp },
-                // { headers: { "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept", "Access-Control-Allow-Origin": "*" }, }
+            login: (email, password, fastlg, otp) => axios.post(`${baseurl}/identity/login`, { email, password, fastlg, otp },
             ),
-            // login: (email, password, fastlg, otp) => fetch(`${baseurl}/api/identity/login`,
-            //     {
-            //         method: 'POST',
-            //         headers: {
-            //             'Content-Type': 'application/json',
-            //             'Access-Control-Allow-Origin': '*'
-            //         },
-            //         mode: 'cors',
-            //         body: JSON.stringify({ email, password, fastlg, otp })
-            //     }),
             /**
              * 
              * @@description logout
@@ -33,5 +22,19 @@ export default {
              */
             refreshToken: (token, refreshToken) => axios.post(`${baseurl}/identity/refreshToken`, { token, refreshToken }),
         },
+        product: {
+            /**
+             * @description sản phẩm
+             * Search : từ khóa tìm kiếm
+                Cate : (không bắt buộc) lọc theo thể loại
+                Brand : (không bắt buộc) lọc theo nhãn hiệu
+                FromPrice : (không bắt buộc) lọc theo khoảng giá
+                ToPrice : (không bắt buộc) lọc theo khoảng giá
+                Certification : (không bắt buộc) lọc theo chứng chỉ
+                PageNumber : phân trang - vị trí
+                RowsPage : phân trang - số trang
+             */
+            getProduct: params => axios.get(`${baseurl}/product/get-product`, { params }),
+        }
     },
 }

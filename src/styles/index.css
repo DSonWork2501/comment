@@ -10,14 +10,14 @@ body.no-animate *::after {
 }
 
 html {
-    font-size: 62.5%;
+    font-size: 70%;
     /* font-family: Muli, Roboto, Helvetica Neue, Arial, sans-serif; */
     font-family: Roboto;
     background-color: #121212;
 }
 
 body {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.4;
 }
 

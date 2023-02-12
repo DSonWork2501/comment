@@ -1,5 +1,6 @@
 const locale = {
-	MANAGER_WINE: 'Quản lý rượu'
+	'PRODUCT': 'Sản Phẩm',
+	'PRODUCT_MANAGEMENT': 'Quản Lý Sản Phẩm'
 };
 
 export default locale;

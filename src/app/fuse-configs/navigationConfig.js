@@ -26,24 +26,23 @@ export const navigationCustom = [
 
 const navigationConfig = [
 	{
-		id: 'nvi-manager-wine',
-		title: 'Quản lý rượu vang',
-		translate: 'MANAGER_WINE',
+		id: 'nvi-product',
+		title: 'Sản Phẩm',
+		translate: 'PRODUCT',
 		type: 'group',
-		icon: 'library_books',
-		url: '/license-budget',
+		icon: 'shop',
+		
 		// auth: ["GetLicense", "ReportLicense"],
-		// children: [
-		// 	{
-		// 		id: 'nvi-manager-number-license-faf-budget',
-		// 		title: 'Quản lý Bản Quyền',
-		// 		translate: 'NUMBER_LICENSE_BUDGET',
-		// 		type: 'item',
-		// 		icon: 'account_balance',
-		// 		url: '/license-budget',
-		// 		auth: ["GetLicense"]
-		// 	},
-		// ],
+		children: [
+			{
+				id: 'nvi-manager-number-license-faf-budget',
+				title: 'Quản Lý Sản Phẩm',
+				translate: 'PRODUCT_MANAGEMENT',
+				type: 'item',
+				icon: 'shop',
+				url: '/product',
+			},
+		],
 		targetID: 'nvi-manager-number'
 	},
 ];

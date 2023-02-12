@@ -109,7 +109,7 @@ function FuseNavigation(props) {
 	const classes = useStyles(props);
 	const { navigation, layout, active, dense, className } = props;
 	const settings = useSelector(({ fuse }) => fuse.settings.current);
-
+	
 	const verticalNav = (
 		<>
 			<List
@@ -132,7 +132,7 @@ function FuseNavigation(props) {
 					history.push('/login')
 				}}
 			>
-				<ListItemIcon className="min-w-40">
+				<ListItemIcon className="min-w-44">
 					<Icon>exit_to_app</Icon>
 				</ListItemIcon>
 				<ListItemText primary="Đăng xuất" />
