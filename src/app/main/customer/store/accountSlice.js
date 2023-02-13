@@ -3,14 +3,14 @@ import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 
 
-const appName = "products";
-const moduleName = "category";
+const appName = "customers";
+const moduleName = "account";
 /**
- * @description lấy danh sách category
+ * @description lấy danh sách account
  */
 export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, async (params, thunkAPI) => {
     try {
-        const response = await connect.live.category.getList(params);
+        const response = await connect.live.account.getList(params);
         const data = await response.data;
         return data
     } catch (error) {

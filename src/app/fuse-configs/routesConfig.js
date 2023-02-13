@@ -6,13 +6,15 @@ import Error404PageConfig from 'app/main/errors/404/Error404PageConfig';
 import Error500PageConfig from 'app/main/errors/500/Error500PageConfig';
 import HomeConfig from 'app/main/home/config'
 import ProductConfig from 'app/main/product/config'
+import CustomerConfig from 'app/main/customer/config'
 
 const routeConfigs = [
 	LoginConfig,
 	Error404PageConfig,
 	Error500PageConfig,
 	HomeConfig,
-	ProductConfig
+	ProductConfig,
+	CustomerConfig
 ];
 
 const routes = [

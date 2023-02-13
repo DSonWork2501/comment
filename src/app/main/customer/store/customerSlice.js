@@ -3,14 +3,14 @@ import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 
 
-const appName = "products";
-const moduleName = "category";
+const appName = "customers";
+const moduleName = "customer";
 /**
- * @description lấy danh sách category
+ * @description lấy danh sách product
  */
 export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, async (params, thunkAPI) => {
     try {
-        const response = await connect.live.category.getList(params);
+        const response = await connect.live.customer.getList(params);
         const data = await response.data;
         return data
     } catch (error) {
@@ -19,16 +19,20 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
     }
 });
 
+
+
 const initSearchState = {
-    id: '',
-    name: '',
-    type: '',
-    status: '',
+    search: '',
+    cate: '',
+    branch: '',
+    fromPrice: '',
+    toPrice: '',
+    certification: '',
     pageNumber: 1,
     rowsPage: 10,
 }
 
-const categorySlice = createSlice({
+const productSlice = createSlice({
     name: `${appName}/${moduleName}`,
     initialState: {
         loading: false,
@@ -112,6 +116,6 @@ const categorySlice = createSlice({
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setIsEdit } = categorySlice.actions;
+export const { setSelected, setSearch, resetSearch, setIsEdit } = productSlice.actions;
 
-export default categorySlice.reducer;
+export default productSlice.reducer;

@@ -7,53 +7,38 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { keyStore } from "./common";
-import FilterOptionView from "./components/filterOptionView";
-import reducer from "./store";
-import { getList as getProduct, resetSearch, setSearch } from "./store/productSlice";
-import { getList as getCategory } from "./store/categorySlice";
+import { keyStore } from "../../common";
+import FilterOptionView from "./filterOptionView";
+import reducer from "../../store";
+import { getList as getCustomer, resetSearch, setSearch } from "../../store/customerSlice";
+import { get } from "lodash";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "catename", label: "Danh Mục", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "name", label: "Tên S/P", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "shortname", label: "Tên Ngắn", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "image", label: "Hình Ảnh", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "sku", label: "SKU", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "price", label: "Giá", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "email", label: "Email", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "name", label: "Tên Khách Hàng", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "phone", label: "Phone", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "gender", label: "Gender", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "status", label: "Trạng thái", alignHeader: "left", alignValue: "left", sortable: false }),
 ]
 
-function ProductView() {
+function CategoryView() {
     const dispatch = useDispatch()
-    const search = useSelector(store => store[keyStore].product.search)
-    const loading = useSelector(store => store[keyStore].product.loading)
-    const entities = useSelector(store => store[keyStore].product.entities)
+    const search = useSelector(store => store[keyStore].customer.search)
+    const loading = useSelector(store => store[keyStore].customer.loading)
+    const entities = useSelector(store => store[keyStore].customer.entities)
     const [filterOptions, setFilterOptions] = useState(null);
 
-    const JsonParseString = (str) => {
-        try {
-            return JSON.parse(str)
-        } catch (error) {
-            return null
-        }
-    }
-
     useEffect(() => {
-        dispatch(getProduct(search))
+        dispatch(getCustomer(search))
     }, [dispatch, search])
-
-    useEffect(() => {
-        dispatch(getCategory())
-    }, [dispatch])
 
     const data = useMemo(() => entities?.data?.map(item => ({
         id: item.id,
+        email: item.email,
         name: item.name,
-        catename: JsonParseString(item.catename) ? JsonParseString(item.catename).join(', ') : <div></div>,
-        shortname: item.shortname,
-        image: (<img src={item?.img} alt={item?.img} />),
-        sku: item.sku,
-        price: item.price,
+        phone: item.phone,
+        gender: item.gender,
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
                 <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" />
@@ -117,4 +102,4 @@ function ProductView() {
     )
 }
 
-export default withReducer(keyStore, reducer)(ProductView);
+export default withReducer(keyStore, reducer)(CategoryView);

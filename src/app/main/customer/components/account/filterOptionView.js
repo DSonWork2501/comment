@@ -1,10 +1,9 @@
-import { CmsButton, CmsButtonGroup, CmsFilter, CmsIconButton, CmsMenu, CmsSelect, CmsTextField } from "@widgets/components"
-import { FilterOptions } from "@widgets/metadatas"
+import { CmsButton, CmsFilter, CmsIconButton, CmsSelect, CmsTextField } from "@widgets/components"
 import React from "react"
 import { useMemo } from "react"
 import { useEffect } from "react"
 import { useSelector } from "react-redux"
-import { keyStore } from "../common"
+import { keyStore } from "../../common"
 
 function FilterOptionView(
     { filterOptions, search, setSearch, setFilterOptions, resetSearch }
@@ -57,7 +56,7 @@ function FilterOptionView(
                         </div>
                         <div className="w-1/4 space-y-8">
                             <CmsSelect label="Thể Loại" className="" data={[{ id: "", name: "Tất cả" }, ...cateData]} value={searchValue?.cate || ''} onChange={event => setSearchValue({ ...searchValue, cate: event.target.value })} />
-
+                            <CmsTextField value={searchValue?.certification || ''} onChange={event => setSearchValue({ ...searchValue, certification: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="" startText="Certification" isSearch={true} />
                         </div>
                         <div className="w-1/4 space-y-8">
 

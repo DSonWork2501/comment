@@ -125,7 +125,7 @@ class JwtService extends FuseUtils.EventEmitter {
 					this.setSession(token);
 					this.setUser(value.user);
 
-					const data = { data: { displayName: value.user, email: '' }, user: value.user, success: true, token: value.token, redirectUrl: "/" }
+					const data = { data: { displayName: value.user, email: '', shortcuts: [] }, user: value.user, success: true, token: value.token, redirectUrl: "/" }
 					resolve(data);
 
 				} else {

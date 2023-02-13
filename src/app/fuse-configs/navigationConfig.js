@@ -35,15 +35,66 @@ const navigationConfig = [
 		// auth: ["GetLicense", "ReportLicense"],
 		children: [
 			{
-				id: 'nvi-manager-number-license-faf-budget',
+				id: 'nvi-manager-product',
 				title: 'Quản Lý Sản Phẩm',
 				translate: 'PRODUCT_MANAGEMENT',
 				type: 'item',
 				icon: 'shop',
 				url: '/product',
 			},
+			{
+				id: 'nvi-manager-category',
+				title: 'Quản Lý Danh Mục',
+				translate: 'PRODUCT_CATEGORY_MANAGEMENT',
+				type: 'item',
+				icon: 'category',
+				url: '/product-category',
+			},
 		],
-		targetID: 'nvi-manager-number'
+	},
+	{
+		id: 'nvi-customer',
+		title: 'Khách Hàng',
+		translate: 'CUSTOMER',
+		type: 'group',
+		icon: 'person',
+		// auth: ["GetLicense", "ReportLicense"],
+		children: [
+			{
+				id: 'nvi-manager-customer',
+				title: 'Thông Tin Khách hàng',
+				translate: 'CUSTOMER_INFO',
+				type: 'item',
+				icon: 'person',
+				url: '/customer',
+			},
+			{
+				id: 'nvi-manager-account',
+				title: 'Thông tin tài khoản',
+				translate: 'ACCOUNT',
+				type: 'item',
+				icon: 'account_circle',
+				url: '/account',
+			},
+		],
+	},
+	{
+		id: 'nvi-order',
+		title: 'Đơn Hàng',
+		translate: 'ORDER',
+		type: 'group',
+		icon: 'reorder',
+		// auth: ["GetLicense", "ReportLicense"],
+		children: [
+			{
+				id: 'nvi-manager-order',
+				title: 'Quản Lý Đơn Hàng',
+				translate: 'ORDER_MANAGEMENT',
+				type: 'item',
+				icon: 'reorder',
+				url: '/order',
+			},
+		],
 	},
 ];
 
