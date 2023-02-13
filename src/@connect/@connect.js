@@ -50,6 +50,9 @@ export default {
         },
         customer: {
             getList: params => axios.get(`${baseurl}/customer/get-customer`, { params }),
+        },
+        order: {
+            getList: params => axios.get(`${baseurl}/order/get-order`, { params }),
         }
     },
 }

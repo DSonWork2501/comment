@@ -7,6 +7,7 @@ import Error500PageConfig from 'app/main/errors/500/Error500PageConfig';
 import HomeConfig from 'app/main/home/config'
 import ProductConfig from 'app/main/product/config'
 import CustomerConfig from 'app/main/customer/config'
+import OrderConfig from 'app/main/order/config'
 
 const routeConfigs = [
 	LoginConfig,
@@ -14,7 +15,8 @@ const routeConfigs = [
 	Error500PageConfig,
 	HomeConfig,
 	ProductConfig,
-	CustomerConfig
+	CustomerConfig,
+	OrderConfig
 ];
 
 const routes = [
