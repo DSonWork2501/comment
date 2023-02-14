@@ -22,12 +22,8 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
 
 
 const initSearchState = {
-    search: '',
-    cate: '',
-    branch: '',
-    fromPrice: '',
-    toPrice: '',
-    certification: '',
+    email: '',
+    status: '',
     pageNumber: 1,
     rowsPage: 10,
 }

@@ -59,7 +59,8 @@ function FilterOptionView(
                             <CmsTextField value={searchValue?.certification || ''} onChange={event => setSearchValue({ ...searchValue, certification: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="" startText="Certification" isSearch={true} />
                         </div>
                         <div className="w-1/4 space-y-8">
-
+                            <CmsTextField label="Từ Giá" isNumberFormat={true} value={searchValue?.fromPrice} onKeyPress={onSearchBasicKeyPress} onChange={event => setSearchValue({ ...searchValue, fromPrice: event.target.value })} />
+                            <CmsTextField label="Đến Giá" isNumberFormat={true} value={searchValue?.toPrice} onKeyPress={onSearchBasicKeyPress} onChange={event => setSearchValue({ ...searchValue, toPrice: event.target.value })} />
                         </div>
                     </div>
                     <CmsButton label="Tìm" startIcon="search" onClick={onSearchAdvandClick} />

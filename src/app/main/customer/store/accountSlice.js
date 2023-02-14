@@ -20,10 +20,7 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
 });
 
 const initSearchState = {
-    id: '',
-    name: '',
-    type: '',
-    status: '',
+    email: '',
     pageNumber: 1,
     rowsPage: 10,
 }
