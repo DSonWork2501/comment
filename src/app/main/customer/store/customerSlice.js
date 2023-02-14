@@ -6,7 +6,7 @@ import { showMessage } from 'app/store/fuse/messageSlice'
 const appName = "customers";
 const moduleName = "customer";
 /**
- * @description lấy danh sách product
+ * @description lấy danh sách customer
  */
 export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, async (params, thunkAPI) => {
     try {
