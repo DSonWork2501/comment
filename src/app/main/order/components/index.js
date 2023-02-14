@@ -86,7 +86,7 @@ function OrderView() {
             toolbar={
                 <div className="w-full flex items-center justify-between px-12">
                     <div className="flex items-center justify-items-start">
-                        <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType)} />
+                        <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType).filter(x=>x.id === FilterOptions.FilterType.basic.id)} />
                     </div>
                     <div className="flex items-center justify-end">
                         <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" />

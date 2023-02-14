@@ -1,14 +1,10 @@
-import { CmsButton, CmsFilter, CmsIconButton, CmsSelect, CmsTextField } from "@widgets/components"
+import { CmsButton, CmsFilter, CmsSelect, CmsTextField } from "@widgets/components"
 import React from "react"
-import { useMemo } from "react"
 import { useEffect } from "react"
-import { useSelector } from "react-redux"
-import { keyStore } from "../common"
 
 function FilterOptionView(
     { filterOptions, search, setSearch, setFilterOptions, resetSearch }
 ) {
-    const cateEntities = useSelector(store => store[keyStore].category.entities)
     const [searchValue, setSearchValue] = React.useState(null)
 
     useEffect(() => {
@@ -21,9 +17,9 @@ function FilterOptionView(
         }
     }
 
-    const onSearchBasicClick = () => {
-        setSearch({ ...searchValue, search: searchValue?.search, page: 1, limit: 10 })
-    }
+    // const onSearchBasicClick = () => {
+    //     setSearch({ ...searchValue, search: searchValue?.search, page: 1, limit: 10 })
+    // }
 
     const onSearchAdvandClick = () => {
 
@@ -36,27 +32,18 @@ function FilterOptionView(
         setSearchValue({ ...search, page: 1, limit: 10 })
     }
 
-    const cateData = useMemo(() => cateEntities?.data.map(x => ({ id: x.name, name: x.name })), [cateEntities])
-
     return (
         <CmsFilter
             ftype={filterOptions}
             fbasic={(
-                <div className="flex w-full md:w-1/4 sm:w-1/2">
-                    <CmsTextField value={searchValue?.search || ''} onChange={event => setSearchValue({ ...searchValue, search: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="sản phẩm..." startText="Tên" endNode={<CmsIconButton icon="search" onClick={onSearchBasicClick} />} isSearch={true} />
-
-                </div>
-            )}
-            fadvance={
                 <div className="w-full space-y-8">
                     <div className="w-full flex space-x-8">
                         <div className="w-1/4 space-y-8">
-                            <CmsTextField value={searchValue?.search || ''} onChange={event => setSearchValue({ ...searchValue, search: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="sản phẩm..." startText="Tên" isSearch={true} />
-                            <CmsTextField value={searchValue?.shortname || ''} onChange={event => setSearchValue({ ...searchValue, shortname: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="" startText="Short Name" isSearch={true} />
+                            <CmsTextField value={searchValue?.cusId || ''} onChange={event => setSearchValue({ ...searchValue, cusId: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="..." startText="cusId" isSearch={true} />
+                            <CmsTextField value={searchValue?.orderId || ''} onChange={event => setSearchValue({ ...searchValue, orderId: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="..." startText="orderId" isSearch={true} />
                         </div>
                         <div className="w-1/4 space-y-8">
-                            <CmsSelect label="Thể Loại" className="" data={[{ id: "", name: "Tất cả" }, ...cateData]} value={searchValue?.cate || ''} onChange={event => setSearchValue({ ...searchValue, cate: event.target.value })} />
-                            <CmsTextField value={searchValue?.certification || ''} onChange={event => setSearchValue({ ...searchValue, certification: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="" startText="Certification" isSearch={true} />
+                            <CmsSelect label="" data={[{ id: '', name: 'Tất Cả' }, { id: '1', name: 'Bình Thường' }, { id: '0', name: 'Đã Khóa' }]} />
                         </div>
                         <div className="w-1/4 space-y-8">
 
@@ -65,7 +52,7 @@ function FilterOptionView(
                     <CmsButton label="Tìm" startIcon="search" onClick={onSearchAdvandClick} />
                     <CmsButton label="Hủy" className="ml-4" color="default" startIcon="cached" onClick={onResetAdvandClick} />
                 </div>
-            }
+            )}
         />
     )
 }
