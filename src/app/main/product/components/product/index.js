@@ -1,4 +1,4 @@
-import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
+import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsLabel, CmsTableBasic } from "@widgets/components";
 import { initColumn } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
@@ -12,6 +12,7 @@ import FilterOptionView from "./filterOptionView";
 import reducer from "../../store";
 import { getList as getProduct, resetSearch, setSearch } from "../../store/productSlice";
 import { getList as getCategory } from "../../store/categorySlice";
+import History from "@history";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -56,7 +57,12 @@ function ProductView() {
         price: item.price,
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
-                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" />
+                <CmsIconButton
+                    tooltip={<CmsLabel content={"Cập nhật"} className="text-10" />}
+                    icon="edit"
+                    className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
+                    onClick={() => History.push(`/product/${item.id}`)}
+                />
             </div>
         ) || []
     })), [entities])
@@ -104,7 +110,7 @@ function ProductView() {
                         <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType)} />
                     </div>
                     <div className="flex items-center justify-end">
-                        <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" />
+                        <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" onClick={() => History.push(`/product/0`)}/>
                         {/* <CmsMenu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} data={[
                             { id: 1, name: "Xuất Excel", icon: "upgrade", tooltip: "Chỉ hỗ trợ export 5000 chương trình", onClick: () => dispatch(exportExcel({ ...search, Limit: 5000 })) },
                             { id: 2, name: "Tải Lại", icon: "cached", onClick: () => dispatch(getEditors({ Page: 1, Limit: 10 })) },

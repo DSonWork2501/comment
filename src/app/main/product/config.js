@@ -17,7 +17,7 @@ const ProductConfig = {
 			component: React.lazy(() => import('./components/category'))
 		},
 		{
-			path: '/product:id',
+			path: '/product/:id',
 			exact: true,
 			component: React.lazy(() => import('./components/product/editDetail'))
 		},
