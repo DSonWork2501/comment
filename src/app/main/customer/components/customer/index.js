@@ -11,7 +11,6 @@ import { keyStore } from "../../common";
 import FilterOptionView from "./filterOptionView";
 import reducer from "../../store";
 import { getList as getCustomer, resetSearch, setSearch } from "../../store/customerSlice";
-import { get } from "lodash";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),

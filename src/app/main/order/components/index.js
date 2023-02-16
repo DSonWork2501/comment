@@ -11,7 +11,6 @@ import { keyStore } from "../common";
 import FilterOptionView from "./filterOptionView";
 import reducer from "../store";
 import { getList as getOrder, resetSearch, setSearch } from "../store/orderSlice";
-import { get } from "lodash";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -49,8 +48,6 @@ function OrderView() {
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
     };
-
-    // console.log('filterOptions', filterOptions)
 
     return (
         <CmsCardedPage
