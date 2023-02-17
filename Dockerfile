@@ -11,7 +11,8 @@ WORKDIR /usr/src/app
 COPY run_client/package*.json ./
 
 RUN yarn && \
-    yarn cache clean
+        yarn build &&\
+        yarn cache clean
 # If you are building your code for production
 # RUN npm ci --only=production
 # Bundle app source
