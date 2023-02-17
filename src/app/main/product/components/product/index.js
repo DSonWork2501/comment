@@ -15,12 +15,11 @@ import { getList as getCategory } from "../../store/categorySlice";
 import History from "@history";
 
 const columns = [
-    new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
+    new initColumn({ field: "sku", label: "SKU", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "catename", label: "Danh Mục", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "name", label: "Tên S/P", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "shortname", label: "Tên Ngắn", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "image", label: "Hình Ảnh", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "sku", label: "SKU", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "price", label: "Giá", alignHeader: "left", alignValue: "left", sortable: false }),
 ]
 
@@ -61,7 +60,7 @@ function ProductView() {
                     tooltip={<CmsLabel content={"Cập nhật"} className="text-10" />}
                     icon="edit"
                     className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
-                    onClick={() => History.push(`/product/${item.id}`)}
+                    onClick={() => History.push(`/product/${item.sku}`)}
                 />
             </div>
         ) || []
