@@ -1,80 +1,24 @@
-image: docker:20.10.16
+variables:
+  DOCKER_VERSION:
+    value: 20.10.16
+  # explicit tag to be used within pipeline
+  BUILD_IMAGE_NAME: 
+    value: "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA"
+    description: "current pipeline image"
 
-services:
-  - docker:20.10.16-dind
+  IMAGE_PREVIOUS: 
+    value: "${CI_REGISTRY}/api/cms-api-logs:$CI_COMMIT_BRANCH"
+    description: "previous pipeline image"
+  DOCKERFILE_PATH:
+    value: "./Dockerfile"
+  # we also publish a floating tag to simplify manual testing
+  BUILD_IMAGE_NAME_LATEST: 
+    value: "cms-ibp-$CI_COMMIT_BRANCH"
 
-# before_script:
-#   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-
-update-cache:
-  stage: cache
-  image: node:16.18.1-alpine
-  script:
-    - yarn && yarn cache clean
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules
-      # - dist
-    policy: pull-push
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "web"
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-    - if: $CI_PIPELINE_SOURCE =~ "^(push)$" && $CI_COMMIT_BRANCH == "demo"
-      changes:
-        - package.json
-        - run_client/package.json
-    - if: $CI_PIPELINE_SOURCE =~ "^(web|push)$" && $CI_COMMIT_BRANCH =~ "^(staging|master)$" #$CI_PROJECT_ID == "194" && $CI_PIPELINE_SOURCE =~ "^(web|push)$" && $CI_COMMIT_BRANCH =~ "^(staging|master)$"
-      changes:
-        - package.json
-        - run_client/package.json
-
-.prepare-build:
-  stage: prepare-build
-  image: node:16.18.1-alpine
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules/
-    policy: pull
-  script:
-    # - sed -i "s/REACT_APP_API_BASE_URL.*/$BASE_URL/g" src/@connect/@connect.js
-    - yarn build
-  artifacts:
-    paths:
-      - dist
-
-prepare-build-dev:
-  extends: .prepare-build
-#   before_script:
-#     - cat "$ENV_DEV_CONFIG" > "$(pwd)/.env"
-#     - cat .env
-  rules:
-    - if: $CI_PIPELINE_SOURCE =~ "^(schedule|merge_request_event)$"
-      when: never
-    - if: $CI_PIPELINE_SOURCE =~ "^(web|push)$" && $CI_COMMIT_BRANCH == "demo" # $CI_PROJECT_ID == "194" && $CI_PIPELINE_SOURCE =~ "^(web|push)$" && $CI_COMMIT_BRANCH == "dev"
-    #   when: manual
-      allow_failure: false
-
-prepare-build-stag:
-  extends: .prepare-build
-  rules:
-    - if: $CI_PIPELINE_SOURCE =~ "^(schedule|merge_request_event)$"
-      when: never
-    - if: $CI_PIPELINE_SOURCE =~ "^(web|push)$" && $CI_COMMIT_BRANCH == "staging" # $CI_PROJECT_ID == "194" && $CI_PIPELINE_SOURCE =~ "^(web|push)$" && $CI_COMMIT_BRANCH == "staging"
-      when: manual    
-      allow_failure: false
-
-prepare-build-prod:
-  extends: .prepare-build
-  rules:
-    - if: $CI_PIPELINE_SOURCE =~ "^(schedule|merge_request_event)$"
-      when: never
-    - if: $CI_PIPELINE_SOURCE =~ "^(web|push)$" && $CI_COMMIT_BRANCH == "master" # $CI_PROJECT_ID == "194" && $CI_PIPELINE_SOURCE =~ "^(web|push)$" && $CI_COMMIT_BRANCH == "master"
-      when: manual
-      allow_failure: false
-
+  # NAMESPACE:
+  #   value: "..."
+  # SERVICE:
+  #   value: "cms-ibp"
 
 stages:
   - cache
@@ -82,16 +26,11 @@ stages:
   # - build
   # - deploy
 
-# build-dev:
-#   stage: build
-#   script:
-#     - docker build -t test .
-#   only:
-#     - master
-
-# deploy-prod:
-#   stage: deploy
-#   script:
-#     - docker stack deploy -c docker-compose.yml --with-registry-auth my-stack
-#   only:
-#     - master
+include:
+  - project: "devops903408/gitlab/gitlab-ci-template"
+    ref: main
+    file:
+      - "/ci/nodejs/update-cache-yarn.gitlab-ci.yml"
+      - "/ci/nodejs/prepare-build.gitlab-ci.yml"
+      # - "/ci/docker/build-image.gitlab-ci.yml"
+      # - "/cd/docker/docker-swarm.gitlab-ci.yml"
