@@ -15,7 +15,7 @@ RUN yarn && \
 
 COPY ./src ./
 COPY tailwind.config.js ./
-
+RUN yarn build
 # If you are building your code for production
 # RUN npm ci --only=production
 # Bundle app source
