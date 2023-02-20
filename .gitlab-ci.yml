@@ -59,8 +59,6 @@ prepare-build-dev:
 
 prepare-build-stag:
   extends: .prepare-build
-  before_script:
-    - cat "$ENV_STAGING_CONFIG" > "$(pwd)/.env"
   rules:
     - if: $CI_PIPELINE_SOURCE =~ "^(schedule|merge_request_event)$"
       when: never
@@ -70,8 +68,6 @@ prepare-build-stag:
 
 prepare-build-prod:
   extends: .prepare-build
-  before_script:
-    - cat "$ENV_PROD_CONFIG" > "$(pwd)/.env"
   rules:
     - if: $CI_PIPELINE_SOURCE =~ "^(schedule|merge_request_event)$"
       when: never
