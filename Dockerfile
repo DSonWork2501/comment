@@ -11,8 +11,11 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN yarn && \
-    yarn build && \
     yarn cache clean
+
+COPY ./src ./
+COPY tailwind.config.js ./
+
 # If you are building your code for production
 # RUN npm ci --only=production
 # Bundle app source
