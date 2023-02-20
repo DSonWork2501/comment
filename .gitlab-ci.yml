@@ -44,7 +44,6 @@ update-cache:
   artifacts:
     paths:
       - dist
-  tags: [cache]
 
 prepare-build-dev:
   extends: .prepare-build
