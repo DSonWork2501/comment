@@ -17,6 +17,7 @@
         "axios": "0.21.0",
         "axios-mock-adapter": "1.19.0",
         "base-64": "^1.0.0",
+        "caniuse-lite": "^1.0.30001457",
         "chart.js": "2.9.4",
         "clsx": "^1.1.1",
         "cross-fetch": "3.0.6",

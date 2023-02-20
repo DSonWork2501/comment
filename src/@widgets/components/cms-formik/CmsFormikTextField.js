@@ -24,8 +24,11 @@ function CmsFormikTextField(props) {
             {...otherProps}
             name={name}
             value={props?.isNumber ? (value ? JSON.stringify(parseInt(value)) : 0) : (value || "")}
-            //onChange={(event) => { setValue(event.target.value); onChange && onChange(event); clearBlur && formik.setFieldValue(name, event.target.value) }}
-            onChange={(event) => { setValue((trimLeft && event.target.value) ? event.target.value.trimLeft() : event.target.value); onChange && onChange(event, name); clearBlur && formik.setFieldValue(name, (trimLeft && event.target.value) ? event.target.value.trimLeft() : event.target.value) }}
+            onChange={(event) => {
+                setValue((trimLeft && event.target.value) ? event.target.value.trimLeft() : event.target.value);
+                onChange && onChange(event, name);
+                clearBlur && formik.setFieldValue(name, (trimLeft && event.target.value) ? event.target.value.trimLeft() : event.target.value)
+            }}
             onBlur={onBlur || handleSetFomrik}
             error={get(formik.touched, name) && Boolean(get(formik.errors, name))}
             helperText={get(formik.touched, name) && get(formik.errors, name)}
