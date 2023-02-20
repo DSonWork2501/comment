@@ -1,0 +1,22 @@
+image: tiangolo/docker-with-compose
+
+# before_script:
+#   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+
+stages:
+  - build
+  # - deploy
+
+build-dev:
+  stage: build
+  script:
+    - docker build -t test .
+  only:
+    - master
+
+# deploy-prod:
+#   stage: deploy
+#   script:
+#     - docker stack deploy -c docker-compose.yml --with-registry-auth my-stack
+#   only:
+#     - master
