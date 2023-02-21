@@ -3,12 +3,14 @@ variables:
     value: 20.10.16
   # explicit tag to be used within pipeline
   BUILD_IMAGE_NAME: 
-    value: "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA"
+    value: "$CI_REGISTRY_IMAGE/$CI_PROJECT_PATH_SLUG/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA"
     description: "current pipeline image"
 
   IMAGE_PREVIOUS: 
-    value: "${CI_REGISTRY}/api/cms-api-logs:$CI_COMMIT_BRANCH"
+    value: "${CI_REGISTRY}/$CI_PROJECT_PATH_SLUG/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA"
     description: "previous pipeline image"
+  DOCKERFILE_DIR:
+    value: "./"
   DOCKERFILE_PATH:
     value: "./Dockerfile"
   DOCKER_COMPOSEFILE_PATH:

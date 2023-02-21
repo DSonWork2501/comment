@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: DOCKER_IMAGE
+    image: <DOCKER_IMAGE>
     ports:
       - 3000:80
     deploy:
@@ -24,7 +24,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: DOCKER_IMAGE
+    image: <DOCKER_IMAGE>
     ports:
       - 5001:80
     deploy:
