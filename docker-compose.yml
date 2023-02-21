@@ -2,10 +2,10 @@ version: '3.7'
 
 services:
   cms_ibp:
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
-    image: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cms-ibp:master
     ports:
       - 3000:80
     deploy:
