@@ -13,13 +13,16 @@ COPY package*.json ./
 RUN yarn && \
     yarn cache clean
 
-COPY ./src ./
-COPY tailwind.config.js ./
+COPY . ./
+# COPY ./src ./
+# COPY tailwind.config.js ./
 RUN yarn build
 # If you are building your code for production
 # RUN npm ci --only=production
 # Bundle app source
-COPY . /app
 
-EXPOSE 3000
-CMD [ "yarn", "start" ]
+# EXPOSE 3000
+# CMD [ "yarn", "start" ]
+
+FROM nginx:1.23.3-alpine
+COPY --from=build /app/public /usr/share/nginx/html
