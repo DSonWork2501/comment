@@ -11,27 +11,29 @@ variables:
     description: "previous pipeline image"
   DOCKERFILE_PATH:
     value: "./Dockerfile"
+  DOCKER_COMPOSEFILE_PATH:
+    value: "./docker-compose.yml"
   # we also publish a floating tag to simplify manual testing
   BUILD_IMAGE_NAME_LATEST: 
-    value: "cms-ibp"
+    value: "${CI_REGISTRY_USER_STAG}/cms-ibp" #image build for dockerhub
     description: "latest pipeline image"
 
   # NAMESPACE:
   #   value: "..."
-  # SERVICE:
-  #   value: "cms-ibp"
+  SERVICE:
+    value: "ibp_cms"
 
 stages:
   - cache
-  # - prepare-build
+  - prepare-build
   - build
-  # - deploy
+  - deploy
 
 include:
   - project: "devops903408/gitlab/gitlab-ci-template"
     ref: main
     file:
       - "/ci/nodejs/update-cache-yarn.gitlab-ci.yml"
-      # - "/ci/nodejs/prepare-build.gitlab-ci.yml"
+      - "/ci/nodejs/prepare-build.gitlab-ci.yml"
       - "/ci/docker/build-image.gitlab-ci.yml"
-      # - "/cd/docker/docker-swarm.gitlab-ci.yml"
+      - "/cd/docker/docker-swarm.gitlab-ci.yml"

@@ -1,15 +1,34 @@
 version: '3.7'
 
 services:
-  cms_ibp:
+  cms:
     build:
       context: .
       dockerfile: Dockerfile
-    image: cms-ibp:master
+    image: DOCKER_IMAGE
     ports:
       - 3000:80
     deploy:
-      placement:
+      # placement:
+        # constraints:
+        #   # - "node.hostname==CacheNode-3-215"
+        #   - "node.labels.redisCluster == true"
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: DOCKER_IMAGE
+    ports:
+      - 5001:80
+    deploy:
+      # placement:
         # constraints:
         #   # - "node.hostname==CacheNode-3-215"
         #   - "node.labels.redisCluster == true"
