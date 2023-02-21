@@ -71,7 +71,7 @@ function CmsRadioGroup(props) {
     return (
         <div className={clsx(classes.formGroup, className, error && "border-red")} style={otherProps?.style || {}}>
             {label && <Typography className={classes.formGroupTitle} color={error ? "error" : "primary"}>{required ? `${label} *` : label}</Typography>}
-            <FormControl component="fieldset" className={classes.formControl}>
+            <FormControl component="fieldset" className={clsx(classes.formControl, otherProps?.fieldsetclass)}>
                 <RadioGroup className="my-1"
                     {...otherProps}
                     onChange={handleChange}

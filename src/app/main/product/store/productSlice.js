@@ -18,6 +18,19 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
         return error
     }
 });
+/**
+ * @description lấy danh sách product
+ */
+export const getDetail = createAsyncThunk(`${appName}/${moduleName}/getDetail`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getDetail(params);
+        const data = await response.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return error
+    }
+});
 
 
 
@@ -109,6 +122,27 @@ const productSlice = createSlice({
             }
         },
         [getList.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        /**
+         * @description getDetail
+         */
+        [getDetail.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [getDetail.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                entity: payload,
+                error: null
+            }
+        },
+        [getDetail.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

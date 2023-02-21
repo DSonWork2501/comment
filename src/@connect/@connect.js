@@ -35,6 +35,7 @@ export default {
                 RowsPage : phân trang - số trang
              */
             getList: params => axios.get(`${baseurl}/product/get-product`, { params }),
+            getDetail: params => axios.get(`${baseurl}/product/get-product-detail`, { params }),
             insert: entity => axios.post(`${baseurl}/product/insert-product`, entity),
             update: entity => axios.put(`${baseurl}/product/update-product`, entity),
             delete: entity => axios.delete(`${baseurl}/product/delete-product`, entity),

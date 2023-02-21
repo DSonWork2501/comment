@@ -1,4 +1,4 @@
-import { CmsBoxLine, CmsButton, CmsButtonProgress, CmsCardedPage, CmsTab } from "@widgets/components"
+import { CmsAlert, CmsBoxLine, CmsButton, CmsButtonProgress, CmsCardedPage, CmsLoadingOverlay, CmsTab } from "@widgets/components"
 import { keyStore } from "app/main/product/common"
 import reducer from "app/main/product/store"
 import withReducer from "app/store/withReducer"
@@ -9,10 +9,11 @@ import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router"
 import { Link } from "react-router-dom"
 import BasicInfo from "./BasicInfo"
-import { getList as getProduct } from "../../../store/productSlice";
+import { getDetail } from "../../../store/productSlice";
 import { initData } from '../../../model/product/model'
 import { useFormik } from "formik"
 import ClassifyInfo from "./ClassifyInfo"
+import { colors } from "@material-ui/core"
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
@@ -23,12 +24,13 @@ function EditProduct(props) {
     const params = useParams()
     const dispatch = useDispatch()
     const entity = useSelector(store => store[keyStore].product.entity)
+    const loading = useSelector(store => store[keyStore].product.loading)
     const [data, setData] = useState(null)
     const [tabValue, setTabValue] = useState(TabType.co_ban.id)
 
     useEffect(() => {
         if (params?.id) {
-            dispatch(getProduct({ search: params?.id }))
+            dispatch(getDetail({ sku: params?.id }))
         }
     }, [params, dispatch])
 
@@ -38,6 +40,20 @@ function EditProduct(props) {
 
     const handleSaveData = ({ BasicInfo }) => {
         console.log('BasicInfo', BasicInfo)
+    }
+    const handleResetData = () => {
+        CmsAlert.fire({
+			icon: 'question',
+			heightAuto: false,
+			title: `Bạn có muốn reset lại data ?`,
+			showCancelButton: true,
+			showConfirmButton: true,
+			confirmButtonText: "Đồng Ý",
+			confirmButtonColor: colors.green[500]
+		}).then(result => {
+			formik.setValues(initData(data))
+		})
+        
     }
 
     function handleChangeTab(event, value) {
@@ -65,6 +81,7 @@ function EditProduct(props) {
                 }
                 content={
                     <div className="w-full h-full px-16 pb-40 pt-20 px-40 space-y-10">
+                        <CmsLoadingOverlay loading={loading}/>
                         {tabValue === TabType.co_ban.id &&
                             <CmsBoxLine label="Thông tin cơ bản">
                                 <BasicInfo formik={formik} />
@@ -82,8 +99,9 @@ function EditProduct(props) {
                                 <CmsTab data={Object.values(TabType)} value={tabValue} onChange={handleChangeTab} />
                             </div>
                         </div>
-                        <div className="flex items-center justify-end">
-                            <CmsButtonProgress label="Lưu" onClick={handleSaveData} />
+                        <div className="flex items-center justify-end space-x-8">
+                            <CmsButtonProgress label="Lưu" onClick={handleSaveData} loading={loading}/>
+                            <CmsButtonProgress color="default" label="Reset" onClick={handleResetData} />
                         </div>
                     </div>
                 }

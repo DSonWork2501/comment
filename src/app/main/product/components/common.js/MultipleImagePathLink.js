@@ -5,6 +5,7 @@ import { initColumn } from "@widgets/functions";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useFormik } from "formik";
+export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const columns = [
     new initColumn({ field: "stt", label: "STT", alignHeader: "left", alignValue: "left", sortable: false }),
@@ -39,7 +40,7 @@ function MutipleImagePathLink({ images, setImage }) {
     const data = [...formik.values?.map((x, index) => ({
         stt: index + 1,
         link: <CmsFormikTextField size="small" key={`path_key_${index}`} label="Image" formik={formik} name={`[${index}].link`} />,
-        image: <img key={`image_key_${index}`} alt={`image_alt_${index}`} src={formik.values[index].link || noImage} className="max-h-32 max-w-32" />,
+        image: <img key={`image_key_${index}`} alt={`image_alt_${index}`} src={`${baseurl}${formik.values[index].link}` || noImage} className="max-h-32 max-w-32" />,
         thaotac: <CmsIconButton tooltip={"Xóa"} icon="close" onClick={() => handleDelete(index)} className="text-red" />
     }))] || []
 
