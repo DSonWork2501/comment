@@ -1,7 +1,7 @@
 import { CmsButton, CmsTableBasic } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { initColumn } from "@widgets/functions"
-import { initDetailModel } from "app/main/product/model/product/model"
+// import { initDetailModel } from "app/main/product/model/product/model"
 import { useFormik } from "formik"
 import React from "react"
 import { useState } from "react"
@@ -31,7 +31,7 @@ const EditShelfContent = () => {
 
 function ShelfContent({ data_shelf, index }) {
 
-    const [shelfIndex, setShelfIndex] = useState('')
+    const [shelfIndex] = useState('')
 
     const formik_shelf = useFormik({
         initialValues: data_shelf || [],
