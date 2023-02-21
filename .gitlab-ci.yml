@@ -23,7 +23,7 @@ variables:
 
 stages:
   - cache
-  - prepare-build
+  # - prepare-build
   - build
   # - deploy
 
@@ -32,6 +32,6 @@ include:
     ref: main
     file:
       - "/ci/nodejs/update-cache-yarn.gitlab-ci.yml"
-      - "/ci/nodejs/prepare-build.gitlab-ci.yml"
+      # - "/ci/nodejs/prepare-build.gitlab-ci.yml"
       - "/ci/docker/build-image.gitlab-ci.yml"
       # - "/cd/docker/docker-swarm.gitlab-ci.yml"
