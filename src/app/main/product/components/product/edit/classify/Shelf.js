@@ -1,6 +1,7 @@
-import { CmsButton, CmsTableBasic } from "@widgets/components"
+import { CmsBoxLine, CmsButton, CmsIconButton, CmsLabel, CmsTableBasic } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { initColumn } from "@widgets/functions"
+import { CheckStringIsJson } from "@widgets/functions/Common"
 // import { initDetailModel } from "app/main/product/model/product/model"
 import { useFormik } from "formik"
 import React from "react"
@@ -34,32 +35,33 @@ function ShelfContent({ data_shelf, index }) {
     const [shelfIndex] = useState('')
 
     const formik_shelf = useFormik({
-        initialValues: data_shelf || [],
+        initialValues: CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [],
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
     })
-    const data = formik_shelf?.values.map((x, index) => (
+    const data = formik_shelf.values?.map((x, index) => (
         {
             stt: index + 1,
             info: shelfIndex !== index ? <InfoShelfContent formik={formik_shelf} /> : <EditShelfContent formik={formik_shelf} />
         }
-    ))
+    )) || []
 
     const HandleAddItem = () => {
 
     }
 
     return (
-        <div className="w-full space-y-8">
-            <CmsTableBasic
-                data={data}
-                columns={columns}
-                isPagination={false}
-            />
-            <div className="w-full text-center m-0">
-                <CmsButton label="Thêm mới" className="bg-yellow-700 hover:bg-yellow-900" onClick={() => HandleAddItem()} />
-            </div>
+        <CmsBoxLine label={'Model'} >
+            <div className="flex flex-row p-6 justify-between space-x-4 bg-blue-500 text-white rounded-12">
+                <div className="flex items-center justify-items-start space-x-8">
+                    <CmsLabel content={'Ngăn trên'} />
+                    <CmsLabel content={'(stack)'} />
+                </div>
+                <div className="flex items-center justify-end space-x-8">
+                    {/* <CmsIconButton size="small" icon="edit" tooltip={'Cập nhật'} className={'bg-green-500 hover:bg-green-700 text-white'} /> */}
+                </div>
         </div>
+        </CmsBoxLine>
     )
 
 }

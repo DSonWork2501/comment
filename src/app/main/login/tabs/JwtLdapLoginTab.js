@@ -18,17 +18,17 @@ function JwtLdapLoginTab(props) {
 	const formRef = useRef(null);
 
 	useEffect(() => {
-		if (login.error && (login.error.email || login.error.password)) {
+		if (login.error && (login.error.email)) {
 			formRef.current.updateInputsWithError({
 				...login.error
 			});
-			disableButton();
+			// disableButton();
 		}
 	}, [login.error]);
 
-	function disableButton() {
-		setIsFormValid(false);
-	}
+	// function disableButton() {
+	// 	setIsFormValid(false);
+	// }
 
 	function enableButton() {
 		setIsFormValid(true);
@@ -43,7 +43,7 @@ function JwtLdapLoginTab(props) {
 			<Formsy
 				onValidSubmit={handleSubmit}
 				onValid={enableButton}
-				onInvalid={disableButton}
+				// onInvalid={disableButton}
 				ref={formRef}
 				className="flex flex-col justify-center w-full mb-136"
 			>
@@ -90,7 +90,7 @@ function JwtLdapLoginTab(props) {
 						)
 					}}
 					variant="outlined"
-					required
+					// required
 				/>
 
 				<TextFieldFormsy

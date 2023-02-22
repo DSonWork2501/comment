@@ -1,7 +1,7 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup"
 import { CmsFormikRadioGroup, CmsFormikTextField } from "@widgets/components"
 import React from "react"
-import MutipleImagePathLink from "../../common.js/MultipleImagePathLink"
+import MutipleImagePathLink from "../../common/MultipleImagePathLink"
 import noImage from '@widgets/images/noImage.jpg';
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 

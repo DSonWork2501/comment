@@ -36,7 +36,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
                 <CmsFormikRadioGroup fieldsetclass="m-0" className="border-0 m-0 p-0" vertical={false} key={`${index}_status`} size="small" name={`status`} formik={formik_item} label="" data={Object.values(ProductStatus)} />
             </div>
             <div className="col-span-4 items-start">
-                <ShelfContent data_shelf={formik_item?.values?.Model} index={index}/>
+                <ShelfContent data_shelf={formik_item?.values?.Model} index={index} />
             </div>
             <div className="flex flex-row space-x-12 items-start">
                 <CmsButton size="small" label={"Lưu"} startIcon="save" className="text-white bg-blue-500 hover:bg-green-700" onClick={() => handleSaveData(formik_item.values, index)} />
@@ -50,18 +50,19 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
 const InfoContent = ({ index, formik }) => {
     const { lotid, colorid, sizeid, volume, weight, height, model, maketime, expiretime, status } = formik.values.detail[index]
     return (
-        <div className="grid grid-cols-3 gap-10" >
-            <LabelInfo label={{ content: 'Lot ID' }} info={{ content: lotid }} />
-            <LabelInfo label={{ content: 'Color ID' }} info={{ content: colorid }} />
-            <LabelInfo label={{ content: 'Size ID' }} info={{ content: sizeid }} />
-            <LabelInfo label={{ content: 'Volume' }} info={{ content: volume }} />
-            <LabelInfo label={{ content: 'Weight' }} info={{ content: weight }} />
-            <LabelInfo label={{ content: 'Height' }} info={{ content: height }} />
-            <LabelInfo label={{ content: 'Model' }} info={{ content: model }} />
-            <LabelInfo label={{ content: 'Maketime' }} info={{ content: maketime }} />
-            <LabelInfo label={{ content: 'Expiretime' }} info={{ content: expiretime }} />
-            <LabelInfo label={{ content: 'Trạng Thái' }} info={{ content: ProductStatus[status]?.name, className: ProductStatus[status]?.className }} />
-            
+        <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-10" >
+                <LabelInfo label={{ content: 'Lot ID' }} info={{ content: lotid }} />
+                <LabelInfo label={{ content: 'Color ID' }} info={{ content: colorid }} />
+                <LabelInfo label={{ content: 'Size ID' }} info={{ content: sizeid }} />
+                <LabelInfo label={{ content: 'Volume' }} info={{ content: volume }} />
+                <LabelInfo label={{ content: 'Weight' }} info={{ content: weight }} />
+                <LabelInfo label={{ content: 'Height' }} info={{ content: height }} />
+                <LabelInfo label={{ content: 'Maketime' }} info={{ content: maketime }} />
+                <LabelInfo label={{ content: 'Expiretime' }} info={{ content: expiretime }} />
+                <LabelInfo label={{ content: 'Trạng Thái' }} info={{ content: ProductStatus[status]?.name, className: ProductStatus[status]?.className }} />
+            </div>
+                <ShelfContent data_shelf={model} index={index} />
         </div>
     )
 
