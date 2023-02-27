@@ -1,5 +1,5 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup"
-import { CmsButton, CmsFormikDateTimePicker, CmsFormikRadioGroup, CmsFormikTextField, CmsIconButton, CmsTableBasic } from "@widgets/components"
+import { CmsButton, CmsFormikDateTimePicker, CmsFormikRadioGroup, CmsFormikTextField, CmsTableBasic } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { initColumn } from "@widgets/functions"
 import { ProductStatus } from "@widgets/metadatas/common/productStatus"
@@ -35,9 +35,6 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
             <div className="col-span-2 items-start">
                 <CmsFormikRadioGroup fieldsetclass="m-0" className="border-0 m-0 p-0" vertical={false} key={`${index}_status`} size="small" name={`status`} formik={formik_item} label="" data={Object.values(ProductStatus)} />
             </div>
-            <div className="col-span-4 items-start">
-                <ShelfContent data_shelf={formik_item?.values?.Model} index={index} />
-            </div>
             <div className="flex flex-row space-x-12 items-start">
                 <CmsButton size="small" label={"Lưu"} startIcon="save" className="text-white bg-blue-500 hover:bg-green-700" onClick={() => handleSaveData(formik_item.values, index)} />
                 <CmsButton size="small" label={"Hủy"} startIcon="cancel" className="text-white bg-grey-500 hover:bg-grey-700" onClick={() => handleCancelSetIndex()} />
@@ -48,7 +45,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
 }
 
 const InfoContent = ({ index, formik }) => {
-    const { lotid, colorid, sizeid, volume, weight, height, model, maketime, expiretime, status } = formik.values.detail[index]
+    const { lotid, colorid, sizeid, volume, weight, height, maketime, expiretime, status } = formik.values.detail[index]
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-3 gap-10" >
@@ -62,7 +59,6 @@ const InfoContent = ({ index, formik }) => {
                 <LabelInfo label={{ content: 'Expiretime' }} info={{ content: expiretime }} />
                 <LabelInfo label={{ content: 'Trạng Thái' }} info={{ content: ProductStatus[status]?.name, className: ProductStatus[status]?.className }} />
             </div>
-                <ShelfContent data_shelf={model} index={index} />
         </div>
     )
 
@@ -71,6 +67,7 @@ const InfoContent = ({ index, formik }) => {
 function ClassifyInfo({ formik }) {
     const { detail } = formik.values
     const [editIndex, setEditIndex] = useState('')
+    const [modalIndex, setModalIndex] = useState('')
 
     const HandleAddItem = () => {
         formik.setFieldValue(`detail[${formik.values.detail.length}]`, initDetail())
@@ -90,17 +87,19 @@ function ClassifyInfo({ formik }) {
     }
 
     console.log('detail', formik.values.detail)
-    // console.log('editIndex', editIndex)
+    console.log('editIndex', editIndex)
+    const model = formik?.values?.detail[modalIndex]?.model
     const data = detail?.map((x, index) => ({
         stt: index + 1,
         info: editIndex === index ? <EditRowContent index={index} formik={formik} handleSaveData={HandleSaveItem} handleCancelSetIndex={() => setEditIndex('')} /> : <InfoContent index={index} formik={formik} />,
         thaotac:
             <div className="flex flex-row space-x-8">
                 {editIndex !== index &&
-                    <CmsIconButton size="small" tooltip={"Chỉnh sửa"} icon="edit" className="text-white bg-green-500 hover:bg-green-700" onClick={() => setEditIndex(index)} />
+                    <CmsButton size="small" label={"Sửa"} className="text-white bg-green-500 hover:bg-green-700" onClick={() => { setEditIndex(index) }} />
                 }
+                {<CmsButton size="small" label={"Model"} className="text-white bg-blue-500 hover:bg-blue-700" onClick={() => { setModalIndex(index) }} />}
                 {editIndex !== index &&
-                    <CmsIconButton size="small" tooltip={"Xóa"} icon="close" className="text-white bg-red-500 hover:bg-red-700" onClick={() => HandleDelete(index)} />
+                    <CmsButton size="small" label={"Xóa"} className="text-white bg-red-500 hover:bg-red-700" onClick={() => HandleDelete(index)} />
                 }
             </div>
     }))
@@ -116,6 +115,13 @@ function ClassifyInfo({ formik }) {
                     <CmsButton label="Thêm mới" className="bg-yellow-700 hover:bg-yellow-900" onClick={() => HandleAddItem()} />
                 </div>
             </div>
+            {!isNaN(parseInt(modalIndex)) &&
+                <ShelfContent
+                    open={!isNaN(parseInt(modalIndex))}
+                    handleClose={() => setModalIndex('')}
+                    data_shelf={model}
+                    index={editIndex}
+                />}
         </FuseAnimateGroup>
     )
 }
