@@ -5,7 +5,7 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
     return data?.map((item, index) =>
     (
         <div key={`${index}_div_0`} className="pl-6 w-full flex flex-row justify-between space-x-4 bg-green-300 hover:bg-green-500 text-white rounded-12">
-            <div key={`${index}_div_1`} onClick={() => HandleClickDetail(item, index)} className="flex items-center justify-items-start space-x-8">
+            <div key={`${index}_div_1`} onClick={() => HandleClickDetail(stack_index, index)} className="flex items-center justify-items-start space-x-8">
                 <CmsLabel content={item.name} key={`${index}_name`} />
                 <CmsLabel content={item.type ? `(${item.type})` : ''} key={`${index}_type`} />
             </div>
@@ -26,7 +26,7 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                 {data?.map((item, index) => (
                     <div className="w-full space-y-4" key={`${index}_div_1`}>
                         <div key={`${index}_div_2`} className="pl-6 flex flex-row justify-between space-x-4 bg-blue-300 hover:bg-blue-500 text-white rounded-12">
-                            <div key={`${index}_div_3`} onClick={() => HandleClickDetail(item, index)} className="flex items-center justify-items-start space-x-8">
+                            <div key={`${index}_div_3`} onClick={() => HandleClickDetail(index)} className="flex items-center justify-items-start space-x-8">
                                 <CmsLabel content={item.name || 'Click vào đây, chỉnh sửa bên thông tin chi tiết'} key={`${index}_stack_name`} />
                                 <CmsLabel content={item.type ? `(${item.type})` : ''} key={`${index}_type_name`} />
                             </div>

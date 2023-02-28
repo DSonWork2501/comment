@@ -10,7 +10,7 @@ import { get } from "lodash"
 
 function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
 
-    const [item, setItem] = useState()
+    const [prefix, setPrefix] = useState('')
 
     const formik_shelf = useFormik({
         initialValues: CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [],
@@ -36,7 +36,9 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
         formik_shelf.setFieldValue(`[${stack_index}].slots`, array)
     }
 
-    const HandleClickDetail = () => {
+    const HandleClickDetail = (stack_index, slot_index) => {
+        var data = !isNaN(parseInt(slot_index)) ? `[${stack_index}].slots[${slot_index}]` : `[${stack_index}]`
+        setPrefix(data)
     }
 
     const HandleDeleteSlot = (stack_index, slot_index) => {
@@ -73,8 +75,8 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
                 </div>
                 <div className="w-2/3">
                     <RightSideContent
-                        item={item}
-                        setItem={setItem}
+                        formik={formik_shelf}
+                        prefix={prefix}
 
                     />
                 </div>

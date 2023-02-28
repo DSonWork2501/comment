@@ -1,19 +1,14 @@
 import { CmsBoxLine, CmsFormikTextField } from "@widgets/components"
-import { useFormik } from "formik"
 import React from "react"
 
-function RightSideContent({ data, type }) {
-    const formik = useFormik({
-        initialValues: data,
-        keepDirtyOnReinitialize: true,
-        enableReinitialize: true,
-    })
+function RightSideContent({ formik, prefix }) {
+    
     return (
         <CmsBoxLine label={'Thông tin chi tiết'}>
             <div className="w-full space-y-8">
-                <CmsFormikTextField size="small" name="name" label="Tên" formik={formik}/>
-                <CmsFormikTextField isNumberFormat={true} size="small" name="capacity" label="capacity" formik={formik}/>
-                <CmsFormikTextField isNumberFormat={true} size="small" name="heightlimit" label="height limit" formik={formik}/>
+                <CmsFormikTextField size="small" name={`${prefix}name`} label="Tên" formik={formik}/>
+                <CmsFormikTextField isNumberFormat={true} size="small" name={`${prefix}capacity`} label="capacity" formik={formik}/>
+                <CmsFormikTextField isNumberFormat={true} size="small" name={`${prefix}heightlimit`} label="height limit" formik={formik}/>
             </div>
         </CmsBoxLine>
     )
