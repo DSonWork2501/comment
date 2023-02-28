@@ -55,7 +55,7 @@ function ProductView() {
         sku: item.sku,
         price: item.price,
         action: (
-            <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
+            <div className="flex flex-row">
                 <CmsIconButton
                     tooltip={<CmsLabel content={"Cập nhật"} className="text-10" />}
                     icon="edit"

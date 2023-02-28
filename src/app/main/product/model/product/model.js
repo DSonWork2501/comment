@@ -57,45 +57,60 @@ export const initDetail = (data) => {
         return data
     }
     return {
-        "uniqueid": "string",
-        "sku": "string",
-        "lotid": "string",
+        "uniqueid": "",
+        "sku": "",
+        "lotid": "",
         "colorid": 0,
         "sizeid": 0,
         "volume": 0,
         "weight": 0,
         "height": 0,
-        "model": "string",
-        "maketime": "2023-02-19T09:21:10.605Z",
-        "expiretime": "2023-02-19T09:21:10.605Z",
+        "model": "",
+        "maketime": null,
+        "expiretime": null,
         "status": 0
     }
 }
 
 export const initDetailModel = (data) => {
     if (data) {
-        return data
+        return {
+            "parentid": data.parentid || null,
+            "name": data.name || "",
+            "type": data.type || "",
+            "active": data.active || 1,
+            "capacity": data.capacity || 0,
+            "heightlimit": data.heightlimit || 0,
+            "slots": data.slots ||[]
+        }
     }
     return {
         "parentid": null,
         "name": "",
         "type": "",
         "active": 1,
-        "capacity": 3,
-        "heightlimit": 25,
+        "capacity": 0,
+        "heightlimit": 0,
         "slots": []
     }
 }
 export const initDetailModelSlot = (data) => {
     if (data) {
-        return data
+        return {
+            "parentid": data.parentid || null,
+            "name": data.name || '',
+            "type": data.type || 'stack',
+            "active": data.active || 1,
+            "capacity": data.capacity || 0,
+            "heightlimit": data.heightlimit || 0
+        }
     }
     return {
-        "parentid": 1,
+        "parentid": null,
         "name": "",
         "type": "",
         "active": 1,
-        "capacity": 1,
-        "heightlimit": null
+        "capacity": 0,
+        "heightlimit": 0
     }
 }

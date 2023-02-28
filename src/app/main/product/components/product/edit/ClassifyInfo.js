@@ -87,7 +87,6 @@ function ClassifyInfo({ formik }) {
     }
 
     console.log('detail', formik.values.detail)
-    console.log('editIndex', editIndex)
     const model = formik?.values?.detail[modalIndex]?.model
     const data = detail?.map((x, index) => ({
         stt: index + 1,
