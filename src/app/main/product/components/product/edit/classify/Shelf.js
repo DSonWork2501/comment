@@ -8,9 +8,11 @@ import { useState } from "react"
 import { initDetailModel, initDetailModelSlot } from 'app/main/product/model/product/model'
 import { get } from "lodash"
 
-function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
 
+function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     const [prefix, setPrefix] = useState('')
+    const [stackIndex, setStackIndex] = useState('')
+    const [slotIndex, setSlotIndex] = useState('')
 
     const formik_shelf = useFormik({
         initialValues: CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [],
@@ -24,7 +26,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
         }
     )) || []
 
-    console.log('data_shelf', data_shelf)
+    // console.log('data_shelf', data_shelf)
 
     const HandleAddStack = () => {
         var array = [...get(formik_shelf, 'values'), initDetailModel()]
@@ -39,16 +41,22 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     const HandleClickDetail = (stack_index, slot_index) => {
         var data = !isNaN(parseInt(slot_index)) ? `[${stack_index}].slots[${slot_index}]` : `[${stack_index}]`
         setPrefix(data)
+        setStackIndex(stack_index)
+        setSlotIndex(slot_index)
     }
 
     const HandleDeleteSlot = (stack_index, slot_index) => {
-        var array = get(formik_shelf.values[stack_index], 'slots').filter((x, index)=> slot_index !== index)
+        var array = get(formik_shelf.values[stack_index], 'slots').filter((x, index) => slot_index !== index)
         formik_shelf.setFieldValue(`[${stack_index}].slots`, array)
     }
 
     const HandleDeleteStack = (stack_index) => {
-        var array = formik_shelf.values.filter((x, index)=> index !== stack_index)
+        var array = formik_shelf.values.filter((x, index) => index !== stack_index)
         formik_shelf.setValues(array)
+    }
+
+    const handleCloseModal = () => {
+        handleClose(formik_shelf.values)
     }
 
     return (
@@ -56,7 +64,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
             title={"Thông tin tủ hàng"}
             contentClass={'overflow-y-auto'}
             // disabledSave={imageLoading || snapshot_loading}
-            handleClose={handleClose}
+            handleClose={handleCloseModal}
             handleSave={handleSave}
             isCloseDialogSubmit={false}
             open={open}
@@ -71,6 +79,8 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
                         HandleClickDetail={HandleClickDetail}
                         HandleDeleteSlot={HandleDeleteSlot}
                         HandleDeleteStack={HandleDeleteStack}
+                        stackIndex={stackIndex}
+                        slotIndex={slotIndex}
                     />
                 </div>
                 <div className="w-2/3">

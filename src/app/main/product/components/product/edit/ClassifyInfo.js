@@ -86,6 +86,11 @@ function ClassifyInfo({ formik }) {
         setEditIndex('')
     }
 
+    const HandleCloseShelfModal = (value) => {
+        formik.setFieldValue(`detail[${parseInt(modalIndex)}].model`, JSON.stringify(value))
+        setModalIndex('')
+    }
+
     console.log('detail', formik.values.detail)
     const model = formik?.values?.detail[modalIndex]?.model
     const data = detail?.map((x, index) => ({
@@ -117,7 +122,7 @@ function ClassifyInfo({ formik }) {
             {!isNaN(parseInt(modalIndex)) &&
                 <ShelfContent
                     open={!isNaN(parseInt(modalIndex))}
-                    handleClose={() => setModalIndex('')}
+                    handleClose={HandleCloseShelfModal}
                     data_shelf={model}
                     index={editIndex}
                 />}
