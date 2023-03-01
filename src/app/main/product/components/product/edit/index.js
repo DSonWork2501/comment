@@ -9,11 +9,13 @@ import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router"
 import { Link } from "react-router-dom"
 import BasicInfo from "./BasicInfo"
-import { getDetail } from "../../../store/productSlice";
+import { getDetail, insertProduct, updateProduct } from "../../../store/productSlice";
 import { initData } from '../../../model/product/model'
 import { useFormik } from "formik"
 import ClassifyInfo from "./ClassifyInfo"
 import { colors } from "@material-ui/core"
+import { alertInformation } from "@widgets/functions"
+import { showMessage } from "app/store/fuse/messageSlice"
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
@@ -38,22 +40,30 @@ function EditProduct(props) {
         setData(entity?.data)
     }, [entity])
 
-    const handleSaveData = ({ BasicInfo }) => {
-        console.log('BasicInfo', BasicInfo)
+    const handleSaveData = (values) => {
+        alertInformation({
+            text: 'Bạn có muốn lưu thao tác',
+            data: values,
+            confirm: async (data) => {
+                var result = params?.id === 0 ? await dispatch(insertProduct(data)) : await dispatch(updateProduct(data))
+                if (result)
+                    dispatch(showMessage({ variant: "success", message: 'Thao tác thành công!' }))
+            },
+        })
     }
     const handleResetData = () => {
         CmsAlert.fire({
-			icon: 'question',
-			heightAuto: false,
-			title: `Bạn có muốn reset lại data ?`,
-			showCancelButton: true,
-			showConfirmButton: true,
-			confirmButtonText: "Đồng Ý",
-			confirmButtonColor: colors.green[500]
-		}).then(result => {
-			formik.setValues(initData(data))
-		})
-        
+            icon: 'question',
+            heightAuto: false,
+            title: `Bạn có muốn reset lại data ?`,
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonText: "Đồng Ý",
+            confirmButtonColor: colors.green[500]
+        }).then(result => {
+            formik.setValues(initData(data))
+        })
+
     }
 
     function handleChangeTab(event, value) {
@@ -81,14 +91,14 @@ function EditProduct(props) {
                 }
                 content={
                     <div className="w-full h-full px-16 pb-40 pt-20 px-40 space-y-10">
-                        <CmsLoadingOverlay loading={loading}/>
+                        <CmsLoadingOverlay loading={loading} />
                         {tabValue === TabType.co_ban.id &&
                             <CmsBoxLine label="Thông tin cơ bản">
                                 <BasicInfo formik={formik} />
                             </CmsBoxLine>}
                         {tabValue === TabType.phan_loai.id &&
                             <CmsBoxLine label="Thông tin phân loại">
-                                <ClassifyInfo formik={formik}  />
+                                <ClassifyInfo formik={formik} />
                             </CmsBoxLine>}
                     </div>
                 }
@@ -100,7 +110,7 @@ function EditProduct(props) {
                             </div>
                         </div>
                         <div className="flex items-center justify-end space-x-8">
-                            <CmsButtonProgress label="Lưu" onClick={handleSaveData} loading={loading}/>
+                            <CmsButtonProgress label="Lưu" onClick={formik.handleSubmit} loading={loading} />
                             <CmsButtonProgress color="default" label="Reset" onClick={handleResetData} />
                         </div>
                     </div>

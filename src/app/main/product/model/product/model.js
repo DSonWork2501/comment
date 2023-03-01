@@ -57,18 +57,23 @@ export const initDetail = (data) => {
         return data
     }
     return {
-        "uniqueid": "",
-        "sku": "",
-        "lotid": "",
-        "colorid": 0,
-        "sizeid": 0,
-        "volume": 0,
-        "weight": 0,
-        "height": 0,
+        "uniqueid": "17012023.1",
+        "lotid": null,
+        "colorid": 1,
+        "sizeid": 1,
+        "volume": 1,
+        "weight": 100000,
+        "height": 150,
         "model": "",
         "maketime": null,
         "expiretime": null,
-        "status": 0
+        "status": 0,
+        "code": "",
+        "color": "N/A",
+        "sizename": "N/A",
+        "price": 0,
+        "retailprice": 0,
+        "wholesaleprice": 0
     }
 }
 
@@ -77,17 +82,17 @@ export const initDetailModel = (data) => {
         return {
             "parentid": data.parentid || null,
             "name": data.name || "",
-            "type": data.type || "",
+            "type": data.type || "stack",
             "active": data.active || 1,
             "capacity": data.capacity || 0,
             "heightlimit": data.heightlimit || 0,
-            "slots": data.slots ||[]
+            "slots": data.slots || []
         }
     }
     return {
         "parentid": null,
         "name": "",
-        "type": "",
+        "type": "stack",
         "active": 1,
         "capacity": 0,
         "heightlimit": 0,
@@ -99,7 +104,7 @@ export const initDetailModelSlot = (data) => {
         return {
             "parentid": data.parentid || null,
             "name": data.name || '',
-            "type": data.type || 'stack',
+            "type": data.type || 'slot',
             "active": data.active || 1,
             "capacity": data.capacity || 0,
             "heightlimit": data.heightlimit || 0
@@ -108,7 +113,7 @@ export const initDetailModelSlot = (data) => {
     return {
         "parentid": null,
         "name": "",
-        "type": "",
+        "type": "slot",
         "active": 1,
         "capacity": 0,
         "heightlimit": 0

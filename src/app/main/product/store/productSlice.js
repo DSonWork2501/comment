@@ -32,6 +32,32 @@ export const getDetail = createAsyncThunk(`${appName}/${moduleName}/getDetail`, 
     }
 });
 
+/**
+ * @description thêm sản phẩm
+ */
+export const insertProduct = createAsyncThunk(`${appName}/${moduleName}/insertProduct`, async (entity, thunkAPI) => {
+    try {
+        const response = await connect.live.product.insert(entity);
+        const data = await response.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return error
+    }
+});
+/**
+ * @description cập nhật sản phẩm
+ */
+export const updateProduct = createAsyncThunk(`${appName}/${moduleName}/updateProduct`, async (entity, thunkAPI) => {
+    try {
+        const response = await connect.live.product.update(entity);
+        const data = await response.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return error
+    }
+});
 
 
 const initSearchState = {

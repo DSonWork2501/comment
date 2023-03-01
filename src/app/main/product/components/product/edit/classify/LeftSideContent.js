@@ -6,15 +6,15 @@ import clsx from "clsx"
 
 const useStyles = makeStyles(theme => ({
     chosen: {
-        border: '1px solid rgba(0, 0, 0, 0.12)'
+        border: '3px solid #DC143C',
     }
 }))
 
-const CheckIndex = (type, stack, slot, index) => {
-    if(type === 'stack'){
-        return !isNaN(parseInt(stack)) && isNaN(parseInt(slot)) && stack === index
-    }else{
-        return !isNaN(parseInt(stack)) && !isNaN(parseInt(slot)) && slot === index
+const CheckIndex = (type, stack, slot, stack_index, slot_index) => {
+    if (type === 'stack') {
+        return !isNaN(parseInt(stack)) && isNaN(parseInt(slot)) && stack === stack_index
+    } else {
+        return !isNaN(parseInt(stack)) && !isNaN(parseInt(slot)) && slot === slot_index && stack_index === stack
     }
 }
 
@@ -22,12 +22,12 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
     return data?.map((item, index) =>
     (
         <div className="w-full flex flex-row space-x-4" key={`${index}_div_slot_0`}>
-            <div 
-            key={`${index}_div_0`} 
-            onClick={() => HandleClickDetail(stack_index, index)} 
-            className={clsx(CheckIndex('stack', stackIndex, slotIndex, index) && classes.chosen, "pl-6 w-full flex flex-row justify-between space-x-4 bg-green-300 hover:bg-green-500 text-white rounded-12")}>
+            <div
+                key={`${index}_div_0`}
+                onClick={() => HandleClickDetail(stack_index, index)}
+                className={clsx("focus:shadow-outline cursor-pointer pl-6 w-full flex flex-row justify-between space-x-4 bg-green-300 hover:bg-green-500 text-white rounded-12", CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}>
                 <div key={`${index}_div_1_slot`} className="flex items-center justify-items-start space-x-8">
-                    <CmsLabel content={item.name} key={`${index}_name`} />
+                    <CmsLabel content={item.name || 'New slot'} key={`${index}_name`} />
                     <CmsLabel content={item.type ? `(${item.type})` : ''} key={`${index}_type`} />
                 </div>
                 <div key={`${index}_div_2`} className="flex items-center justify-items-center space-x-8">
@@ -54,10 +54,10 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                             <div
                                 key={`${index}_div_2`}
                                 onClick={() => HandleClickDetail(index)}
-                                className={clsx(CheckIndex('stack', stackIndex, slotIndex, index) && classes.chosen, "w-full pl-6 flex flex-row justify-between space-x-4 bg-blue-300 hover:bg-blue-500 text-white rounded-12")}
+                                className={clsx("focus:shadow-outline cursor-pointer w-full pl-6 flex flex-row justify-between space-x-4 bg-blue-300 hover:bg-blue-500 text-white rounded-12", CheckIndex('stack', stackIndex, slotIndex, index) && classes.chosen)}
                             >
                                 <div key={`${index}_div_3`} className="flex items-center justify-items-start space-x-8">
-                                    <CmsLabel content={item.name || 'Click vào đây, chỉnh sửa bên thông tin chi tiết'} key={`${index}_stack_name`} />
+                                    <CmsLabel content={item.name || 'New stack'} key={`${index}_stack_name`} />
                                     <CmsLabel content={item.type ? `(${item.type})` : ''} key={`${index}_type_name`} />
                                 </div>
                                 <div key={`${index}_div_4`} className="flex items-center justify-end space-x-8">
@@ -73,7 +73,7 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 stack_id={index}
                                 HandleClickDetail={HandleClickDetail}
                                 HandleDeleteSlot={HandleDeleteSlot}
-                                stackIndex={stackIndex} 
+                                stackIndex={stackIndex}
                                 slotIndex={slotIndex}
                                 classes={classes}
                             />

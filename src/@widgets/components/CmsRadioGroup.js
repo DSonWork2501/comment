@@ -78,7 +78,7 @@ function CmsRadioGroup(props) {
                 >
                     <Hidden mdDown>
                         {!vertical && (
-                            <div className="md:flex">
+                            <div>
                                 {data.map((item, index) => (
                                     <React.Fragment key={index}>
                                         <CmsRadio name={name} label={selectOption(item)} value={item.id} disabled={item.disabled} {...item.props} />
