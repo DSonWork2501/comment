@@ -19,8 +19,6 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
     }
 });
 
-
-
 const initSearchState = {
     cusId: null,
     orderId: '',

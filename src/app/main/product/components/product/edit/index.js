@@ -10,12 +10,11 @@ import { useParams } from "react-router"
 import { Link } from "react-router-dom"
 import BasicInfo from "./BasicInfo"
 import { getDetail, insertProduct, updateProduct } from "../../../store/productSlice";
-import { initData } from '../../../model/product/model'
+import { initData, initProduct } from '../../../model/product/model'
 import { useFormik } from "formik"
 import ClassifyInfo from "./ClassifyInfo"
 import { colors } from "@material-ui/core"
 import { alertInformation } from "@widgets/functions"
-import { showMessage } from "app/store/fuse/messageSlice"
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
@@ -45,9 +44,14 @@ function EditProduct(props) {
             text: 'Bạn có muốn lưu thao tác',
             data: values,
             confirm: async (data) => {
-                var result = params?.id === 0 ? await dispatch(insertProduct(data)) : await dispatch(updateProduct(data))
-                if (result)
-                    dispatch(showMessage({ variant: "success", message: 'Thao tác thành công!' }))
+                var model = {
+                    products: [
+                        initProduct(data)
+                    ],
+                    details: data.detail
+                    
+                }
+                params?.id === 0 ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))
             },
         })
     }
@@ -90,7 +94,7 @@ function EditProduct(props) {
                     </div>
                 }
                 content={
-                    <div className="w-full h-full px-16 pb-40 pt-20 px-40 space-y-10">
+                    <div className="w-full h-full px-16 pb-40 pt-20 space-y-10">
                         <CmsLoadingOverlay loading={loading} />
                         {tabValue === TabType.co_ban.id &&
                             <CmsBoxLine label="Thông tin cơ bản">

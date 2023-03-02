@@ -35,6 +35,10 @@ export default {
                 RowsPage : phân trang - số trang
              */
             getList: params => axios.get(`${baseurl}/product/get-product`, { params }),
+            // bảng màu
+            getColor: params => axios.get(`${baseurl}/product/get-color`, { params }),
+            // kích thước
+            getSize: params => axios.get(`${baseurl}/product/get-size`, { params }),
             getDetail: params => axios.get(`${baseurl}/product/get-product-detail`, { params }),
             insert: entity => axios.post(`${baseurl}/product/insert-product`, entity),
             update: entity => axios.put(`${baseurl}/product/update-product`, entity),

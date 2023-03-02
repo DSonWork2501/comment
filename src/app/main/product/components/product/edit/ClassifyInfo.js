@@ -1,12 +1,15 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup"
-import { CmsButton, CmsFormikDateTimePicker, CmsFormikRadioGroup, CmsFormikTextField, CmsTableBasic } from "@widgets/components"
+import { CmsButton, CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikRadioGroup, CmsFormikTextField, CmsTableBasic } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { ConvertDateTime, initColumn } from "@widgets/functions"
 import { ProductStatus } from "@widgets/metadatas/common/productStatus"
+import { keyStore } from "app/main/product/common"
 import { initDetail } from "app/main/product/model/product/model"
 import { useFormik } from "formik"
+import { get } from "lodash"
 import React from "react"
 import { useState } from "react"
+import { useSelector } from "react-redux"
 import ShelfContent from "./classify/Shelf"
 
 const columns = [
@@ -16,6 +19,8 @@ const columns = [
 ]
 
 const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex }) => {
+    const colorRes = useSelector(store => store[keyStore].product.color)
+    const sizeRes = useSelector(store => store[keyStore].product.size)
     const formik_item = useFormik({
         initialValues: formik.values.detail[index] || initDetail(),
         keepDirtyOnReinitialize: true,
@@ -26,8 +31,34 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
         <div className="grid grid-cols-4 gap-10 w-11/12">
             <CmsFormikTextField key={`${index}_uniqueid`} size="small" name={`uniqueid`} formik={formik_item} label="uniqueid" />
             <CmsFormikTextField key={`${index}_lotid`} size="small" name={`lotid`} formik={formik_item} label="lotid" />
-            <CmsFormikTextField key={`${index}_colorid`} size="small" name={`colorid`} formik={formik_item} label="Color" />
-            <CmsFormikTextField key={`${index}_sizeid`} size="small" name={`sizeid`} formik={formik_item} label="Size" />
+            <CmsFormikAutocomplete
+                valueIsId
+                data={colorRes}
+                key={`${index}_colorid`}
+                size="small"
+                name={`colorid`}
+                formik={formik_item}
+                label="Color"
+                autocompleteProps={{
+                    limitTags: 20,
+                    getOptionLabel: (option) => option?.color || '',
+                    renderOption: (option, { selected }) => option?.color
+                }}
+            />
+            <CmsFormikAutocomplete
+                valueIsId
+                data={sizeRes}
+                key={`${index}_sizeid`}
+                size="small"
+                name={`sizeid`}
+                formik={formik_item}
+                label="Size"
+                autocompleteProps={{
+                    limitTags: 20,
+                    getOptionLabel: (option) => option?.sizename || '',
+                    renderOption: (option, { selected }) => option?.sizename
+                }}
+            />
             <CmsFormikTextField key={`${index}_volume`} size="small" name={`volume`} formik={formik_item} label="Volume" />
             <CmsFormikTextField key={`${index}_weight`} size="small" name={`weight`} formik={formik_item} label="Weight" />
             <CmsFormikTextField key={`${index}_height`} size="small" name={`height`} formik={formik_item} label="Height" />
@@ -35,9 +66,9 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
             <CmsFormikDateTimePicker key={`${index}_expiretime`} size="small" name={`expiretime`} formik={formik_item} label="Expiretime" />
             <CmsFormikTextField key={`${index}_code`} size="small" name={`Code`} formik={formik_item} label="Code" />
             <CmsFormikTextField key={`${index}_sizename`} size="small" name={`sizename`} formik={formik_item} label="sizename" />
-            <CmsFormikTextField key={`${index}_price`} size="small" name={`price`} formik={formik_item} label="price" />
-            <CmsFormikTextField key={`${index}_retailprice`} size="small" name={`retailprice`} formik={formik_item} label="retailprice" />
-            <CmsFormikTextField key={`${index}_wholesaleprice`} size="small" name={`wholesaleprice`} formik={formik_item} label="wholesaleprice" />
+            <CmsFormikTextField isNumberFormat key={`${index}_price`} size="small" name={`price`} formik={formik_item} label="price" />
+            <CmsFormikTextField isNumberFormat key={`${index}_retailprice`} size="small" name={`retailprice`} formik={formik_item} label="retailprice" />
+            <CmsFormikTextField isNumberFormat key={`${index}_wholesaleprice`} size="small" name={`wholesaleprice`} formik={formik_item} label="wholesaleprice" />
             <div className="col-span-2 items-start">
                 <CmsFormikRadioGroup fieldsetclass="m-0" className="border-0 m-0 p-0" vertical={false} key={`${index}_status`} size="small" name={`status`} formik={formik_item} label="" data={Object.values(ProductStatus)} />
             </div>
@@ -51,6 +82,8 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
 }
 
 const InfoContent = ({ index, formik }) => {
+    const colorRes = useSelector(store => store[keyStore].product.color)
+    const sizeRes = useSelector(store => store[keyStore].product.size)
     const { lotid, colorid, sizeid, volume, weight, height, maketime, expiretime, status, uniqueid, code, sizename,
         price, retailprice, wholesaleprice } = formik.values.detail[index]
     return (
@@ -58,8 +91,8 @@ const InfoContent = ({ index, formik }) => {
             <div className="grid grid-cols-3 gap-10" >
                 <LabelInfo label={{ content: 'Unique ID' }} info={{ content: uniqueid }} />
                 <LabelInfo label={{ content: 'Lot ID' }} info={{ content: lotid }} />
-                <LabelInfo label={{ content: 'Color ID' }} info={{ content: colorid }} />
-                <LabelInfo label={{ content: 'Size ID' }} info={{ content: sizeid }} />
+                <LabelInfo label={{ content: 'Color ID' }} info={{ content: get(colorRes?.find(x => x.id === colorid), 'color') || '' }} />
+                <LabelInfo label={{ content: 'Size ID' }} info={{ content: get(sizeRes?.find(x => x.id === sizeid), 'sizename') || '' }} />
                 <LabelInfo label={{ content: 'Volume' }} info={{ content: volume }} />
                 <LabelInfo label={{ content: 'Weight' }} info={{ content: weight }} />
                 <LabelInfo label={{ content: 'Height' }} info={{ content: height }} />
@@ -69,7 +102,7 @@ const InfoContent = ({ index, formik }) => {
                 <LabelInfo label={{ content: 'SizeName' }} info={{ content: sizename }} />
                 <LabelInfo label={{ content: 'Price' }} info={{ content: !isNaN(parseInt(price)) ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
                 <LabelInfo label={{ content: 'RetailPrice' }} info={{ content: !isNaN(parseInt(retailprice)) ? retailprice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
-                <LabelInfo label={{ content: 'WholeSalePrice' }} info={{ content: !isNaN(parseInt(wholesaleprice)) ? wholesaleprice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","): 0 }} />
+                <LabelInfo label={{ content: 'WholeSalePrice' }} info={{ content: !isNaN(parseInt(wholesaleprice)) ? wholesaleprice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
                 <LabelInfo label={{ content: 'Trạng Thái' }} info={{ content: ProductStatus[status]?.name, className: ProductStatus[status]?.className }} />
             </div>
         </div>

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
+import { getErrorMessage } from '@widgets/functions';
 
 
 const appName = "products";
@@ -14,7 +15,7 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
         const data = await response.data;
         return data
     } catch (error) {
-        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
         return error
     }
 });
@@ -25,9 +26,11 @@ export const getDetail = createAsyncThunk(`${appName}/${moduleName}/getDetail`, 
     try {
         const response = await connect.live.product.getDetail(params);
         const data = await response.data;
+        thunkAPI.dispatch(getColor())
+        thunkAPI.dispatch(getSize())
         return data
     } catch (error) {
-        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
         return error
     }
 });
@@ -39,9 +42,10 @@ export const insertProduct = createAsyncThunk(`${appName}/${moduleName}/insertPr
     try {
         const response = await connect.live.product.insert(entity);
         const data = await response.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
         return data
     } catch (error) {
-        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
         return error
     }
 });
@@ -52,13 +56,40 @@ export const updateProduct = createAsyncThunk(`${appName}/${moduleName}/updatePr
     try {
         const response = await connect.live.product.update(entity);
         const data = await response.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
         return data
     } catch (error) {
-        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
         return error
     }
 });
 
+/**
+ * @description lấy bảng màu
+ */
+export const getColor = createAsyncThunk(`${appName}/${moduleName}/getColor`, async (entity, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getColor(entity);
+        const data = await response.data.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
+/**
+ * @description lấy bảng màu
+ */
+export const getSize = createAsyncThunk(`${appName}/${moduleName}/getSize`, async (entity, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getSize(entity);
+        const data = await response.data.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
 
 const initSearchState = {
     search: '',
@@ -81,6 +112,8 @@ const productSlice = createSlice({
         selected: null,
         response: null,
         search: initSearchState,
+        color: null,
+        size: null,
     },
     reducers: {
         /**
@@ -169,6 +202,48 @@ const productSlice = createSlice({
             }
         },
         [getDetail.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        /**
+         * @description getColor
+         */
+        [getColor.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [getColor.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                color: payload,
+                error: null
+            }
+        },
+        [getColor.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        /**
+         * @description getSize
+         */
+        [getSize.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [getSize.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                size: payload,
+                error: null
+            }
+        },
+        [getSize.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

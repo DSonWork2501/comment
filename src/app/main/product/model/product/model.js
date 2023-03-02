@@ -22,12 +22,34 @@ export const initData = (data) => {
         "isfastsale": 0,
         "isfreeship": 0,
         "status": 0,
-        "detail": []
+        "detail": [],
+        "ishs": 0
     }
 }
 export const initProduct = (data) => {
     if (data) {
-        return data
+        return {
+            "sku": data.sku,
+            "barcode": data.barcode,
+            "name": data.name,
+            "shortname": data.shortname,
+            "brand": data.brand,
+            "description": data.description,
+            "unit": data.unit,
+            "classify": data.classify,
+            "certification": data.certification,
+            "suggest": data.suggest,
+            "note": data.note,
+            "image": data.image,
+            "images": JSON.stringify(data.images),
+            "isnew": data.isnew,
+            "ishot": data.ishot,
+            "ishome": data.ishome,
+            "isfastsale": data.isfastsale,
+            "isfreeship": data.isfreeship,
+            "status": data.status,
+            "ishs": data.ishs
+        }
     }
     return {
         "sku": "",
@@ -48,7 +70,8 @@ export const initProduct = (data) => {
         "ishome": 0,
         "isfastsale": 0,
         "isfreeship": 0,
-        "status": 0
+        "status": 0,
+        "ishs": 0
     }
 }
 
@@ -57,13 +80,13 @@ export const initDetail = (data) => {
         return data
     }
     return {
-        "uniqueid": "17012023.1",
+        "uniqueid": null,
         "lotid": null,
         "colorid": 1,
         "sizeid": 1,
         "volume": 1,
-        "weight": 100000,
-        "height": 150,
+        "weight": 0,
+        "height": 0,
         "model": "",
         "maketime": null,
         "expiretime": null,
