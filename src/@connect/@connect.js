@@ -48,7 +48,7 @@ export default {
             getList: params => axios.get(`${baseurl}/product/get-category`, { params }),
             insert: entity => axios.post(`${baseurl}/product/insert-category`, entity),
             update: entity => axios.put(`${baseurl}/product/update-category`, entity),
-            delete: entity => axios.delete(`${baseurl}/product/delete-category`, entity),
+            changeStatus: entity => axios.put(`${baseurl}/product/delete-category`, entity),
         },
         account: {
             getList: params => axios.get(`${baseurl}/customer/get-account`, { params }),

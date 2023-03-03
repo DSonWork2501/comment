@@ -1,5 +1,5 @@
-import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
-import { initColumn } from "@widgets/functions";
+import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTableBasic, CmsLabel } from "@widgets/components";
+import { alertInformation, initColumn } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
 import React from "react";
@@ -10,9 +10,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import FilterOptionView from "./filterOptionView";
 import reducer from "../../store";
-import { getList as getCategory, resetSearch, setSearch } from "../../store/categorySlice";
-import { type as CateType } from "../../model/category/Type";
+import { changeStatus, editCate, getById, getList as getCategory, resetSearch, setSearch } from "../../store/categorySlice";
+import { status, type as CateType } from "../../model/category/Type";
 import { get } from "lodash";
+import { useCallback } from "react";
+import EditCateContent from "./edit";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -27,24 +29,66 @@ function CategoryView() {
     const loading = useSelector(store => store[keyStore].category.loading)
     const entities = useSelector(store => store[keyStore].category.entities)
     const [filterOptions, setFilterOptions] = useState(null);
+    const [open, setOpen] = useState(null);
+    const [editId, setEditId] = useState(0);
 
     useEffect(() => {
         dispatch(getCategory(search))
     }, [dispatch, search])
 
+    const HandleGetInfoCate = useCallback((id) => {
+        dispatch(getById(id))
+        setOpen('edit')
+        setEditId(id)
+    }, [dispatch])
+
+    const HandleChangeStatus = useCallback((status, item) => {
+        alertInformation({
+            text: `Bạn có muốn ${status === 1 ? 'BẬT' : 'TẮT'} trạng thái thể loại ?`,
+            data: [
+                {
+                    ...item, status: status
+                }
+            ],
+            confirm: (data) => {
+                dispatch(changeStatus(data))
+            }
+        })
+    }, [dispatch]);
+
     const data = useMemo(() => entities?.data?.map(item => ({
         id: item.id,
         name: item.name,
-        type: item.type ? get(CateType.find(x => x.id === item.type), 'name') || '' : '',
+        type: !isNaN(parseInt(item.type)) ? get(CateType.find(x => x.id === item.type), 'name') || '' : '',
+        status: <CmsLabel component={'span'} content={status[item.status].name} className={status[item.status].className} />,
         action: (
-            <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
-                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" />
+            <div className="flex flex-row space-x-8">
+                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => HandleGetInfoCate(item.id)} />
+                {
+                    item.status === 1 ?
+                        <CmsIconButton tooltip={'Tắt thể loại'} icon="close" className="bg-red-500 hover:bg-red-700 hover:shadow-2 text-white" onClick={() => HandleChangeStatus(0, item)} />
+                        :
+                        <CmsIconButton tooltip={'Hiện thể loại'} icon="check_circle" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => HandleChangeStatus(1, item)} />
+                }
             </div>
         ) || []
-    })), [entities])
+    })), [entities, HandleGetInfoCate, HandleChangeStatus])
 
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
+    };
+
+    const HandleSaveData = (value) => {
+        dispatch(editCate(value))
+    };
+
+    const HandleAddNew = () => {
+        setEditId(0)
+        setOpen('edit')
+    };
+
+    const HandleRefresh = () => {
+        dispatch(getCategory(search))
     };
 
     // console.log('filterOptions', filterOptions)
@@ -61,32 +105,41 @@ function CategoryView() {
                 </div>
             }
             content={
-                <CmsTableBasic
-                    className="w-full h-full"
-                    isServerSide={true}
-                    data={data}
-                    search={search}
-                    columns={columns}
-                    loading={loading}
-                    filterOptions={
-                        <FilterOptionView
-                            filterOptions={filterOptions}
-                            search={search}
-                            setFilterOptions={setFilterOptions}
-                            resetSearch={() => dispatch(resetSearch())}
-                            setSearch={(value) => dispatch(setSearch(value))}
-                        />
-                    }
-                    openFilterOptions={Boolean(filterOptions)}
-                />
+                <div className="w-full h-full">
+                    <CmsTableBasic
+                        className="w-full h-full"
+                        isServerSide={true}
+                        data={data}
+                        search={search}
+                        columns={columns}
+                        loading={loading}
+                        filterOptions={
+                            <FilterOptionView
+                                filterOptions={filterOptions}
+                                search={search}
+                                setFilterOptions={setFilterOptions}
+                                resetSearch={() => dispatch(resetSearch())}
+                                setSearch={(value) => dispatch(setSearch(value))}
+                            />
+                        }
+                        openFilterOptions={Boolean(filterOptions)}
+                    />
+                    <EditCateContent
+                        id={editId}
+                        open={open === 'edit'}
+                        handleClose={() => setOpen('')}
+                        handleSave={HandleSaveData}
+                    />
+                </div>
             }
             toolbar={
                 <div className="w-full flex items-center justify-between px-12">
                     <div className="flex items-center justify-items-start">
                         <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType)} />
                     </div>
-                    <div className="flex items-center justify-end">
-                        <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" />
+                    <div className="flex items-center justify-end space-x-8">
+                        <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" onClick={() => HandleAddNew()} />
+                        <CmsButton className="bg-grey-500 text-white hover:bg-grey-700" label="Làm mới" startIcon="refresh" onClick={() => HandleRefresh()} />
                         {/* <CmsMenu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} data={[
                             { id: 1, name: "Xuất Excel", icon: "upgrade", tooltip: "Chỉ hỗ trợ export 5000 chương trình", onClick: () => dispatch(exportExcel({ ...search, Limit: 5000 })) },
                             { id: 2, name: "Tải Lại", icon: "cached", onClick: () => dispatch(getEditors({ Page: 1, Limit: 10 })) },
