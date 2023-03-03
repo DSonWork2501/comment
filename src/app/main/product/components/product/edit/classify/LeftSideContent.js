@@ -21,11 +21,11 @@ const CheckIndex = (type, stack, slot, stack_index, slot_index) => {
 function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes }) {
     return data?.map((item, index) =>
     (
-        <div className="w-full flex flex-row space-x-4" key={`${index}_div_slot_0`}>
-            <div
-                key={`${index}_div_0`}
+        <div className="flex flex-row-reverse space-x-4">
+            <CmsIconButton icon="close" onClick={() => HandleDeleteSlot(stack_index, index)} size="small" tooltip={'xóa slot'} className="text-red hover:shadow-2 border-red-500" key={`${index}_delete_slot`} />
+            <div key={`${index}_div_slot_0`}
                 onClick={() => HandleClickDetail(stack_index, index)}
-                className={clsx("focus:shadow-outline cursor-pointer pl-6 w-full flex flex-row justify-between space-x-4 bg-green-300 hover:bg-green-500 text-white rounded-12", CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}>
+                className={clsx("w-4/5 flex flex-row focus:shadow-outline cursor-pointer pl-6 justify-between space-x-4 bg-green-300 hover:bg-green-500 text-white rounded-12", CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}>
                 <div key={`${index}_div_1_slot`} className="flex items-center justify-items-start space-x-8">
                     <CmsLabel content={item.name || 'New slot'} key={`${index}_name`} />
                     <CmsLabel content={item.type ? `(${item.type})` : ''} key={`${index}_type`} />
@@ -37,7 +37,6 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
 
                 </div>
             </div>
-            <CmsIconButton icon="close" onClick={() => HandleDeleteSlot(stack_index, index)} size="small" tooltip={'xóa slot'} className="text-red hover:shadow-2 border-red-500" key={`${index}_delete_slot`} />
         </div>
 
     ))

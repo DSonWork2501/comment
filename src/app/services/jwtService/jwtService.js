@@ -70,9 +70,9 @@ class JwtService extends FuseUtils.EventEmitter {
 
 			connect.live.identity.login(email, password, type, otp)
 				.then(response => {
-					if (response.data.token) {
+					if (response.data.data.token) {
 						let token = {
-							access_token: response.data.token,
+							access_token: response.data.data.token,
 						}
 						this.setSession(token);
 						this.setUser(email);
@@ -84,7 +84,7 @@ class JwtService extends FuseUtils.EventEmitter {
 								photoURL: 'assets/images/avatars/avatar-user.png',
 								settings: {},
 								shortcuts: []
-							}, ...response.data, redirectUrl: "/home"
+							}, ...response.data.data, redirectUrl: "/home"
 						}
 						
 						resolve(data);

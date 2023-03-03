@@ -80,7 +80,6 @@ function ProductView() {
             // leftBottomHeader={leftBottomHeader}
             rightHeaderButton={
                 <div>
-
                 </div>
             }
             content={
@@ -109,7 +108,7 @@ function ProductView() {
                         <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType)} />
                     </div>
                     <div className="flex items-center justify-end">
-                        <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" onClick={() => History.push(`/product/0`)}/>
+                        <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" onClick={() => History.push(`/product/0`)} />
                         {/* <CmsMenu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} data={[
                             { id: 1, name: "Xuất Excel", icon: "upgrade", tooltip: "Chỉ hỗ trợ export 5000 chương trình", onClick: () => dispatch(exportExcel({ ...search, Limit: 5000 })) },
                             { id: 2, name: "Tải Lại", icon: "cached", onClick: () => dispatch(getEditors({ Page: 1, Limit: 10 })) },

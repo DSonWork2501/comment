@@ -38,11 +38,13 @@ export const getById = createAsyncThunk(`${appName}/${moduleName}/getById`, asyn
  */
 export const editCate = createAsyncThunk(`${appName}/${moduleName}/editCate`, async (entity, thunkAPI) => {
     try {
+        const search = thunkAPI.getState().products.category.search
         const response = entity.id
             ? await connect.live.category.update([entity])
             : await connect.live.category.insert([entity]);
-        const data = await response?.data?.data?.find(e => true);
-        return data
+        thunkAPI.dispatch(getList(search))
+        thunkAPI.dispatch(getById(search?.id))
+        return response.data
     } catch (error) {
         thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
         return error

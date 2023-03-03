@@ -5,7 +5,7 @@ function RightSideContent({ formik, prefix }) {
     
     return (
         <CmsBoxLine label={'Thông tin chi tiết'}>
-            <div className="w-full space-y-8">
+            <div className="w-full space-y-16">
                 <CmsFormikTextField size="small" name={`${prefix}name`} label="Tên" formik={formik}/>
                 <CmsFormikTextField isNumberFormat={true} size="small" name={`${prefix}capacity`} label="capacity" formik={formik}/>
                 <CmsFormikTextField isNumberFormat={true} size="small" name={`${prefix}heightlimit`} label="height limit" formik={formik}/>

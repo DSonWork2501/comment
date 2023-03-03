@@ -48,7 +48,7 @@ export const initProduct = (data) => {
             "isfastsale": data.isfastsale,
             "isfreeship": data.isfreeship,
             "status": data.status,
-            "ishs": data.ishs
+            "ishs": data.ishs || 0
         }
     }
     return {
