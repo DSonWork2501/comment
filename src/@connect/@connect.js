@@ -20,7 +20,7 @@ export default {
             /**
              * @description refreshToken
              */
-            refreshToken: (token, refreshToken) => axios.post(`${baseurl}/identity/refreshToken`, { token, refreshToken }),
+            refreshToken: (token, refreshToken) => axios.post(`${baseurl}/identity/refresh-login`, { token, refreshToken }),
         },
         product: {
             /**

@@ -67,14 +67,8 @@ class Auth extends Component {
 					const config = response.config ? response.config : null;
 					if (response.data) {
 						let dataResponse = response.data
-						if (dataResponse.errors && dataResponse.errors.length > 0) {
-							let errors = dataResponse.errors
-							let obError = errors[0]
-							if (obError) {
-								if (obError.message) {
-									this.props.showMessage({ variant: "error", message: obError.message });
-								}
-							}
+						if (dataResponse.message) {
+							this.props.showMessage({ variant: "error", message: dataResponse.message });
 						}
 						else if (dataResponse && dataResponse.data && Array.isArray(dataResponse.data) && dataResponse.data.length > 0) {
 							//this.props.showMessage({variant: "error", message: JSON.stringify(dataResponse.data) || "" });

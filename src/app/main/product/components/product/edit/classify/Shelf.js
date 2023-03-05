@@ -7,6 +7,8 @@ import RightSideContent from "./RightSideContent"
 import { useState } from "react"
 import { initDetailModel, initDetailModelSlot } from 'app/main/product/model/product/model'
 import { get } from "lodash"
+import clsx from "clsx"
+import FuseAnimate from "@fuse/core/FuseAnimate"
 
 
 function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
@@ -63,7 +65,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
         <CmsDialog
             title={"Thông tin tủ hàng"}
             text={
-                <div className="w-full flex flex-row space-x-8">
+                <div className={'w-full flex flex-row space-x-8'}>
                     <CmsLabel content={'Hướng dẫn:'} className="text-green-500" />
                     <CmsLabel content={'Tích chọn thông tin tủ, thông tin chi tiết sẽ hiển thị tương ứng'} className="" />
                 </div>
@@ -76,26 +78,29 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
             open={open}
             size="lg"
         >
-            <div className="w-full flex flex-row space-x-8">
-                <div className="w-1/3">
-                    <LeftSideContent
-                        data={data}
-                        HandleAddStack={HandleAddStack}
-                        HandleAddSlot={HandleAddSlot}
-                        HandleClickDetail={HandleClickDetail}
-                        HandleDeleteSlot={HandleDeleteSlot}
-                        HandleDeleteStack={HandleDeleteStack}
-                        stackIndex={stackIndex}
-                        slotIndex={slotIndex}
-                    />
-                </div>
-                <div className="w-2/3">
-                    <RightSideContent
-                        formik={formik_shelf}
-                        prefix={prefix}
-
-                    />
-                </div>
+            <div className={clsx(prefix && 'flex flex-row', "w-full space-x-8")}>
+                <FuseAnimate animation="transition.slideLeftIn" delay={50}>
+                    <div className={prefix ? 'w-1/3' : 'w-full'}>
+                        <LeftSideContent
+                            data={data}
+                            HandleAddStack={HandleAddStack}
+                            HandleAddSlot={HandleAddSlot}
+                            HandleClickDetail={HandleClickDetail}
+                            HandleDeleteSlot={HandleDeleteSlot}
+                            HandleDeleteStack={HandleDeleteStack}
+                            stackIndex={stackIndex}
+                            slotIndex={slotIndex}
+                        />
+                    </div>
+                </FuseAnimate>
+                {prefix && <FuseAnimate animation="transition.slideLeftIn" delay={50}>
+                    <div className="w-2/3">
+                         <RightSideContent
+                            formik={formik_shelf}
+                            prefix={prefix}
+                        />
+                    </div>
+                </FuseAnimate>}
             </div>
         </CmsDialog>
     )
