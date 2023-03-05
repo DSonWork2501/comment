@@ -24,6 +24,7 @@ class JwtService extends FuseUtils.EventEmitter {
 						let accessToken = this.getAccessToken()
 						let refreshToken = this.getRefreshToken()
 						if (accessToken && refreshToken) {
+							
 							this.setSession(null)
 							this.handleRefreshToken().catch(error => {
 								this.setSession(null)
