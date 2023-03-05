@@ -1,4 +1,4 @@
-import { CmsDialog } from "@widgets/components"
+import { CmsDialog, CmsLabel } from "@widgets/components"
 import { useFormik } from "formik"
 import { CheckStringIsJson } from "@widgets/functions/Common"
 import React from "react"
@@ -26,7 +26,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
         }
     )) || []
 
-    // console.log('data_shelf', data_shelf)
+    console.log('data_shelf', formik_shelf.values)
 
     const HandleAddStack = () => {
         var array = [...get(formik_shelf, 'values'), initDetailModel()]
@@ -62,7 +62,13 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     return (
         <CmsDialog
             title={"Thông tin tủ hàng"}
-            contentClass={'overflow-y-auto'}
+            text={
+                <div className="w-full flex flex-row space-x-8">
+                    <CmsLabel content={'Hướng dẫn:'} className="text-green-500" />
+                    <CmsLabel content={'Tích chọn thông tin tủ, thông tin chi tiết sẽ hiển thị tương ứng'} className="" />
+                </div>
+            }
+            contentClass={'overflow-y-auto space-y-16'}
             // disabledSave={imageLoading || snapshot_loading}
             handleClose={handleCloseModal}
             handleSave={handleSave}
@@ -70,7 +76,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
             open={open}
             size="lg"
         >
-            <div className="w-full flex flex-row space-x-4">
+            <div className="w-full flex flex-row space-x-8">
                 <div className="w-1/3">
                     <LeftSideContent
                         data={data}
