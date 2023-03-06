@@ -19,21 +19,23 @@ class JwtService extends FuseUtils.EventEmitter {
 				return new Promise((resolve, reject) => {
 					// if you ever get an unauthorized response, logout the user
 					// if (err.response && err.response.status && err.response.status === 401 && err.config && !err.config.__isRetryRequest) {
-						
-					// if (err.response && err.response.status && err.response.status === 401) {
-					// 	let accessToken = this.getAccessToken()
-					// 	let refreshToken = this.getRefreshToken()
-					// 	if (accessToken && refreshToken) {
-					// 		this.handleRefreshToken().catch(error => {
-					// 			this.setSession(null)
-					// 			reject()
-					// 		})
-					// 	} else {
-					// 		this.setSession(null)
-					// 		this.emit('onAutoLogout', 'Đăng nhập thất bại!')
-					// 		resolve()
-					// 	}
-					// }
+
+					if (err.response && err.response.status && err.response.status === 401) {
+						let accessToken = this.getAccessToken()
+						let refreshToken = this.getRefreshToken()
+						if (accessToken && refreshToken) {
+							
+							this.setSession(null)
+							this.handleRefreshToken().catch(error => {
+								this.setSession(null)
+								reject()
+							})
+						} else {
+							this.setSession(null)
+							this.emit('onAutoLogout', 'Đăng nhập thất bại!')
+							resolve()
+						}
+					}
 					this.emit("handleError", err);
 					reject(err)
 					// throw err
@@ -69,29 +71,30 @@ class JwtService extends FuseUtils.EventEmitter {
 
 			connect.live.identity.login(email, password, type, otp)
 				.then(response => {
-					if (response.data.token) {
+					if (response?.data?.data?.token && response?.data?.data?.refreshToken) {
 						let token = {
-							access_token: response.data.token,
+							access_token: response.data.data.token,
+							refresh_token: response.data.data.refreshToken,
 						}
 						this.setSession(token);
 						this.setUser(email);
 
 						const data = {
 							data: {
-								displayName: email, 
-								email: '', 
+								displayName: email,
+								email: '',
 								photoURL: 'assets/images/avatars/avatar-user.png',
 								settings: {},
 								shortcuts: []
-							}, ...response.data, redirectUrl: "/home"
+							}, ...response.data.data, redirectUrl: "/home"
 						}
-						
+
 						resolve(data);
 					} else {
-						reject(response.data);
+						reject(response.data.message);
 					}
 				}).catch(error => {
-					reject(error);
+					reject(error.response.data.message);
 				})
 		});
 	};
@@ -99,18 +102,13 @@ class JwtService extends FuseUtils.EventEmitter {
 	signInWithToken = () => {
 		return new Promise((resolve, reject) => {
 			const getToken = () => new Promise((resolve, reject) => {
-				// let token = this.getAccessToken()
-				// let refreshToken = this.getRefreshToken()
-				// if (token && refreshToken) {
-				// 	resolve({ token, refreshToken })
-				// } else {
-				// 	reject()
-				// }
+				this.emit('handleRefreshToken')
 
 				let token = this.getAccessToken()
+				let refreshToken = this.getRefreshToken()
 				let user = this.getUser()
 				if (token) {
-					resolve({ token, user })
+					resolve({ token, user, refreshToken })
 				} else {
 					reject()
 				}
@@ -120,7 +118,7 @@ class JwtService extends FuseUtils.EventEmitter {
 				if (value.token) {
 					let token = {
 						access_token: value.token,
-						// refresh_token: value.refreshToken
+						refresh_token: value.refreshToken
 					}
 					this.setSession(token);
 					this.setUser(value.user);
@@ -144,37 +142,26 @@ class JwtService extends FuseUtils.EventEmitter {
 		return new Promise((resolve, reject) => {
 			let token = this.getAccessToken()
 			let refreshToken = this.getRefreshToken()
+			let email = this.getUser()
 			connect.live.identity.refreshToken(token, refreshToken)
 				.then(response => {
-					if (response.data.token) {
+					if (response.data.token && response.data.token) {
 						let token = {
 							access_token: response.data.token,
 							refresh_token: response.data.refreshToken
 						}
 						this.setSession(token);
-						const decoded = jwtDecode(token.access_token);
-						const permission = decoded && decoded.Permission ? decoded.Permission : []
-						connect.live.user.getById(decoded.userId)
-							.then(resUser => {
-								let data = {
-									...token,
-									role: permission && permission.length > 0 ? permission : ["NewUser"],
-									roleName: (resUser && resUser.data && resUser.data.data && resUser.data.data.roleName) || "",
-									user: resUser ? { ...resUser.data.data, redirectUrl: "/" } : { redirectUrl: "/" },
-									data: {
-										displayName: (resUser && resUser.data && resUser.data.data && resUser.data.data.fullName) || "",
-										photoURL: 'assets/images/avatars/avatar-user.png',
-										email: (resUser && resUser.data && resUser.data.data && resUser.data.data.email) || "",
-										settings: {},
-										shortcuts: []
-									}
-								}
-								resolve(data);
-							})
-							.catch(error => {
-								this.logout();
-								reject(error)
-							})
+						const data = {
+							data: {
+								displayName: email,
+								email: '',
+								photoURL: 'assets/images/avatars/avatar-user.png',
+								settings: {},
+								shortcuts: []
+							}, ...response.data.data, redirectUrl: "/home"
+						}
+
+						resolve(data);
 					} else {
 						this.logout();
 						reject(new Error('Failed to get user info.'));
@@ -189,13 +176,13 @@ class JwtService extends FuseUtils.EventEmitter {
 
 
 	setSession = token => {
-		if (token && token.access_token) {
+		if (token && token.access_token && token.refresh_token) {
 			localStorage.setItem('jwt_access_token', token.access_token);
-			// localStorage.setItem('jwt_refresh_token', token.refresh_token);
+			localStorage.setItem('jwt_refresh_token', token.refresh_token);
 			axios.defaults.headers.common.Authorization = `Bearer ${token.access_token}`;
 		} else {
 			localStorage.removeItem('jwt_access_token');
-			// localStorage.removeItem('jwt_refresh_token');
+			localStorage.removeItem('jwt_refresh_token');
 			delete axios.defaults.headers.common.Authorization;
 		}
 	};

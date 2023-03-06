@@ -66,6 +66,13 @@ function BasicInfo({ formik, SaveData,  }) {
                         label={'FreeShip'}
                         vertical={false}
                     />
+                    <CmsFormikRadioGroup
+                        name="ishs"
+                        data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
+                        formik={formik}
+                        label={'Home subscription'}
+                        vertical={false}
+                    />
                 </div>
             </div>
         </FuseAnimateGroup>

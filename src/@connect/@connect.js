@@ -20,7 +20,7 @@ export default {
             /**
              * @description refreshToken
              */
-            refreshToken: (token, refreshToken) => axios.post(`${baseurl}/identity/refreshToken`, { token, refreshToken }),
+            refreshToken: (token, refreshToken) => axios.post(`${baseurl}/identity/refresh-login`, { token, refreshToken }),
         },
         product: {
             /**
@@ -35,6 +35,10 @@ export default {
                 RowsPage : phân trang - số trang
              */
             getList: params => axios.get(`${baseurl}/product/get-product`, { params }),
+            // bảng màu
+            getColor: params => axios.get(`${baseurl}/product/get-color`, { params }),
+            // kích thước
+            getSize: params => axios.get(`${baseurl}/product/get-size`, { params }),
             getDetail: params => axios.get(`${baseurl}/product/get-product-detail`, { params }),
             insert: entity => axios.post(`${baseurl}/product/insert-product`, entity),
             update: entity => axios.put(`${baseurl}/product/update-product`, entity),
@@ -44,7 +48,7 @@ export default {
             getList: params => axios.get(`${baseurl}/product/get-category`, { params }),
             insert: entity => axios.post(`${baseurl}/product/insert-category`, entity),
             update: entity => axios.put(`${baseurl}/product/update-category`, entity),
-            delete: entity => axios.delete(`${baseurl}/product/delete-category`, entity),
+            changeStatus: entity => axios.put(`${baseurl}/product/delete-category`, entity),
         },
         account: {
             getList: params => axios.get(`${baseurl}/customer/get-account`, { params }),

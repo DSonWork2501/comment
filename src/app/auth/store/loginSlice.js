@@ -75,7 +75,7 @@ const loginSlice = createSlice({
 		},
 		loginError: (state, action) => {
 			state.success = false;
-			state.error = action.payload;
+			state.error = action?.payload;
 		}
 	},
 	extraReducers: {}
