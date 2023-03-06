@@ -96,7 +96,7 @@ export const initDetail = (data) => {
         "sizename": "N/A",
         "price": 0,
         "retailprice": 0,
-        "wholesaleprice": 0
+        "wholesaleprice": 0,
     }
 }
 
@@ -130,7 +130,13 @@ export const initDetailModelSlot = (data) => {
             "type": data.type || 'slot',
             "active": data.active || 1,
             "capacity": data.capacity || 0,
-            "heightlimit": data.heightlimit || 0
+            "heightlimit": data.heightlimit || 0,
+            item: {
+                "uniqueid": "",
+                "name": "",
+                "img": "",
+                "type": ""
+            }
         }
     }
     return {
