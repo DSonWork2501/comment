@@ -118,7 +118,7 @@ function CmsAutocomplete(props) {
                                 {option.image &&
                                     <img
                                         loading="lazy"
-                                        width="200"
+                                        width="100"
                                         src={`${option.image}`}
                                         srcSet={`${option.image} 2x`}
                                         alt=""

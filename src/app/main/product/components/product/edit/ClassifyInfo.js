@@ -73,7 +73,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
                 <CmsFormikRadioGroup fieldsetclass="m-0" className="border-0 m-0 p-0" vertical={false} key={`${index}_status`} size="small" name={`status`} formik={formik_item} label="" data={Object.values(ProductStatus)} />
             </div>
             <div className="col-span-4 flex flex-row space-x-12 items-start justify-end">
-                <CmsButton size="small" label={"Lưu"} startIcon="save" className="text-white bg-blue-500 hover:bg-green-700" onClick={() => handleSaveData(formik_item.values, index)} />
+                <CmsButton size="small" label={"Lưu tạm"} startIcon="save" className="text-white bg-blue-500 hover:bg-green-700" onClick={() => handleSaveData(formik_item.values, index)} />
                 <CmsButton size="small" label={"Hủy"} startIcon="cancel" className="text-white bg-grey-500 hover:bg-grey-700" onClick={() => handleCancelSetIndex()} />
             </div>
         </div>
