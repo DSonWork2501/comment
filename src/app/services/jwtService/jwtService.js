@@ -24,8 +24,7 @@ class JwtService extends FuseUtils.EventEmitter {
 						let accessToken = this.getAccessToken()
 						let refreshToken = this.getRefreshToken()
 						if (accessToken && refreshToken) {
-							
-							this.setSession(null)
+
 							this.handleRefreshToken().catch(error => {
 								this.setSession(null)
 								reject()
@@ -145,12 +144,13 @@ class JwtService extends FuseUtils.EventEmitter {
 			let email = this.getUser()
 			connect.live.identity.refreshToken(token, refreshToken)
 				.then(response => {
-					if (response.data.token && response.data.token) {
+					if (response?.data?.data?.token && response?.data?.data?.refreshToken) {
 						let token = {
-							access_token: response.data.token,
-							refresh_token: response.data.refreshToken
+							access_token: response.data.data.token,
+							refresh_token: response.data.data.refreshToken,
 						}
 						this.setSession(token);
+						this.setUser(email);
 						const data = {
 							data: {
 								displayName: email,
@@ -158,7 +158,7 @@ class JwtService extends FuseUtils.EventEmitter {
 								photoURL: 'assets/images/avatars/avatar-user.png',
 								settings: {},
 								shortcuts: []
-							}, ...response.data.data, redirectUrl: "/home"
+							}, ...response.data.data, redirectUrl: "/"
 						}
 
 						resolve(data);

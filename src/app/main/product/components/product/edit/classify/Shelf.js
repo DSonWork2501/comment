@@ -31,7 +31,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     console.log('data_shelf', formik_shelf.values)
 
     const HandleAddStack = () => {
-        var array = [...get(formik_shelf, 'values'), initDetailModel()]
+        var array = [...get(formik_shelf, 'values') || [], initDetailModel()]
         formik_shelf.setValues(array)
     }
     const HandleAddSlot = (stack_index) => {
@@ -95,7 +95,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
                 </FuseAnimate>
                 {prefix && <FuseAnimate animation="transition.slideLeftIn" delay={50}>
                     <div className="w-2/3">
-                         <RightSideContent
+                        <RightSideContent
                             formik={formik_shelf}
                             prefix={prefix}
                         />

@@ -36,6 +36,20 @@ export const getDetail = createAsyncThunk(`${appName}/${moduleName}/getDetail`, 
 });
 
 /**
+ * @description lấy danh sách product
+ */
+export const searchDetail = createAsyncThunk(`${appName}/${moduleName}/searchDetail`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getDetail(params);
+        const data = await response.data.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
+
+/**
  * @description thêm sản phẩm
  */
 export const insertProduct = createAsyncThunk(`${appName}/${moduleName}/insertProduct`, async (entity, thunkAPI) => {
@@ -107,6 +121,8 @@ const productSlice = createSlice({
     initialState: {
         loading: false,
         entities: null,
+        searchDetailEntities: null,
+        searchDetailLoading: false,
         entity: null,
         error: null,
         selected: null,
@@ -246,6 +262,27 @@ const productSlice = createSlice({
         [getSize.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
+            error: error
+        }),
+        /**
+         * @description searchDetail
+         */
+        [searchDetail.pending]: state => ({
+            ...state,
+            searchDetailLoading: true,
+            error: null
+        }),
+        [searchDetail.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                searchDetailLoading: false,
+                searchDetailEntities: payload,
+                error: null
+            }
+        },
+        [searchDetail.rejected]: (state, { error }) => ({
+            ...state,
+            searchDetailLoading: false,
             error: error
         }),
     }
