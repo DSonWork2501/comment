@@ -135,7 +135,7 @@ export const initDetailModelSlot = (data) => {
                 "uniqueid": "",
                 "name": "",
                 "img": "",
-                "type": ""
+                "type": "wine"
             }
         }
     }

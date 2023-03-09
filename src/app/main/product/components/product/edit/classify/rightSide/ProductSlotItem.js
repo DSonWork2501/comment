@@ -39,7 +39,6 @@ function ProductSlotSKUItem({ formik, prefix }) {
     const item_detail = detail_data?.find(x => x.uniqueid === uniqueId) || null
 
     const onChangeSku = (event, value) => {
-        console.log('value', value)
         formik.setFieldValue(`${prefix}.item`, {...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.img, sku: value?.sku, uniqueid: null })
     }
     const onChangeProductDetail = (event, value) => {
