@@ -24,5 +24,5 @@
 # EXPOSE 3000
 # CMD [ "yarn", "start" ]
 
-FROM nginx:1.23.3-alpine
+FROM thanhth22/nginx-react:latest
 COPY build /usr/share/nginx/html
