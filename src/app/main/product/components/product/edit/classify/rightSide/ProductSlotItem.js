@@ -1,6 +1,6 @@
 import { CmsAutocomplete } from "@widgets/components"
 import { keyStore } from "app/main/product/common"
-import { getList, searchDetail } from "app/main/product/store/productSlice"
+import { getList, getListHS, searchDetail } from "app/main/product/store/productSlice"
 import { get } from "lodash"
 import React, { useMemo } from "react"
 import { useEffect } from "react"
@@ -11,8 +11,8 @@ export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 function ProductSlotSKUItem({ formik, prefix }) {
 
     const dispatch = useDispatch()
-    const product_entities = useSelector(store => store[keyStore].product.entities)?.data
-    const loading = useSelector(store => store[keyStore].product.loading)
+    const product_entities = useSelector(store => store[keyStore].product.hsEntities)?.data
+    const loading = useSelector(store => store[keyStore].product.hsLoading)
     const detail_entities = useSelector(store => store[keyStore].product.searchDetailEntities)?.detail
     const detail_loading = useSelector(store => store[keyStore].product.searchDetailLoading)
 
@@ -23,7 +23,7 @@ function ProductSlotSKUItem({ formik, prefix }) {
     const sku = item_product ? item_product?.sku : null
 
     useEffect(() => {
-        dispatch(getList({ homeSubscription: 2, PageNumber: 1, rowsPage: 30 }))
+        dispatch(getListHS({ homeSubscription: 2, PageNumber: 1, rowsPage: 30 }))
     }, [dispatch])
 
     useEffect(() => {

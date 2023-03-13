@@ -20,6 +20,19 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
     }
 });
 /**
+ * @description lấy danh sách product home supscription
+ */
+export const getListHS = createAsyncThunk(`${appName}/${moduleName}/getList`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getList(params);
+        const data = await response.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
+/**
  * @description lấy danh sách product
  */
 export const getDetail = createAsyncThunk(`${appName}/${moduleName}/getDetail`, async (params, thunkAPI) => {
@@ -121,6 +134,8 @@ const productSlice = createSlice({
     initialState: {
         loading: false,
         entities: null,
+        hsLoading: false,
+        hsEntities: null,
         searchDetailEntities: null,
         searchDetailLoading: false,
         entity: null,
@@ -283,6 +298,27 @@ const productSlice = createSlice({
         [searchDetail.rejected]: (state, { error }) => ({
             ...state,
             searchDetailLoading: false,
+            error: error
+        }),
+        /**
+         * @description getListHS
+         */
+        [getListHS.pending]: state => ({
+            ...state,
+            hsLoading: true,
+            error: null
+        }),
+        [getListHS.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                hsLoading: false,
+                hsEntities: payload,
+                error: null
+            }
+        },
+        [getListHS.rejected]: (state, { error }) => ({
+            ...state,
+            hsLoading: false,
             error: error
         }),
     }
