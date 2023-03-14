@@ -5,10 +5,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: <DOCKER_IMAGE>
-    ports:
-      - 3000:80
+    image: thanhth22/cms-ibp:prod
+    # ports:
+    #   - 3000:80
     deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=reverse-proxy-net"
+        - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
+        - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
+        - "traefik.http.routers.ibp_cms-redircect.middlewares=https_redirect"
+        - "traefik.http.routers.ibp_cms-redircect.rule=Host(`4person.sytes.net`)"
+        - "traefik.http.routers.ibp_cms-redircect.entrypoints=web"
+        - "traefik.http.services.ibp_cms.loadbalancer.server.port=80"
+        - "traefik.http.routers.ibp_cms.rule=Host(`4person.sytes.net`)"
+        # - "traefik.http.routers.ibp_cms.service=ibp_cms"
+        - "traefik.http.routers.ibp_cms.entrypoints=websecure"
+        - "traefik.http.routers.ibp_cms.tls"
+        - "traefik.http.routers.ibp_cms.tls.certresolver=myresolver"
+      mode: replicated
+      replicas: 1
       # placement:
         # constraints:
         #   # - "node.hostname==CacheNode-3-215"
@@ -24,10 +40,48 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: <DOCKER_IMAGE>
-    ports:
-      - 5001:80
+    image: thanhth22/api-ibp:prod
+    # entrypoint: ["ln", "-s", "/mnt/team-ibp/", "/app/imgs"]
+    # ports:
+    #   - 5001:80
+    volumes:
+      # - "ftpsharedata:/mnt/:ro"
+      - "ftpsharedata:/mnt/"
+    depends_on:
+      - ftp
+    configs:
+      - source: ibp_api-config
+        target: /app/appsettings.json
+        # uid: '103'
+        # gid: '103'
+        mode: 0644
     deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=reverse-proxy-net"
+        - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
+        - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
+        - "traefik.http.routers.ibp_api-redircect.middlewares=https_redirect"
+        - "traefik.http.routers.ibp_api-redircect.rule=Host(`4person.sytes.net`) && (PathPrefix(`/api`) || PathPrefix(`/swagger`) || PathPrefix(`/imgs`))"
+        - "traefik.http.routers.ibp_api-redircect.entrypoints=web"
+        - "traefik.http.services.ibp_api.loadbalancer.server.port=80"
+        - "traefik.http.routers.ibp_api.rule=Host(`4person.sytes.net`) && (PathPrefix(`/api`) || PathPrefix(`/imgs`))"
+        # - "traefik.http.routers.ibp_api.service=ibp_api"
+        - "traefik.http.routers.ibp_api.entrypoints=websecure"
+        - "traefik.http.routers.ibp_api.tls"
+        - "traefik.http.routers.ibp_api.tls.certresolver=myresolver"
+        - "traefik.http.routers.ibp_api_swagger.rule=Host(`4person.sytes.net`) && PathPrefix(`/swagger`)"
+        # - "traefik.http.routers.ibp_api_swagger.service=ibp_api_swagger"
+        - traefik.http.routers.ibp_api_swagger.middlewares=swagger_auth_default@file
+        # - traefik.http.routers.ibp_api_swagger.middlewares=swagger_auth        
+        - "traefik.http.routers.ibp_api_swagger.entrypoints=websecure"
+        - "traefik.http.routers.ibp_api_swagger.tls"
+        - "traefik.http.routers.ibp_api_swagger.tls.certresolver=myresolver"
+
+        # auth middleware (already set on global config middlewares in traefik_dynamic.yml )
+        # - "traefik.http.middlewares.swagger_auth.basicauth.users=dev:$2y$05$ib.C.wrtbFhTWrhCfT7SduY.oMxzL/zea2mKxy1K1QHij3b15zjU6" # htpasswd -nbB dev "password" for generate
+      mode: replicated
+      replicas: 1
       # placement:
         # constraints:
         #   # - "node.hostname==CacheNode-3-215"
@@ -35,7 +89,54 @@ services:
       resources:
         limits:
           cpus: '0.50'
+          memory: 200M
+        reservations:
+          cpus: '0.25'
+          memory: 50M
+  ftp:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        USER_ID: 1000
+        GROUP_ID: 1000
+    image: 'fauria/vsftpd'
+    environment:
+      - "FTP_USER=team-ibp"
+      - "FTP_PASS=trI3Ud0$$$$$$" #trI3Ud0$$$
+      - "PASV_ADDRESS=66.42.56.145"
+      - "PASV_MIN_PORT=21100"
+      - "PASV_MAX_PORT=21110"
+    restart: always
+    ports:
+      - 0.0.0.0:20:20
+      - 0.0.0.0:21:21
+      - 21100-21110:21100-21110
+    volumes:
+      - ftpsharedata:/home/vsftpd
+      - ftpsharelogs:/var/log/vsftpd
+    deploy:
+      # placement:
+      #   constraints:
+      #     # - "node.hostname==CacheNode-3-215"
+      #     - "node.labels.redisCluster == true"
+      resources:
+        limits:
+          cpus: '0.50'
           memory: 50M
         reservations:
           cpus: '0.25'
           memory: 20M
+
+configs:
+   ibp_api-config:
+    external: true
+
+volumes:
+  ftpsharedata:
+  ftpsharelogs:
+
+networks:
+  default:
+    name: reverse-proxy-net
+    external: true
