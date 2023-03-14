@@ -35,7 +35,7 @@ function BasicInfo({ formik, SaveData,  }) {
                         name="isnew"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
-                        label={'New'}
+                        label={'Hàng mới'}
                         vertical={false}
                     />
                     <CmsFormikRadioGroup
