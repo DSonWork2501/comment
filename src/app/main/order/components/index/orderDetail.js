@@ -19,7 +19,7 @@ function OrderDetailContent({ entity, handleClose, open }) {
         name: x.name,
         quantity: x.quantity,
         price: NumberWithCommas(x.price),
-        image: <img className="max-h-32 max-w-32" src={x.image} alt={`${x.sku}_image`} />
+        image: <img className="max-h-52 max-w-52 ml-auto mr-auto" src={`${baseurl}${x.image}`} alt={`${x.sku}_image`} />
     })) || []
 
     const totalPrice = NumberWithCommas(entity?.moneytotal) || 0
