@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
+import { getErrorMessage } from '@widgets/functions';
 
 
 const appName = "orders";
@@ -14,7 +15,7 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
         const data = await response.data;
         return data
     } catch (error) {
-        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
         return error
     }
 });
@@ -23,8 +24,12 @@ const initSearchState = {
     cusId: null,
     orderId: '',
     status: '',
+    homeSubscription: null,
+    fromDate: '',
+    toDate: '',
     pageNumber: 1,
     rowsPage: 10,
+    cms: 1
 }
 
 const orderSlice = createSlice({

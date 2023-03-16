@@ -22,7 +22,7 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
 /**
  * @description lấy danh sách product home supscription
  */
-export const getListHS = createAsyncThunk(`${appName}/${moduleName}/getList`, async (params, thunkAPI) => {
+export const getListHS = createAsyncThunk(`${appName}/${moduleName}/getListHS`, async (params, thunkAPI) => {
     try {
         const response = await connect.live.product.getList(params);
         const data = await response.data;

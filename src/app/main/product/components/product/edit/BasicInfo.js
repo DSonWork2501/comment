@@ -3,9 +3,10 @@ import { CmsFormikRadioGroup, CmsFormikTextField } from "@widgets/components"
 import React from "react"
 import MutipleImagePathLink from "../../common/MultipleImagePathLink"
 import noImage from '@widgets/images/noImage.jpg';
+import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
-function BasicInfo({ formik, SaveData,  }) {
+function BasicInfo({ formik, SaveData, }) {
 
     const { images } = formik?.values
 
@@ -68,7 +69,7 @@ function BasicInfo({ formik, SaveData,  }) {
                     />
                     <CmsFormikRadioGroup
                         name="ishs"
-                        data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
+                        data={Object.values(HomeSubscription).map(x => ({ ...x, id: parseInt(x.id) }))}
                         formik={formik}
                         label={'Home subscription'}
                         vertical={false}

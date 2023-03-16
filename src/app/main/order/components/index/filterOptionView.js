@@ -1,6 +1,8 @@
 import { CmsButton, CmsFilter, CmsSelect, CmsTextField } from "@widgets/components"
+import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
 import React from "react"
 import { useEffect } from "react"
+import { orderStatus } from "../../model/status"
 
 function FilterOptionView(
     { filterOptions, search, setSearch, setFilterOptions, resetSearch }
@@ -16,10 +18,6 @@ function FilterOptionView(
             setSearch({ ...searchValue, search: searchValue?.search, page: 1, limit: 10 })
         }
     }
-
-    // const onSearchBasicClick = () => {
-    //     setSearch({ ...searchValue, search: searchValue?.search, page: 1, limit: 10 })
-    // }
 
     const onSearchAdvandClick = () => {
 
@@ -40,13 +38,13 @@ function FilterOptionView(
                     <div className="w-full flex space-x-8">
                         <div className="w-1/4 space-y-8">
                             <CmsTextField value={searchValue?.cusId || ''} onChange={event => setSearchValue({ ...searchValue, cusId: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="..." startText="cusId" isSearch={true} />
+                            <CmsSelect value={searchValue?.homeSubscription || ''} label="HomeSubscription" data={[{id: '', name: 'Tất cả'},...Object.values(HomeSubscription)]} onChange={event => setSearchValue({ ...searchValue, homeSubscription: event.target.value })}/>
+                        </div>
+                        <div className="w-1/4 space-y-8">
                             <CmsTextField value={searchValue?.orderId || ''} onChange={event => setSearchValue({ ...searchValue, orderId: event.currentTarget.value })} onKeyPress={onSearchBasicKeyPress} placeholder="..." startText="orderId" isSearch={true} />
                         </div>
                         <div className="w-1/4 space-y-8">
-                            <CmsSelect label="" data={[{ id: '', name: 'Tất Cả' }, { id: '1', name: 'Bình Thường' }, { id: '0', name: 'Đã Khóa' }]} />
-                        </div>
-                        <div className="w-1/4 space-y-8">
-
+                            <CmsSelect value={searchValue?.status || ''} label="Trạng thái" data={[{ id: '', name: 'Tất cả' }, ...Object.values(orderStatus)]} onChange={event => setSearchValue({ ...searchValue, status: event.target.value })}/>
                         </div>
                     </div>
                     <CmsButton label="Tìm" startIcon="search" onClick={onSearchAdvandClick} />

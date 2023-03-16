@@ -14,6 +14,7 @@ import { getList as getOrder, resetSearch, setSearch } from "../store/orderSlice
 import clsx from "clsx";
 import { orderStatus } from "../model/status";
 import OrderDetailContent from "./index/orderDetail";
+import ChangeOderStatusContent from "./index/changeOrderStatus";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -42,6 +43,11 @@ function OrderView() {
         setOpen('detail')
     }
 
+    const HandleChangeStatus = (item) => {
+        setOpen('changeStatus')
+        setInfo(item)
+    }
+
     const data = useMemo(() => entities?.data?.map(item => ({
         id: item.id,
         createdate: ConvertDateTime.DisplayDateTime(item.createdate),
@@ -51,7 +57,7 @@ function OrderView() {
         status: <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} />,
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
-                <CmsIconButton tooltip={'Cập nhật'} icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" />
+                <CmsIconButton tooltip={'Edit Trạng thái'} icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={()=>HandleChangeStatus()}/>
             </div>
         ) || []
     })), [entities])
@@ -93,6 +99,11 @@ function OrderView() {
                     />
                     <OrderDetailContent
                         open={open === 'detail'}
+                        entity={info}
+                        handleClose={() => { setOpen(''); setInfo(null) }}
+                    />
+                    <ChangeOderStatusContent
+                        open={open === 'changeStatus'}
                         entity={info}
                         handleClose={() => { setOpen(''); setInfo(null) }}
                     />
