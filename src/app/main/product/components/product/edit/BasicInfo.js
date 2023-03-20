@@ -4,6 +4,7 @@ import React from "react"
 import MutipleImagePathLink from "../../common/MultipleImagePathLink"
 import noImage from '@widgets/images/noImage.jpg';
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
+import { FocusError } from "focus-formik-error";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 function BasicInfo({ formik, SaveData, }) {
@@ -15,6 +16,7 @@ function BasicInfo({ formik, SaveData, }) {
     return (
         <FuseAnimateGroup className="flex flex-wrap p-20 overflow-hidden w-full h-full" enter={{ animation: 'transition.slideUpBigIn' }}>
             <div className="w-full space-y-16">
+                <FocusError formik={formik} />
                 <CmsFormikTextField size="small" formik={formik} name="name" label="Tên sản phẩm" />
                 <CmsFormikTextField size="small" formik={formik} name="shortname" label="Tên ngắn" />
                 <CmsFormikTextField size="small" formik={formik} name="barcode" label="Barcode" />

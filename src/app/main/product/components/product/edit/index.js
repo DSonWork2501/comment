@@ -15,6 +15,7 @@ import { useFormik } from "formik"
 import ClassifyInfo from "./ClassifyInfo"
 import { colors } from "@material-ui/core"
 import { alertInformation } from "@widgets/functions"
+import * as Yup from 'yup'
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
@@ -78,7 +79,11 @@ function EditProduct(props) {
         initialValues: initData(data),
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
-        onSubmit: handleSaveData
+        onSubmit: handleSaveData,
+        validationSchema: Yup.object({
+            name: Yup.string().typeError("Tên sản phẩm không được bỏ trống !").required("Tên sản phẩm không được bỏ trống !"),
+            sku: Yup.string().typeError("SKU không được bỏ trống !").required("SKU không được bỏ trống !"),
+        })
     })
 
     return (
