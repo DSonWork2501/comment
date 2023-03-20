@@ -70,7 +70,6 @@ function EditProduct(props) {
         })
 
     }
-
     function handleChangeTab(event, value) {
         setTabValue(value);
     }
@@ -80,12 +79,13 @@ function EditProduct(props) {
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
         onSubmit: handleSaveData,
+        validate: ()=> setTabValue(TabType.co_ban.id),
         validationSchema: Yup.object({
             name: Yup.string().typeError("Tên sản phẩm không được bỏ trống !").required("Tên sản phẩm không được bỏ trống !"),
             sku: Yup.string().typeError("SKU không được bỏ trống !").required("SKU không được bỏ trống !"),
         })
     })
-
+    
     return (
         (
             <CmsCardedPage
