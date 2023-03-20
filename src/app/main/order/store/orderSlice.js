@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
-import { getErrorMessage } from '@widgets/functions';
+// import { getErrorMessage } from '@widgets/functions';
 
 
 const appName = "orders";
@@ -15,7 +15,24 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
         const data = await response.data;
         return data
     } catch (error) {
-        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        // thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
+/**
+ * @description cập nhật trạng thái
+ */
+export const updateOrderStatus = createAsyncThunk(`${appName}/${moduleName}/status`, async (params, thunkAPI) => {
+    try {
+        const search = thunkAPI.getState().orders.order.search
+        const response = await connect.live.order.update(params);
+        const data = await response.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+        thunkAPI.dispatch(getList(search))
+        return data
+    } catch (error) {
+        // console.log('error', error)
+        // thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
         return error
     }
 });
@@ -109,6 +126,27 @@ const orderSlice = createSlice({
             }
         },
         [getList.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        /**
+         * @description updateOrderStatus
+         */
+        [updateOrderStatus.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [updateOrderStatus.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                response: payload,
+                error: null
+            }
+        },
+        [updateOrderStatus.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

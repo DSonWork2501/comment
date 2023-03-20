@@ -1,4 +1,4 @@
-import { CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsLabel, CmsTableBasic } from "@widgets/components";
+import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsLabel, CmsTableBasic } from "@widgets/components";
 import { ConvertDateTime, initColumn, NumberWithCommas } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../common";
 import FilterOptionView from "./index/filterOptionView";
 import reducer from "../store";
-import { getList as getOrder, resetSearch, setSearch } from "../store/orderSlice";
+import { getList as getOrder, resetSearch, setSearch, updateOrderStatus } from "../store/orderSlice";
 import clsx from "clsx";
 import { orderStatus } from "../model/status";
 import OrderDetailContent from "./index/orderDetail";
@@ -48,6 +48,10 @@ function OrderView() {
         setInfo(item)
     }
 
+    const HandleSaveStatus = (value) => {
+       dispatch(updateOrderStatus(value))
+    }
+
     const data = useMemo(() => entities?.data?.map(item => ({
         id: item.id,
         createdate: ConvertDateTime.DisplayDateTime(item.createdate),
@@ -57,13 +61,16 @@ function OrderView() {
         status: <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} />,
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
-                <CmsIconButton tooltip={'Edit Trạng thái'} icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={()=>HandleChangeStatus()}/>
+                <CmsIconButton tooltip={'Edit Trạng thái'} icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={()=>HandleChangeStatus(item)}/>
             </div>
         ) || []
     })), [entities])
 
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
+    };
+    const HandleRefresh = () => {
+        dispatch(getOrder(search))
     };
     return (
         <CmsCardedPage
@@ -100,12 +107,13 @@ function OrderView() {
                     <OrderDetailContent
                         open={open === 'detail'}
                         entity={info}
-                        handleClose={() => { setOpen(''); setInfo(null) }}
+                        handleClose={() => { setOpen('')}}
                     />
                     <ChangeOderStatusContent
                         open={open === 'changeStatus'}
+                        handleSave={HandleSaveStatus}
                         entity={info}
-                        handleClose={() => { setOpen(''); setInfo(null) }}
+                        handleClose={() => { setOpen(''); }}
                     />
                 </>
             }
@@ -115,7 +123,7 @@ function OrderView() {
                         <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType).filter(x => x.id === FilterOptions.FilterType.basic.id)} />
                     </div>
                     <div className="flex items-center justify-end">
-                        {/* <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" /> */}
+                        <CmsButton color="default" label="Refresh" startIcon="refresh" onClick={HandleRefresh}/>
                         {/* <CmsMenu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} data={[
                             { id: 1, name: "Xuất Excel", icon: "upgrade", tooltip: "Chỉ hỗ trợ export 5000 chương trình", onClick: () => dispatch(exportExcel({ ...search, Limit: 5000 })) },
                             { id: 2, name: "Tải Lại", icon: "cached", onClick: () => dispatch(getEditors({ Page: 1, Limit: 10 })) },

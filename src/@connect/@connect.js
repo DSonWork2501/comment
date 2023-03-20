@@ -58,8 +58,8 @@ export default {
         },
         order: {
             getList: params => axios.get(`${baseurl}/order/get-order`, { params }),
-            update: params => axios.get(`${baseurl}/order/update-order`, { params }),
-            
+            update: entity => axios.put(`${baseurl}/order/update-order`, entity),
+
         }
     },
 }

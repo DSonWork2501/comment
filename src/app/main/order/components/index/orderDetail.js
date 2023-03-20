@@ -26,7 +26,7 @@ function OrderDetailContent({ entity, handleClose, open }) {
 
     return (
         <CmsDialog
-            title="Thông tin đơn hàng"
+            title={`Thông tin đơn hàng ID: ${entity?.id}`}
             handleClose={handleClose}
             open={open}
             size={'xl'}
