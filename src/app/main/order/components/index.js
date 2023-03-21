@@ -83,6 +83,7 @@ function OrderView() {
                         isServerSide={true}
                         data={data}
                         search={search}
+                        setSearch={(value)=> dispatch(setSearch({...search, value}))}
                         columns={columns}
                         loading={loading}
                         filterOptions={
@@ -95,7 +96,7 @@ function OrderView() {
                             />
                         }
                         openFilterOptions={Boolean(filterOptions)}
-                        pagination={data?.pagination?.map(x => ({ page: x.pagenumber, limit: x.rowspage, totalPage: x.totalpage }))}
+                        pagination={data?.pagination}
                     />
                     <OrderDetailContent
                         open={open === 'detail'}
