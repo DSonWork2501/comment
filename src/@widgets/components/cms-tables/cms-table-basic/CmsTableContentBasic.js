@@ -76,25 +76,25 @@ function TableContentBasic(props) {
 
 	useEffect(() => {
 		if (isServerSide && pagination) {
-			if (pagination.page) {
-				setPage(pagination.page - 1)
+			if (pagination.pagenumber) {
+				setPage(pagination.pagenumber - 1)
 			}
-			if (pagination.limit) {
-				setLimit(pagination.limit)
+			if (pagination.rowspage) {
+				setLimit(pagination.rowspage)
 			}
-			if (pagination.totalPage) {
-				setTotalPage(pagination.totalPage)
+			if (pagination.totalpage) {
+				setTotalPage(pagination.totalpage)
 			} else {
-				if (pagination.limit && pagination.total) {
-					setTotalPage(Math.ceil(pagination.total / pagination.limit))
+				if (pagination.rowspage && pagination.total) {
+					setTotalPage(Math.ceil(pagination.total / pagination.rowspage))
 				}
 			}
-			if (pagination.total || pagination.totalRecord) {
+			if (pagination.total || pagination.totalrow) {
 				if (pagination.total) {
 					setTotalRecord(pagination.total)
 				}
-				if (pagination.totalRecord) {
-					setTotalRecord(pagination.totalRecord)
+				if (pagination.totalrow) {
+					setTotalRecord(pagination.totalrow)
 				}
 			}
 		} else {

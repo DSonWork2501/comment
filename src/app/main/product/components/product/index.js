@@ -90,6 +90,7 @@ function ProductView() {
                     search={search}
                     columns={columns}
                     loading={loading}
+                    setSearch={(value)=> dispatch(setSearch({...search, value}))}
                     filterOptions={
                         <FilterOptionView
                             filterOptions={filterOptions}
@@ -100,6 +101,7 @@ function ProductView() {
                         />
                     }
                     openFilterOptions={Boolean(filterOptions)}
+                    pagination={entities?.pagination}
                 />
             }
             toolbar={
