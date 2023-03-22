@@ -19,7 +19,36 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
     }
 });
 
+/**
+ * @description lấy danh sách customer
+ */
+export const getCusById = createAsyncThunk(`${appName}/${moduleName}/getCusById`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.customer.getList(params);
+        const data = await response?.data?.data?.find(x=>true);
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return error
+    }
+});
 
+/**
+ * @description lấy danh sách customer
+ */
+export const insertCus = createAsyncThunk(`${appName}/${moduleName}/insertCus`, async (entity, thunkAPI) => {
+    try {
+        const search = thunkAPI.getState().customers.customer.search
+        const response = await connect.live.customer.insert(entity);
+        const data = await response?.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+        thunkAPI.dispatch(getList(search))
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return error
+    }
+});
 
 const initSearchState = {
     email: '',
@@ -105,6 +134,48 @@ const productSlice = createSlice({
             }
         },
         [getList.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        /**
+         * @description get
+         */
+        [getCusById.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [getCusById.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                entity: payload,
+                error: null
+            }
+        },
+        [getCusById.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        /**
+         * @description insertCus
+         */
+        [insertCus.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [insertCus.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                response: payload,
+                error: null
+            }
+        },
+        [insertCus.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

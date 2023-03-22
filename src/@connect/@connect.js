@@ -55,6 +55,7 @@ export default {
         },
         customer: {
             getList: params => axios.get(`${baseurl}/customer/get-customer`, { params }),
+            insert: entity => axios.post(`${baseurl}/customer/insert-customer`, entity),
         },
         order: {
             getList: params => axios.get(`${baseurl}/order/get-order`, { params }),
