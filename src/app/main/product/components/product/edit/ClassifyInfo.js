@@ -147,7 +147,7 @@ function ClassifyInfo({ formik }) {
                 {editIndex !== index &&
                     <CmsButton size="small" label={"Sửa"} className="text-white bg-green-500 hover:bg-green-700" onClick={() => { setEditIndex(index) }} />
                 }
-                {<CmsButton size="small" label={"Model"} className="text-white bg-blue-500 hover:bg-blue-700" onClick={() => { setModalIndex(index) }} />}
+                {<CmsButton size="small" label={"Ngăn/tủ"} className="text-white bg-blue-500 hover:bg-blue-700" onClick={() => { setModalIndex(index) }} />}
                 {editIndex !== index &&
                     <CmsButton size="small" label={"Xóa"} className="text-white bg-red-500 hover:bg-red-700" onClick={() => HandleDelete(index)} />
                 }

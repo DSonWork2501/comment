@@ -1,17 +1,29 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup"
-import { CmsFormikRadioGroup, CmsFormikTextField } from "@widgets/components"
+import { CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/components"
 import React from "react"
 import MutipleImagePathLink from "../../common/MultipleImagePathLink"
 import noImage from '@widgets/images/noImage.jpg';
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
 import { FocusError } from "focus-formik-error";
+import { useDispatch, useSelector } from "react-redux";
+import { uploadImage } from "app/main/product/store/productSlice";
+import { keyStore } from "app/main/product/common";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 function BasicInfo({ formik, SaveData, }) {
-
-    const { images } = formik?.values
-
+    const dispatch = useDispatch()
+    const imageLoading = useSelector(store => store[keyStore].product.imgLoading)
     console.log('formik', formik)
+
+    const HandleUploadImage = async(file) => {
+        let filesForm = new FormData();
+        filesForm.append('files', file);
+        filesForm.append('sku', formik?.values?.sku);
+        var response = await dispatch(uploadImage(filesForm));
+        if(response?.payload?.result){
+            formik.setFieldValue('image',`${formik?.values?.sku}/${file.name}`)
+        }
+    }
 
     return (
         <FuseAnimateGroup className="flex flex-wrap p-20 overflow-hidden w-full h-full" enter={{ animation: 'transition.slideUpBigIn' }}>
@@ -28,38 +40,48 @@ function BasicInfo({ formik, SaveData, }) {
                 <CmsFormikTextField size="small" formik={formik} name="certification" label="certification" />
                 <CmsFormikTextField size="small" formik={formik} name="suggest" label="Gợi ý" />
                 <CmsFormikTextField size="small" formik={formik} name="note" label="Ghi chú" />
-                <div key="div_0" className="flex flex-row items-center space-x-8">
-                    <CmsFormikTextField key={`path_key_0`} label="Image" formik={formik} name="image" />
-                    <img key={`image_key_0`} alt={`image_alt_0`} src={`${baseurl}${formik?.values?.image}` || noImage} className="max-h-32 max-w-32" />
+                <div className="w-full self-center px-224 my-0">
+                <CmsImageBox2
+                    title="Hình đại diện (Lưu ý: Click vào hình để upload !)"
+                    loading={imageLoading}
+                    value={`${baseurl}${formik?.values?.image}` || noImage}
+                    setValue={HandleUploadImage}
+                    styleImage={{className: 'w-128'}}
+                    disablebtitle
+                />
                 </div>
-                <MutipleImagePathLink images={images} setImage={(value) => formik.setFieldValue('images', value)} />
+                <MutipleImagePathLink
+                    formik={formik}
+                    name="images"
+                    setImage={(value) => formik.setFieldValue('images', value)}
+                />
                 <div className="flex flex-row w-full space-x-8 justify-between">
                     <CmsFormikRadioGroup
                         name="isnew"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
-                        label={'Hàng mới'}
+                        label={'Hàng Mới'}
                         vertical={false}
                     />
                     <CmsFormikRadioGroup
                         name="ishot"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
-                        label={'Hot'}
+                        label={'Hàng Hot'}
                         vertical={false}
                     />
                     <CmsFormikRadioGroup
                         name="ishome"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
-                        label={'Home'}
+                        label={'Trang Home'}
                         vertical={false}
                     />
                     <CmsFormikRadioGroup
                         name="ishome"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
-                        label={'FastSale'}
+                        label={'Bán Chạy'}
                         vertical={false}
                     />
                     <CmsFormikRadioGroup
