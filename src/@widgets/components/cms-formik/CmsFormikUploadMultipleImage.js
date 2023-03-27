@@ -11,29 +11,29 @@ import clsx from 'clsx'
 const useStyles = makeStyles(theme => ({
     productImageFeaturedStar: {
         position: 'absolute',
-        top     : 0,
-        right   : 0,
-        color   : colors.orange[400],
-        opacity : 0
+        top: 0,
+        right: 0,
+        color: colors.orange[400],
+        opacity: 0
     },
-    productImageUpload      : {
-        transitionProperty      : 'box-shadow',
-        transitionDuration      : theme.transitions.duration.short,
+    productImageUpload: {
+        transitionProperty: 'box-shadow',
+        transitionDuration: theme.transitions.duration.short,
         transitionTimingFunction: theme.transitions.easing.easeInOut,
     },
-    productImageItem        : {
-        transitionProperty      : 'box-shadow',
-        transitionDuration      : theme.transitions.duration.short,
+    productImageItem: {
+        transitionProperty: 'box-shadow',
+        transitionDuration: theme.transitions.duration.short,
         transitionTimingFunction: theme.transitions.easing.easeInOut,
-        '&:hover'               : {
+        '&:hover': {
             '& $productImageFeaturedStar': {
                 opacity: .8
             }
         },
-        '&.featured'            : {
-            pointerEvents                      : 'none',
-            boxShadow                          : theme.shadows[3],
-            '& $productImageFeaturedStar'      : {
+        '&.featured': {
+            pointerEvents: 'none',
+            boxShadow: theme.shadows[3],
+            '& $productImageFeaturedStar': {
                 opacity: 1
             },
             '&:hover $productImageFeaturedStar': {
@@ -54,47 +54,23 @@ function CmsFormikUploadMultipleImage(props) {
         className,
         name,
         onChange,
-        onDelete
+        onDelete,
+        domain
     } = props
-    function handleUploadChange(e)
-    {
+    function handleUploadChange(e) {
         const files = e.target.files;
-        if ( !files )
-        {
+        if (!files) {
             return;
         }
-        let array = formik.values[name]
-        // let fileArr = []
-        
-        formik.setFieldValue(name,
-            [
-                ...array.map((x,index)=>({id: index, url: x.url, position: index + 1, isNew: x.isNew})),
-                ...Object.values(files).map((file, index)=>(
-                    {
-                        'id'  : array.length + index,
-                        'url' : URL.createObjectURL(file),
-                        'position': array.length + 1 + index,
-                        'isNew': 1
-                    }
-                ))
-            ]
-        );
-        onChange && onChange(Object.values(files).map((x, index)=>({
-            'id'  : array.length + index,
-            'file' : x,
-            'position': array.length + 1 + index
-        })))
+        onChange && onChange(files)
 
-        // reader.onerror = function () {
-        //     console.log("xảy ra lỗi khi upload hình!");
-        // };
     }
-    function handleSetField(id)
-    {
-        formik.setFieldValue(name, formik.values[name].filter(x=>x.id !== id));
+    function handleSetField(id, index_item) {
+        formik.setFieldValue(name, formik.values[name].filter((x, index) => index !== index_item));
         onDelete && onDelete(id)
     }
     let array = formik && formik.values && formik.values[name]
+    
     return (
         <div className={className}>
             <input
@@ -111,26 +87,26 @@ function CmsFormikUploadMultipleImage(props) {
                     className={
                         clsx(
                             classes.productImageUpload,
-                            "flex items-center justify-center relative w-208 h-208 rounded-4 mr-16 mb-16 overflow-hidden cursor-pointer shadow-1 hover:shadow-5"
+                            "flex items-center justify-center relative w-160 h-160 rounded-4 mr-16 mb-16 overflow-hidden cursor-pointer shadow-1 hover:shadow-5"
                         )}
                 >
                     <Icon fontSize="large" color="action">cloud_upload</Icon>
                 </label>
-                {array.map(item => (
+                {array?.map((item, index) => (
                     <div
                         className={
                             clsx(
                                 classes.productImageItem,
-                                "flex items-center justify-center relative w-208 h-208 rounded-4 mr-16 mb-16 overflow-hidden cursor-pointer shadow-1 hover:shadow-5",
+                                "flex items-center justify-center relative w-160 h-160 rounded-4 mr-16 mb-16 overflow-hidden cursor-pointer shadow-1 hover:shadow-5",
                                 // (media.id === form.featuredImageId) && 'featured'
-                                )
+                            )
                         }
-                        key={item.id}
+                        key={`${index}_image_div`}
                     >
-                        <Icon  className={classes.productImageFeaturedStar} onClick={() => handleSetField(item.id)}>clear</Icon>
-                        <img className="max-w-none w-auto h-full" src={item.url} alt="images"/>
+                        <Icon key={`${index}_icon`} className={classes.productImageFeaturedStar} onClick={() => handleSetField(item.id, index)}>clear</Icon>
+                        <img key={`${index}_image`} className="max-w-none w-auto h-full" src={`${domain}${item}`} alt="images" />
                     </div>
-                ))}
+                )) || <></>}
             </div>
         </div>
     )
@@ -139,13 +115,15 @@ function CmsFormikUploadMultipleImage(props) {
 CmsFormikUploadMultipleImage.propTypes = {
     formik: PropTypes.any,
     label: PropTypes.string,
-    name: PropTypes.string
+    name: PropTypes.string,
+    domain: PropTypes.string
 }
 
 CmsFormikUploadMultipleImage.defaultProps = {
     label: "",
     image: [],
-    name: ""
+    name: "",
+    domain: ""
 }
 
 export default React.memo(CmsFormikUploadMultipleImage)
