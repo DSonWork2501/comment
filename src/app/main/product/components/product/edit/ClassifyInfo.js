@@ -30,6 +30,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
     return (
         <div className="grid grid-cols-4 gap-10 w-11/12">
             <CmsFormikTextField key={`${index}_uniqueid`} size="small" name={`uniqueid`} formik={formik_item} label="uniqueid" />
+            <CmsFormikTextField isNumberFormat key={`${index}_capacity`} size="small" name={`capacity`} formik={formik_item} label="Capacity" />
             <CmsFormikTextField key={`${index}_lotid`} size="small" name={`lotid`} formik={formik_item} label="lotid" />
             <CmsFormikAutocomplete
                 valueIsId
@@ -73,7 +74,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
                 <CmsFormikRadioGroup fieldsetclass="m-0" className="border-0 m-0 p-0" vertical={false} key={`${index}_status`} size="small" name={`status`} formik={formik_item} label="" data={Object.values(ProductStatus)} />
             </div>
             <div className="col-span-4 flex flex-row space-x-12 items-start justify-end">
-                <CmsButton size="small" label={"Lưu tạm"} startIcon="save" className="text-white bg-blue-500 hover:bg-green-700" onClick={() => handleSaveData(formik_item.values, index)} />
+                <CmsButton type="button" size="small" label={"Lưu tạm"} startIcon="save" className="text-white bg-blue-500 hover:bg-green-700" onClick={() => handleSaveData(formik_item.values, index)} />
                 <CmsButton size="small" label={"Hủy"} startIcon="cancel" className="text-white bg-grey-500 hover:bg-grey-700" onClick={() => handleCancelSetIndex()} />
             </div>
         </div>
@@ -85,11 +86,12 @@ const InfoContent = ({ index, formik }) => {
     const colorRes = useSelector(store => store[keyStore].product.color)
     const sizeRes = useSelector(store => store[keyStore].product.size)
     const { lotid, colorid, sizeid, volume, weight, height, maketime, expiretime, status, uniqueid, code, sizename,
-        price, retailprice, wholesaleprice } = formik.values.detail[index]
+        price, retailprice, wholesaleprice, capacity } = formik.values.detail[index]
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-3 gap-10" >
                 <LabelInfo label={{ content: 'Unique ID' }} info={{ content: uniqueid }} />
+                <LabelInfo label={{ content: 'Capacity' }} info={{ content: capacity }} />
                 <LabelInfo label={{ content: 'Lot ID' }} info={{ content: lotid }} />
                 <LabelInfo label={{ content: 'Color ID' }} info={{ content: get(colorRes?.find(x => x.id === colorid), 'color') || '' }} />
                 <LabelInfo label={{ content: 'Size ID' }} info={{ content: get(sizeRes?.find(x => x.id === sizeid), 'sizename') || '' }} />

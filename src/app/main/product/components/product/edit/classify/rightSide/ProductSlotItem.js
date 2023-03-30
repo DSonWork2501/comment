@@ -6,9 +6,27 @@ import React, { useMemo } from "react"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import noImage from '@widgets/images/noImage.jpg';
+import { LabelInfo } from "@widgets/components/common/LabelInfo"
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
-function ProductSlotSKUItem({ formik, prefix }) {
+function InfoSKUProductContent({ data }) {
+    const { img, name, sku, type, uniqueid } = data
+    return (
+        <div className="w-full flex flex-row">
+            <div>
+                <img src={`${baseurl}${img}`} alt="image_detail" className="h-128" />
+            </div>
+            <div className="w-full self-center">
+                <LabelInfo label={{ content: 'name' }} info={{ content: name }} />
+                <LabelInfo label={{ content: 'uniqueid' }} info={{ content: uniqueid }} />
+                <LabelInfo label={{ content: 'sku' }} info={{ content: sku }} />
+                <LabelInfo label={{ content: 'type' }} info={{ content: type }} />
+            </div>
+        </div>
+    )
+}
+
+export default function ProductSlotSKUItem({ formik, prefix }) {
 
     const dispatch = useDispatch()
     const product_entities = useSelector(store => store[keyStore].product.hsEntities)?.data
@@ -39,58 +57,60 @@ function ProductSlotSKUItem({ formik, prefix }) {
     const item_detail = detail_data?.find(x => x.uniqueid === uniqueId) || null
 
     const onChangeSku = (event, value) => {
-        formik.setFieldValue(`${prefix}.item`, {...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.img, sku: value?.sku, uniqueid: null })
+        formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.img, sku: value?.sku, uniqueid: null })
     }
     const onChangeProductDetail = (event, value) => {
-        formik.setFieldValue(`${prefix}.item`, {...get(formik.values, `${prefix}.item`), uniqueid: value?.uniqueid })
+        formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), uniqueid: value?.uniqueid })
     }
 
     console.log('formik prefix', formik.values)
-
     return (
-        <div className="w-full py-6 md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
-            <CmsAutocomplete
-                loading={loading}
-                label="Danh sách Sản phẩm"
-                value={item}
-                multiple={false}
-                data={product_data}
-                onChange={onChangeSku}
-                required={true}
-                onKeyPress={(value) => { dispatch(getList({ search: value, homeSubscription: 2, PageNumber: 1, rowsPage: 30 })) }}
-                autocompleteProps={{
-                    // limitTags: 20,
-                    getOptionLabel: (option) => option?.name,
-                    // ChipProps: {
-                    //     size: 'small'
-                    // },
-                    size: 'small',
-                    disableCloseOnSelect: false,
-                    filterSelectedOptions: false,
-                }}
-            />
-            {item?.sku && <CmsAutocomplete
-                loading={detail_loading}
-                label="Id Sản phẩm"
-                value={item_detail}
-                multiple={false}
-                data={detail_data}
-                onChange={onChangeProductDetail}
-                required={true}
-                onKeyPress={(value) => { dispatch(searchDetail({ sku: value })) }}
-                autocompleteProps={{
-                    // limitTags: 20,
-                    getOptionLabel: (option) => option?.name || "",
-                    // ChipProps: {
-                    //     size: 'small'
-                    // },
-                    size: 'small',
-                    disableCloseOnSelect: false,
-                    filterSelectedOptions: false,
-                    getOptionSelected: (option, value) => parseFloat(option.uniqueid) === parseFloat(value.uniqueid),
-                }}
-            />}
-        </div>
+        <>
+            <div className="w-full py-6 md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
+                <CmsAutocomplete
+                    loading={loading}
+                    label="Danh sách Sản phẩm"
+                    value={item}
+                    multiple={false}
+                    data={product_data}
+                    onChange={onChangeSku}
+                    required={true}
+                    onKeyPress={(value) => { dispatch(getList({ search: value, homeSubscription: 2, PageNumber: 1, rowsPage: 30 })) }}
+                    autocompleteProps={{
+                        // limitTags: 20,
+                        getOptionLabel: (option) => option?.name,
+                        // ChipProps: {
+                        //     size: 'small'
+                        // },
+                        size: 'small',
+                        disableCloseOnSelect: false,
+                        filterSelectedOptions: false,
+                    }}
+                />
+                {item?.sku &&
+                    <CmsAutocomplete
+                        loading={detail_loading}
+                        label="Id Sản phẩm"
+                        value={item_detail}
+                        multiple={false}
+                        data={detail_data}
+                        onChange={onChangeProductDetail}
+                        required={true}
+                        onKeyPress={(value) => { dispatch(searchDetail({ sku: value })) }}
+                        autocompleteProps={{
+                            // limitTags: 20,
+                            getOptionLabel: (option) => option?.name || "",
+                            // ChipProps: {
+                            //     size: 'small'
+                            // },
+                            size: 'small',
+                            disableCloseOnSelect: false,
+                            filterSelectedOptions: false,
+                            getOptionSelected: (option, value) => parseFloat(option.uniqueid) === parseFloat(value.uniqueid),
+                        }}
+                    />}
+            </div>
+            {get(formik.values, `${prefix}.item`) && <InfoSKUProductContent data={get(formik.values, `${prefix}.item`) || null} />}
+        </>
     )
 }
-export default ProductSlotSKUItem
