@@ -97,6 +97,7 @@ export const initDetail = (data) => {
         "price": 0,
         "retailprice": 0,
         "wholesaleprice": 0,
+        "capacity": 0
     }
 }
 
