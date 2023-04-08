@@ -44,7 +44,7 @@ function BasicInfo({ formik, SaveData, }) {
                 <CmsImageBox2
                     title="Hình đại diện (Lưu ý: Click vào hình để upload !)"
                     loading={imageLoading}
-                    value={`${baseurl}${formik?.values?.image}` || noImage}
+                    value={formik?.values?.image ? `${baseurl}${formik?.values?.image}` : noImage}
                     setValue={HandleUploadImage}
                     styleImage={{className: 'w-128'}}
                     disablebtitle

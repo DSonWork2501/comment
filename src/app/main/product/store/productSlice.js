@@ -131,6 +131,20 @@ export const uploadImage = createAsyncThunk(`${appName}/${moduleName}/uploadImag
     }
 });
 
+/**
+ * @description upload hình ảnh
+ */
+export const getHistoryPrice = createAsyncThunk(`${appName}/${moduleName}/getHistoryPrice`, async (entity, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getHistoryPrice(entity);
+        const data = await response.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
+
 const initSearchState = {
     search: '',
     cate: '',
@@ -147,7 +161,9 @@ const productSlice = createSlice({
     initialState: {
         loading: false,
         imgLoading: false,
+        priceLoading: false,
         entities: null,
+        historyPrice: null,
         hsLoading: false,
         hsEntities: null,
         searchDetailEntities: null,
@@ -354,6 +370,27 @@ const productSlice = createSlice({
         [uploadImage.rejected]: (state, { error }) => ({
             ...state,
             imgLoading: false,
+            error: error
+        }),
+        /**
+         * @description getHistoryPrice
+         */
+        [getHistoryPrice.pending]: state => ({
+            ...state,
+            priceLoading: true,
+            error: null
+        }),
+        [getHistoryPrice.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                priceLoading: false,
+                historyPrice: payload,
+                error: null
+            }
+        },
+        [getHistoryPrice.rejected]: (state, { error }) => ({
+            ...state,
+            priceLoading: false,
             error: error
         }),
     }

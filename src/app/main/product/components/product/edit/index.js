@@ -16,6 +16,7 @@ import ClassifyInfo from "./ClassifyInfo"
 import { colors } from "@material-ui/core"
 import { alertInformation } from "@widgets/functions"
 import * as Yup from 'yup'
+import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
@@ -49,8 +50,7 @@ function EditProduct(props) {
                     products: [
                         initProduct(data)
                     ],
-                    details: data.detail
-
+                    details: [...data.detail.map(x => ({ ...x, model: values.ishs === HomeSubscription['1'].id ? x.model : '' }))]
                 }
                 params?.id === 0 ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))
             },
