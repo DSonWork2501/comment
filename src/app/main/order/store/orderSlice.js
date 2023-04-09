@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
+import { InitOrderModal } from '../model/modal';
 // import { getErrorMessage } from '@widgets/functions';
 
 
@@ -14,6 +15,24 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
         const response = await connect.live.order.getList(params);
         const data = await response.data;
         return data
+    } catch (error) {
+        // thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
+/**
+ * @description lấy chi tiết sản phẩm
+ */
+export const getDetail = createAsyncThunk(`${appName}/${moduleName}/getDetail`, async (params, thunkAPI) => {
+    try {
+        const { cusId, orderId } = params
+        if (cusId && orderId && orderId !== "0") {
+            const response = await connect.live.order.getDetail(cusId, orderId);
+            const data = await response.data.data;
+            return InitOrderModal({entity: data})
+        } else {
+            return InitOrderModal({customerid: cusId})
+        }
     } catch (error) {
         // thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
         return error
@@ -126,6 +145,27 @@ const orderSlice = createSlice({
             }
         },
         [getList.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        /**
+         * @description getDetail
+         */
+        [getDetail.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [getDetail.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                entity: payload,
+                error: null
+            }
+        },
+        [getDetail.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error
