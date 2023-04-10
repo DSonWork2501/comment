@@ -1,4 +1,4 @@
-import { CmsButtonProgress, CmsCardedPage, CmsTab } from "@widgets/components";
+import { CmsButton, CmsButtonProgress, CmsCardedPage, CmsTab } from "@widgets/components";
 import withReducer from "app/store/withReducer";
 import { useFormik } from "formik";
 import React from "react";
@@ -14,6 +14,7 @@ import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup";
 import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 import { useState } from "react";
 import DetailProductContent from "./detail/DetailProduct";
+import { Link } from "react-router-dom";
 
 const TabType = {
     'thongtin': { id: 'thongtin', name: 'Thông tin đơn hàng' },
@@ -60,13 +61,13 @@ function EditOrderContent() {
 
     return (
         <CmsCardedPage
-            title={orderId === '0' ? `Thêm mới đơn hàng (Mã ID: ${cusId})` : ''}
+            title={orderId === '0' ? `Thêm mới đơn hàng` : `Cập nhật đơn hàng (Mã ID: ${orderId})`}
             subTitle={'Tạo mới đơn hàng'}
             icon="whatshot"
             // leftBottomHeader={leftBottomHeader}
             rightHeaderButton={
                 <div>
-
+                     <CmsButton label="Danh sách đơn hàng" variant="text" color="default" component={Link} to={`/order`} className="mx-2" startIcon="arrow_back" />
                 </div>
             }
             content={

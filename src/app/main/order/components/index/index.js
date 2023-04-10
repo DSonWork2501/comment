@@ -63,7 +63,7 @@ function OrderView() {
         detail: <CmsIconButton onClick={() => HandleClickDetail(item)} size="small" tooltip={'Thông tin chi tiết'} icon="info" className="text-16 hover:shadow-2 text-grey-500 hover:text-grey-700" />,
         status: <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} />,
         action: (
-            <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
+            <div className="w-full flex flex-row">
                 <CmsIconButton tooltip={'Edit Trạng thái'} icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={()=>HandleChangeStatus(item)}/>
             </div>
         ) || []

@@ -48,7 +48,7 @@ export const InitOrderModal = ({entity, customerid}) => {
         "parentid": 0,
         "modifydate": "",
         "productorder": [
-            InitProductOrder()
+            // InitProductOrder()
         ]
     }
 }

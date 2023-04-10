@@ -1,5 +1,4 @@
 import { CmsAutocomplete } from "@widgets/components"
-import { keyStore } from "app/main/product/common"
 import { getList, getListHS, searchDetail } from "app/main/product/store/productSlice"
 import { get } from "lodash"
 import React, { useMemo } from "react"
@@ -26,7 +25,7 @@ function InfoSKUProductContent({ data }) {
     )
 }
 
-export default function ProductSlotSKUItem({ formik, prefix }) {
+export default function ProductSlotSKUItem({ formik, prefix, keyStore }) {
 
     const dispatch = useDispatch()
     const product_entities = useSelector(store => store[keyStore].product.hsEntities)?.data
