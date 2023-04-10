@@ -13,7 +13,7 @@ import BasicInfoContent from "./BasicInfo";
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup";
 import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 import { useState } from "react";
-import DetailProductContent from "./detail/DetailProduct";
+import DetailProductContent from "./DetailInfo";
 import { Link } from "react-router-dom";
 
 const TabType = {

@@ -81,6 +81,3 @@ export const InitProductOrder = (entity) => {
         }
     }
 }
-export const CustomModal = (entity) => {
-    return
-}

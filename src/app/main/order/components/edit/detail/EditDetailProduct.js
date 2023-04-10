@@ -1,15 +1,23 @@
 import { CmsDialog, CmsFormikTextField } from "@widgets/components"
-import ProductSlotSKUItem from "app/main/product/components/product/edit/classify/rightSide/ProductSlotItem"
+import ProductSlotSKUItem from "app/main/order/components/edit/detail/ProductSlotItem"
 import { useFormik } from "formik"
 import React from "react"
 import * as Yup from 'yup'
-import {keyStore} from 'app/main/order/common'
- 
- export default function EditDetailProductContent({data, open, HandleClose, HandleSave, prefix, formik}) {
-    
+import { keyStore } from 'app/main/order/common'
+
+export default function EditDetailProductContent({ data, open, HandleClose, HandleSave, formik, editIndex }) {
+
     const handleSaveData = (values) => {
-        // formik.setFieldValue(formik_item)
-        console.log('values', values)
+        
+        const {productorder} = formik.values
+        var arr = [...productorder]
+        if(editIndex){// cập nhật
+            arr.map((x, index)=>(editIndex === index ? { ...values }: x))
+        }else{ // tạo mới
+            arr = [...productorder, values]
+        }
+        formik.setFieldValue('productorder',  arr)
+        
     }
 
     const formik_item = useFormik({
@@ -23,19 +31,19 @@ import {keyStore} from 'app/main/order/common'
             // sku: Yup.string().typeError("SKU không được bỏ trống !").required("SKU không được bỏ trống !"),
         })
     })
-    console.log()
+
     return (
-        <CmsDialog 
+        <CmsDialog
             title={`Thêm mới sản phẩm`}
             open={open}
             handleClose={HandleClose}
-            HandleSave={formik_item.handleSubmit}
+            handleSave={formik_item.handleSubmit}
         >
-        <div className="w-full space-y-16">
-            <CmsFormikTextField size="small" formik={formik_item} name="capacity" label="Sức chứa"/>
-            <CmsFormikTextField size="small" formik={formik_item} name="quantity" label="Số lượng"/>
-            <ProductSlotSKUItem formik={formik_item} prefix={prefix} keyStore={keyStore}/>
-        </div>
+            <div className="w-full space-y-16">
+                {/* <CmsFormikTextField isNumber size="small" formik={formik_item} name="capacity" label="Sức chứa" />
+                <CmsFormikTextField isNumber size="small" formik={formik_item} name="quantity" label="Số lượng" /> */}
+                <ProductSlotSKUItem formik={formik_item} keyStore={keyStore} />
+            </div>
         </CmsDialog>
     )
- }
+}
