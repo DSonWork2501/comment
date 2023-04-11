@@ -15,6 +15,8 @@ import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 import { useState } from "react";
 import DetailProductContent from "./DetailInfo";
 import { Link } from "react-router-dom";
+import { alertInformation } from "@widgets/functions";
+import { insertOrder } from "app/main/order/store/orderSlice";
 
 const TabType = {
     'thongtin': { id: 'thongtin', name: 'Thông tin đơn hàng' },
@@ -34,8 +36,14 @@ function EditOrderContent() {
         dispatch(getCustomers())
     }, [dispatch, cusId, orderId])
 
-    const handleSaveData = () => {
-
+    const handleSaveData = (values) => {
+        alertInformation({
+            text: 'Bạn có muốn lưu thông tin ?',
+            data: values,
+            confirm: (item) => {
+                dispatch(insertOrder(item))
+            }
+        })
     }
     const handleResetData = () => {
 

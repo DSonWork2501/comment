@@ -146,7 +146,7 @@ export default function ProductSlotSKUItem({ formik, keyStore, HandleAddData }) 
                             {!isNaN(value?.price) && <LabelInfo label={{ content: 'giá' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />}
                         </div>
                         <div className="flex flex-row w-2/6 self-center space-x-16">
-                            <CmsFormikTextField isNumber size="small" formik={formik} name="capacity" label="Sức chứa" />
+                            {/* <CmsFormikTextField isNumber size="small" formik={formik} name="capacity" label="Sức chứa" /> */}
                             <CmsFormikTextField isNumber size="small" formik={formik} name="quantity" label="Số lượng" />
                             <CmsButton size="small" label="thêm" onClick={() => HandleAddData()} />
                         </div>

@@ -1,4 +1,4 @@
-import { CmsBoxLine, CmsButton, CmsTableBasic } from "@widgets/components"
+import { CmsBoxLine, CmsButton, CmsFormikTextField, CmsTableBasic } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { initColumn } from "@widgets/functions"
 import React, {  } from "react"
@@ -46,13 +46,13 @@ export default function DetailProductContent({ formik, keyStore }) {
         stt: index + 1,
         info: <InfoProductDetail data={x} index={index} />,
         price: !isNaN(parseInt(x?.price)) ? x?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0,
-        quantity: x.quantity || 0,
+        quantity: <CmsFormikTextField inputProps={{ min: 0, max: 10  }} isNumber key={`${index}_quantity_detail_edit`} name={`productorder[${index}].quantity`} isNumberFormat formik={formik} label="Số lượng"/>,
         thaotac: <div className="w-full flex flex-row">
             <CmsButton label="xóa" className="bg-red-500 hover:bg-red-700 hover:shadow-2" onClick={()=>HandleDelete(index)}/>
         </div>
     }))
     return (
-        <div className="w-full space-y-16 p-20">
+        <div className="w-full space-y-16 p-20 pb-40">
             <CmsBoxLine label={"Tìm kiếm sản phẩm"}>
                 <CreateDetailProduct 
                     formik={formik}

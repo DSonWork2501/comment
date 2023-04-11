@@ -3,6 +3,7 @@ import React from "react"
 import ProductSlotSKUItem from "./ProductSlotItem"
 import { keyStore } from "app/main/order/common"
 import { InitProductOrder } from "app/main/order/model/modal"
+import CmsAccordion from "@widgets/components/CmsAccordion"
 
 export default function CreateDetailProduct({formik}) {
 
@@ -19,6 +20,8 @@ export default function CreateDetailProduct({formik}) {
     }
 
     return (
-        <ProductSlotSKUItem formik={formik_item} keyStore={keyStore} HandleAddData={HandleAddData}/>
+        <CmsAccordion title={"Click để sổ chọn"}>
+            <ProductSlotSKUItem formik={formik_item} keyStore={keyStore} HandleAddData={HandleAddData}/>
+        </CmsAccordion>
     )
 }
