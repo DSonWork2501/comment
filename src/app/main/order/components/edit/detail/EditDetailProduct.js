@@ -1,4 +1,4 @@
-import { CmsDialog, CmsFormikTextField } from "@widgets/components"
+import { CmsDialog } from "@widgets/components"
 import ProductSlotSKUItem from "app/main/order/components/edit/detail/ProductSlotItem"
 import { useFormik } from "formik"
 import React from "react"
