@@ -37,13 +37,18 @@ const InfoProductDetail = React.memo(({ data, index }) => {
 export default function DetailProductContent({ formik, keyStore }) {
     const { productorder } = formik.values
     // console.log('productorder', productorder)
+
+    const HandleDelete = (index_item) => {
+        formik.setFieldValue('productorder', productorder.filter((x, index)=> index !== index_item))
+    }
+
     const data = productorder?.map((x, index) => ({
         stt: index + 1,
         info: <InfoProductDetail data={x} index={index} />,
         price: !isNaN(parseInt(x?.price)) ? x?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0,
         quantity: x.quantity || 0,
         thaotac: <div className="w-full flex flex-row">
-            <CmsButton label="xóa" className="bg-red-500 hover:bg-red-700 hover:shadow-2" onClick={()=>{}}/>
+            <CmsButton label="xóa" className="bg-red-500 hover:bg-red-700 hover:shadow-2" onClick={()=>HandleDelete(index)}/>
         </div>
     }))
     return (

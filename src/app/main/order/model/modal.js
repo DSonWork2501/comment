@@ -32,7 +32,7 @@ export const InitOrderModal = ({entity, customerid}) => {
         "carrierserviceid": 0,
         "customershipfee": 0,
         "deliverydate": null,
-        "status": 0,
+        "status": 1,
         "description": null,
         "privatedescription": "",
         "createdate": "",

@@ -40,22 +40,47 @@ export default function ProductSlotSKUItem({ formik, keyStore, HandleAddData }) 
 
     const onChangeSku = (event, value) => {
         console.log('sku', value)
-        formik.setValues((prev) => ({
-            ...prev,
-            sku: value.sku,
-            name: value.name,
-            img: value.img,
-            image: value.image
-        }))
+        if (value) {
+            formik.setValues((prev) => ({
+                ...prev,
+                sku: value.sku,
+                name: value.name,
+                img: value.img,
+                image: value.image,
+                'uniqueid': '',
+                'model': '',
+                'price': 0
+            }))
+        }else{
+            formik.setValues((prev) => ({
+                ...prev,
+                sku: '',
+                name: '',
+                img: '',
+                image: '',
+                'uniqueid': '',
+                'model': '',
+                'price': 0
+            }))
+        }
+
     }
     const onChangeProductDetail = (event, value) => {
-        console.log('unquiID', value)
-        formik.setValues((prev) => ({
-            ...prev,
-            'uniqueid': value?.uniqueid,
-            'model': value?.model,
-            'price': value?.price
-        }))
+        if (value) {
+            formik.setValues((prev) => ({
+                ...prev,
+                'uniqueid': value?.uniqueid,
+                'model': value?.model,
+                'price': value?.price
+            }))
+        }else{
+            formik.setValues((prev) => ({
+                ...prev,
+                'uniqueid': '',
+                'model': '',
+                'price': 0
+            }))
+        }
     }
 
     const value = formik?.values
