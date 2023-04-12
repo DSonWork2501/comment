@@ -1,4 +1,4 @@
-export const InitOrderModal = ({entity, customerid}) => {
+export const InitOrderModal = ({ entity, customerid }) => {
     if (entity) {
         return {
             ...entity,
@@ -49,7 +49,12 @@ export const InitOrderModal = ({entity, customerid}) => {
         "modifydate": "",
         "productorder": [
             // InitProductOrder()
-        ]
+        ],
+        "cusid": "",
+        "orderid": 0,
+        "contractid": 0,
+        "expire": 0,
+        "signature": ""
     }
 }
 export const InitProductOrder = (entity) => {
@@ -79,5 +84,55 @@ export const InitProductOrder = (entity) => {
             "capacity": 0,
             "model": ""
         }
+    }
+}
+export const customModal = (item) => {
+    return {
+        "order": {
+            "depotid": item.depotid,
+            "type": item.type,
+            "customerid": item.customerid,
+            "customername": item.customername,
+            "customermoblie": item.customermoblie,
+            "customeremail": item.customeremail,
+            "customeraddress": item.customeraddress,
+            "customercity": item.customercity?.name,
+            "customerdistrict": item.customerdistrict?.name,
+            "customerward": item.customerward?.name,
+            "moneytotal": item.moneytotal,
+            "moneydiscount": item.moneydiscount,
+            "moneytransfer": item.moneytransfer,
+            "moneytransferaccount": item.moneytransferaccount,
+            "moneydeposit": item.moneydeposit,
+            "moneydepositaccount": item.moneydepositaccount,
+            "paymentmethod": item.paymentmethod,
+            "paymentcode": item.paymentcode,
+            "paymentgateway": item.paymentgateway,
+            "carrierid": item.carrierid,
+            "carrierserviceid": item.carrierserviceid,
+            "customershipfee": item.customershipfee,
+            "deliverydate": item.deliverydate,
+            "status": item.status,
+            "description": item.description,
+            "privatedescription": item.privatedescription,
+            "couponcode": item.couponcode,
+            "allowtest": item.allowtest,
+            "autosend": item.autosend,
+            "sendcarriertype": item.sendcarriertype,
+            "usedpoints": item.usedpoints,
+            "discount": item.discount,
+            "ref": item.ref,
+            "bonus": item.bonus,
+            "combo": item.combo,
+            "parentid": item.parentid
+          },
+        "contract": {
+            "cusid": item.cusid,
+            "orderid": item.orderid,
+            "contractid": item.contractid,
+            "expire": item.expire,
+            "signature": item.signature
+          },
+        "details": item.productorder || []
     }
 }

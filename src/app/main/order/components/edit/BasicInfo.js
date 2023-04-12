@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikTextField } from "@widgets/components";
+import { CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikTextField, CmsSignature } from "@widgets/components";
 import { useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import LocationContent from "./basic/LocationContent";
@@ -15,7 +15,7 @@ export default function BasicInfoContent({ formik }) {
             <CmsFormikTextField size="small" required={false} formik={formik} name="customername" label="Tên khách hàng" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customermoblie" label="Điện thoại" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customeremail" label="Email" />
-            <LocationContent formik={formik}/>
+            <LocationContent formik={formik} />
             <CmsFormikAutocomplete data={Object.values(orderPaymentMethod)} size="small" required={false} formik={formik} name="type" label="Loại" />
             <CmsFormikAutocomplete size="small" data={Object.values(orderAllowTest)} valueIsId formik={formik} name="allowtest" label="Allow Test" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="customershipfee" label="Phí ship" />
@@ -37,6 +37,11 @@ export default function BasicInfoContent({ formik }) {
             <CmsFormikTextField endNode="điểm" size="small" required={false} formik={formik} name="usedpoints" label="Điểm dùng được" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="ref" label="giới thiệu" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="bonus" label="Tiền hoa hồng" />
+            <CmsSignature
+                title="Chữ ký"
+                setValue={(value)=> formik.setFieldValue('signature', value) }
+                value={formik?.values?.signature || ''}
+            />
         </div>
     )
 }

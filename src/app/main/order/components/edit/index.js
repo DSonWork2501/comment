@@ -17,6 +17,7 @@ import DetailProductContent from "./DetailInfo";
 import { Link } from "react-router-dom";
 import { alertInformation } from "@widgets/functions";
 import { insertOrder } from "app/main/order/store/orderSlice";
+import { customModal } from "../../model/modal";
 
 const TabType = {
     'thongtin': { id: 'thongtin', name: 'Thông tin đơn hàng' },
@@ -41,7 +42,7 @@ function EditOrderContent() {
             text: 'Bạn có muốn lưu thông tin ?',
             data: values,
             confirm: (item) => {
-                dispatch(insertOrder(item))
+                dispatch(insertOrder(customModal(item)))
             }
         })
     }
