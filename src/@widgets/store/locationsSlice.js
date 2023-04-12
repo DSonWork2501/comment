@@ -1,56 +1,122 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import {showMessage} from 'app/store/fuse/messageSlice'
-import {storage} from '@widgets/functions'
-import {KeyStorage} from '@widgets/metadatas'
+// import {storage} from '@widgets/functions'
+// import {KeyStorage} from '@widgets/metadatas'
 
 const appName = "Widgets";
-const moduleName = "areas";
+const moduleName = "location";
 
 /**
  * @description Get Locations
  */
-export const getLocations = createAsyncThunk(`${appName}/${moduleName}/getLocations`, async (params, thunkAPI) => {
+export const getCity = createAsyncThunk(`${appName}/${moduleName}/getCity`, async (params, thunkAPI) => {
     try {
-        const response = await connect.live.Schedule3G.getLocations()
+        const response = await connect.live.location.getList({...params, type: 'CITY'})
         const data = await response.data.data;
-        storage.setStorage(KeyStorage.locations, data)
         return data
     } catch (error) {
         thunkAPI.dispatch(showMessage({variant: "error", message: error.message}))
     }
 });
 
-const widgetFoldersSlice = createSlice({
+export const getDistrict = createAsyncThunk(`${appName}/${moduleName}/getDistrict`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.location.getList({...params, type: 'DISTRICT'})
+        const data = await response.data.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({variant: "error", message: error.message}))
+    }
+});
+
+export const getWard = createAsyncThunk(`${appName}/${moduleName}/getWard`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.location.getList({...params, type: 'WARD'})
+        const data = await response.data.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({variant: "error", message: error.message}))
+    }
+});
+
+const widgetLocationsSlice = createSlice({
 	name: `${appName}/${moduleName}`,
 	initialState: {
-        loading: false,
-        entities: null,
+        cityLoading: false,
+        districtLoading: false,
+        wardLoading: false,
+        citys: null,
+        districts: null,
+        wards: null,
         error: null,
     },
 	extraReducers: {
         /**
-         * @description getFolders
+         * @description getCity
          */
-        [getLocations.pending]: state => ({
+        [getCity.pending]: state => ({
             ...state,
-            loading: true,
+            cityLoading: true,
             error: null
         }),
-        [getLocations.fulfilled]: (state, { payload }) => {
+        [getCity.fulfilled]: (state, { payload }) => {
             return {
                 ...state,
-                loading: false,
-                entities: payload,
+                cityLoading: false,
+                citys: payload,
                 error: null
             }
         },
-        [getLocations.rejected]: (state, {error}) => ({
+        [getCity.rejected]: (state, {error}) => ({
             ...state,
-            loading: false,
+            cityLoading: false,
             error: error
         }),
+        /**
+         * @description getDistrict
+         */
+        [getDistrict.pending]: state => ({
+            ...state,
+            districtLoading: true,
+            error: null
+        }),
+        [getDistrict.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                districtLoading: false,
+                districts: payload,
+                error: null
+            }
+        },
+        [getDistrict.rejected]: (state, {error}) => ({
+            ...state,
+            districtLoading: false,
+            error: error
+        }),
+        /**
+         * @description getWard
+         */
+        [getWard.pending]: state => ({
+            ...state,
+            wardLoading: true,
+            error: null
+        }),
+        [getWard.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                wardLoading: false,
+                wards: payload,
+                error: null
+            }
+        },
+        [getWard.rejected]: (state, {error}) => ({
+            ...state,
+            wardLoading: false,
+            error: error
+        }),
+        
 	}
 });
 
-export default widgetFoldersSlice.reducer;
+export default widgetLocationsSlice.reducer;

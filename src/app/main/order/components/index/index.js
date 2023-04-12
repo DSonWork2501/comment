@@ -7,14 +7,15 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { keyStore } from "../common";
-import FilterOptionView from "./index/filterOptionView";
-import reducer from "../store";
-import { getList as getOrder, resetSearch, setSearch, updateOrderStatus } from "../store/orderSlice";
+import { keyStore } from "../../common";
+import FilterOptionView from "./filterOptionView";
+import reducer from "../../store";
+import { getList as getOrder, resetSearch, setSearch, updateOrderStatus } from "../../store/orderSlice";
 import clsx from "clsx";
-import { orderStatus } from "../model/status";
-import OrderDetailContent from "./index/orderDetail";
-import ChangeOderStatusContent from "./index/changeOrderStatus";
+import { orderStatus } from "../../model/status";
+import OrderDetailContent from "./orderDetail";
+import ChangeOderStatusContent from "./changeOrderStatus";
+import History from "@history";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -62,7 +63,7 @@ function OrderView() {
         detail: <CmsIconButton onClick={() => HandleClickDetail(item)} size="small" tooltip={'Thông tin chi tiết'} icon="info" className="text-16 hover:shadow-2 text-grey-500 hover:text-grey-700" />,
         status: <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} />,
         action: (
-            <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
+            <div className="w-full flex flex-row">
                 <CmsIconButton tooltip={'Edit Trạng thái'} icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={()=>HandleChangeStatus(item)}/>
             </div>
         ) || []
@@ -125,7 +126,8 @@ function OrderView() {
                     <div className="flex items-center justify-items-start">
                         <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType).filter(x => x.id === FilterOptions.FilterType.basic.id)} />
                     </div>
-                    <div className="flex items-center justify-end">
+                    <div className="flex items-center justify-end space-x-8">
+                        <CmsButton color="primary" label="Tạo đơn hàng" startIcon="add" onClick={() => History.push(`/order/edit/0/0`)}/>
                         <CmsButton color="default" label="Refresh" startIcon="refresh" onClick={HandleRefresh}/>
                         {/* <CmsMenu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} data={[
                             { id: 1, name: "Xuất Excel", icon: "upgrade", tooltip: "Chỉ hỗ trợ export 5000 chương trình", onClick: () => dispatch(exportExcel({ ...search, Limit: 5000 })) },

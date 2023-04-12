@@ -44,6 +44,7 @@ export default {
             update: entity => axios.put(`${baseurl}/product/update-product`, entity),
             delete: entity => axios.delete(`${baseurl}/product/delete-product`, entity),
             uploadImage: (entity) => axios.post(`${baseurl}/product/upload-image`, entity, { headers: { 'Content-Type': 'multipart/form-data' } }),
+            getHistoryPrice: params => axios.get(`${baseurl}/product/get-history-price`, { params }),
         },
         category: {
             getList: params => axios.get(`${baseurl}/product/get-category`, { params }),
@@ -60,8 +61,12 @@ export default {
         },
         order: {
             getList: params => axios.get(`${baseurl}/order/get-order`, { params }),
+            getDetail: (cusId, orderId) => axios.get(`${baseurl}/order/get-order-detail/${cusId}/${orderId}`),
+            insert: entity => axios.post(`${baseurl}/order/insert-order`, entity),
             update: entity => axios.put(`${baseurl}/order/update-order`, entity),
-
+        },
+        location:{
+            getList: params => axios.get(`${baseurl}/location/get-locations`, { params }),
         }
     },
 }

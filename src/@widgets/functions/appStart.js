@@ -8,6 +8,7 @@
 // import {getReasonDown} from '@widgets/store/reasonDownSlice'
 // import { storage } from '@widgets/functions'
 // import { KeyStorage } from '@widgets/metadatas'
+// import { getLocations } from '@widgets/store/locationsSlice'
 /**
  * @description gọi data theo flat
  * @author vinhtq24
@@ -18,7 +19,7 @@ const getAppStart = async(dispatch, flat) => {
     
         // const flatStorage = storage.getStorage(KeyStorage.appStart)
         // if (flat !== flatStorage) {
-        //     await storage.removeStorage(KeyStorage.categories)
+        //     await storage.removeStorage(KeyStorage.locations)
         //     await storage.removeStorage(KeyStorage.copyright)
         //     await storage.removeStorage(KeyStorage.country)
         //     await storage.removeStorage(KeyStorage.department)
@@ -27,7 +28,7 @@ const getAppStart = async(dispatch, flat) => {
         //     await storage.setStorage(KeyStorage.appStart, flat)
         // }
 
-        // dispatch(getCountry())
+        // dispatch(getLocations())
         // dispatch(getCopyright())
         // dispatch(getFolders())
         // dispatch(getUser())

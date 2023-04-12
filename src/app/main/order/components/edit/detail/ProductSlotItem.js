@@ -1,6 +1,6 @@
-import { CmsAutocomplete } from "@widgets/components"
+import { CmsAutocomplete, CmsBoxLine, CmsButton, CmsFormikTextField } from "@widgets/components"
 import { getList, getListHS, searchDetail } from "app/main/product/store/productSlice"
-import { get } from "lodash"
+// import { get } from "lodash"
 import React, { useMemo } from "react"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -8,24 +8,7 @@ import noImage from '@widgets/images/noImage.jpg';
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
-function InfoSKUProductContent({ data }) {
-    const { img, name, sku, type, uniqueid } = data
-    return (
-        <div className="w-full flex flex-row">
-            <div>
-                <img src={`${baseurl}${img}`} alt="image_detail" className="h-128" />
-            </div>
-            <div className="w-full self-center">
-                <LabelInfo label={{ content: 'name' }} info={{ content: name }} />
-                <LabelInfo label={{ content: 'uniqueid' }} info={{ content: uniqueid }} />
-                <LabelInfo label={{ content: 'sku' }} info={{ content: sku }} />
-                <LabelInfo label={{ content: 'type' }} info={{ content: type }} />
-            </div>
-        </div>
-    )
-}
-
-export default function ProductSlotSKUItem({ formik, prefix, keyStore }) {
+export default function ProductSlotSKUItem({ formik, keyStore, HandleAddData }) {
 
     const dispatch = useDispatch()
     const product_entities = useSelector(store => store[keyStore].product.hsEntities)?.data
@@ -36,7 +19,7 @@ export default function ProductSlotSKUItem({ formik, prefix, keyStore }) {
     // const [item, setItem] = useState(null)
     // const [item_detail, setItem_detail] = useState(null)
 
-    const item_product = get(formik.values, prefix)?.item ? get(formik.values, prefix)?.item : null
+    const item_product = formik.values || null
     const sku = item_product ? item_product?.sku : null
 
     useEffect(() => {
@@ -56,15 +39,54 @@ export default function ProductSlotSKUItem({ formik, prefix, keyStore }) {
     const item_detail = detail_data?.find(x => x.uniqueid === uniqueId) || null
 
     const onChangeSku = (event, value) => {
-        formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.img, sku: value?.sku, uniqueid: null })
+        console.log('sku', value)
+        if (value) {
+            formik.setValues((prev) => ({
+                ...prev,
+                sku: value.sku,
+                name: value.name,
+                img: value.img,
+                image: value.image,
+                'uniqueid': '',
+                'model': '',
+                'price': 0
+            }))
+        }else{
+            formik.setValues((prev) => ({
+                ...prev,
+                sku: '',
+                name: '',
+                img: '',
+                image: '',
+                'uniqueid': '',
+                'model': '',
+                'price': 0
+            }))
+        }
+
     }
     const onChangeProductDetail = (event, value) => {
-        formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), uniqueid: value?.uniqueid })
+        if (value) {
+            formik.setValues((prev) => ({
+                ...prev,
+                'uniqueid': value?.uniqueid,
+                'model': value?.model,
+                'price': value?.price
+            }))
+        }else{
+            formik.setValues((prev) => ({
+                ...prev,
+                'uniqueid': '',
+                'model': '',
+                'price': 0
+            }))
+        }
     }
 
+    const value = formik?.values
     console.log('formik prefix', formik.values)
     return (
-        <>
+        <div className="w-full space-y-16">
             <div className="w-full py-6 md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
                 <CmsAutocomplete
                     loading={loading}
@@ -108,8 +130,31 @@ export default function ProductSlotSKUItem({ formik, prefix, keyStore }) {
                             getOptionSelected: (option, value) => parseFloat(option.uniqueid) === parseFloat(value.uniqueid),
                         }}
                     />}
+
             </div>
-            {get(formik.values, `${prefix}.item`) && <InfoSKUProductContent data={get(formik.values, `${prefix}.item`) || null} />}
-        </>
+            {formik?.values?.sku &&
+                <CmsBoxLine label={'Thông tin sản phẩm'}>
+                    <div className="w-full flex flex-row">
+                        <div className="w-1/6">
+                            <img src={`${baseurl}${value?.img}`} alt="image_detail" className="h-128" />
+                        </div>
+                        <div className="w-3/6 self-center">
+                            <LabelInfo label={{ content: 'tên' }} info={{ content: value?.name }} />
+                            <LabelInfo label={{ content: 'uniqueid' }} info={{ content: value?.uniqueid }} />
+                            <LabelInfo label={{ content: 'sku' }} info={{ content: value?.sku }} />
+                            {value?.type && <LabelInfo label={{ content: 'loại' }} info={{ content: value?.type || '-' }} />}
+                            {!isNaN(value?.price) && <LabelInfo label={{ content: 'giá' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />}
+                        </div>
+                        <div className="flex flex-row w-2/6 self-center space-x-16">
+                            {/* <CmsFormikTextField isNumber size="small" formik={formik} name="capacity" label="Sức chứa" /> */}
+                            <CmsFormikTextField isNumber inputProps={{ inputProps: { min: 0, max: 1000 } }} size="small" formik={formik} name="quantity" label="Số lượng" />
+                            <CmsButton size="small" label="thêm" onClick={() => HandleAddData()} />
+                        </div>
+                        {/* <div className="flex flex-row w-1/5 self-center space-x-8">
+                        </div> */}
+                    </div>
+                </CmsBoxLine>
+            }
+        </div>
     )
 }

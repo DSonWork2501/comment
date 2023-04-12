@@ -3,6 +3,7 @@ import { CmsBoxLine, CmsFormikTextField } from "@widgets/components"
 import { get } from "lodash"
 import React, { } from "react"
 import ProductSlotSKUItem from "./rightSide/ProductSlotItem"
+import { keyStore } from "app/main/product/common"
 
 function RightSideContent({ formik, prefix }) {
     return (
@@ -15,7 +16,7 @@ function RightSideContent({ formik, prefix }) {
                     {get(formik?.values, `${prefix}.type`) === 'slot' &&
                         <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }} className="w-full">
                             <CmsBoxLine label="Lựa chọn sản phẩm">
-                                <ProductSlotSKUItem formik={formik} prefix={prefix} />
+                                <ProductSlotSKUItem formik={formik} prefix={prefix} keyStore={keyStore} />
                             </CmsBoxLine>
                         </FuseAnimateGroup>}
                 </div>
