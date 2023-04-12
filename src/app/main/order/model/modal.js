@@ -90,7 +90,7 @@ export const customModal = (item) => {
     return {
         "order": {
             "depotid": item.depotid,
-            "type": item.type,
+            "type": item.type ? item.type + '' : '0',
             "customerid": item.customerid,
             "customername": item.customername,
             "customermoblie": item.customermoblie,
@@ -127,7 +127,7 @@ export const customModal = (item) => {
             "parentid": item.parentid
           },
         "contract": {
-            "cusid": item.cusid,
+            "cusid": item.customerid,
             "orderid": item.orderid,
             "contractid": item.contractid,
             "expire": item.expire,

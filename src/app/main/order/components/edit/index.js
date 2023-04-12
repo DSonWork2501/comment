@@ -65,6 +65,17 @@ function EditOrderContent() {
     function handleChangeTab(event, value) {
         setTabValue(value);
     }
+    const setValue = formik.setFieldValue
+    const productorder = formik?.values?.productorder
+
+    useEffect(() => {
+        if (Array.isArray(productorder)){
+            var total = productorder?.map(x => x.quantity * x.price)
+            let sum = 0;
+            total.map(x => sum += x);
+            setValue('moneytotal', sum)
+        }
+    }, [productorder, setValue])
 
     console.log('formik', formik.values)
 
@@ -76,19 +87,19 @@ function EditOrderContent() {
             // leftBottomHeader={leftBottomHeader}
             rightHeaderButton={
                 <div>
-                     <CmsButton label="Danh sách đơn hàng" variant="text" color="default" component={Link} to={`/order`} className="mx-2" startIcon="arrow_back" />
+                    <CmsButton label="Danh sách đơn hàng" variant="text" color="default" component={Link} to={`/order`} className="mx-2" startIcon="arrow_back" />
                 </div>
             }
             content={
                 <>
                     {tabValue === TabType.thongtin.id && (
-                    <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }}>
-                        <BasicInfoContent formik={formik} />
-                    </FuseAnimateGroup>)}
+                        <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }}>
+                            <BasicInfoContent formik={formik} />
+                        </FuseAnimateGroup>)}
                     {tabValue === TabType.chitiet.id && (
-                    <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }}>
-                        <DetailProductContent formik={formik} />
-                    </FuseAnimateGroup>)}
+                        <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }}>
+                            <DetailProductContent formik={formik} />
+                        </FuseAnimateGroup>)}
                 </>
             }
             toolbar={

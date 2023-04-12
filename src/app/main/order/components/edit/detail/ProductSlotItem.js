@@ -147,7 +147,7 @@ export default function ProductSlotSKUItem({ formik, keyStore, HandleAddData }) 
                         </div>
                         <div className="flex flex-row w-2/6 self-center space-x-16">
                             {/* <CmsFormikTextField isNumber size="small" formik={formik} name="capacity" label="Sức chứa" /> */}
-                            <CmsFormikTextField isNumber size="small" formik={formik} name="quantity" label="Số lượng" />
+                            <CmsFormikTextField isNumber inputProps={{ inputProps: { min: 0, max: 1000 } }} size="small" formik={formik} name="quantity" label="Số lượng" />
                             <CmsButton size="small" label="thêm" onClick={() => HandleAddData()} />
                         </div>
                         {/* <div className="flex flex-row w-1/5 self-center space-x-8">

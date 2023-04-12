@@ -3,12 +3,13 @@ import { CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikTextField, Cms
 import { useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import LocationContent from "./basic/LocationContent";
-import { orderAllowTest, orderPaymentMethod } from "../../model";
+import { orderAllowTest, orderPaymentMethod, orderType } from "../../model";
 
 export default function BasicInfoContent({ formik }) {
+
     const cusEntity = useSelector(store => store[keyStore].customer.entities)
     const cusData = useMemo(() => cusEntity?.data?.map(x => ({ id: x.id, name: `id: ${x.id || '-'}, tên: ${x.name || '-'}, email: ${x.email || '-'}` })) || [], [cusEntity])
-    // console.log('cusData', cusData)
+   
     return (
         <div className="w-full space-y-16 p-20 pb-40">
             <CmsFormikAutocomplete size="small" data={cusData} valueIsId formik={formik} name="customerid" label="Mã khách hàng" />
@@ -16,31 +17,31 @@ export default function BasicInfoContent({ formik }) {
             <CmsFormikTextField size="small" required={false} formik={formik} name="customermoblie" label="Điện thoại" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customeremail" label="Email" />
             <LocationContent formik={formik} />
-            <CmsFormikAutocomplete data={Object.values(orderPaymentMethod)} size="small" required={false} formik={formik} name="type" label="Loại" />
+            <CmsFormikAutocomplete data={Object.values(orderType)} size="small" required={false} formik={formik} name="type" label="Loại" />
             <CmsFormikAutocomplete size="small" data={Object.values(orderAllowTest)} valueIsId formik={formik} name="allowtest" label="Allow Test" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="customershipfee" label="Phí ship" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="couponcode" label="Mã coupon" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="combo" label="Combo" />
             <CmsFormikDateTimePicker isOpenKeyBoard={false} format="yyyy-MM-dd HH:mm:ss" size="small" required={false} formik={formik} name="deliverydate" label="Ngày giao hàng" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="description" label="Mô tả" />
-            <CmsFormikTextField endNode="%" size="small" required={false} formik={formik} name="discount" label="Giảm giá" />
+            <CmsFormikTextField isNumber endNode="%" size="small" required={false} formik={formik} name="discount" label="Giảm giá" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="moneydeposit" label="Tiền gửi" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="moneydepositaccount" label="Tài khoản tiền gửi" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="moneydiscount" label="Tiền Giảm giá" />
-            <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="moneytotal" label="Tổng tiền" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="moneytransfer" label="Tiền chuyển khoản" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="moneytransferaccount" label="Tài khoản tiền chuyển khoản" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="paymentcode" label="Mã thanh toán" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="paymentgateway" label="Cổng thanh toán" />
-            <CmsFormikTextField size="small" required={false} formik={formik} name="paymentmethod" label="Phương thức thanh toán" />
+            <CmsFormikAutocomplete data={Object.values(orderPaymentMethod)} size="small" required={false} formik={formik} name="paymentmethod" label="Phương thức thanh toán" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="privatedescription" label="Mô tả riêng tư" />
             <CmsFormikTextField endNode="điểm" size="small" required={false} formik={formik} name="usedpoints" label="Điểm dùng được" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="ref" label="giới thiệu" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="bonus" label="Tiền hoa hồng" />
             <CmsSignature
                 title="Chữ ký"
-                setValue={(value)=> formik.setFieldValue('signature', value) }
+                setValue={(value) => formik.setFieldValue('signature', value)}
                 value={formik?.values?.signature || ''}
+                className={'w-full shadow-4'}
             />
         </div>
     )

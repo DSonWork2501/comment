@@ -46,6 +46,7 @@ export const insertOrder = createAsyncThunk(`${appName}/${moduleName}/insertOrde
     try {
         const response = await connect.live.order.insert(entity);
         const data = await response.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
         return data
 
     } catch (error) {
