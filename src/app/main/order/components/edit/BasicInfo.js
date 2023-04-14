@@ -8,11 +8,21 @@ import { orderAllowTest, orderPaymentMethod, orderType } from "../../model";
 export default function BasicInfoContent({ formik }) {
 
     const cusEntity = useSelector(store => store[keyStore].customer.entities)
-    const cusData = useMemo(() => cusEntity?.data?.map(x => ({ id: x.id, name: `id: ${x.id || '-'}, tên: ${x.name || '-'}, email: ${x.email || '-'}` })) || [], [cusEntity])
-   
+    const cusData = useMemo(() => cusEntity?.data?.map(x => ({ ...x, id: x.id, name: `id: ${x.id || '-'}, tên: ${x.name || '-'}, email: ${x.email || '-'}`, cusName: x.name })) || [], [cusEntity])
+
+    const HandleChangeCusId = (value) => {
+        const itemValue = {
+            customerid: value.id,
+            customername: value.cusName,
+            customermoblie: value.phone,
+            customeremail: value.email
+        }
+        formik.setValues({ ...formik.values, ...itemValue })
+    }
+
     return (
         <div className="w-full space-y-16 p-20 pb-40">
-            <CmsFormikAutocomplete size="small" data={cusData} valueIsId formik={formik} name="customerid" label="Mã khách hàng" />
+            <CmsFormikAutocomplete onChangeValue={HandleChangeCusId} size="small" data={cusData} valueIsId formik={formik} name="customerid" label="Mã khách hàng" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customername" label="Tên khách hàng" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customermoblie" label="Điện thoại" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customeremail" label="Email" />

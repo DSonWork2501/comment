@@ -57,8 +57,8 @@ function EditOrderContent() {
         onSubmit: handleSaveData,
         // validate: () => { Object.values(formik.errors)?.length > 0 && setTabValue(TabType.co_ban.id) },
         validationSchema: Yup.object({
-            // name: Yup.string().typeError("Tên sản phẩm không được bỏ trống !").required("Tên sản phẩm không được bỏ trống !"),
-            // sku: Yup.string().typeError("SKU không được bỏ trống !").required("SKU không được bỏ trống !"),
+            customerid: Yup.number().typeError("Mã khách hàng không được bỏ trống !").required("Mã khách hàng không được bỏ trống !"),
+            customername: Yup.string().typeError("Tên khách hàng không được bỏ trống !").required("Tên khách hàng không được bỏ trống !"),
         })
     })
 
@@ -67,7 +67,7 @@ function EditOrderContent() {
     }
     const setValue = formik.setFieldValue
     const productorder = formik?.values?.productorder
-
+    
     useEffect(() => {
         if (Array.isArray(productorder)){
             var total = productorder?.map(x => x.quantity * x.price)

@@ -11,7 +11,7 @@ export const InitOrderModal = ({ entity, customerid }) => {
         "id": 0,
         "depotid": 0,
         "type": "",
-        "customerid": "",
+        "customerid": null,
         "customername": "",
         "customermoblie": "",
         "customeremail": "",
