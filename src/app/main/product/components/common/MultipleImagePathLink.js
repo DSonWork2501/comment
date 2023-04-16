@@ -11,8 +11,8 @@ function MutipleImagePathLink({ formik }) {
         var result = []
         var error = []
         if (files.length > 0) {
-            let findDuplicates = arr => arr.filter((item, index) => arr.indexOf(item) !== index)
-            var dupImages = findDuplicates([...[...files].map(x => (`${formik?.values?.sku}/${x?.name}`)), ...formik?.values?.images])
+            let findDuplicates = arr => Array.isArray(arr) && arr.length > 0 ? arr.filter((item, index) => arr.indexOf(item) !== index): []
+            var dupImages = findDuplicates([...[...files].map(x => (`${formik?.values?.sku}/${x?.name}`)), ...formik?.values?.images || []])
             if (dupImages?.length > 0) {
                 dispatch(showMessage({ variant: "error", message: `Tên hình đã tồn tại: ${dupImages.join(',')} !` }))
                 return false
@@ -29,7 +29,7 @@ function MutipleImagePathLink({ formik }) {
                     error = [...error, `${formik?.values?.sku}/${item?.name}`]
                 }
             }
-            result?.length > 0 && formik.setFieldValue('images', [...formik?.values?.images, ...result])
+            result?.length > 0 && formik.setFieldValue('images', [...formik?.values?.images || [], ...result])
         }
     }
 
