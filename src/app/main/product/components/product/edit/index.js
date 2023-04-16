@@ -50,7 +50,7 @@ function EditProduct(props) {
                     products: [
                         initProduct(data)
                     ],
-                    details: [...data.detail.map(x => ({ ...x, model: values.ishs === HomeSubscription['1'].id ? x.model : '' }))]
+                    details: [...data.detail.map(x => ({ ...x, model: parseInt(values.ishs) === parseInt(HomeSubscription['1'].id) ? x.model : '' }))]
                 }
                 params?.id === 0 ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))
             },
