@@ -78,7 +78,6 @@ function EditOrderContent() {
     }, [productorder, setValue])
 
     console.log('formik', formik.values)
-
     return (
         <CmsCardedPage
             title={orderId === '0' ? `Thêm mới đơn hàng` : `Cập nhật đơn hàng (Mã ID: ${orderId})`}

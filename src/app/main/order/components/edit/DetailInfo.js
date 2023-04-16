@@ -1,9 +1,10 @@
-import { CmsBoxLine, CmsButton, CmsFormikTextField, CmsTableBasic } from "@widgets/components"
+import { CmsBoxLine, CmsButton, CmsTableBasic, CmsTextField } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { initColumn } from "@widgets/functions"
 import React, { } from "react"
 import noImage from '@widgets/images/noImage.jpg';
 import CreateDetailProduct from "./detail/CreateDetailProduct";
+import { get } from "lodash";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const columns = [
@@ -20,21 +21,21 @@ const InfoProductDetail = React.memo(({ data, index }) => {
     return (
         <div key={`InfoProductDetail_${index}_div_0`} className="w-full flex flex-row space-x-16">
             <div>
-                <img key={`InfoProductDetail_${index}_div_img`} src={image || noImage} alt="image_detail" className="h-92 min-w-44" />
+                <img key={`InfoProductDetail_${index}_div_img`} src={image || noImage} alt="image_detail" className="h-80 min-w-52" />
             </div>
             <div className="w-full self-center space-y-16">
-                <LabelInfo label={{ content: 'uniqueid' }} info={{ content: uniqueid || '-' }} />
-                <LabelInfo label={{ content: 'Tên' }} info={{ content: name || '-' }} />
+                <LabelInfo label={{ content: 'uniqueid', className: 'min-w-min' }} info={{ content: uniqueid || '-' }} />
+                <LabelInfo label={{ content: 'tên', className: 'min-w-min' }} info={{ content: name || '-' }} />
             </div>
             <div className="w-full self-center space-y-16">
-                <LabelInfo label={{ content: 'giá' }} info={{ content: !isNaN(parseInt(price)) ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' }} />
-                <LabelInfo label={{ content: 'imei hs' }} info={{ content: imei_hs || '-' }} />
+                <LabelInfo label={{ content: 'giá', className: 'min-w-min' }} info={{ content: !isNaN(parseInt(price)) ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' }} />
+                <LabelInfo label={{ content: 'imei hs', className: 'min-w-min' }} info={{ content: imei_hs || '-' }} />
             </div>
         </div>
     )
 })
 
-export default function DetailProductContent({ formik, keyStore }) {
+export default function DetailProductContent({ formik }) {
     const { productorder, moneytotal } = formik.values
     // console.log('productorder', productorder)
 
@@ -46,7 +47,17 @@ export default function DetailProductContent({ formik, keyStore }) {
         stt: index + 1,
         info: <InfoProductDetail data={x} index={index} />,
         totalprice: (parseInt(x?.quantity || 0) * parseInt(x?.price || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        quantity: <CmsFormikTextField inputProps={{ inputProps: { min: 0, max: 1000 } }} isNumber key={`${index}_quantity_detail_edit`} name={`productorder[${index}].quantity`} formik={formik} label="Số lượng" />,
+        quantity: <CmsTextField
+            inputProps={{ inputProps: { min: 0, max: 1000 } }}
+            isNumber
+            key={`${index}_quantity_detail_edit`}
+            name={`productorder[${index}].quantity`}
+            value={get(formik.values, `productorder[${index}].quantity` || 0)}
+            onChange={formik.handleChange}
+            label=""
+            variant="standard"
+            className="w-44"
+        />,
         thaotac: <div className="w-full flex flex-row">
             <CmsButton label="xóa" className="bg-red-500 hover:bg-red-700 hover:shadow-2" onClick={() => HandleDelete(index)} />
         </div>
@@ -60,14 +71,16 @@ export default function DetailProductContent({ formik, keyStore }) {
             </CmsBoxLine>
             <div className="flex flex-row-reverse">
             </div>
-            <CmsTableBasic
-                tableClassName="overflow-hidden"
-                // className=""
-                columns={columns}
-                data={data}
-                isPagination={false}
-                footerData={{ quantity: 'Tổng tiền', totalprice: !isNaN(parseInt(moneytotal)) ? moneytotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' }}
-            />
+            <CmsBoxLine label={'Danh sách chi tiết sản phẩm'}>
+                <CmsTableBasic
+                    tableClassName="overflow-hidden"
+                    // className=""
+                    columns={columns}
+                    data={data}
+                    isPagination={false}
+                    footerData={data?.length > 0 ? { quantity: 'Tổng tiền', totalprice: !isNaN(parseInt(moneytotal)) ? moneytotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' } : null}
+                />
+            </CmsBoxLine>
         </div>
     )
 }
