@@ -6,6 +6,8 @@ import { InitProductOrder } from "app/main/order/model/modal"
 import CmsAccordion from "@widgets/components/CmsAccordion"
 import { CmsAlert } from "@widgets/components"
 
+export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
+
 export default function CreateDetailProduct({ formik }) {
     const formik_item = useFormik({
         initialValues: InitProductOrder(),
@@ -13,12 +15,22 @@ export default function CreateDetailProduct({ formik }) {
         enableReinitialize: true,
     })
 
-    const HandleAddData = ({quantity, item}) => {
+    const HandleAddData = ({ quantity, item }) => {
         if (!quantity || quantity === 0) {
             CmsAlert.fire({ heightAuto: false, text: 'Vui lòng nhập số lượng sản phẩm !', icon: 'error' })
         } else {
             const { productorder } = formik.values
-            const itemAdd = {...formik_item.values, quantity: quantity, uniqueid: item.uniqueid, price: item.price}
+            console.log('item', item)
+            console.log('formik_item.values', formik_item.values)
+            var itemAdd = {
+                ...formik_item.values,
+                quantity: quantity,
+                uniqueid: item.uniqueid,
+                price: item.price,
+            }
+            if (item.name) itemAdd = { ...itemAdd, name: item.name }
+            if (item.img) itemAdd = { ...itemAdd, image: `${baseurl}${item.img}` }
+            console.log('itemAdd', itemAdd)
             formik.setFieldValue('productorder', [...productorder, itemAdd])
         }
     }
