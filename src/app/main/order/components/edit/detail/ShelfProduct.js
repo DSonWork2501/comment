@@ -86,8 +86,8 @@ function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
 function DetailModelContent({ value, classes, HandleAddData }) {
     const slots = value?.slots || []
     return (
-        <div className="w-full grid">
-            <div className="w-full shadow-4 bg-green-500 rounded-4 grid">
+        <div className="w-full grid border-solid border-2 border-green-500 rounded-4">
+            <div className="w-full shadow-4 bg-green-500 rounded-2 grid">
                 <CmsLabel
                     className="text-white justify-self-center"
                     content={value?.name}
