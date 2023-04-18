@@ -40,18 +40,18 @@ function DetailShelfContent({ value, img, index, handleClickBread, classes, Hand
 
 function DetailShelfProductContent({ value, img, index, handleClickBread, classes, HandleAddData }) {
     return (
-        <div onClick={handleClickBread} className="w-full">
-            <div
-                key={`div-0-detai-${index}`}
-                className={clsx("w-full flex flex-row shadow-2 hover:shadow-4 py-4", classes.shelf)}
-            >
-                <img src={img || noImage} alt="image_detail" className="h-128" />
-                <div className="grid justify-items-start">
-                    <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min' }} info={{ content: value?.uniqueid || '-' }} />
-                    <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
-                    <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min' }} info={{ content: value?.color || '-' }} />
-                    <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'S/lượng', className: 'min-w-min' }} info={{ content: value?.quantity || '-' }} />
-                </div>
+        <div
+            key={`div-0-detai-${index}`}
+            className={clsx("w-full flex flex-row shadow-2 hover:shadow-4 py-4", classes.shelf)}
+        >
+            <img src={img || noImage} alt="image_detail" className="h-128" />
+            <div className="w-full self-center space-y-16">
+                <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min' }} info={{ content: value?.uniqueid || '-' }} />
+                <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
+            </div>
+            <div className="w-full self-center space-y-16">
+                <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min' }} info={{ content: value?.color || '-' }} />
+                <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'S/lượng', className: 'min-w-min' }} info={{ content: value?.quantity || '-' }} />
             </div>
         </div>
     )
