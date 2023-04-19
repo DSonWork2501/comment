@@ -86,7 +86,7 @@ function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
 function DetailModelContent({ value, classes, HandleAddData }) {
     const slots = value?.slots || []
     return (
-        <div className="w-full grid border-solid border-2 border-green-500 rounded-4">
+        <div className="w-full grid border-solid border-2 border-green-500 rounded-4 ">
             <div className="w-full shadow-4 bg-green-500 rounded-2 grid">
                 <CmsLabel
                     className="text-white justify-self-center"
@@ -132,7 +132,7 @@ function ShelfProductContent({ img, HandleAddData, data }) {
     return (
         <div className="w-full space-y-8">
             {breadValue === 'danh_sach_tu' &&
-                <div className="w-full grid grid-cols-3 gap-4 place-items-start">
+                <div className="w-full max-h-320 grid grid-cols-3 gap-4 place-items-start overflow-y-auto">
                     {data?.map((item, index) =>
                     (<DetailShelfContent
                         img={img}
@@ -157,13 +157,15 @@ function ShelfProductContent({ img, HandleAddData, data }) {
                         </div>
 
                     </div>
-                    {model?.map((item, index) =>
-                    (<DetailModelContent
-                        key={`DetailModelContent_${index}`}
-                        value={item}
-                        classes={classes}
-                        HandleAddData={HandleAddData}
-                    />))}
+                    <div className="max-h-320 overflow-y-auto">
+                        {model?.map((item, index) =>
+                        (<DetailModelContent
+                            key={`DetailModelContent_${index}`}
+                            value={item}
+                            classes={classes}
+                            HandleAddData={HandleAddData}
+                        />))}
+                    </div>
                 </div>}
         </div >)
 }
