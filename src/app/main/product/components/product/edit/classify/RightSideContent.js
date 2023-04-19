@@ -11,6 +11,7 @@ function RightSideContent({ formik, prefix }) {
             <CmsBoxLine label={'Thông tin chi tiết'} className="p-16">
                 <div className="w-full space-y-16">
                     <CmsFormikTextField size="small" name={`${prefix}.name`} label="Tên" formik={formik} />
+                    <CmsFormikTextField size="small" name={`${prefix}.subname`} label="Tên phụ" formik={formik} />
                     <CmsFormikTextField isNumberFormat={true} size="small" name={`${prefix}.capacity`} label="capacity" formik={formik} />
                     <CmsFormikTextField isNumberFormat={true} size="small" name={`${prefix}.heightlimit`} label="height limit" formik={formik} />
                     {get(formik?.values, `${prefix}.type`) === 'slot' &&

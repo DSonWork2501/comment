@@ -20,6 +20,9 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
         initialValues: CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [],
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
+        validationSchema: Yup.object({
+            
+        })
     })
     const data = formik_shelf.values?.map((x, index) => (
         {

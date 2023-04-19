@@ -27,7 +27,7 @@ export default function BasicInfoContent({ formik }) {
             <CmsFormikTextField size="small" required={false} formik={formik} name="customermoblie" label="Điện thoại" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customeremail" label="Email" />
             <LocationContent formik={formik} />
-            <CmsFormikAutocomplete data={Object.values(orderType)} size="small" required={false} formik={formik} name="type" label="Loại" />
+            <CmsFormikAutocomplete valueIsId data={Object.values(orderType)} size="small" required={false} formik={formik} name="type" label="Loại" />
             <CmsFormikAutocomplete size="small" data={Object.values(orderAllowTest)} valueIsId formik={formik} name="allowtest" label="Allow Test" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="customershipfee" label="Phí ship" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="couponcode" label="Mã coupon" />
