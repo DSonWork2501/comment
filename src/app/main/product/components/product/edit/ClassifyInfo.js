@@ -1,5 +1,5 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup"
-import { CmsButton, CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikRadioGroup, CmsFormikTextField, CmsTableBasic } from "@widgets/components"
+import { CmsAlert, CmsButton, CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikRadioGroup, CmsFormikTextField, CmsTableBasic } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { ConvertDateTime, initColumn } from "@widgets/functions"
 import { ProductStatus } from "@widgets/metadatas/common/productStatus"
@@ -113,12 +113,20 @@ const InfoContent = ({ index, formik }) => {
 }
 
 function ClassifyInfo({ formik }) {
-    const { detail } = formik.values
+    const { detail, sku } = formik.values
     const [editIndex, setEditIndex] = useState('')
     const [modalIndex, setModalIndex] = useState('')
 
     const HandleAddItem = () => {
-        formik.setFieldValue(`detail[${formik.values.detail.length}]`, initDetail())
+        if(!sku){
+            CmsAlert.fire({heightAuto: false, text: 'Chưa nhập SKU !', icon: 'warning'})
+        }else{
+            formik.setFieldValue(`detail[${formik.values.detail.length}]`, 
+                {...initDetail(), 
+                    uniqueid: `${sku}.${formik.values.detail.length + 1}`,
+                    sku: sku
+                })
+        }
     }
 
     const HandleDelete = (index_item) => {

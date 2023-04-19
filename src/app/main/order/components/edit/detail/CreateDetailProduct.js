@@ -26,10 +26,11 @@ export default function CreateDetailProduct({ formik }) {
                 ...formik_item.values,
                 quantity: quantity,
                 uniqueid: item.uniqueid,
-                price: item.price,
+                sku: item.sku
             }
+            if (item.price) itemAdd = { ...itemAdd, price: item.price }
             if (item.name) itemAdd = { ...itemAdd, name: item.name }
-            if (item.img) itemAdd = { ...itemAdd, image: `${baseurl}${item.img}` }
+            if (item.img) itemAdd = { ...itemAdd, image: `${baseurl}${item.img}`, img: item.img }
             console.log('itemAdd', itemAdd)
             formik.setFieldValue('productorder', [...productorder, itemAdd])
         }
