@@ -9,6 +9,7 @@ import { initDetailModel, initDetailModelSlot } from 'app/main/product/model/pro
 import { get } from "lodash"
 import clsx from "clsx"
 import FuseAnimate from "@fuse/core/FuseAnimate"
+import * as Yup from 'yup'
 
 
 function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {

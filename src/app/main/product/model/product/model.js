@@ -81,6 +81,7 @@ export const initDetail = (data) => {
     }
     return {
         "uniqueid": null,
+        "subname": null,
         "lotid": null,
         "colorid": 1,
         "sizeid": 1,

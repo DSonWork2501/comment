@@ -12,6 +12,8 @@ import { orange } from '@material-ui/core/colors'
 import noImage from '@widgets/images/noImage.jpg'
 import styled, { css } from "styled-components"
 import LoadingOverlay from 'react-loading-overlay';
+import CmsAlert from './CmsAlert';
+import { useRef } from 'react';
 
 /**
  * 
@@ -73,8 +75,9 @@ const useStyles = makeStyles(theme => ({
 
 function CmsImageBox2(props) {
     const classes = useStyles(props)
-    const { divBeforeImage, title, btitle, btitleClassName, value, setValue, styleImage, id, loading, disablebtitle = false, disable = false, moreOption } = props
+    const { divBeforeImage, title, btitle, btitleClassName, value, setValue, styleImage, id, loading, disablebtitle = false, disable = false, moreOption, CheckError } = props
     const [image, setImage] = useState(null)
+    const fileRef = useRef(); 
 
     useEffect(() => {
         if (value) {
@@ -98,8 +101,17 @@ function CmsImageBox2(props) {
                 reader.readAsBinaryString(file);
             })
         }
-        const newImage = await readFileAsync();
-        setImage(newImage)
+        if(CheckError){
+            CmsAlert.fire({
+                heightAuto: false,
+                icon: 'warning',
+                text: CheckError
+            })
+            if (fileRef) fileRef.current.value = null;
+        }else{
+            const newImage = await readFileAsync();
+            setImage(newImage)
+        }
     }
     return (
         <div className="w-full flex flex-col justify-between">
@@ -114,7 +126,7 @@ function CmsImageBox2(props) {
             <div className="text-center py-12">
                 <Paper className="w-full rounded-8 shadow-5 overflow-hidden hover:shadow-20 relative grid justify-items-center">
                     <div className="text-center p-16">
-                        {disable === false && <input accept="image/*" className="hidden" id={`image-file_${id}`} name="image" type="file" onChange={handleUploadChange} />}
+                        {disable === false && <input accept="image/*" ref={fileRef} className="hidden" id={`image-file_${id}`} name="image" type="file" onChange={handleUploadChange} />}
                         <label htmlFor={`image-file_${id}`}>
                             <div className={clsx(classes.imageItem, "flex items-center justify-center relative cursor-pointer", divBeforeImage)}>
                                 {!image && <img className={styleImage.className} width={styleImage.width || ''} height={styleImage.height || ''} src={noImage} alt={"NoImage"} />}
@@ -159,7 +171,8 @@ CmsImageBox2.propTypes = {
     disablebtitle: PropTypes.bool,
     disable: PropTypes.bool,
     moreOption: PropTypes.object,
-    divBeforeImage: PropTypes.string
+    divBeforeImage: PropTypes.string,
+    fileRef: PropTypes.any
 }
 
 CmsImageBox2.defaultProps = {
@@ -174,7 +187,7 @@ CmsImageBox2.defaultProps = {
     disablebtitle: false, 
     disable: false,
     moreOption: null,
-    divBeforeImage: ''
+    divBeforeImage: '',
 }
 
 export default React.memo(CmsImageBox2)
