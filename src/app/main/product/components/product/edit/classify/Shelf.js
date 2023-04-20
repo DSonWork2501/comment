@@ -9,6 +9,7 @@ import { initDetailModel, initDetailModelSlot } from 'app/main/product/model/pro
 import { get } from "lodash"
 import clsx from "clsx"
 import FuseAnimate from "@fuse/core/FuseAnimate"
+import * as Yup from 'yup'
 
 
 function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
@@ -20,6 +21,9 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
         initialValues: CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [],
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
+        validationSchema: Yup.object({
+            
+        })
     })
     const data = formik_shelf.values?.map((x, index) => (
         {

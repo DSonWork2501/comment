@@ -5,7 +5,7 @@ import { useState } from "react"
 import noImage from '@widgets/images/noImage.jpg';
 import FuseAnimate from "@fuse/core/FuseAnimate/FuseAnimate";
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
-// import ShelfProductContent from './ShelfProduct'
+import ShelfProductContent from './ShelfProduct'
 // export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 function DetailProduct({ value, index, HandleAddData, img }) {
@@ -46,9 +46,6 @@ function DetailProduct({ value, index, HandleAddData, img }) {
 function LisProductContent({ data, HandleAddData, img, hs }) {
 
     console.log('data', data)
-    console.log('hs', hs)
-    console.log('hs === parseInt(HomeSubscription[1].id)', hs === parseInt(HomeSubscription[1].id))
-    console.log('data', data?.map(x => ({ ...x, model: JSON.parse(x.model) ? JSON.parse(x.model) : x.model })))
     return (
         <FuseAnimate animation="transition.expandIn" delay={500}>
             <>
@@ -65,15 +62,15 @@ function LisProductContent({ data, HandleAddData, img, hs }) {
                             />))}
                         </div>
                     </CmsBoxLine>}
-                {/* {hs === parseInt(HomeSubscription[1].id) &&
-                    <div className="grid grid-cols-3 gap-4 place-items-start">
+                {hs === parseInt(HomeSubscription[1].id) &&
+                    <div className="w-full">
                         <ShelfProductContent
                             img={img}
                             HandleAddData={HandleAddData}
                             data={data}
                         />
                     </div>
-                } */}
+                }
             </>
         </FuseAnimate>
     )

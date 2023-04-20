@@ -5,7 +5,7 @@ import React, { } from "react"
 import { useDispatch } from "react-redux";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
-function MutipleImagePathLink({ formik }) {
+function MutipleImagePathLink({ formik, CheckError }) {
     const dispatch = useDispatch()
     const HandleAddImage = async (files) => {
         var result = []
@@ -41,6 +41,7 @@ function MutipleImagePathLink({ formik }) {
                 onChange={HandleAddImage}
                 name="images"
                 domain={baseurl}
+                CheckError={CheckError}
             />
         </CmsBoxLine>
     )

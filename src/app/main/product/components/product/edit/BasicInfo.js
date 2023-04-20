@@ -1,6 +1,6 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup"
 import { CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/components"
-import React from "react"
+import React, { } from "react"
 import MutipleImagePathLink from "../../common/MultipleImagePathLink"
 import noImage from '@widgets/images/noImage.jpg';
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
@@ -15,13 +15,14 @@ function BasicInfo({ formik, SaveData, }) {
     const imageLoading = useSelector(store => store[keyStore].product.imgLoading)
     console.log('formik', formik)
 
-    const HandleUploadImage = async(file) => {
+    const HandleUploadImage = async (file) => {
+
         let filesForm = new FormData();
         filesForm.append('files', file);
         filesForm.append('sku', formik?.values?.sku);
         var response = await dispatch(uploadImage(filesForm));
-        if(response?.payload?.result){
-            formik.setFieldValue('image',`${formik?.values?.sku}/${file.name}`)
+        if (response?.payload?.result) {
+            formik.setFieldValue('image', `${formik?.values?.sku}/${file.name}`)
         }
     }
 
@@ -41,19 +42,21 @@ function BasicInfo({ formik, SaveData, }) {
                 <CmsFormikTextField size="small" formik={formik} name="suggest" label="Gợi ý" />
                 <CmsFormikTextField size="small" formik={formik} name="note" label="Ghi chú" />
                 <div className="w-full self-center px-224 my-0">
-                <CmsImageBox2
-                    title="Hình đại diện (Lưu ý: Click vào hình để upload !)"
-                    loading={imageLoading}
-                    value={formik?.values?.image ? `${baseurl}${formik?.values?.image}` : noImage}
-                    setValue={HandleUploadImage}
-                    styleImage={{className: 'w-128'}}
-                    disablebtitle
-                />
+                    <CmsImageBox2
+                        CheckError={!formik.values.sku ? 'Vùi lòng nhập SKU !' : null}
+                        title="Hình đại diện (Lưu ý: Click vào hình để upload !)"
+                        loading={imageLoading}
+                        value={formik?.values?.image ? `${baseurl}${formik?.values?.image}` : noImage}
+                        setValue={HandleUploadImage}
+                        styleImage={{ className: 'w-128' }}
+                        disablebtitle
+                    />
                 </div>
                 <MutipleImagePathLink
                     formik={formik}
                     name="images"
                     setImage={(value) => formik.setFieldValue('images', value)}
+                    CheckError={!formik.values.sku ? 'Vùi lòng nhập SKU !' : null}
                 />
                 <div className="flex flex-row w-full space-x-8 justify-between">
                     <CmsFormikRadioGroup

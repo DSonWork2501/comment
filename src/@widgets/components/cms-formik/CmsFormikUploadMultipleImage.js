@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import {
     Icon,
     makeStyles
@@ -7,6 +7,7 @@ import * as PropTypes from 'prop-types';
 import { colors } from '@material-ui/core';
 // import FileProperties from '@widgets/metadatas/FileProperties';
 import clsx from 'clsx'
+import CmsAlert from '../CmsAlert';
 
 const useStyles = makeStyles(theme => ({
     productImageFeaturedStar: {
@@ -49,31 +50,42 @@ const useStyles = makeStyles(theme => ({
  */
 function CmsFormikUploadMultipleImage(props) {
     const classes = useStyles(props);
+    const fileRef = useRef(props);
     const {
         formik,
         className,
         name,
         onChange,
         onDelete,
-        domain
+        domain,
+        CheckError
     } = props
     function handleUploadChange(e) {
-        const files = e.target.files;
-        if (!files) {
-            return;
+        if (CheckError) {
+            CmsAlert.fire({
+                heightAuto: false,
+                icon: 'warning',
+                text: CheckError
+            })
+            if (fileRef) fileRef.current.value = null;
+        } else {
+            const files = e.target.files;
+            if (!files) {
+                return;
+            }
+            onChange && onChange(files)
         }
-        onChange && onChange(files)
-
     }
     function handleSetField(id, index_item) {
         formik.setFieldValue(name, formik.values[name].filter((x, index) => index !== index_item));
         onDelete && onDelete(id)
     }
     let array = formik && formik.values && formik.values[name]
-    
+
     return (
         <div className={className}>
             <input
+                ref={fileRef}
                 accept="image/*"
                 className="hidden"
                 id="button-file"

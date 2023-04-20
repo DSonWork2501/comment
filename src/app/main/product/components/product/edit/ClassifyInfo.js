@@ -1,5 +1,5 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup"
-import { CmsButton, CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikRadioGroup, CmsFormikTextField, CmsTableBasic } from "@widgets/components"
+import { CmsAlert, CmsButton, CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikRadioGroup, CmsFormikTextField, CmsTableBasic } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { ConvertDateTime, initColumn } from "@widgets/functions"
 import { ProductStatus } from "@widgets/metadatas/common/productStatus"
@@ -30,6 +30,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
     return (
         <div className="grid grid-cols-4 gap-10 w-11/12">
             <CmsFormikTextField key={`${index}_uniqueid`} size="small" name={`uniqueid`} formik={formik_item} label="uniqueid" />
+            <CmsFormikTextField key={`${index}_subname`} size="small" name={`subname`} formik={formik_item} label="subname" />
             <CmsFormikTextField isNumberFormat key={`${index}_capacity`} size="small" name={`capacity`} formik={formik_item} label="Capacity" />
             <CmsFormikTextField key={`${index}_lotid`} size="small" name={`lotid`} formik={formik_item} label="lotid" />
             <CmsFormikAutocomplete
@@ -86,11 +87,12 @@ const InfoContent = ({ index, formik }) => {
     const colorRes = useSelector(store => store[keyStore].product.color)
     const sizeRes = useSelector(store => store[keyStore].product.size)
     const { lotid, colorid, sizeid, volume, weight, height, maketime, expiretime, status, uniqueid, code, sizename,
-        price, retailprice, wholesaleprice, capacity } = formik.values.detail[index]
+        price, retailprice, wholesaleprice, capacity, subname } = formik.values.detail[index]
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-3 gap-10" >
                 <LabelInfo label={{ content: 'Unique ID' }} info={{ content: uniqueid }} />
+                <LabelInfo label={{ content: 'subname' }} info={{ content: subname }} />
                 <LabelInfo label={{ content: 'Capacity' }} info={{ content: capacity }} />
                 <LabelInfo label={{ content: 'Lot ID' }} info={{ content: lotid }} />
                 <LabelInfo label={{ content: 'Color ID' }} info={{ content: get(colorRes?.find(x => x.id === colorid), 'color') || '' }} />
@@ -113,12 +115,21 @@ const InfoContent = ({ index, formik }) => {
 }
 
 function ClassifyInfo({ formik }) {
-    const { detail } = formik.values
+    const { detail, sku } = formik.values
     const [editIndex, setEditIndex] = useState('')
     const [modalIndex, setModalIndex] = useState('')
 
     const HandleAddItem = () => {
-        formik.setFieldValue(`detail[${formik.values.detail.length}]`, initDetail())
+        if (!sku) {
+            CmsAlert.fire({ heightAuto: false, text: 'Chưa nhập SKU !', icon: 'warning' })
+        } else {
+            formik.setFieldValue(`detail[${formik.values.detail.length}]`,
+                {
+                    ...initDetail(),
+                    uniqueid: `${sku}.${formik.values.detail.length + 1}`,
+                    sku: sku
+                })
+        }
     }
 
     const HandleDelete = (index_item) => {
@@ -126,12 +137,25 @@ function ClassifyInfo({ formik }) {
     }
 
     const HandleSaveItem = (index_item, index) => {
-        console.log('index_item', index_item)
-        var item = Object.assign({}, index_item)
-        var arr = [...formik.values.detail]
-        arr[index] = item
-        formik.setFieldValue(`detail`, arr)
-        setEditIndex('')
+        var items = {
+            uniqueid: { value: index_item.uniqueid, label: 'Unique ID' },
+            subname: { value: index_item.subname, label: 'Tên phụ' }
+        }
+        var check_items = Object.keys(items).filter(x => !items[x]?.value) || []
+        if (check_items.length > 0) {
+            CmsAlert.fire({
+                heightAuto: false,
+                icon: 'warning',
+                text: `${Object.values(check_items.map(x => items[x].label)).join(', ')} Không được bỏ trống !`
+            })
+        } else {
+            var item = Object.assign({}, index_item)
+            var arr = [...formik.values.detail]
+            arr[index] = item
+            formik.setFieldValue(`detail`, arr)
+            setEditIndex('')
+        }
+
     }
 
     const HandleCloseShelfModal = (value) => {
