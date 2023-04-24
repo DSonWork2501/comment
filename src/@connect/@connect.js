@@ -58,6 +58,8 @@ export default {
         customer: {
             getList: params => axios.get(`${baseurl}/customer/get-customer`, { params }),
             insert: entity => axios.post(`${baseurl}/customer/insert-customer`, entity),
+            getShelf: params => axios.get(`${baseurl}/customer/get-households`, { params }),
+            getWine: params => axios.get(`${baseurl}/customer/get-wines`, { params }),
         },
         order: {
             getList: params => axios.get(`${baseurl}/order/get-order`, { params }),
@@ -65,7 +67,7 @@ export default {
             insert: entity => axios.post(`${baseurl}/order/insert-order`, entity),
             update: entity => axios.put(`${baseurl}/order/update-order`, entity),
         },
-        location:{
+        location: {
             getList: params => axios.get(`${baseurl}/location/get-locations`, { params }),
         }
     },
