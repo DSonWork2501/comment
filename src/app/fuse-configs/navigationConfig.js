@@ -76,6 +76,14 @@ const navigationConfig = [
 				icon: 'account_circle',
 				url: '/account',
 			},
+			{
+				id: 'nvi-manager-shelf',
+				title: 'Quản lý tủ rượu',
+				translate: 'CUSTOM_SHELF',
+				type: 'item',
+				icon: 'call_to_action',
+				url: '/customer-shelf',
+			},
 		],
 	},
 	{

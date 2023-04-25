@@ -18,7 +18,7 @@ const routeConfigs = [
 	ProductConfig,
 	CustomerConfig,
 	OrderConfig,
-	CustomerShelfConfig
+	CustomerShelfConfig,
 ];
 
 const routes = [

@@ -7,6 +7,7 @@ const locale = {
 	'ACCOUNT': 'Tài Khoản',
 	'ORDER': 'Đơn Hàng',
 	'ORDER_MANAGEMENT': 'Quản Lý Đơn Hàng',
+	'CUSTOM_SHELF': 'Quản Lý tủ rượu',
 };
 
 export default locale;
