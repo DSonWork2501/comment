@@ -10,16 +10,17 @@ import { useMemo } from "react";
 import { initColumn } from "@widgets/functions";
 import noImage from '@widgets/images/noImage.jpg';
 import GenFilterOptionContent from './components/index/GenFilterOption'
+import { LabelInfo } from "@widgets/components/common/LabelInfo";
 
 
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "uniqueid", label: "Unique ID", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "info", label: "Thông tin", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "name", label: "Tên sản phẩm", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "cusname", label: "Tên khách hàng", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "sku", label: "SKU", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "qrcode", label: "QRCode", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "image", label: "Hình ảnh", alignHeader: "left", alignValue: "left", sortable: false }),
 ]
 
@@ -36,6 +37,11 @@ function CustomerShelfContent() {
     const data = useMemo(() =>
         entities?.data?.map((x, index) => ({
             ...x,
+            info: <div className="w-full">
+                <LabelInfo label={{content: 'SKU'}} info={{content: x.sku}}/>
+                <LabelInfo label={{content: 'Unique ID'}} info={{content: x.uniqueid}}/>
+            </div>,
+            qrcode: <img alt={`image_${index}`} src={x.qrcode ? `data:image/png;base64, ${x.qrcode}` : noImage} className="h-64"/>,
             image: <img alt={`image_${index}`} src={x.img?`${baseurl}${x.img}`: noImage} className="h-64"/>
         })) || []
         , [entities])
