@@ -8,6 +8,7 @@ import HomeConfig from 'app/main/home/config'
 import ProductConfig from 'app/main/product/config'
 import CustomerConfig from 'app/main/customer/config'
 import OrderConfig from 'app/main/order/config'
+import CustomerShelfConfig from 'app/main/customer-shelf/config';
 
 const routeConfigs = [
 	LoginConfig,
@@ -16,7 +17,8 @@ const routeConfigs = [
 	HomeConfig,
 	ProductConfig,
 	CustomerConfig,
-	OrderConfig
+	OrderConfig,
+	CustomerShelfConfig,
 ];
 
 const routes = [

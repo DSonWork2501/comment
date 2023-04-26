@@ -7,6 +7,7 @@ const columns = [
     new initColumn({ field: "sku", label: "SKU", classHeader: "w-128", sortable: false }),
     new initColumn({ field: "name", label: "Tên Sản Phẩm", classHeader: "w-128", sortable: false }),
     new initColumn({ field: "image", label: "Hình ảnh", alignHeader: "center", alignValue: "center", classHeader: "w-128", sortable: false }),
+    new initColumn({ field: "imei_hs", label: "imei", classHeader: "w-128", sortable: false }),
     new initColumn({ field: "quantity", label: "Số lượng", classHeader: "w-128", sortable: false }),
     new initColumn({ field: "price", label: "Giá tiền", classHeader: "w-128", sortable: false }),
 ]
@@ -18,6 +19,7 @@ function OrderDetailContent({ entity, handleClose, open }) {
         sku: x.sku,
         name: x.name,
         quantity: x.quantity,
+        imei_hs: x.imei_hs,
         price: NumberWithCommas(x.price),
         image: <img className="max-h-52 max-w-52 ml-auto mr-auto" src={`${baseurl}${x.image}`} alt={`${x.sku}_image`} />
     })) || []

@@ -11,6 +11,7 @@ import React from "react"
 import { useState } from "react"
 import { useSelector } from "react-redux"
 import ShelfContent from "./classify/Shelf"
+import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
 
 const columns = [
     new initColumn({ field: "stt", label: "STT", alignHeader: "left", alignValue: "left", sortable: false }),
@@ -165,6 +166,7 @@ function ClassifyInfo({ formik }) {
 
     console.log('detail', formik.values.detail)
     const model = formik?.values?.detail[modalIndex]?.model
+    const ishs  = parseInt(formik?.values?.ishs) && parseInt(formik?.values?.ishs)
     const data = detail?.map((x, index) => ({
         stt: index + 1,
         info: editIndex === index ? <EditRowContent index={index} formik={formik} handleSaveData={HandleSaveItem} handleCancelSetIndex={() => setEditIndex('')} /> : <InfoContent index={index} formik={formik} />,
@@ -173,7 +175,7 @@ function ClassifyInfo({ formik }) {
                 {editIndex !== index &&
                     <CmsButton size="small" label={"Sửa"} className="text-white bg-green-500 hover:bg-green-700" onClick={() => { setEditIndex(index) }} />
                 }
-                {<CmsButton size="small" label={"Ngăn/tủ"} className="text-white bg-blue-500 hover:bg-blue-700" onClick={() => { setModalIndex(index) }} />}
+                {ishs === parseInt(HomeSubscription[1].id) && <CmsButton size="small" label={"Ngăn/tủ"} className="text-white bg-blue-500 hover:bg-blue-700" onClick={() => { setModalIndex(index) }} />}
                 {editIndex !== index &&
                     <CmsButton size="small" label={"Xóa"} className="text-white bg-red-500 hover:bg-red-700" onClick={() => HandleDelete(index)} />
                 }
