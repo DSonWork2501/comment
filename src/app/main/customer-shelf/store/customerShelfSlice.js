@@ -42,6 +42,7 @@ const customerShelfSlice = createSlice({
     initialState: {
         loading: false,
         entities: null,
+        detailEntities: null, 
         entity: null,
         error: null,
         selected: null,
@@ -130,7 +131,7 @@ const customerShelfSlice = createSlice({
             return {
                 ...state,
                 loading: false,
-                entities: payload,
+                detailEntities: payload,
                 error: null
             }
         },

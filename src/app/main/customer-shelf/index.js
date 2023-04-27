@@ -1,9 +1,9 @@
 import withReducer from "app/store/withReducer";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { keyStore } from "./common";
 import reducer from "./store";
-import { CmsCardedPage, CmsTableBasic } from "@widgets/components";
-import { getShelf, setSearch } from "./store/customerShelfSlice";
+import { CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
+import { getShelf, getWine, setSearch } from "./store/customerShelfSlice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
@@ -11,6 +11,7 @@ import { initColumn } from "@widgets/functions";
 import noImage from '@widgets/images/noImage.jpg';
 import GenFilterOptionContent from './components/index/GenFilterOption'
 import { LabelInfo } from "@widgets/components/common/LabelInfo";
+import ShelfDetailContent from "./components/detail/ShelfDetail";
 
 
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
@@ -29,22 +30,31 @@ function CustomerShelfContent() {
     const entities = useSelector(store => store[keyStore]?.cusShelf?.entities)
     const loading = useSelector(store => store[keyStore]?.cusShelf?.loading)
     const search = useSelector(store => store[keyStore]?.cusShelf?.search)
+    const [open, setOpen] = useState('')
 
     useEffect(() => {
         dispatch(getShelf(search))
     }, [search, dispatch])
 
+    const handleShowDetail = useCallback((cusid, id) => {
+        setOpen('detail')
+        dispatch(getWine({ cusId: cusid, parentId: id, cms: 1 }))
+    }, [dispatch])
+
     const data = useMemo(() =>
         entities?.data?.map((x, index) => ({
             ...x,
             info: <div className="w-full">
-                <LabelInfo label={{content: 'SKU'}} info={{content: x.sku}}/>
-                <LabelInfo label={{content: 'Unique ID'}} info={{content: x.uniqueid}}/>
+                <LabelInfo label={{ content: 'SKU' }} info={{ content: x.sku }} />
+                <LabelInfo label={{ content: 'Unique ID' }} info={{ content: x.uniqueid }} />
             </div>,
-            qrcode: <img alt={`image_${index}`} src={x.qrcode ? `data:image/png;base64, ${x.qrcode}` : noImage} className="h-64"/>,
-            image: <img alt={`image_${index}`} src={x.img?`${baseurl}${x.img}`: noImage} className="h-64"/>
+            qrcode: <img alt={`image_${index}`} src={x.qrcode ? `data:image/png;base64, ${x.qrcode}` : noImage} className="h-64" />,
+            image: <img alt={`image_${index}`} src={x.img ? `${baseurl}${x.img}` : noImage} className="h-64" />,
+            action: <div>
+                {x.parentid === 0 && <CmsIconButton icon="info" onClick={() => handleShowDetail(x.cusid, x.id)} tooltip={'chi tiết'} />}
+            </div>
         })) || []
-        , [entities])
+        , [entities, handleShowDetail])
 
     return (
         <CmsCardedPage
@@ -69,6 +79,11 @@ function CustomerShelfContent() {
                         loading={loading}
                         pagination={data?.pagination}
                     />
+                    {open === 'detail' &&
+                        <ShelfDetailContent
+                            open={open === 'detail'}
+                            handleClose={() => setOpen('')}
+                        />}
                 </>
             }
             toolbar={
