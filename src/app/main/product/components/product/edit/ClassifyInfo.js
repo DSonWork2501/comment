@@ -31,7 +31,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
     return (
         <div className="grid grid-cols-4 gap-10 w-11/12">
             <CmsFormikTextField key={`${index}_uniqueid`} size="small" name={`uniqueid`} formik={formik_item} label="uniqueid" />
-            <CmsFormikTextField key={`${index}_subname`} size="small" name={`subname`} formik={formik_item} label="subname" />
+            <CmsFormikTextField key={`${index}_subname`} size="small" name={`subname`} formik={formik_item} label="Tên Sub" />
             <CmsFormikTextField isNumberFormat key={`${index}_capacity`} size="small" name={`capacity`} formik={formik_item} label="Capacity" />
             <CmsFormikTextField key={`${index}_lotid`} size="small" name={`lotid`} formik={formik_item} label="lotid" />
             <CmsFormikAutocomplete
@@ -93,7 +93,7 @@ const InfoContent = ({ index, formik }) => {
         <div className="space-y-4">
             <div className="grid grid-cols-3 gap-10" >
                 <LabelInfo label={{ content: 'Unique ID' }} info={{ content: uniqueid }} />
-                <LabelInfo label={{ content: 'subname' }} info={{ content: subname }} />
+                <LabelInfo label={{ content: 'Tên Sub' }} info={{ content: subname }} />
                 <LabelInfo label={{ content: 'Capacity' }} info={{ content: capacity }} />
                 <LabelInfo label={{ content: 'Lot ID' }} info={{ content: lotid }} />
                 <LabelInfo label={{ content: 'Color ID' }} info={{ content: get(colorRes?.find(x => x.id === colorid), 'color') || '' }} />
