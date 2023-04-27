@@ -12,18 +12,10 @@ import noImage from '@widgets/images/noImage.jpg';
 import GenFilterOptionContent from './components/index/GenFilterOption'
 import { LabelInfo } from "@widgets/components/common/LabelInfo";
 import ShelfDetailContent from "./components/detail/ShelfDetail";
+import { CustomerProductType } from "./model/CustomerProductType";
 
 
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
-
-const columns = [
-    new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "info", label: "Thông tin", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "name", label: "Tên sản phẩm", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "cusname", label: "Tên khách hàng", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "qrcode", label: "QRCode", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "image", label: "Hình ảnh", alignHeader: "left", alignValue: "left", sortable: false }),
-]
 
 function CustomerShelfContent() {
     const dispatch = useDispatch()
@@ -55,6 +47,15 @@ function CustomerShelfContent() {
             </div>
         })) || []
         , [entities, handleShowDetail])
+
+        const columns = [
+            new initColumn({ field: 'id', label: CustomerProductType['wine'].id === search.Type ? 'imei': 'id', classHeader: "w-128", sortable: false }),
+            new initColumn({ field: "info", label: "Thông tin", alignHeader: "left", alignValue: "left", sortable: false }),
+            new initColumn({ field: "name", label: "Tên sản phẩm", alignHeader: "left", alignValue: "left", sortable: false }),
+            new initColumn({ field: "cusname", label: "Tên khách hàng", alignHeader: "left", alignValue: "left", sortable: false }),
+            CustomerProductType['wine'].id === search.Type && new initColumn({ field: "qrcode", label: "QRCode", alignHeader: "left", alignValue: "left", sortable: false }),
+            new initColumn({ field: "image", label: "Hình ảnh", alignHeader: "left", alignValue: "left", sortable: false }),
+        ]
 
     return (
         <CmsCardedPage
