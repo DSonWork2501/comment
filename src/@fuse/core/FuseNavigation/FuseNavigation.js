@@ -109,7 +109,7 @@ function FuseNavigation(props) {
 	const classes = useStyles(props);
 	const { navigation, layout, active, dense, className } = props;
 	const settings = useSelector(({ fuse }) => fuse.settings.current);
-	
+
 	const verticalNav = (
 		<>
 			<List
@@ -123,9 +123,18 @@ function FuseNavigation(props) {
 				)}
 			>
 				{navigation.map(_item => (
-					<FuseNavItem key={_item.id} type={`vertical-${settings.layout.style === 'layout3' ? _item.type :'collapse'}`} item={_item} nestedLevel={0} />
+					<FuseNavItem key={_item.id} type={`vertical-${settings.layout.style === 'layout3' ? _item.type : 'collapse'}`} item={_item} nestedLevel={0} />
 				))}
 			</List>
+			<MenuItem
+				onClick={() => window.open('https://nhanh.vn/oauth?version=2.0&appId=73437&returnLink=https://4person.sytes.net/api/identity/nhanhvn', '_blank')}
+
+			>
+				<ListItemIcon  className="min-w-44">
+					<Icon>double_arrow</Icon>
+				</ListItemIcon>
+				<ListItemText primary="NhanhVN" />
+			</MenuItem>
 			<MenuItem
 				onClick={() => {
 					dispatch(logoutUser());
@@ -137,7 +146,7 @@ function FuseNavigation(props) {
 				</ListItemIcon>
 				<ListItemText primary="Đăng xuất" />
 			</MenuItem>
-		</>			
+		</>
 	);
 
 	const horizontalNav = (
