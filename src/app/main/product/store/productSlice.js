@@ -67,6 +67,21 @@ export const searchDetail = createAsyncThunk(`${appName}/${moduleName}/searchDet
  */
 export const insertProduct = createAsyncThunk(`${appName}/${moduleName}/insertProduct`, async (entity, thunkAPI) => {
     try {
+        const { details } = entity
+        const modal = [...details]?.map(x => ({
+            "uniqueid": x.uniqueid,
+            "retailprice": x.retailprice,
+            "wholesaleprice": x.wholesaleprice,
+            "price": x.price,
+            "discount": 0,
+            "vat": 0
+        }))
+        if (modal) {
+            const priceResponse = await thunkAPI.dispatch(insertProPrice(modal))
+            if (!priceResponse?.payload?.result) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: '' }))
+            }
+        }
         const response = await connect.live.product.insert(entity);
         const data = await response.data;
         thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
@@ -81,6 +96,21 @@ export const insertProduct = createAsyncThunk(`${appName}/${moduleName}/insertPr
  */
 export const updateProduct = createAsyncThunk(`${appName}/${moduleName}/updateProduct`, async (entity, thunkAPI) => {
     try {
+        const { details } = entity
+        const modal = [...details]?.map(x => ({
+            "uniqueid": x.uniqueid,
+            "retailprice": x.retailprice,
+            "wholesaleprice": x.wholesaleprice,
+            "price": x.price,
+            "discount": 0,
+            "vat": 0
+        }))
+        if (modal) {
+            const priceResponse = await thunkAPI.dispatch(insertProPrice(modal))
+            if (!priceResponse?.payload?.result) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: '' }))
+            }
+        }
         const response = await connect.live.product.update(entity);
         const data = await response.data;
         thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
@@ -144,6 +174,19 @@ export const getHistoryPrice = createAsyncThunk(`${appName}/${moduleName}/getHis
         return error
     }
 });
+/**
+ * @description insert price
+ */
+export const insertProPrice = createAsyncThunk(`${appName}/${moduleName}/insertProPrice`, async (entity, thunkAPI) => {
+    try {
+        const response = await connect.live.product.price.insert(entity);
+        const data = await response.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
 
 const initSearchState = {
     search: '',
@@ -175,6 +218,7 @@ const productSlice = createSlice({
         search: initSearchState,
         color: null,
         size: null,
+        insertPrice: null
     },
     reducers: {
         /**
@@ -391,6 +435,27 @@ const productSlice = createSlice({
         [getHistoryPrice.rejected]: (state, { error }) => ({
             ...state,
             priceLoading: false,
+            error: error
+        }),
+        /**
+         * @description insertProPrice
+         */
+        [insertProPrice.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [insertProPrice.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                insertPrice: payload,
+                error: null
+            }
+        },
+        [insertProPrice.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
             error: error
         }),
     }

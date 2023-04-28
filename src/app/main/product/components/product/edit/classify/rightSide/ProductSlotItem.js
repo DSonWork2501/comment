@@ -11,7 +11,7 @@ export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 function InfoSKUProductContent({ data }) {
     const { img, name, sku, type, uniqueid } = data
     return (
-        <div className="w-full flex flex-row">
+        <div className="w-full flex flex-row space-x-16">
             <div>
                 <img src={`${baseurl}${img}`} alt="image_detail" className="h-128" />
             </div>

@@ -56,6 +56,7 @@ function EditProduct(props) {
                         capacity: parseInt(x.capacity) ? parseInt(x.capacity) : 0
                     }))]
                 }
+                console.log('model', model)
                 params?.id === '0' ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))
             },
         })
