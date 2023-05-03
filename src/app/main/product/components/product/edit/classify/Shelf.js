@@ -67,6 +67,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
 
     return (
         <CmsDialog
+            className="w-full h-full"
             title={"Thông tin tủ hàng"}
             text={
                 <div className={'w-full flex flex-row space-x-8'}>
@@ -80,7 +81,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
             handleSave={handleSave}
             isCloseDialogSubmit={false}
             open={open}
-            size="lg"
+            size="xl"
         >
             <div className={clsx(prefix && 'flex flex-row', "w-full space-x-8")}>
                 <FuseAnimate animation="transition.slideLeftIn" delay={50}>

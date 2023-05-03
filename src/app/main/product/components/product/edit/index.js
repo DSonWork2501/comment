@@ -50,11 +50,23 @@ function EditProduct(props) {
                     products: [
                         initProduct(data)
                     ],
-                    details: [...data.detail.map(x => ({ 
-                        ...x, 
+                    details: [...data.detail.map(x => ({
+                        ...x,
                         model: parseInt(values.ishs) === parseInt(HomeSubscription['1'].id) ? x.model : '',
                         capacity: parseInt(x.capacity) ? parseInt(x.capacity) : 0
-                    }))]
+                    }))],
+                    "prices": data.detail.map(x=>(
+                        {
+                            "uniqueid": x.uniqueid || 0,
+                            "retailprice": parseInt(x.retailprice) || 0,
+                            "wholesaleprice": parseInt(x.wholesaleprice) || 0,
+                            "price": parseInt(x.price) || 0,
+                            "discount": parseInt(x.discount) || 0,
+                            "vat": parseInt(x.vat) || 0
+                        }
+                    ))
+                        
+                    
                 }
                 console.log('model', model)
                 params?.id === '0' ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))

@@ -7,6 +7,7 @@ import {
 import * as PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { isArray } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * 
@@ -34,7 +35,7 @@ function CmsTab(props) {
             textColor="primary"
             variant="scrollable"
             scrollButtons="auto"
-            classes={{ root: 'w-full h-full' }}
+            classes={{ root: clsx('w-full h-full', otherProps.className) }}
             value={isLink ? data.find(e => e.link === window.location.pathname)?.id : otherProps?.value}
         >
             {data.map((item, index) => {
