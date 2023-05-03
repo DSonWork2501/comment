@@ -59,6 +59,7 @@ function EditOrderContent() {
         validationSchema: Yup.object({
             customerid: Yup.number().typeError("Mã khách hàng không được bỏ trống !").required("Mã khách hàng không được bỏ trống !"),
             customername: Yup.string().typeError("Tên khách hàng không được bỏ trống !").required("Tên khách hàng không được bỏ trống !"),
+            privatedescription: Yup.string().typeError("Ghi chú nội bộ không được bỏ trống !").required("Ghi chú nội bộ không được bỏ trống !"),
         })
     })
 

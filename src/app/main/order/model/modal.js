@@ -34,7 +34,7 @@ export const InitOrderModal = ({ entity, customerid }) => {
         "deliverydate": null,
         "status": 1,
         "description": null,
-        "privatedescription": "",
+        "privatedescription": '2',
         "createdate": "",
         "couponcode": null,
         "allowtest": 0,
