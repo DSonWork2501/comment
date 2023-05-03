@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import LocationContent from "./basic/LocationContent";
 import { orderAllowTest, orderPaymentMethod, orderType } from "../../model";
+import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
 
 export default function BasicInfoContent({ formik }) {
 
@@ -27,7 +28,7 @@ export default function BasicInfoContent({ formik }) {
             <CmsFormikTextField size="small" required={false} formik={formik} name="customermoblie" label="Điện thoại" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customeremail" label="Email" />
             <LocationContent formik={formik} />
-            <CmsFormikAutocomplete valueIsId data={Object.values(orderType)} size="small" required={false} formik={formik} name="type" label="Loại" />
+            <CmsFormikAutocomplete valueIsId data={Object.values(orderType)} size="small" required={false} formik={formik} name="type" label="Cách thức mua hàng" />
             <CmsFormikAutocomplete size="small" data={Object.values(orderAllowTest)} valueIsId formik={formik} name="allowtest" label="Allow Test" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="customershipfee" label="Phí ship" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="couponcode" label="Mã coupon" />
@@ -43,7 +44,7 @@ export default function BasicInfoContent({ formik }) {
             <CmsFormikTextField size="small" required={false} formik={formik} name="paymentcode" label="Mã thanh toán" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="paymentgateway" label="Cổng thanh toán" />
             <CmsFormikAutocomplete data={Object.values(orderPaymentMethod)} size="small" required={false} formik={formik} name="paymentmethod" label="Phương thức thanh toán" />
-            <CmsFormikTextField size="small" required={false} formik={formik} name="privatedescription" label="Mô tả riêng tư" />
+            <CmsFormikAutocomplete valueIsId size="small" required={false} formik={formik} name="privatedescription" label="Ghi chú nội bộ" data={Object.values(HomeSubscription)}/>
             <CmsFormikTextField endNode="điểm" size="small" required={false} formik={formik} name="usedpoints" label="Điểm dùng được" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="ref" label="giới thiệu" />
             <CmsFormikTextField isNumberFormat endNode="VND" size="small" required={false} formik={formik} name="bonus" label="Tiền hoa hồng" />

@@ -45,6 +45,9 @@ export default {
             delete: entity => axios.delete(`${baseurl}/product/delete-product`, entity),
             uploadImage: (entity) => axios.post(`${baseurl}/product/upload-image`, entity, { headers: { 'Content-Type': 'multipart/form-data' } }),
             getHistoryPrice: params => axios.get(`${baseurl}/product/get-history-price`, { params }),
+            price: {
+                insert: entity => axios.post(`${baseurl}/product/insert-price`, entity),
+            }
         },
         category: {
             getList: params => axios.get(`${baseurl}/product/get-category`, { params }),

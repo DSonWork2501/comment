@@ -18,7 +18,7 @@ import ChangeOderStatusContent from "./changeOrderStatus";
 import History from "@history";
 
 const columns = [
-    new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
+    new initColumn({ field: "id", label: "IMEI", classHeader: "w-128", sortable: false }),
     new initColumn({ field: "createdate", label: "Ngày tạo", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "cusname", label: "Tên khách hàng", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "moneydiscount", label: "Giảm giá", alignHeader: "left", alignValue: "left", sortable: false }),
