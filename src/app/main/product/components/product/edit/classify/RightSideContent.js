@@ -27,7 +27,7 @@ function RightSideContent({ formik, prefix }) {
                     <CmsTab className="bg-orange-200 border-solid border-1 rounded-6" data={Object.values(TabType)} value={tabValue} onChange={handleChangeTab} />
                     <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }} className="w-full">
 
-                        {tabValue === TabType.da_chon.id && <InfoProductDetail data={item} />}
+                        {tabValue === TabType.da_chon.id && <InfoProductDetail data={item} handleViewList={() => setTabValue(TabType.danh_sach.id)}/>}
                         {tabValue === TabType.danh_sach.id &&
                             <CmsBoxLine label="Lựa chọn sản phẩm">
                                 <ProductSlotItemComponent

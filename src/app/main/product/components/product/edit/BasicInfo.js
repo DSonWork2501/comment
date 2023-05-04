@@ -30,17 +30,17 @@ function BasicInfo({ formik, SaveData, }) {
         <FuseAnimateGroup className="flex flex-wrap p-20 overflow-hidden w-full h-full" enter={{ animation: 'transition.slideUpBigIn' }}>
             <div className="w-full space-y-16">
                 <FocusError formik={formik} />
-                <CmsFormikTextField size="small" formik={formik} name="name" label="Tên sản phẩm" />
-                <CmsFormikTextField size="small" formik={formik} name="shortname" label="Tên ngắn" />
-                <CmsFormikTextField size="small" formik={formik} name="barcode" label="Barcode" />
-                <CmsFormikTextField size="small" formik={formik} name="sku" label="SKU" />
-                <CmsFormikTextField size="small" formik={formik} name="brand" label="brand" />
+                <CmsFormikTextField size="small" formik={formik} name="name" label="tên sản phẩm" />
+                <CmsFormikTextField size="small" formik={formik} name="shortname" label="tên ngắn" />
+                <CmsFormikTextField size="small" formik={formik} name="barcode" label="barcode" />
+                <CmsFormikTextField size="small" formik={formik} name="sku" label="sku" />
+                <CmsFormikTextField size="small" formik={formik} name="brand" label="thương hiệu" />
                 <CmsFormikTextField size="small" multiline={true} formik={formik} name="description" label="Mô tả" />
                 <CmsFormikTextField size="small" formik={formik} name="unit" label="đơn vị" />
-                <CmsFormikTextField size="small" formik={formik} name="classify" label="classify" />
-                <CmsFormikTextField size="small" formik={formik} name="certification" label="certification" />
-                <CmsFormikTextField size="small" formik={formik} name="suggest" label="Gợi ý" />
-                <CmsFormikTextField size="small" formik={formik} name="note" label="Ghi chú" />
+                <CmsFormikTextField size="small" formik={formik} name="classify" label="phân loại" />
+                <CmsFormikTextField size="small" formik={formik} name="certification" label="chứng nhận" />
+                <CmsFormikTextField size="small" formik={formik} name="suggest" label="gợi ý" />
+                <CmsFormikTextField size="small" formik={formik} name="note" label="ghi chú" />
                 <div className="w-full self-center px-224 my-0">
                     <CmsImageBox2
                         CheckError={!formik.values.sku ? 'Vùi lòng nhập SKU !' : null}
@@ -91,7 +91,7 @@ function BasicInfo({ formik, SaveData, }) {
                         name="isfreeship"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
-                        label={'FreeShip'}
+                        label={'Miễn phí vận chuyển'}
                         vertical={false}
                     />
                     <CmsFormikRadioGroup
