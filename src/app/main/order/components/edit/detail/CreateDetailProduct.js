@@ -20,8 +20,8 @@ export default function CreateDetailProduct({ formik }) {
             CmsAlert.fire({ heightAuto: false, text: 'Vui lòng nhập số lượng sản phẩm !', icon: 'error' })
         } else {
             const { productorder } = formik.values
-            console.log('item', item)
-            console.log('formik_item.values', formik_item.values)
+            // console.log('item', item)
+            // console.log('formik_item.values', formik_item.values)
             var itemAdd = {
                 ...formik_item.values,
                 quantity: quantity,
@@ -35,7 +35,7 @@ export default function CreateDetailProduct({ formik }) {
             formik.setFieldValue('productorder', [...productorder, itemAdd])
         }
     }
-    console.log('formik_item', formik_item)
+    // console.log('formik_item', formik_item)
     return (
         <CmsAccordion title={"Click để sổ chọn"}>
             <ProductSlotSKUItem formik_entity={formik} formik={formik_item} keyStore={keyStore} HandleAddData={HandleAddData} />
