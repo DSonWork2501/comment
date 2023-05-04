@@ -11,6 +11,7 @@ const DetailUniqueProductComponent = React.memo(({ item, index, skuItem, onClick
     const { img, name } = skuItem
     const price = NumberWithCommas(item?.price)
     const retailprice = NumberWithCommas(item?.retailprice)
+    const wholesaleprice = NumberWithCommas(item?.wholesaleprice)
     return (<div
         className="flex flex-row p-10 shadow-2 hover:shadow-6 w-full cursor-pointer rounded-6 space-x-8 items-center"
         key={`${index}_div_DetailUniqueProductComponent`}
@@ -32,7 +33,7 @@ const DetailUniqueProductComponent = React.memo(({ item, index, skuItem, onClick
                 </div>
                 <div className="w-full">
                     <LabelInfo label={{ content: 'tên phụ' }} key={`${index}_subname_DetailUniqueProductComponent`} info={{ content: item?.subname }} />
-                    <LabelInfo label={{ content: 'giá bán sỉ' }} key={`${index}_wholesaleprice_DetailUniqueProductComponent`} info={{ content: item?.wholesaleprice }} />
+                    <LabelInfo label={{ content: 'giá bán sỉ' }} key={`${index}_wholesaleprice_DetailUniqueProductComponent`} info={{ content: wholesaleprice }} />
                 </div>
             </div>
         </div>
