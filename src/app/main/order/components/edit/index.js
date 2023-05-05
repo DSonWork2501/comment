@@ -49,9 +49,6 @@ function EditOrderContent() {
             }
         })
     }
-    const handleResetData = () => {
-
-    }
 
     const formik = useFormik({
         initialValues: entity,
@@ -113,7 +110,6 @@ function EditOrderContent() {
                     </div>
                     <div className="flex items-center justify-end space-x-8">
                         <CmsButtonProgress label="Lưu" onClick={formik.handleSubmit} loading={loading} />
-                        <CmsButtonProgress color="default" label="Reset" onClick={handleResetData} />
                     </div>
                 </div>
             }

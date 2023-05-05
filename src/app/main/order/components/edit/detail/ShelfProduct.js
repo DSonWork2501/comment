@@ -25,7 +25,7 @@ function DetailShelfContent({ value, img, index, handleClickBread, classes, Hand
     return (
         <div onClick={handleClickBread}>
             <div key={`div-0-detail-${index}`}
-                className={clsx("w-full grid justify-items-center space-y-8 hover: shadow-4 py-4", classes.shelf)}
+                className={clsx("border-1 border-collapse rounded-2 w-full grid justify-items-center space-y-8 hover:shadow-4 py-4", classes.shelf)}
             >
                 <img src={img || noImage} alt="image_detail" className="h-128" />
                 <div className="grid justify-items-start">
@@ -133,7 +133,7 @@ function ShelfProductContent({ img, HandleAddData, data }) {
     return (
         <div className="w-full space-y-8">
             {breadValue === 'danh_sach_tu' &&
-                <div className="w-full max-h-384 grid grid-cols-3 gap-4 place-items-start overflow-y-auto">
+                <div className="w-full max-h-384 grid grid-cols-6 gap-4 place-items-start overflow-y-auto">
                     {data?.map((item, index) =>
                     (<DetailShelfContent
                         img={img}
