@@ -18,6 +18,8 @@ import { Link } from "react-router-dom";
 import { alertInformation } from "@widgets/functions";
 import { insertOrder } from "app/main/order/store/orderSlice";
 import { customModal } from "../../model/modal";
+import { OrderContext } from "../../context/OrderContext";
+import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
 
 const TabType = {
     'thongtin': { id: 'thongtin', name: 'Thông tin đơn hàng' },
@@ -31,6 +33,7 @@ function EditOrderContent() {
     const entity = useSelector(store => store[keyStore].order.entity)
     const [tabValue, setTabValue] = useState(TabType.thongtin.id)
     const { cusId, orderId } = params
+    const [hs, setHs] = useState(HomeSubscription['0'].id)
 
     useEffect(() => {
         dispatch(getDetail({ cusId, orderId }))
@@ -59,7 +62,6 @@ function EditOrderContent() {
         validationSchema: Yup.object({
             customerid: Yup.number().typeError("Mã khách hàng không được bỏ trống !").required("Mã khách hàng không được bỏ trống !"),
             customername: Yup.string().typeError("Tên khách hàng không được bỏ trống !").required("Tên khách hàng không được bỏ trống !"),
-            privatedescription: Yup.string().typeError("Ghi chú nội bộ không được bỏ trống !").required("Ghi chú nội bộ không được bỏ trống !"),
         })
     })
 
@@ -91,7 +93,7 @@ function EditOrderContent() {
                 </div>
             }
             content={
-                <>
+                <OrderContext.Provider value={{ hs, setHs }}>
                     {tabValue === TabType.thongtin.id && (
                         <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }}>
                             <BasicInfoContent formik={formik} />
@@ -100,7 +102,7 @@ function EditOrderContent() {
                         <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }}>
                             <DetailProductContent formik={formik} />
                         </FuseAnimateGroup>)}
-                </>
+                </OrderContext.Provider>
             }
             toolbar={
                 <div className="w-full flex items-center justify-between px-12">

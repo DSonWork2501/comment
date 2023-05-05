@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import LocationContent from "./basic/LocationContent";
 import { orderAllowTest, orderPaymentMethod, orderType } from "../../model";
-import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
 
 export default function BasicInfoContent({ formik }) {
 
@@ -27,7 +26,6 @@ export default function BasicInfoContent({ formik }) {
             <CmsFormikTextField size="small" required={false} formik={formik} name="customername" label="Tên khách hàng" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customermoblie" label="Điện thoại" />
             <CmsFormikTextField size="small" required={false} formik={formik} name="customeremail" label="Email" />
-            <CmsFormikAutocomplete valueIsId size="small" required={false} formik={formik} name="privatedescription" label="Ghi chú nội bộ" data={Object.values(HomeSubscription)}/>
             <LocationContent formik={formik} />
             <CmsFormikAutocomplete valueIsId data={Object.values(orderType)} size="small" required={false} formik={formik} name="type" label="Cách thức mua hàng" />
             <CmsFormikAutocomplete size="small" data={Object.values(orderAllowTest)} valueIsId formik={formik} name="allowtest" label="Allow Test" />
