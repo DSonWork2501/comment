@@ -133,7 +133,7 @@ function ShelfProductContent({ img, HandleAddData, data }) {
     return (
         <div className="w-full space-y-8">
             {breadValue === 'danh_sach_tu' &&
-                <div className="w-full max-h-320 grid grid-cols-3 gap-4 place-items-start overflow-y-auto">
+                <div className="w-full max-h-384 grid grid-cols-3 gap-4 place-items-start overflow-y-auto">
                     {data?.map((item, index) =>
                     (<DetailShelfContent
                         img={img}
@@ -158,7 +158,7 @@ function ShelfProductContent({ img, HandleAddData, data }) {
                         </div>
 
                     </div>
-                    <div className="max-h-320 overflow-y-auto">
+                    <div className="max-h-384 overflow-y-auto">
                         {model?.map((item, index) =>
                         (<DetailModelContent
                             key={`DetailModelContent_${index}`}
@@ -168,6 +168,6 @@ function ShelfProductContent({ img, HandleAddData, data }) {
                         />))}
                     </div>
                 </div>}
-        </div >)
+        </div>)
 }
 export default React.memo(ShelfProductContent)
