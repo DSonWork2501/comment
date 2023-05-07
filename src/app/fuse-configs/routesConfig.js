@@ -9,6 +9,7 @@ import ProductConfig from 'app/main/product/config'
 import CustomerConfig from 'app/main/customer/config'
 import OrderConfig from 'app/main/order/config'
 import CustomerShelfConfig from 'app/main/customer-shelf/config';
+import ContractConfig from 'app/main/contract/config';
 
 const routeConfigs = [
 	LoginConfig,
@@ -19,6 +20,7 @@ const routeConfigs = [
 	CustomerConfig,
 	OrderConfig,
 	CustomerShelfConfig,
+	ContractConfig
 ];
 
 const routes = [

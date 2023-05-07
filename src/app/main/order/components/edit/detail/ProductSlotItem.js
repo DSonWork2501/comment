@@ -65,14 +65,15 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
         const value = event.target.value
         setHs(event.target.value)
         const private_description = formik_entity.values.privatedescription
-        if ([HomeSubscription[1].id, HomeSubscription[1].id].includes(value)) {
+        if ([HomeSubscription[1].id, HomeSubscription[2].id].includes(value)) {
             private_description !== 'home_subscription' && formik_entity.setFieldValue('privatedescription', 'home_subscription')
         } else{
             private_description && formik_entity.setFieldValue('privatedescription', '')
         }
     }
 
-    console.log('formik prefix', formik.values)
+    // console.log('formik prefix', formik.values)
+    const disabledHs = formik_entity?.values?.productorder?.length > 0 ? true : false
     return (
         <div className="w-full space-y-16">
             <div className="w-full py-6 md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
@@ -83,6 +84,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                     onChange={(event) => handleChangeHs(event)}
                     label="Loại"
                     data={Object.values(HomeSubscription)}
+                    disabled={disabledHs}
                 />
                 <CmsAutocomplete
                     loading={loading}

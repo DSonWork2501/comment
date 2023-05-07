@@ -5,6 +5,7 @@ import React, { } from "react"
 import noImage from '@widgets/images/noImage.jpg';
 import CreateDetailProduct from "./detail/CreateDetailProduct";
 import { get } from "lodash";
+import ContractInfo from "./basic/ContractInfo";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const columns = [
@@ -64,6 +65,9 @@ export default function DetailProductContent({ formik }) {
     }))
     return (
         <div className="w-full space-y-16 p-20 pb-40">
+            <CmsBoxLine label={"Thông tin hợp đồng"}>
+                <ContractInfo formik={formik} />
+            </CmsBoxLine>
             <CmsBoxLine label={"Tìm kiếm sản phẩm"}>
                 <CreateDetailProduct
                     formik={formik}

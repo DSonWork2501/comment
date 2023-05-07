@@ -104,6 +104,23 @@ const navigationConfig = [
 			},
 		],
 	},
+	{
+		id: 'nvi-order',
+		title: 'Hợp đồng',
+		translate: 'CONTRACT',
+		type: 'group',
+		icon: 'reorder',
+		children: [
+			{
+				id: 'nvi-manager-order',
+				title: 'Quản Lý Hợp Đồng',
+				translate: 'CONTRACT_MANAGEMENT',
+				type: 'item',
+				icon: 'gavel',
+				url: '/contract',
+			},
+		],
+	},
 ];
 
 export default navigationConfig;
