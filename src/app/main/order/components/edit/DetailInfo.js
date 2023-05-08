@@ -6,6 +6,8 @@ import noImage from '@widgets/images/noImage.jpg';
 import CreateDetailProduct from "./detail/CreateDetailProduct";
 import { get } from "lodash";
 import ContractInfo from "./basic/ContractInfo";
+import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
+import { OrderContext } from "../../context/OrderContext";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const columns = [
@@ -39,6 +41,7 @@ const InfoProductDetail = React.memo(({ data, index }) => {
 export default function DetailProductContent({ formik }) {
     const { productorder, moneytotal } = formik.values
     // console.log('productorder', productorder)
+    const { hs } = React.useContext(OrderContext) || null;
 
     const HandleDelete = (index_item) => {
         formik.setFieldValue('productorder', productorder.filter((x, index) => index !== index_item))
@@ -63,27 +66,28 @@ export default function DetailProductContent({ formik }) {
             <CmsButton label="xóa" className="bg-red-500 hover:bg-red-700 hover:shadow-2" onClick={() => HandleDelete(index)} />
         </div>
     }))
+    const isContract = HomeSubscription[0].id !== hs
     return (
         <div className="w-full space-y-16 p-20 pb-40">
-            <CmsBoxLine label={"Thông tin hợp đồng"}>
+            {isContract && <CmsBoxLine label={"Thông tin hợp đồng"}>
                 <ContractInfo formik={formik} />
-            </CmsBoxLine>
-            <CmsBoxLine label={"Tìm kiếm sản phẩm"}>
-                <CreateDetailProduct
-                    formik={formik}
-                />
-            </CmsBoxLine>
+            </CmsBoxLine>}
             <div className="flex flex-row-reverse">
             </div>
             <CmsBoxLine label={'Danh sách chi tiết sản phẩm'}>
-                <CmsTableBasic
-                    tableClassName="overflow-hidden"
-                    // className=""
-                    columns={columns}
-                    data={data}
-                    isPagination={false}
-                    footerData={data?.length > 0 ? { quantity: 'Tổng tiền', totalprice: !isNaN(parseInt(moneytotal)) ? moneytotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' } : null}
-                />
+                <div className="space-y-8">
+                    <CreateDetailProduct
+                        formik={formik}
+                    />
+                    <CmsTableBasic
+                        tableClassName="overflow-hidden"
+                        // className=""
+                        columns={columns}
+                        data={data}
+                        isPagination={false}
+                        footerData={data?.length > 0 ? { quantity: 'Tổng tiền', totalprice: !isNaN(parseInt(moneytotal)) ? moneytotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' } : null}
+                    />
+                </div>
             </CmsBoxLine>
         </div>
     )

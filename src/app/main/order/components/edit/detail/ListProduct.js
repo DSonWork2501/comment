@@ -51,7 +51,7 @@ function LisProductContent({ data, HandleAddData, img, hs }) {
             <>
                 {hs === parseInt(HomeSubscription[2].id) &&
                     <CmsBoxLine label={'Thông tin sản phẩm'}>
-                        <div className="grid grid-cols-3 gap-4 place-items-start">
+                        <div className="grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 place-items-start">
                             {data.map((item, index) =>
                             (<DetailProduct
                                 img={img}

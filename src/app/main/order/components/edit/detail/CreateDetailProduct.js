@@ -37,7 +37,7 @@ export default function CreateDetailProduct({ formik }) {
     }
     // console.log('formik_item', formik_item)
     return (
-        <CmsAccordion title={"Click để sổ chọn"}>
+        <CmsAccordion title={"Tìm kiếm sản phẩm (Click để sổ chọn)"}>
             <ProductSlotSKUItem formik_entity={formik} formik={formik_item} keyStore={keyStore} HandleAddData={HandleAddData} />
         </CmsAccordion>
     )
