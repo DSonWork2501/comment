@@ -1,17 +1,17 @@
 
 import React from 'react';
 
-const ContractConfig = {
+const SignedContractConfig = {
 	settings: {
 	},
 	// auth: authRoles.onlyGuest,
 	routes: [
 		{
-			path: '/contract',
+			path: '/signed-contract',
 			exact: true,
 			component: React.lazy(() => import('./components/index'))
 		},
 	]
 };
 
-export default ContractConfig;
+export default SignedContractConfig;

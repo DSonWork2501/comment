@@ -7,27 +7,29 @@ import { useDispatch, useSelector } from "react-redux";
 import GenFilterOption from "./index/GenFilterOption";
 import { initColumn } from "@widgets/functions";
 import { useEffect } from "react";
-import { getList } from 'app/main/contract/store/contractSlice'
+import { getList as getCusContract } from 'app/main/signed-contract/store/signedContractSlice'
 import { useState } from "react";
 import EdiDialog from "./edit/EdiDialog"
+import { DisplayDateTime } from "@widgets/functions/ConvertDateTime";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "title", label: "Tiêu đề", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "create", label: "Thông tin tạo", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "approve", label: "Thông tin duyệt", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "orderid", label: "id đơn hàng", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "cusname", label: "tên khách hàng", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "datesign", label: "ngày kí", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "expire", label: "số ngày hết hạn", alignHeader: "left", alignValue: "left", sortable: false }),
 ]
 
 function ContractComponent() {
     const dispatch = useDispatch()
-    const search = useSelector(store => store[keyStore].contract.search)
-    const entities = useSelector(store => store[keyStore].contract.entities)
-    const loading = useSelector(store => store[keyStore].contract.loading)
+    const search = useSelector(store => store[keyStore].signedContract.search)
+    const entities = useSelector(store => store[keyStore].signedContract.entities)
+    const loading = useSelector(store => store[keyStore].signedContract.loading)
     const [open, setOpen] = useState('')
     const [id, setId] = useState(0)
 
     useEffect(() => {
-        dispatch(getList(search))
+        dispatch(getCusContract(search))
     }, [dispatch, search])
 
     const handleRefresh = () => {
@@ -38,7 +40,7 @@ function ContractComponent() {
         setId(0)
     }
 
-    const data = React.useMemo(() => entities || [], [entities])
+    const data = React.useMemo(() => entities?.map(x=>({...x, datesign: DisplayDateTime(x?.datesign)})) || [], [entities])
 
     return (
         <CmsCardedPage

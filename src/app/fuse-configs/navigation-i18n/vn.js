@@ -9,7 +9,7 @@ const locale = {
 	'ORDER_MANAGEMENT': 'Quản Lý Đơn Hàng',
 	'CUSTOM_SHELF': 'Quản Lý tủ rượu',
 	'CONTRACT_MANAGEMENT': 'Danh Sách Hợp Đồng',
-	'SIGNED_CONTRACT_MANAGEMENT': 'Danh Sách Hợp Đồng Đã Ký',
+	'SIGNED_CONTRACT_MANAGEMENT': 'Hợp Đồng Đã Ký',
 	'CONTRACT': 'Quản Lý hợp đồng',
 };
 

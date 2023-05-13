@@ -1,8 +1,8 @@
 import { combineReducers } from '@reduxjs/toolkit'
-import contract from './contractSlice'
+import signedContract from './signedContractSlice'
 
 const reducer = combineReducers({
-    contract
+    signedContract
 });
 
 export default reducer;

@@ -1,2 +1,2 @@
-export const keyStore = "customers"
-export const keyI18n = "i18nCustomers"
+export const keyStore = "signedContracts"
+export const keyI18n = "i18nSignedContracts"

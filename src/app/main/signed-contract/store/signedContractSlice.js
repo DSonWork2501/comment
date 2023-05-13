@@ -3,28 +3,15 @@ import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 
 
-const appName = "contracts";
-const moduleName = "contract";
+const appName = "signedContracts";
+const moduleName = "signedContract";
 /**
  * @description lấy danh sách customer
  */
 export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, async (params, thunkAPI) => {
     try {
-        const response = await connect.live.contract.getList(params);
+        const response = await connect.live.signedContract.getContract(params);
         const data = await response.data.data;
-        return data
-    } catch (error) {
-        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
-        return error
-    }
-});
-/**
- * @description lấy detail
- */
-export const getById = createAsyncThunk(`${appName}/${moduleName}/getById`, async (id, thunkAPI) => {
-    try {
-        const response = await connect.live.contract.getList({ contractid: id });
-        const data = await response.data.data.find(e => true);
         return data
     } catch (error) {
         thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
@@ -37,7 +24,7 @@ export const getById = createAsyncThunk(`${appName}/${moduleName}/getById`, asyn
  */
 export const editContract = createAsyncThunk(`${appName}/${moduleName}/editContract`, async (entity, thunkAPI) => {
     try {
-        const response = entity[0].id === 0 ? await connect.live.contract.insert(entity) : connect.live.contract.update(entity);
+        const response = entity[0].id === 0 ? await connect.live.signedContract.insert(entity) : connect.live.contract.update(entity);
         const data = await response.data;
         thunkAPI.dispatch(showMessage({ variant: "success", message: 'thao tác thành công !' }))
         return data
@@ -130,27 +117,6 @@ const contractSlice = createSlice({
             }
         },
         [getList.rejected]: (state, { error }) => ({
-            ...state,
-            loading: false,
-            error: error
-        }),
-        /**
-         * @description getById
-         */
-        [getById.pending]: state => ({
-            ...state,
-            loading: true,
-            error: null
-        }),
-        [getById.fulfilled]: (state, { payload }) => {
-            return {
-                ...state,
-                loading: false,
-                entity: payload,
-                error: null
-            }
-        },
-        [getById.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

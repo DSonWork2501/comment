@@ -5,7 +5,7 @@ import { ContractType } from 'app/main/contract/model/type'
 import { keyStore } from "../../common"
 import * as Yup from 'yup'
 import { useDispatch, useSelector } from "react-redux"
-import { editContract } from "app/main/contract/store/contractSlice"
+import { editContract } from "app/main/signed-contract/store/signedContractSlice"
 
 const initData = (id, entity) => {
     if (id) {
@@ -24,7 +24,7 @@ const initData = (id, entity) => {
 
 function EditDialogComponent({ open, handleClose, id = '0' }) {
     const dispatch = useDispatch()
-    const entity = useSelector(store => store[keyStore].contract.entity)
+    const entity = useSelector(store => store[keyStore].signedContract.entity)
 
     const handleSaveData = async(value) => {
        dispatch(editContract([value])) 

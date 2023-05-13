@@ -11,7 +11,7 @@ import { OrderContext } from "app/main/order/context/OrderContext"
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, HandleAddData }) {
-    const { hs, setHs } = React.useContext(OrderContext) || null;
+    const { hs, setHs } = React.useContext(OrderContext) || null
     const dispatch = useDispatch()
     const product_entities = useSelector(store => store[keyStore].product.hsEntities)?.data
     const loading = useSelector(store => store[keyStore].product.hsLoading)

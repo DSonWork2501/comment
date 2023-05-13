@@ -121,7 +121,7 @@ const navigationConfig = [
 			},
 			{
 				id: 'nvi-manager-signed-contract',
-				title: 'Danh Sách Hợp Đồng Đã Ký',
+				title: 'Hợp Đồng Đã Ký',
 				translate: 'SIGNED_CONTRACT_MANAGEMENT',
 				type: 'item',
 				icon: 'gavel',
