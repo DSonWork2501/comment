@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import _ from '@lodash';
 import * as PropTypes from 'prop-types';
 import clsx from 'clsx'
-import { CmsCollapse, CmsLoading } from '@widgets/components'
+import { CmsCollapse } from '@widgets/components'
 import CmsRowContentBasic from './CmsRowContentBasic';
 import CmsTableFooterBasic from './CmsTableFooterBasic';
 
@@ -286,7 +286,6 @@ function TableContentBasic(props) {
 	return (
 		<div className={clsx("w-full flex flex-col", className)}>
 			{loading && <LinearProgress className="w-full" />}
-			<CmsLoading loading={loading} />
 			{filterOptions && <CmsCollapse open={openFilterOptions}>{filterOptions}</CmsCollapse>}
 			{viewOptions && <CmsCollapse open={openViewOptions}>{viewOptions}</CmsCollapse>}
 			{/* {(viewOptions || filterOptions) && <div className="p-8"></div>} */}

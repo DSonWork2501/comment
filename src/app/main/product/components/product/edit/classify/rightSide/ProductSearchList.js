@@ -23,8 +23,8 @@ const DetailSkuProduct = React.memo(({ item, index, onClickSku }) => {
                 onClick={(event) => onClickSku(event, item)}
             >
                 <img src={img} alt={`image_detail_${index}`} key={`${index}_img_DetailSkuProduct`} />
-                <div className="px-4 py-6 bg-green-600 text-white rounded-6">
-                    <CmsLabel content={item.name} key={`${index}_name_DetailSkuProduct`} className="text-12" />
+                <div className="flex flex-col px-4 py-6 bg-green-600 text-white rounded-6 justify-items-center">
+                    <CmsLabel content={item.name} key={`${index}_name_DetailSkuProduct`} className="text-12 text-center" />
                 </div>
             </div>
         </Tooltip>

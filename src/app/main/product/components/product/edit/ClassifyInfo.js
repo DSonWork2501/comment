@@ -160,13 +160,14 @@ function ClassifyInfo({ formik }) {
     }
 
     const HandleCloseShelfModal = (value) => {
-        formik.setFieldValue(`detail[${parseInt(modalIndex)}].model`, JSON.stringify(value))
+        var model = value.map(x => ({ ...x, capacity: parseInt(x.capacity) }))
+        formik.setFieldValue(`detail[${parseInt(modalIndex)}].model`, JSON.stringify(model))
         setModalIndex('')
     }
 
     console.log('detail', formik.values.detail)
     const model = formik?.values?.detail[modalIndex]?.model
-    const ishs  = parseInt(formik?.values?.ishs) && parseInt(formik?.values?.ishs)
+    const ishs = parseInt(formik?.values?.ishs) && parseInt(formik?.values?.ishs)
     const data = detail?.map((x, index) => ({
         stt: index + 1,
         info: editIndex === index ? <EditRowContent index={index} formik={formik} handleSaveData={HandleSaveItem} handleCancelSetIndex={() => setEditIndex('')} /> : <InfoContent index={index} formik={formik} />,

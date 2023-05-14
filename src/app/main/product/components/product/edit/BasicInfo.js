@@ -3,11 +3,11 @@ import { CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/
 import React, { } from "react"
 import MutipleImagePathLink from "../../common/MultipleImagePathLink"
 import noImage from '@widgets/images/noImage.jpg';
-import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
 import { FocusError } from "focus-formik-error";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadImage } from "app/main/product/store/productSlice";
 import { keyStore } from "app/main/product/common";
+import CmsFormikProductType from '@widgets/components/product-type/index'
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 function BasicInfo({ formik, SaveData, }) {
@@ -94,12 +94,15 @@ function BasicInfo({ formik, SaveData, }) {
                         label={'Miễn phí vận chuyển'}
                         vertical={false}
                     />
-                    <CmsFormikRadioGroup
+                    {/* <CmsFormikRadioGroup
                         name="ishs"
-                        data={Object.values(HomeSubscription).map(x => ({ ...x, id: parseInt(x.id) }))}
+                        data={Object.values(ProductType).map(x => ({ ...x, id: parseInt(x.id) }))}
                         formik={formik}
-                        label={'Home subscription'}
+                        label={'Loại sản phẩm'}
                         vertical={false}
+                    /> */}
+                    <CmsFormikProductType
+                        formik={formik}
                     />
                 </div>
             </div>

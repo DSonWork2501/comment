@@ -72,6 +72,17 @@ export default {
         },
         location: {
             getList: params => axios.get(`${baseurl}/location/get-locations`, { params }),
+        },
+        contract: {
+            getList: params => axios.get(`${baseurl}/contract/get-contracts`, { params }),
+            insert: entity => axios.post(`${baseurl}/contract/insert-contract`, entity),
+            update: entity => axios.put(`${baseurl}/contract/update-contract`, entity),
+            changeStatus:  entity => axios.put(`${baseurl}/contract/status-contracts`, entity),
+        },
+        signedContract: {
+            getContract: params => axios.get(`${baseurl}/contract/get-cus-contracts`, { params }),
+            insert: entity => axios.post(`${baseurl}/contract/insert-cus-contract`, entity),
+            update: entity => axios.post(`${baseurl}/contract/update-cus-contract`, entity),
         }
     },
 }

@@ -104,6 +104,31 @@ const navigationConfig = [
 			},
 		],
 	},
+	{
+		id: 'nvi-contract',
+		title: 'Hợp đồng',
+		translate: 'CONTRACT',
+		type: 'group',
+		icon: 'reorder',
+		children: [
+			{
+				id: 'nvi-manager-contract',
+				title: 'Danh Sách Hợp Đồng',
+				translate: 'CONTRACT_MANAGEMENT',
+				type: 'item',
+				icon: 'gavel',
+				url: '/contract',
+			},
+			{
+				id: 'nvi-manager-signed-contract',
+				title: 'Hợp Đồng Đã Ký',
+				translate: 'SIGNED_CONTRACT_MANAGEMENT',
+				type: 'item',
+				icon: 'gavel',
+				url: '/signed-contract',
+			},
+		],
+	},
 ];
 
 export default navigationConfig;

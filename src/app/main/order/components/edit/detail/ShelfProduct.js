@@ -1,5 +1,5 @@
-import { makeStyles } from "@material-ui/core"
-import { CmsButton, CmsLabel, CmsTextField } from "@widgets/components"
+import { Tooltip, makeStyles } from "@material-ui/core"
+import { CmsButton, CmsIconButton, CmsLabel, CmsTextField } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import React from "react"
 import { useCallback } from "react"
@@ -24,42 +24,84 @@ const useStyles = makeStyles((theme) => ({
 function DetailShelfContent({ value, img, index, handleClickBread, classes, HandleAddData }) {
     return (
         <div onClick={handleClickBread}>
-            <div key={`div-0-detail-${index}`}
-                className={clsx("w-full grid justify-items-center space-y-8 hover: shadow-4 py-4", classes.shelf)}
-            >
-                <img src={img || noImage} alt="image_detail" className="h-128" />
-                <div className="grid justify-items-start">
-                    <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min' }} info={{ content: value?.uniqueid || '-' }} />
-                    <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
-                    <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min' }} info={{ content: value?.color || '-' }} />
-                    <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'S/lượng', className: 'min-w-min' }} info={{ content: value?.quantity || '-' }} />
+            <Tooltip title={<CmsLabel content={'Click vào để hiển thị thông tin chi tiết !'} className="text-14"/>}>
+                <div key={`div-0-detail-${index}`}
+                    className={clsx("border-1 border-collapse rounded-2 w-full grid justify-items-center space-y-8 hover:shadow-4", classes.shelf)}
+                >
+                    <img src={img || noImage} alt="image_detail" className="w-44" />
+                    <div className="grid justify-items-start px-4">
+                        <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min text-10' }} info={{ content: value?.uniqueid || '-', className: 'text-10' }} />
+                        <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min text-10' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0, className: 'text-10' }} />
+                        <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min text-10' }} info={{ content: value?.color || '-', className: 'text-10' }} />
+                        <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'S/lượng', className: 'min-w-min text-10' }} info={{ content: value?.quantity || '-', className: 'text-10' }} />
+                    </div>
                 </div>
-            </div>
+            </Tooltip>
         </div>
     )
 }
+function TooltipProduct({ value, index }) {
+
+    return <div>
+        <div className="w-full">
+            <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min text-10' }} info={{ content: value?.uniqueid || '-', className: 'text-10' }} />
+            <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min text-10' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0, className: 'text-10' }} />
+        </div>
+        <div className="w-full">
+            <LabelInfo key={`name-${index}-labelInfo`} label={{ content: 'tên', className: 'min-w-min text-10' }} info={{ content: value?.name || '-', className: 'text-10' }} />
+            <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'S/lượng', className: 'min-w-min text-10' }} info={{ content: value?.quantity || '-', className: 'text-10' }} />
+        </div>
+    </div>
+
+}
 // chi tiết ngăn tủ
 function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
-    const [quantity, setQuantity] = useState(0)
+    const [quantity, setQuantity] = useState(1)
     const value = data?.item || null
     const img = value.img ? `${baseurl}${value.img}` : noImage
     return (
         <div
             key={`div-0-detai-${index}`}
-            className={clsx("w-full flex flex-row shadow-2 hover:shadow-4 p-4 h-64", classes.shelf)}
+            className={clsx("w-full shadow-2 hover:shadow-4 p-4 self-center h-192 space-y-8", classes.shelf)}
         >
-            <div className="w-2/3 flex flex-row">
+            <div className="h-64 text-center m-auto">
+                <img src={img} alt="image_detail" className="object-center w-full h-full" />
+            </div>
+            <Tooltip title={<TooltipProduct value={value} index={index} />}>
+                <div className="w-full flex flex-row items-center">
+                    <CmsIconButton size="small" icon="info" className="" />
+                    <CmsLabel content={value?.name} className="text-10 w-88 truncate" />
+                </div>
+            </Tooltip>
+            <div className="flex flex-col space-y-8 self-center">
+                <CmsTextField
+                    key={`quantity-${index}-labelInfo`}
+                    isNumber
+                    inputProps={{ inputProps: { min: 0, max: 1000 } }}
+                    size="small"
+                    value={quantity}
+                    onChange={(event) => setQuantity(event.target.value)}
+                    name="quantity"
+                    label="Số lượng"
+                />
+                <CmsButton
+                    key={`add-${index}-button`}
+                    size="small"
+                    label="thêm"
+                    onClick={() => HandleAddData({ quantity, index: 0, item: value })}
+                />
+            </div>
+            {/* <div className="w-2/3 flex flex-row">
                 <div className="flex self-center w-1/5">
                     <img src={img} alt="image_detail" className="object-cover h-60 self-center" />
                 </div>
                 <div className="w-full self-center space-y-16">
-                    <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min' }} info={{ content: value?.uniqueid || '-' }} />
-                    <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
+                    <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min text-10' }} info={{ content: value?.uniqueid || '-', className: 'text-10' }} />
+                    <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min text-10' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 , className: 'text-10'}} />
                 </div>
                 <div className="w-full self-center space-y-16">
-                    <LabelInfo key={`name-${index}-labelInfo`} label={{ content: 'tên', className: 'min-w-min' }} info={{ content: value?.name || '-' }} />
-                    {/* <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min' }} info={{ content: value?.color || '-' }} /> */}
-                    <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'S/lượng', className: 'min-w-min' }} info={{ content: value?.quantity || '-' }} />
+                    <LabelInfo key={`name-${index}-labelInfo`} label={{ content: 'tên', className: 'min-w-min text-10' }} info={{ content: value?.name || '-', className: 'text-10' }} />
+                    <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'S/lượng', className: 'min-w-min text-10' }} info={{ content: value?.quantity || '-', className: 'text-10' }} />
                 </div>
             </div>
             <div className="flex flex-row space-x-8 w-1/3 self-center">
@@ -79,10 +121,53 @@ function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
                     label="thêm"
                     onClick={() => HandleAddData({ quantity, index: 0, item: value })}
                 />
-            </div>
-        </div>
+            </div> */}
+        </div >
     )
 }
+// function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
+//     const [quantity, setQuantity] = useState(1)
+//     const value = data?.item || null
+//     const img = value.img ? `${baseurl}${value.img}` : noImage
+//     return (
+//         <div
+//             key={`div-0-detai-${index}`}
+//             className={clsx("w-full flex flex-row shadow-2 hover:shadow-4 p-4 h-64", classes.shelf)}
+//         >
+//             <div className="w-2/3 flex flex-row">
+//                 <div className="flex self-center w-1/5">
+//                     <img src={img} alt="image_detail" className="object-cover h-60 self-center" />
+//                 </div>
+//                 <div className="w-full self-center space-y-16">
+//                     <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min text-10' }} info={{ content: value?.uniqueid || '-', className: 'text-10' }} />
+//                     <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min text-10' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 , className: 'text-10'}} />
+//                 </div>
+//                 <div className="w-full self-center space-y-16">
+//                     <LabelInfo key={`name-${index}-labelInfo`} label={{ content: 'tên', className: 'min-w-min text-10' }} info={{ content: value?.name || '-', className: 'text-10' }} />
+//                     <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'S/lượng', className: 'min-w-min text-10' }} info={{ content: value?.quantity || '-', className: 'text-10' }} />
+//                 </div>
+//             </div>
+//             <div className="flex flex-row space-x-8 w-1/3 self-center">
+//                 <CmsTextField
+//                     key={`quantity-${index}-labelInfo`}
+//                     isNumber
+//                     inputProps={{ inputProps: { min: 0, max: 1000 } }}
+//                     size="small"
+//                     value={quantity}
+//                     onChange={(event) => setQuantity(event.target.value)}
+//                     name="quantity"
+//                     label="Số lượng"
+//                 />
+//                 <CmsButton
+//                     key={`add-${index}-button`}
+//                     size="small"
+//                     label="thêm"
+//                     onClick={() => HandleAddData({ quantity, index: 0, item: value })}
+//                 />
+//             </div>
+//         </div>
+//     )
+// }
 // Ngăn tủ
 function DetailModelContent({ value, classes, HandleAddData }) {
     const slots = value?.slots || []
@@ -94,7 +179,7 @@ function DetailModelContent({ value, classes, HandleAddData }) {
                     content={value?.name}
                 />
             </div>
-            <div className="w-full space-y-8">
+            <div className="grid grid-cols-3 gap-4 place-items-center">
                 {slots.map((item, index) => (
                     <DetailShelfProductContent
                         data={item}
@@ -133,7 +218,7 @@ function ShelfProductContent({ img, HandleAddData, data }) {
     return (
         <div className="w-full space-y-8">
             {breadValue === 'danh_sach_tu' &&
-                <div className="w-full max-h-320 grid grid-cols-3 gap-4 place-items-start overflow-y-auto">
+                <div className="w-full grid grid-cols-3 gap-4 place-items-start">
                     {data?.map((item, index) =>
                     (<DetailShelfContent
                         img={img}
@@ -158,7 +243,7 @@ function ShelfProductContent({ img, HandleAddData, data }) {
                         </div>
 
                     </div>
-                    <div className="max-h-320 overflow-y-auto">
+                    <div className="max-h-384 overflow-y-auto">
                         {model?.map((item, index) =>
                         (<DetailModelContent
                             key={`DetailModelContent_${index}`}
@@ -168,6 +253,6 @@ function ShelfProductContent({ img, HandleAddData, data }) {
                         />))}
                     </div>
                 </div>}
-        </div >)
+        </div>)
 }
 export default React.memo(ShelfProductContent)
