@@ -11,7 +11,7 @@ import { OrderContext } from "../../context/OrderContext";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const columns = [
-    new initColumn({ field: "stt", label: "STT", alignHeader: "center", alignValue: "left", sortable: false, classHeader: 'w-56' }),
+    new initColumn({ field: "stt", label: "STT", alignHeader: "center", alignValue: "left", sortable: false, classHeader: 'w-12' }),
     new initColumn({ field: "info", label: "Thông tin", alignHeader: "center", alignValue: "center", sortable: false }),
     new initColumn({ field: "quantity", label: "Số lượng", alignHeader: "center", alignValue: "center", sortable: false }),
     new initColumn({ field: "totalprice", label: "Tổng Giá", alignHeader: "center", alignValue: "center", sortable: false }),
@@ -23,16 +23,16 @@ const InfoProductDetail = React.memo(({ data, index }) => {
 
     return (
         <div key={`InfoProductDetail_${index}_div_0`} className="w-full flex flex-row space-x-16">
-            <div>
-                <img key={`InfoProductDetail_${index}_div_img`} src={image || noImage} alt="image_detail" className="h-80 min-w-52" />
+            <div className="w-96">
+                <img key={`InfoProductDetail_${index}_div_img`} src={image || noImage} alt="image_detail" />
             </div>
             <div className="w-full self-center space-y-16">
-                <LabelInfo label={{ content: 'uniqueid', className: 'min-w-min' }} info={{ content: uniqueid || '-' }} />
-                <LabelInfo label={{ content: 'tên', className: 'min-w-min' }} info={{ content: name || '-' }} />
+                <LabelInfo label={{ content: 'uniqueid', className: 'min-w-min text-10' }} info={{ content: uniqueid || '-', className: 'text-10' }} />
+                <LabelInfo label={{ content: 'tên', className: 'min-w-min text-10' }} info={{ content: name || '-', className: 'text-10' }} />
             </div>
             <div className="w-full self-center space-y-16">
-                <LabelInfo label={{ content: 'giá', className: 'min-w-min' }} info={{ content: !isNaN(parseInt(price)) ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' }} />
-                <LabelInfo label={{ content: 'imei hs', className: 'min-w-min' }} info={{ content: imei_hs || '-' }} />
+                <LabelInfo label={{ content: 'giá', className: 'min-w-min text-10' }} info={{ content: !isNaN(parseInt(price)) ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-', className: 'text-10' }} />
+                <LabelInfo label={{ content: 'imei hs', className: 'min-w-min text-10' }} info={{ content: imei_hs || '-', className: 'text-10' }} />
             </div>
         </div>
     )
@@ -68,27 +68,29 @@ export default function DetailProductContent({ formik }) {
     }))
     const isContract = HomeSubscription[0].id !== hs
     return (
-        <div className="w-full space-y-16 p-20 pb-40">
-            {isContract && <CmsBoxLine label={"Thông tin hợp đồng"}>
-                <ContractInfo formik={formik} />
-            </CmsBoxLine>}
-            <div className="flex flex-row-reverse">
+        <div className="flex flex-row p-20 pb-40 space-x-8">
+            <div className="w-4/12 space-y-16">
+                <CmsBoxLine label={'Tìm kiếm sản phẩm'}>
+                    <CreateDetailProduct formik={formik} />
+                </CmsBoxLine>
             </div>
-            <CmsBoxLine label={'Danh sách chi tiết sản phẩm'}>
-                <div className="space-y-8">
-                    <CreateDetailProduct
-                        formik={formik}
-                    />
-                    <CmsTableBasic
-                        tableClassName="overflow-hidden"
-                        // className=""
-                        columns={columns}
-                        data={data}
-                        isPagination={false}
-                        footerData={data?.length > 0 ? { quantity: 'Tổng tiền', totalprice: !isNaN(parseInt(moneytotal)) ? moneytotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' } : null}
-                    />
-                </div>
-            </CmsBoxLine>
+            <div className="w-8/12 space-y-8">
+                {isContract && <CmsBoxLine label={"Thông tin hợp đồng"}>
+                    <ContractInfo formik={formik} />
+                </CmsBoxLine>}
+                <CmsBoxLine label={'Danh sách chi tiết sản phẩm'}>
+                    <div className="space-y-8">
+                        <CmsTableBasic
+                            tableClassName="overflow-hidden"
+                            // className=""
+                            columns={columns}
+                            data={data}
+                            isPagination={false}
+                            footerData={data?.length > 0 ? { quantity: 'Tổng tiền', totalprice: !isNaN(parseInt(moneytotal)) ? moneytotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' } : null}
+                        />
+                    </div>
+                </CmsBoxLine>
+            </div>
         </div>
     )
 }

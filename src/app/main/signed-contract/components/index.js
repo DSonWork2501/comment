@@ -18,6 +18,7 @@ const columns = [
     new initColumn({ field: "cusname", label: "tên khách hàng", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "datesign", label: "ngày kí", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "expire", label: "số ngày hết hạn", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "reason", label: "lý do", alignHeader: "left", alignValue: "left", sortable: false }),
 ]
 
 function ContractComponent() {

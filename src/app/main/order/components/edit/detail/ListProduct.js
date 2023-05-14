@@ -1,6 +1,6 @@
 import React from "react"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
-import { CmsBoxLine, CmsButton, CmsTextField } from "@widgets/components"
+import { CmsBoxLine, CmsButton, CmsLabel, CmsTextField } from "@widgets/components"
 import { useState } from "react"
 import noImage from '@widgets/images/noImage.jpg';
 import FuseAnimate from "@fuse/core/FuseAnimate/FuseAnimate";
@@ -9,18 +9,21 @@ import ShelfProductContent from './ShelfProduct'
 // export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 function DetailProduct({ value, index, HandleAddData, img }) {
-    const [quantity, setQuantity] = useState(0)
+    const [quantity, setQuantity] = useState(1)
     return (
         <CmsBoxLine label={''}>
             <div key={`div-0-detai-${index}`} className="w-full grid justify-items-center space-y-8">
-                <img src={img || noImage} alt="image_detail" className="h-128" />
-                <div className="grid justify-items-start">
-                    <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min' }} info={{ content: value?.uniqueid || '-' }} />
-                    <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
-                    <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min' }} info={{ content: value?.color || '-' }} />
-                    <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'S/lượng tồn', className: 'min-w-min' }} info={{ content: value?.quantity || '-' }} />
+                <div className="h-64 text-center m-auto">
+                    <img src={img || noImage} alt="image_detail" className="object-center w-full h-full" />
                 </div>
-                <div className="flex flex-row space-x-8">
+                <div className="grid justify-items-start">
+                    <CmsLabel content={value?.uniqueid || '-'} className="text-10" />
+                    {/* <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min' }} info={{ content: value?.uniqueid || '-' }} /> */}
+                    <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min text-10' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0, className: 'text-10' }} />
+                    <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min text-10' }} info={{ content: value?.color || '-', className: 'text-10' }} />
+                    <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'tồn', className: 'min-w-min text-10' }} info={{ content: value?.quantity || '-', className: 'text-10' }} />
+                </div>
+                <div className="flex flex-col space-y-8">
                     <CmsTextField
                         key={`quantity-${index}-labelInfo`}
                         isNumber
@@ -45,13 +48,12 @@ function DetailProduct({ value, index, HandleAddData, img }) {
 
 function LisProductContent({ data, HandleAddData, img, hs }) {
 
-    console.log('data', data)
     return (
         <FuseAnimate animation="transition.expandIn" delay={500}>
             <>
                 {hs === parseInt(HomeSubscription[2].id) &&
                     <CmsBoxLine label={'Thông tin sản phẩm'}>
-                        <div className="grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 place-items-start">
+                        <div className="grid grid-cols-3 gap-4 place-items-start">
                             {data.map((item, index) =>
                             (<DetailProduct
                                 img={img}

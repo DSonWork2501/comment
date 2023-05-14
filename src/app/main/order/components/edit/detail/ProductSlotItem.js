@@ -67,7 +67,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
         const private_description = formik_entity.values.privatedescription
         if ([HomeSubscription[1].id, HomeSubscription[2].id].includes(value)) {
             private_description !== 'home_subscription' && formik_entity.setFieldValue('privatedescription', 'home_subscription')
-        } else{
+        } else {
             private_description && formik_entity.setFieldValue('privatedescription', '')
         }
     }
@@ -77,6 +77,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     return (
         <div className="w-full space-y-16">
             <div className="w-full py-6 md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
+                {/* <CmsFormikProductType formik={formik} divClassName={'w-3/12'}/> */}
                 <CmsSelect
                     size="small"
                     className="w-3/12"

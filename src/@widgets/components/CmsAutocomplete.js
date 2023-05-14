@@ -122,6 +122,7 @@ function CmsAutocomplete(props) {
                                         src={`${option.image}`}
                                         srcSet={`${option.image} 2x`}
                                         alt=""
+                                        className='w-40'
                                     />
                                 }
                             </div>
