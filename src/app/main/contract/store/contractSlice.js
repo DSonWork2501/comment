@@ -46,10 +46,24 @@ export const editContract = createAsyncThunk(`${appName}/${moduleName}/editContr
         return error
     }
 });
+/**
+ * @description chuyển status
+ */
+export const statusContract = createAsyncThunk(`${appName}/${moduleName}/statusContract`, async (entity, thunkAPI) => {
+    try {
+        const response = await connect.live.contract.changeStatus(entity)
+        const data = await response.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'thao tác thành công !' }))
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return error
+    }
+});
 
 const initSearchState = {
     contractId: '',
-    status: '',
+    status: 1,
     type: 1
 }
 
@@ -172,6 +186,27 @@ const contractSlice = createSlice({
             }
         },
         [editContract.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        /**
+         * @description statusContract
+         */
+        [statusContract.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [statusContract.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                response: payload,
+                error: null
+            }
+        },
+        [statusContract.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

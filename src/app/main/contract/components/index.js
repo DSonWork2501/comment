@@ -2,19 +2,21 @@ import React from "react";
 import withReducer from "app/store/withReducer";
 import reducer from "../store";
 import { keyStore } from "../common";
-import { CmsButton, CmsCardedPage, CmsTableBasic } from "@widgets/components";
+import { CmsButton, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
 import { useDispatch, useSelector } from "react-redux";
 import GenFilterOption from "./index/GenFilterOption";
 import { initColumn } from "@widgets/functions";
 import { useEffect } from "react";
-import { getList } from 'app/main/contract/store/contractSlice'
+import { getList, setSearch } from 'app/main/contract/store/contractSlice'
 import { useState } from "react";
-import EdiDialog from "./edit/EdiDialog"
+import EditDialog from "./edit/EditDialog"
+import { DisplayDateTime } from "@widgets/functions/ConvertDateTime";
+import StatusDialog from "./edit/StatusDialog";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
     new initColumn({ field: "title", label: "Tiêu đề", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "create", label: "Thông tin tạo", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "datecreate", label: "Ngày tạo", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "approve", label: "Thông tin duyệt", alignHeader: "left", alignValue: "left", sortable: false }),
 ]
 
@@ -24,10 +26,10 @@ function ContractComponent() {
     const entities = useSelector(store => store[keyStore].contract.entities)
     const loading = useSelector(store => store[keyStore].contract.loading)
     const [open, setOpen] = useState('')
-    const [id, setId] = useState(0)
+    const [item, setItem] = useState(null)
 
     useEffect(() => {
-        dispatch(getList(search))
+        dispatch(getList({ ...search, status: parseInt(search.status) }))
     }, [dispatch, search])
 
     const handleRefresh = () => {
@@ -35,10 +37,35 @@ function ContractComponent() {
     }
     const handleCreateDialog = () => {
         setOpen('edit')
-        setId(0)
+        setItem(null)
+    }
+    const handleUpdateDialog = (value) => {
+        setOpen('edit')
+        setItem(value)
+    }
+    const handleStatusDialog = (value) => {
+        setOpen('status')
+        setItem(value)
     }
 
-    const data = React.useMemo(() => entities || [], [entities])
+    const data = React.useMemo(() => entities?.map(x => ({
+        ...x,
+        datecreate: DisplayDateTime(x.datecreate),
+        action: <div className="w-full flex flex-row space-x-8">
+            <CmsIconButton
+                icon="edit"
+                tooltip={'cập nhật'}
+                className="text-white bg-green-500 hover:bg-green-700"
+                onClick={() => handleUpdateDialog(x)}
+            />
+            <CmsIconButton
+                icon="sync"
+                tooltip={'chuyển trạng thái'}
+                className="text-white bg-blue-500 hover:bg-blue-700"
+                onClick={() => handleStatusDialog(x)}
+            />
+        </div>
+    })) || [], [entities])
 
     return (
         <CmsCardedPage
@@ -62,17 +89,26 @@ function ContractComponent() {
                         loading={loading}
                     />
                     {open === 'edit' &&
-                        <EdiDialog
+                        <EditDialog
                             open={open === 'edit'}
-                            id={id}
-                            handleClose={(value) => setOpen(value)}
+                            item={item}
+                            handleClose={() => setOpen('')}
+                        />}
+                    {open === 'status' &&
+                        <StatusDialog
+                            open={open === 'status'}
+                            item={item}
+                            handleClose={() => setOpen('')}
                         />}
                 </>
             }
             toolbar={
                 <div className="w-full flex items-center justify-between px-12">
                     <div className="flex items-center justify-items-start">
-                        <GenFilterOption />
+                        <GenFilterOption
+                            search={search}
+                            setSearch={(value) => dispatch(setSearch(value))}
+                        />
                     </div>
                     <div className="flex items-center justify-end space-x-8">
                         <CmsButton size="small" label="Tạo mới" startIcon="add" onClick={() => handleCreateDialog()} className="bg-orange-500 hover:bg-orange-700" />

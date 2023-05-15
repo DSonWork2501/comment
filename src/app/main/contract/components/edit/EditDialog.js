@@ -1,15 +1,14 @@
-import { CmsDialog, CmsFormikAutocomplete, CmsFormikTextField } from "@widgets/components"
+import { CmsDialog, CmsFormikSelect, CmsFormikTextField } from "@widgets/components"
 import { useFormik } from "formik"
 import React from "react"
 import { ContractType } from 'app/main/contract/model/type'
-import { keyStore } from "../../common"
 import * as Yup from 'yup'
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { editContract } from "app/main/contract/store/contractSlice"
 
-const initData = (id, entity) => {
-    if (id) {
-        return entity
+const initData = (item) => {
+    if (item) {
+        return item
     }
     else {
         return {
@@ -17,21 +16,22 @@ const initData = (id, entity) => {
             "title": "",
             "content": "",
             "status": 1,
-            "type": '1'
+            "type": 1
         }
     }
 }
 
-function EditDialogComponent({ open, handleClose, id = '0' }) {
+function EditDialogComponent({ open, handleClose, item = null }) {
     const dispatch = useDispatch()
-    const entity = useSelector(store => store[keyStore].contract.entity)
 
-    const handleSaveData = async(value) => {
-       dispatch(editContract([value])) 
+    const handleSaveData = async (value) => {
+        const data = [{ ...value, type: parseInt(value.type), status: parseInt(value.status) }]
+        dispatch(editContract(data))
+        handleClose && handleClose()
     }
 
     const formik = useFormik({
-        initialValues: initData(entity, id),
+        initialValues: initData(item),
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
         onSubmit: handleSaveData,
@@ -40,11 +40,11 @@ function EditDialogComponent({ open, handleClose, id = '0' }) {
             content: Yup.string().typeError("Nội dung không được bỏ trống !").required("Nội dung không được bỏ trống !"),
         })
     })
-
+    console.log('formik', formik)
     return (
         <CmsDialog
             open={open}
-            title={id = '0' ? 'Thêm mới hợp đồng' : 'Cập nhật hợp đồng'}
+            title={item === null ? 'Thêm mới hợp đồng' : 'Cập nhật hợp đồng'}
             handleClose={handleClose}
             handleSave={formik.handleSubmit}
             isCloseDialogSubmit={false}
@@ -53,7 +53,18 @@ function EditDialogComponent({ open, handleClose, id = '0' }) {
             <div className="w-full space-y-8">
                 <CmsFormikTextField formik={formik} label="Tiêu đề" name="title" />
                 <CmsFormikTextField formik={formik} label="Nội dung" name="content" />
-                <CmsFormikAutocomplete valueIsId data={Object.values(ContractType)} formik={formik} label="Loại" name="type" />
+                <CmsFormikSelect
+                    data={Object.values(ContractType)}
+                    formik={formik}
+                    label="Loại"
+                    name="type"
+                />
+                {/* {item && <CmsFormikSelect
+                    data={Object.values(ContractStatus).map(x=>({...x, id: parseInt(x.id)}))}
+                    formik={formik}
+                    label="Trạng thái"
+                    name="status"
+                />} */}
             </div>
         </CmsDialog>
     )
