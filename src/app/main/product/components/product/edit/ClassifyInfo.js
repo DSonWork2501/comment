@@ -33,7 +33,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
             <CmsFormikTextField key={`${index}_uniqueid`} size="small" name={`uniqueid`} formik={formik_item} label="uniqueid" />
             <CmsFormikTextField key={`${index}_subname`} size="small" name={`subname`} formik={formik_item} label="Tên Sub" />
             <CmsFormikTextField isNumberFormat key={`${index}_capacity`} size="small" name={`capacity`} formik={formik_item} label="dung tích" />
-            <CmsFormikTextField key={`${index}_lotid`} size="small" name={`lotid`} formik={formik_item} label="mã lô (lot id)" />
+            <CmsFormikTextField key={`${index}_nhanhid`} size="small" name={`nhanhid`} formik={formik_item} label="nhanhid" />
             <CmsFormikAutocomplete
                 valueIsId
                 data={colorRes}
@@ -87,7 +87,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
 const InfoContent = ({ index, formik }) => {
     const colorRes = useSelector(store => store[keyStore].product.color)
     const sizeRes = useSelector(store => store[keyStore].product.size)
-    const { lotid, colorid, sizeid, volume, weight, height, maketime, expiretime, status, uniqueid, code,
+    const { nhanhid, colorid, sizeid, volume, weight, height, maketime, expiretime, status, uniqueid, code,
         price, retailprice, wholesaleprice, capacity, subname } = formik.values.detail[index]
     return (
         <div className="space-y-4">
@@ -95,7 +95,7 @@ const InfoContent = ({ index, formik }) => {
                 <LabelInfo label={{ content: 'Unique ID' }} info={{ content: uniqueid }} />
                 <LabelInfo label={{ content: 'Tên Sub' }} info={{ content: subname }} />
                 <LabelInfo label={{ content: 'Dung tích' }} info={{ content: capacity }} />
-                <LabelInfo label={{ content: 'mã lô (lot id)' }} info={{ content: lotid }} />
+                <LabelInfo label={{ content: 'nhanhid' }} info={{ content: nhanhid }} />
                 <LabelInfo label={{ content: 'màu' }} info={{ content: get(colorRes?.find(x => x.id === colorid), 'color') || '' }} />
                 <LabelInfo label={{ content: 'Size ID' }} info={{ content: get(sizeRes?.find(x => x.id === sizeid), 'sizename') || '' }} />
                 <LabelInfo label={{ content: 'thê tích' }} info={{ content: volume }} />

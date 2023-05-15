@@ -1,4 +1,4 @@
-import { CmsAutocomplete, CmsLoadingOverlay, CmsSelect } from "@widgets/components"
+import { CmsAutocomplete, CmsLoadingOverlay, CmsRadioGroup, CmsSelect } from "@widgets/components"
 import { getListHS, searchDetail } from "app/main/product/store/productSlice"
 // import { get } from "lodash"
 import React, { useMemo } from "react"
@@ -6,9 +6,50 @@ import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import noImage from '@widgets/images/noImage.jpg';
 import LisProductContent from './ListProduct'
-import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
+import { HomeSubscription, ProductType } from "app/main/product/model/product/homeSubscription"
 import { OrderContext } from "app/main/order/context/OrderContext"
+import { useState } from "react"
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
+
+function FilterHS({ hs, handleChangeHs, setHs }) {
+    const [type, setType] = useState(0)
+    const [isHs, setIsHs] = useState(null)
+    useEffect(() => {
+        setType(Object.keys(ProductType[3]?.type).map(x => (parseInt(x))).includes(parseInt(hs)) ? ProductType[3].id : ProductType[0].id)
+        Object.keys(ProductType[3].type).map(x => (parseInt(x))).includes(parseInt(hs)) && setIsHs(parseInt(hs))
+    }, [hs])
+
+    const handleChangeProductType = (value) => {
+        setType(value)
+        if (value === ProductType[0].id) {
+            setHs(parseInt(value))
+        }else{
+            setHs(parseInt(ProductType[3]?.type['2'].id))
+        }
+    }
+
+    return (
+        <div className="flex flex-row">
+            <CmsRadioGroup
+                size="small"
+                className="w-3/12"
+                value={hs}
+                onChange={(event) => handleChangeProductType(event.target.value)}
+                label="Loại"
+                data={Object.values(ProductType)}
+            // disabled={disabledHs}
+            />
+            {type === ProductType[3].id &&
+                <CmsSelect
+                    label=""
+                    data={Object.values(ProductType[3].type).map(x => ({ ...x, id: parseInt(x.id) }))}
+                    name="ishs"
+                    value={isHs || ''}
+                    onChange={handleChangeHs} />
+            }
+        </div>
+    )
+}
 
 export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, HandleAddData }) {
     const { hs, setHs } = React.useContext(OrderContext) || null
@@ -76,9 +117,10 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     const disabledHs = formik_entity?.values?.productorder?.length > 0 ? true : false
     return (
         <div className="w-full space-y-16">
+            <FilterHS hs={hs} handleChangeHs={handleChangeHs} setHs={setHs}/>
             <div className="w-full py-6 md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
                 {/* <CmsFormikProductType formik={formik} divClassName={'w-3/12'}/> */}
-                <CmsSelect
+                {/* <CmsSelect
                     size="small"
                     className="w-3/12"
                     value={hs}
@@ -86,10 +128,11 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                     label="Loại"
                     data={Object.values(HomeSubscription)}
                     disabled={disabledHs}
-                />
+                /> */}
+
                 <CmsAutocomplete
                     loading={loading}
-                    label="Danh sách Sản phẩm"
+                    label="Tìm kiếm..."
                     value={item}
                     multiple={false}
                     data={product_data}
