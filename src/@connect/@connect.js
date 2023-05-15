@@ -77,7 +77,7 @@ export default {
             getList: params => axios.get(`${baseurl}/contract/get-contracts`, { params }),
             insert: entity => axios.post(`${baseurl}/contract/insert-contract`, entity),
             update: entity => axios.put(`${baseurl}/contract/update-contract`, entity),
-            changeStatus:  entity => axios.put(`${baseurl}/contract/status-contracts`, entity),
+            changeStatus:  entity => axios.put(`${baseurl}/contract/status-contract`, entity),
         },
         signedContract: {
             getContract: params => axios.get(`${baseurl}/contract/get-cus-contracts`, { params }),
