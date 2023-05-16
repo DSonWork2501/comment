@@ -1,4 +1,4 @@
-import { CmsAutocomplete, CmsLoadingOverlay, CmsRadioGroup, CmsSelect } from "@widgets/components"
+import { CmsAutocomplete, CmsLabel, CmsLoadingOverlay, CmsRadioGroup, CmsSelect } from "@widgets/components"
 import { getListHS, searchDetail } from "app/main/product/store/productSlice"
 // import { get } from "lodash"
 import React, { useMemo } from "react"
@@ -6,12 +6,13 @@ import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import noImage from '@widgets/images/noImage.jpg';
 import LisProductContent from './ListProduct'
-import { HomeSubscription, ProductType } from "app/main/product/model/product/homeSubscription"
+import { ProductType } from "app/main/product/model/product/homeSubscription"
 import { OrderContext } from "app/main/order/context/OrderContext"
 import { useState } from "react"
+import { Tooltip } from "@material-ui/core"
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
-function FilterHS({ hs, handleChangeHs, setHs }) {
+function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
     const [type, setType] = useState(0)
     const [isHs, setIsHs] = useState(null)
     useEffect(() => {
@@ -23,33 +24,39 @@ function FilterHS({ hs, handleChangeHs, setHs }) {
         setType(value)
         if (value === ProductType[0].id) {
             setHs(parseInt(value))
+            setPrivate('')
         } else {
             setHs(parseInt(ProductType[3]?.type['2'].id))
+            setPrivate('home_subscription')
         }
     }
 
     return (
-        <div className="w-full space-y-16">
-            <CmsRadioGroup
-                vertical={false}
-                size="small"
-                className="w-full m-0"
-                value={type}
-                onChange={(event) => handleChangeProductType(event)}
-                label="Loại"
-                name="type"
-                data={Object.values(ProductType)}
-            // disabled={disabledHs}
-            />
-            {type === ProductType[3].id &&
-                <CmsSelect
-                    label="Loại home subscription"
-                    data={Object.values(ProductType[3].type).map(x => ({ ...x, id: parseInt(x.id) }))}
-                    name="ishs"
-                    value={isHs || ''}
-                    onChange={handleChangeHs} />
-            }
-        </div>
+        <>
+            <Tooltip title={disabledHs ? <CmsLabel content={'Đơn hàng chỉ có thể chọn 1 loạt sản phẩm cùng loại'} className="text-14" /> : ''}>
+                <div className="w-full space-y-16">
+                    <CmsRadioGroup
+                        vertical={false}
+                        size="small"
+                        className="w-full m-0"
+                        value={type}
+                        onChange={(event) => handleChangeProductType(event)}
+                        label="Loại"
+                        name="type"
+                        data={Object.values(ProductType).map(x => ({ ...x, disabled: disabledHs }))}
+                    />
+                    {type === ProductType[3].id &&
+                        <CmsSelect
+                            label="Loại home subscription"
+                            data={Object.values(ProductType[3].type).map(x => ({ ...x, id: parseInt(x.id) }))}
+                            name="ishs"
+                            value={isHs || ''}
+                            onChange={handleChangeHs}
+                        />
+                    }
+                </div>
+            </Tooltip>
+        </>
     )
 }
 
@@ -106,20 +113,26 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     }
     const handleChangeHs = (event) => {
         const value = event.target.value
-        setHs(event.target.value)
-        const private_description = formik_entity.values.privatedescription
-        if ([HomeSubscription[1].id, HomeSubscription[2].id].includes(value)) {
-            private_description !== 'home_subscription' && formik_entity.setFieldValue('privatedescription', 'home_subscription')
-        } else {
-            private_description && formik_entity.setFieldValue('privatedescription', '')
-        }
+        setHs(value)
+        // const private_description = formik_entity.values.privatedescription
+        // if ([HomeSubscription[1].id, HomeSubscription[2].id].includes(value)) {
+        //     private_description !== 'home_subscription' && formik_entity.setFieldValue('privatedescription', 'home_subscription')
+        // } else {
+        //     private_description && formik_entity.setFieldValue('privatedescription', '')
+        // }
     }
-
+    const values = formik_entity?.values
     // console.log('formik prefix', formik.values)
-    const disabledHs = formik_entity?.values?.productorder?.length > 0 ? true : false
+    const disabledHs = useMemo(() => values?.productorder?.length > 0 ? true : false, [values])
     return (
         <div className="w-full space-y-16">
-            <FilterHS hs={hs} handleChangeHs={handleChangeHs} setHs={setHs} />
+            <FilterHS
+                hs={hs}
+                handleChangeHs={handleChangeHs}
+                setHs={setHs}
+                disabledHs={disabledHs}
+                setPrivate={(value) => formik_entity.setFieldValue('privatedescription', value)}
+            />
             <div className="w-full md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
                 {/* <CmsFormikProductType formik={formik} divClassName={'w-3/12'}/> */}
                 {/* <CmsSelect
