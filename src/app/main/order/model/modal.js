@@ -127,20 +127,15 @@ export const customModal = (item) => {
             "bonus": item.bonus,
             "combo": item.combo,
             "parentid": item.parentid
-          },
-        "contract": item.privatedescription !== 'home_subscription' ? {
-            "cusid": null,
-            "orderid": null,
-            "contractid": null,
-            "expire": 0,
-            "signature": null
-        } : {
-            "cusid": item.customerid,
-            "orderid": item.orderid,
-            "contractid": item.contractid,
-            "expire": item.expire,
-            "signature": item.signature
-          },
+        },
+        "contract": item.privatedescription !== 'home_subscription' ? null
+            : {
+                "cusid": item.customerid,
+                "orderid": item.orderid,
+                "contractid": item.contractid,
+                "expire": item.expire,
+                "signature": item.signature
+            },
         "details": item.productorder || []
     }
 }
