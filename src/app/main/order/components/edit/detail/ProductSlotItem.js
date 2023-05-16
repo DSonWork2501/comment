@@ -23,25 +23,27 @@ function FilterHS({ hs, handleChangeHs, setHs }) {
         setType(value)
         if (value === ProductType[0].id) {
             setHs(parseInt(value))
-        }else{
+        } else {
             setHs(parseInt(ProductType[3]?.type['2'].id))
         }
     }
 
     return (
-        <div className="flex flex-row">
+        <div className="w-full space-y-16">
             <CmsRadioGroup
+                vertical={false}
                 size="small"
-                className="w-3/12"
-                value={hs}
-                onChange={(event) => handleChangeProductType(event.target.value)}
+                className="w-full m-0"
+                value={type}
+                onChange={(event) => handleChangeProductType(event)}
                 label="Loại"
+                name="type"
                 data={Object.values(ProductType)}
             // disabled={disabledHs}
             />
             {type === ProductType[3].id &&
                 <CmsSelect
-                    label=""
+                    label="Loại home subscription"
                     data={Object.values(ProductType[3].type).map(x => ({ ...x, id: parseInt(x.id) }))}
                     name="ishs"
                     value={isHs || ''}
@@ -117,8 +119,8 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     const disabledHs = formik_entity?.values?.productorder?.length > 0 ? true : false
     return (
         <div className="w-full space-y-16">
-            <FilterHS hs={hs} handleChangeHs={handleChangeHs} setHs={setHs}/>
-            <div className="w-full py-6 md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
+            <FilterHS hs={hs} handleChangeHs={handleChangeHs} setHs={setHs} />
+            <div className="w-full md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
                 {/* <CmsFormikProductType formik={formik} divClassName={'w-3/12'}/> */}
                 {/* <CmsSelect
                     size="small"
