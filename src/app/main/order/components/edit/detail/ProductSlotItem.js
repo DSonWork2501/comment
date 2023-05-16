@@ -27,7 +27,6 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
             setPrivate('')
         } else {
             setHs(parseInt(ProductType[3]?.type['2'].id))
-            setPrivate('home_subscription')
         }
     }
 
@@ -114,12 +113,11 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     const handleChangeHs = (event) => {
         const value = event.target.value
         setHs(value)
-        // const private_description = formik_entity.values.privatedescription
-        // if ([HomeSubscription[1].id, HomeSubscription[2].id].includes(value)) {
-        //     private_description !== 'home_subscription' && formik_entity.setFieldValue('privatedescription', 'home_subscription')
-        // } else {
-        //     private_description && formik_entity.setFieldValue('privatedescription', '')
-        // }
+        if(value === ProductType[3].type['1'].id){
+            formik_entity.setFieldValue('privatedescription', 'home_subscription')
+        }else{
+            formik_entity.setFieldValue('privatedescription', '')
+        }
     }
     const values = formik_entity?.values
     // console.log('formik prefix', formik.values)
@@ -134,17 +132,6 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                 setPrivate={(value) => formik_entity.setFieldValue('privatedescription', value)}
             />
             <div className="w-full md:flex md:flex-row md:space-x-8 sm:space-y-16 md:space-y-0 sm:space-x-0">
-                {/* <CmsFormikProductType formik={formik} divClassName={'w-3/12'}/> */}
-                {/* <CmsSelect
-                    size="small"
-                    className="w-3/12"
-                    value={hs}
-                    onChange={(event) => handleChangeHs(event)}
-                    label="Loại"
-                    data={Object.values(HomeSubscription)}
-                    disabled={disabledHs}
-                /> */}
-
                 <CmsAutocomplete
                     loading={loading}
                     label="Tìm kiếm..."
