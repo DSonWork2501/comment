@@ -66,9 +66,9 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     const loading = useSelector(store => store[keyStore].product.hsLoading)
     const detail_entities = useSelector(store => store[keyStore].product.searchDetailEntities)?.detail
     const detail_loading = useSelector(store => store[keyStore].product.searchDetailLoading)
-
     const item_product = formik.values || null
     const sku = item_product ? item_product?.sku : null
+    const [timer, setTimer] = useState()
 
     useEffect(() => {
         dispatch(getListHS({ HomeSubscription: parseInt(hs) }))
@@ -84,8 +84,6 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     const detail_data = useMemo(() => detail_entities || [], [detail_entities])
 
     const onChangeSku = (event, value) => {
-        value?.ishs && setHs(value.ishs)
-
         if (value) {
             formik.setValues((prev) => ({
                 ...prev,
@@ -113,14 +111,26 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     const handleChangeHs = (event) => {
         const value = event.target.value
         setHs(value)
-        if(parseInt(value) === parseInt(ProductType[3].type['1'].id)){
+        if (parseInt(value) === parseInt(ProductType[3].type['1'].id)) {
             formik_entity.setFieldValue('privatedescription', 'home_subscription')
-        }else{
+        } else {
             formik_entity.setFieldValue('privatedescription', '')
         }
     }
+
+    const onInputChange = (event, value, name) => {
+        if (event) {
+            clearTimeout(timer);  //clear any running timeout on key up
+            setTimer(setTimeout(function () { //then give it a second to see if the user is finished
+                //do .post ajax request //then do the ajax call
+                dispatch(getListHS({ search: event.target.value, homeSubscription: hs, PageNumber: 1, rowsPage: 100 }))
+            }, 700))
+        }
+    }
+
     const values = formik_entity?.values
-    // console.log('formik prefix', formik.values)
+    console.log('item_product', item_product)
+    console.log('product_data', product_data)
     const disabledHs = useMemo(() => values?.productorder?.length > 0 ? true : false, [values])
     return (
         <div className="w-full space-y-16">
@@ -140,9 +150,8 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                     data={product_data}
                     onChange={onChangeSku}
                     required={true}
-                    onKeyPress={(value) => { dispatch(getListHS({ search: value, homeSubscription: hs, PageNumber: 1, rowsPage: 100 })) }}
                     autocompleteProps={{
-                        // limitTags: 20,
+                        onInputChange,
                         getOptionLabel: (option) => option?.name,
                         // ChipProps: {
                         //     size: 'small'
