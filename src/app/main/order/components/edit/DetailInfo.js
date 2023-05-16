@@ -6,7 +6,7 @@ import noImage from '@widgets/images/noImage.jpg';
 import CreateDetailProduct from "./detail/CreateDetailProduct";
 import { get } from "lodash";
 import ContractInfo from "./basic/ContractInfo";
-import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
+import { ProductType } from "app/main/product/model/product/homeSubscription";
 import { OrderContext } from "../../context/OrderContext";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
@@ -66,7 +66,7 @@ export default function DetailProductContent({ formik }) {
             <CmsButton label="xóa" className="bg-red-500 hover:bg-red-700 hover:shadow-2" onClick={() => HandleDelete(index)} />
         </div>
     }))
-    const isContract = HomeSubscription[0].id !== hs
+    const isContract = parseInt(ProductType[3].type['1'].id) === hs
     return (
         <div className="flex flex-row p-20 pb-40 space-x-8">
             <div className="w-4/12 space-y-16">

@@ -1,4 +1,4 @@
-import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
+// import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
 
 export const InitOrderModal = ({ entity, customerid }) => {
     if (entity) {
@@ -36,7 +36,7 @@ export const InitOrderModal = ({ entity, customerid }) => {
         "deliverydate": null,
         "status": 1,
         "description": null,
-        "privatedescription": '2',
+        "privatedescription": '',
         "createdate": "",
         "couponcode": null,
         "allowtest": 0,
@@ -128,11 +128,11 @@ export const customModal = (item) => {
             "combo": item.combo,
             "parentid": item.parentid
           },
-        "contract": item.privatedescription === HomeSubscription['0'].id ? {
+        "contract": item.privatedescription !== 'home_subscription' ? {
             "cusid": null,
             "orderid": null,
             "contractid": null,
-            "expire": null,
+            "expire": 0,
             "signature": null
         } : {
             "cusid": item.customerid,
