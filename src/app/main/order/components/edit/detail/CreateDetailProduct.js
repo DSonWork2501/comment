@@ -22,13 +22,12 @@ export default function CreateDetailProduct({ formik }) {
             var itemAdd = {
                 ...formik_item.values,
                 quantity: quantity,
-                uniqueid: item.uniqueid,
-                sku: item.sku
+                uniqueid: item.uniqueid
             }
             if (item.price) itemAdd = { ...itemAdd, price: item.price }
             if (item.name) itemAdd = { ...itemAdd, name: item.name }
             if (item.img) itemAdd = { ...itemAdd, image: `${baseurl}${item.img}`, img: item.img }
-            console.log('itemAdd', itemAdd)
+            // console.log('itemAdd', itemAdd)
             var array = null
             if (productorder.filter(x => x.uniqueid === itemAdd.uniqueid).length > 0) {
                 array = [...productorder].map(x => ({ ...x, quantity: x.uniqueid === itemAdd.uniqueid ? x.quantity + itemAdd.quantity : x.quantity }))

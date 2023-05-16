@@ -113,7 +113,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     const handleChangeHs = (event) => {
         const value = event.target.value
         setHs(value)
-        if(value === ProductType[3].type['1'].id){
+        if(parseInt(value) === parseInt(ProductType[3].type['1'].id)){
             formik_entity.setFieldValue('privatedescription', 'home_subscription')
         }else{
             formik_entity.setFieldValue('privatedescription', '')
