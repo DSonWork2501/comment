@@ -52,7 +52,7 @@ function EditDialogComponent({ open, handleClose, item = null }) {
         >
             <div className="w-full space-y-8">
                 <CmsFormikTextField formik={formik} label="Tiêu đề" name="title" />
-                <CmsFormikTextField formik={formik} label="Nội dung" name="content" />
+                <CmsFormikTextField multiline rows={5} formik={formik} label="Nội dung" name="content" />
                 <CmsFormikSelect
                     data={Object.values(ContractType)}
                     formik={formik}
