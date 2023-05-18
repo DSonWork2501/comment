@@ -47,6 +47,9 @@ export default {
             getHistoryPrice: params => axios.get(`${baseurl}/product/get-history-price`, { params }),
             price: {
                 insert: entity => axios.post(`${baseurl}/product/insert-price`, entity),
+            },
+            filter:{
+                get: params => axios.get(`${baseurl}/product/get-filter`, { params }),
             }
         },
         category: {
@@ -83,6 +86,6 @@ export default {
             getContract: params => axios.get(`${baseurl}/contract/get-cus-contracts`, { params }),
             insert: entity => axios.post(`${baseurl}/contract/insert-cus-contract`, entity),
             update: entity => axios.post(`${baseurl}/contract/update-cus-contract`, entity),
-        }
+        },
     },
 }
