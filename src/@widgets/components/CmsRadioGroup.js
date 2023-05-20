@@ -18,8 +18,8 @@ const useStyles = makeStyles(theme => ({
         position: 'relative',
         border: '1px solid ' + theme.palette.divider,
         borderRadius: 2,
-        padding: '12px 12px 0 12px',
-        margin: '24px 0 16px 0'
+        padding: '0px 0px 0 0px',
+        margin: '0px 0 0px 0'
     },
     formGroupTitle: {
         position: 'absolute',

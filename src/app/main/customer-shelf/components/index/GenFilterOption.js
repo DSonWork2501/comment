@@ -1,4 +1,4 @@
-import { CmsAutocomplete, CmsButtonProgress, CmsSelect } from "@widgets/components"
+import { CmsAutocomplete, CmsButtonProgress, CmsRadioGroup, CmsSelect } from "@widgets/components"
 import React from "react"
 import { CustomerProductType } from "../../model/CustomerProductType"
 import { useDispatch, useSelector } from "react-redux"
@@ -36,8 +36,8 @@ function GenFilterOptionContent() {
         setValue(prev => ({ ...prev, CusID: value_item?.id }))
     }
 
-    const handleChangeType = (event, value_item) => {
-        setValue(prev => ({ ...prev, Type: event.target.value }))
+    const handleChangeType = (type) => {
+        dispatch(setSearch({ ...value, Type: type }))
     }
     const handleClick = () => {
         dispatch(setSearch({...value, Status: value.Status ? value.Status : null}))
@@ -50,14 +50,16 @@ function GenFilterOptionContent() {
     }
 
     return (
-        <div className="flex flex-row w-full space-x-8 self-center">
-            <CmsSelect
-                className="w-1/6"
+        <div className="flex flex-row w-full space-x-8 self-center items-center">
+            <CmsRadioGroup
+                vertical={false}
+                className="w-1/6 border-white"
                 data={Object.values(CustomerProductType)}
                 value={value?.Type || null}
                 size="small"
-                label="loại"
-                onChange={handleChangeType}
+                label=""
+                name="type"
+                onChange={(event) => handleChangeType(event)}
             />
             <CmsSelect
                 className="w-1/6"

@@ -1,4 +1,4 @@
-import { CmsAutocomplete, CmsLabel, CmsLoadingOverlay, CmsRadioGroup, CmsSelect } from "@widgets/components"
+import { CmsAutocomplete, CmsLabel, CmsLoadingOverlay, CmsRadioGroup } from "@widgets/components"
 import { getListHS, searchDetail } from "app/main/product/store/productSlice"
 // import { get } from "lodash"
 import React, { useMemo } from "react"
@@ -14,10 +14,11 @@ export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
     const [type, setType] = useState(0)
-    const [isHs, setIsHs] = useState(null)
+    // const [isHs, setIsHs] = useState(null)
     useEffect(() => {
         setType(Object.keys(ProductType[3]?.type).map(x => (parseInt(x))).includes(parseInt(hs)) ? ProductType[3].id : ProductType[0].id)
-        Object.keys(ProductType[3].type).map(x => (parseInt(x))).includes(parseInt(hs)) && setIsHs(parseInt(hs))
+        Object.keys(ProductType[3].type).map(x => (parseInt(x))).includes(parseInt(hs)) 
+        // && setIsHs(parseInt(hs))
     }, [hs])
 
     const handleChangeProductType = (value) => {
@@ -26,7 +27,8 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
             setHs(parseInt(value))
             setPrivate('')
         } else {
-            setHs(parseInt(ProductType[3]?.type['2'].id))
+            setHs(parseInt(ProductType[3]?.type['1'].id))
+            setPrivate('home_subscription')
         }
     }
 
@@ -44,7 +46,7 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
                         name="type"
                         data={Object.values(ProductType).map(x => ({ ...x, disabled: disabledHs }))}
                     />
-                    {type === ProductType[3].id &&
+                    {/* {type === ProductType[3].id &&
                         <CmsSelect
                             label="Loại home subscription"
                             data={Object.values(ProductType[3].type).map(x => ({ ...x, id: parseInt(x.id) }))}
@@ -52,7 +54,7 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
                             value={isHs || ''}
                             onChange={handleChangeHs}
                         />
-                    }
+                    } */}
                 </div>
             </Tooltip>
         </>

@@ -11347,6 +11347,15 @@ prop-types@15.7.2, prop-types@^15.0.0, prop-types@^15.5.4, prop-types@^15.5.6, p
     object-assign "^4.1.1"
     react-is "^16.8.1"
 
+prop-types@^15.8.1:
+  version "15.8.1"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
+  integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
+  dependencies:
+    loose-envify "^1.4.0"
+    object-assign "^4.1.1"
+    react-is "^16.13.1"
+
 property-expr@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/property-expr/-/property-expr-2.0.4.tgz#37b925478e58965031bb612ec5b3260f8241e910"
@@ -12014,6 +12023,13 @@ react-themeable@^1.1.0:
   integrity sha1-fURm3ZsrX6dQWHJ4JenxUro3mg4=
   dependencies:
     object-assign "^3.0.0"
+
+react-to-print@^2.14.12:
+  version "2.14.12"
+  resolved "https://registry.yarnpkg.com/react-to-print/-/react-to-print-2.14.12.tgz#e3ecddca2a03eddef1773ffb7c1a63c140f44036"
+  integrity sha512-qFJAwvDFd95Z+FWNqitt+HaB1/z+Zdd0MMrNOPUSus3fG32vqv512yB+HXhQ94J3HKoyqaIg44v0Zfc6xUBqlg==
+  dependencies:
+    prop-types "^15.8.1"
 
 react-transition-group@^2.0.0, react-transition-group@^2.2.1, react-transition-group@^2.5.0:
   version "2.9.0"

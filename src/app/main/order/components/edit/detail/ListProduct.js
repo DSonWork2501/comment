@@ -1,6 +1,6 @@
 import React from "react"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
-import { CmsBoxLine, CmsButton, CmsLabel, CmsTextField } from "@widgets/components"
+import { CmsBoxLine, CmsButton, CmsLabel } from "@widgets/components"
 import { useState } from "react"
 import noImage from '@widgets/images/noImage.jpg';
 import FuseAnimate from "@fuse/core/FuseAnimate/FuseAnimate";
@@ -9,7 +9,7 @@ import ShelfProductContent from './ShelfProduct'
 // export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 function DetailProduct({ value, index, HandleAddData, img }) {
-    const [quantity, setQuantity] = useState(1)
+    const [quantity] = useState(1)
     return (
         <CmsBoxLine label={''}>
             <div key={`div-0-detai-${index}`} className="w-full grid justify-items-center space-y-8">
@@ -24,7 +24,7 @@ function DetailProduct({ value, index, HandleAddData, img }) {
                     <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'tồn', className: 'min-w-min text-10' }} info={{ content: value?.quantity || '-', className: 'text-10' }} />
                 </div>
                 <div className="flex flex-col space-y-8">
-                    <CmsTextField
+                    {/* <CmsTextField
                         key={`quantity-${index}-labelInfo`}
                         isNumber
                         inputProps={{ inputProps: { min: 0, max: 1000 } }}
@@ -33,7 +33,7 @@ function DetailProduct({ value, index, HandleAddData, img }) {
                         onChange={(event) => setQuantity(event.target.value)}
                         name="quantity"
                         label="Số lượng"
-                    />
+                    /> */}
                     <CmsButton
                         key={`add-${index}-button`}
                         size="small"
