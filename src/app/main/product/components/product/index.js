@@ -19,8 +19,8 @@ const columns = [
     new initColumn({ field: "catename", label: "Danh Mục", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "name", label: "Tên S/P", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "shortname", label: "Tên Ngắn", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "image", label: "Hình Ảnh", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "price", label: "Giá", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "image", label: "Hình Ảnh", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "price", label: "Giá", alignHeader: "center", alignValue: "center", sortable: false }),
 ]
 
 function ProductView() {
@@ -51,7 +51,7 @@ function ProductView() {
         name: item.name,
         catename: JsonParseString(item.catename) ? JsonParseString(item.catename).join(', ') : <div></div>,
         shortname: item.shortname,
-        image: (<img src={item?.img} alt={item?.img} />),
+        image: (<img style={{ height: 100, margin: '0 auto' }} src={`${item.image ? `${process.env.REACT_APP_BASE_URL}api/product/img/${item?.image}` : 'assets/images/etc/no-image-icon.png'}`} alt={item?.img} />),
         sku: item.sku,
         price: item.price,
         action: (
@@ -90,7 +90,7 @@ function ProductView() {
                     search={search}
                     columns={columns}
                     loading={loading}
-                    setSearch={(value)=> dispatch(setSearch({...search, value}))}
+                    setSearch={(value) => dispatch(setSearch({ ...search, ...value }))}
                     filterOptions={
                         <FilterOptionView
                             filterOptions={filterOptions}

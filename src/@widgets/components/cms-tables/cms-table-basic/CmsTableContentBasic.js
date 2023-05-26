@@ -127,9 +127,9 @@ function TableContentBasic(props) {
 	 */
 	const handleChangePage = (event, value) => {
 		setPage(value);
-		setSearch && setSearch({ ...search, page: value + 1, limit: limit })
+		setSearch && setSearch({ ...search, pageNumber: value + 1, rowsPage: limit })
 		if (isServerSide && apiServerSide) {
-			apiServerSide({ ...search, page: value + 1, limit: limit })
+			apiServerSide({ ...search, pageNumber: value + 1, rowsPage: limit })
 		}
 	}
 
@@ -138,9 +138,9 @@ function TableContentBasic(props) {
 	 */
 	const handleChangeLimit = event => {
 		if (isServerSide && apiServerSide) {
-			apiServerSide({ ...search, page: 1, limit: event.target.value })
+			apiServerSide({ ...search, pageNumber: 1, rowsPage: event.target.value })
 		}
-		setSearch && setSearch({ ...search, limit: event.target.value })
+		setSearch && setSearch({ ...search, rowsPage: event.target.value })
 		setLimit(event.target.value);
 	}
 

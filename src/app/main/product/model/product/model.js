@@ -41,7 +41,7 @@ export const initProduct = (data) => {
             "suggest": data.suggest,
             "note": data.note,
             "image": data.image,
-            "images": JSON.stringify(data.images),
+            "images": data.images ? JSON.stringify(data.images) : "[]",
             "isnew": data.isnew,
             "ishot": data.ishot,
             "ishome": data.ishome,
