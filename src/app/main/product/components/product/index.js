@@ -90,7 +90,7 @@ function ProductView() {
                     search={search}
                     columns={columns}
                     loading={loading}
-                    setSearch={(value)=> dispatch(setSearch({...search, value}))}
+                    setSearch={(value) => dispatch(setSearch({ ...search, ...value }))}
                     filterOptions={
                         <FilterOptionView
                             filterOptions={filterOptions}
