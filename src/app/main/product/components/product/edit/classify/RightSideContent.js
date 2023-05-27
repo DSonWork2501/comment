@@ -20,6 +20,8 @@ function RightSideContent({ formik, prefix }) {
         setTabValue(value);
     }
 
+    console.log(formik);
+
     return (
         <div className="w-full space-y-16">
             {get(formik?.values, `${prefix}.type`) === 'slot' &&
@@ -27,7 +29,7 @@ function RightSideContent({ formik, prefix }) {
                     <CmsTab className="bg-orange-200 border-solid border-1 rounded-6" data={Object.values(TabType)} value={tabValue} onChange={handleChangeTab} />
                     <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }} className="w-full">
 
-                        {tabValue === TabType.da_chon.id && <InfoProductDetail data={item} handleViewList={() => setTabValue(TabType.danh_sach.id)}/>}
+                        {tabValue === TabType.da_chon.id && <InfoProductDetail data={item} handleViewList={() => setTabValue(TabType.danh_sach.id)} />}
                         {tabValue === TabType.danh_sach.id &&
                             <CmsBoxLine label="Lựa chọn sản phẩm">
                                 <ProductSlotItemComponent
@@ -45,8 +47,18 @@ function RightSideContent({ formik, prefix }) {
             <CmsBoxLine label={'Thông tin chi tiết'} className="p-16">
                 <div className="w-full flex flex-row space-x-8">
                     <CmsFormikTextField size="small" name={`${prefix}.name`} label="Tên" formik={formik} />
-                    <CmsFormikTextField isNumberFormat={true} size="small" name={`${prefix}.capacity`} label="dung tích" formik={formik}/>
-                    <CmsFormikTextField isNumberFormat={true} size="small" name={`${prefix}.heightlimit`} label="giới hạn chiều cao" formik={formik} />
+                    <CmsFormikTextField
+                        isNumber
+                        size="small"
+                        name={`${prefix}.capacity`}
+                        label="dung tích"
+                        formik={formik} />
+                    <CmsFormikTextField
+                        isNumber
+                        size="small"
+                        name={`${prefix}.heightlimit`}
+                        label="giới hạn chiều cao"
+                        formik={formik} />
                 </div>
             </CmsBoxLine>
 

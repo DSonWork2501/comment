@@ -1,7 +1,7 @@
 import { CmsDialog, CmsLabel } from "@widgets/components"
 import { useFormik } from "formik"
 import { CheckStringIsJson } from "@widgets/functions/Common"
-import React, { useEffect } from "react"
+import React from "react"
 import LeftSideContent from "./LeftSideContent"
 import RightSideContent from "./RightSideContent"
 import { useState } from "react"
@@ -16,15 +16,17 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     const [prefix, setPrefix] = useState('[0]')
     const [stackIndex, setStackIndex] = useState(0)
     const [slotIndex, setSlotIndex] = useState('')
+    console.log(data_shelf);
 
     const formik_shelf = useFormik({
-        initialValues: CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })],
+        initialValues: data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })],
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
         validationSchema: Yup.object({
 
         })
     })
+
 
     const data = formik_shelf.values?.map((x, index) => (
         {

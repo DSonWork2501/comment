@@ -161,7 +161,12 @@ function ClassifyInfo({ formik }) {
     }
 
     const HandleCloseShelfModal = (value) => {
-        var model = value.map(x => ({ ...x, capacity: parseInt(x.capacity) }))
+        var model = value.map(x => ({
+            ...x,
+            capacity: parseInt(x.capacity),
+            slots: x.slots.map(val => ({ ...val, capacity: parseInt(val?.capacity) || 0, heightlimit: parseInt(val?.heightlimit) || 0 }))
+        }))
+
         formik.setFieldValue(`detail[${parseInt(modalIndex)}].model`, JSON.stringify(model))
         setModalIndex('')
     }
