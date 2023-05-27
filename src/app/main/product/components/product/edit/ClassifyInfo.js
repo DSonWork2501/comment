@@ -32,7 +32,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
         <div className="grid grid-cols-4 gap-10 w-11/12">
             <CmsFormikTextField key={`${index}_uniqueid`} size="small" name={`uniqueid`} formik={formik_item} label="uniqueid" />
             <CmsFormikTextField key={`${index}_subname`} size="small" name={`subname`} formik={formik_item} label="Tên Sub" />
-            <CmsFormikTextField isNumberFormat key={`${index}_capacity`} size="small" name={`capacity`} formik={formik_item} label="dung tích" />
+            <CmsFormikTextField isNumberFormat key={`${index}_capacity`} isNumber size="small" name={`capacity`} formik={formik_item} label="dung tích" />
             <CmsFormikTextField key={`${index}_nhanhid`} size="small" name={`nhanhid`} formik={formik_item} label="nhanhid" />
             <CmsFormikAutocomplete
                 valueIsId
@@ -63,8 +63,8 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
                 }}
             />
             <CmsFormikTextField key={`${index}_volume`} size="small" name={`volume`} formik={formik_item} label="thể tích" />
-            <CmsFormikTextField key={`${index}_weight`} size="small" name={`weight`} formik={formik_item} label="cân nặng" />
-            <CmsFormikTextField key={`${index}_height`} size="small" name={`height`} formik={formik_item} label="chiều cao" />
+            <CmsFormikTextField key={`${index}_weight`} isNumber size="small" name={`weight`} formik={formik_item} label="cân nặng" />
+            <CmsFormikTextField key={`${index}_height`} isNumber size="small" name={`height`} formik={formik_item} label="chiều cao" />
             <CmsFormikDateTimePicker key={`${index}_maketime`} size="small" name={`maketime`} formik={formik_item} label="ngày sản xuất" />
             <CmsFormikDateTimePicker key={`${index}_expiretime`} size="small" name={`expiretime`} formik={formik_item} label="ngày hết hạn" />
             <CmsFormikTextField key={`${index}_code`} size="small" name={`Code`} formik={formik_item} label="mã Code" />
@@ -83,6 +83,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
 
     )
 }
+
 
 const InfoContent = ({ index, formik }) => {
     const colorRes = useSelector(store => store[keyStore].product.color)
@@ -160,7 +161,12 @@ function ClassifyInfo({ formik }) {
     }
 
     const HandleCloseShelfModal = (value) => {
-        var model = value.map(x => ({ ...x, capacity: parseInt(x.capacity) }))
+        var model = value.map(x => ({
+            ...x,
+            capacity: parseInt(x.capacity),
+            slots: x.slots.map(val => ({ ...val, capacity: parseInt(val?.capacity) || 0, heightlimit: parseInt(val?.heightlimit) || 0 }))
+        }))
+
         formik.setFieldValue(`detail[${parseInt(modalIndex)}].model`, JSON.stringify(model))
         setModalIndex('')
     }

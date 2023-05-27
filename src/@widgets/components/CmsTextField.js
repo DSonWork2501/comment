@@ -111,7 +111,6 @@ function NumberFormatCustom(props) {
 
     return (
         <NumberFormat
-            {...other}
             getInputRef={inputRef}
             onValueChange={values => {
                 onChange({
@@ -123,6 +122,7 @@ function NumberFormatCustom(props) {
             thousandSeparator={","}
             decimalSeparator={"."}
             isNumericString
+            {...other}
         />
     );
 }

@@ -53,9 +53,12 @@ function EditProduct(props) {
                     details: [...data.detail.map(x => ({
                         ...x,
                         model: parseInt(values.ishs) === parseInt(HomeSubscription['1'].id) ? x.model : '',
-                        capacity: parseInt(x.capacity) ? parseInt(x.capacity) : 0
+                        capacity: parseInt(x.capacity) ? parseInt(x.capacity) : 0,
+                        volume: x?.volume ? parseInt(x?.volume) : 0,
+                        weight: x?.weight ? parseInt(x?.weight) : 0,
+                        height: x?.height ? parseInt(x?.height) : 0,
                     }))],
-                    "prices": data.detail.map(x=>(
+                    "prices": data.detail.map(x => (
                         {
                             "uniqueid": x.uniqueid || 0,
                             "retailprice": parseInt(x.retailprice) || 0,
@@ -65,8 +68,8 @@ function EditProduct(props) {
                             "vat": parseInt(x.vat) || 0
                         }
                     ))
-                        
-                    
+
+
                 }
                 console.log('model', model)
                 params?.id === '0' ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))

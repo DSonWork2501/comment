@@ -13,18 +13,21 @@ import * as Yup from 'yup'
 
 
 function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
-    const [prefix, setPrefix] = useState('')
-    const [stackIndex, setStackIndex] = useState('')
+    const [prefix, setPrefix] = useState('[0]')
+    const [stackIndex, setStackIndex] = useState(0)
     const [slotIndex, setSlotIndex] = useState('')
+    console.log(data_shelf);
 
     const formik_shelf = useFormik({
-        initialValues: CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [],
+        initialValues: data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })],
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
         validationSchema: Yup.object({
-            
+
         })
     })
+
+
     const data = formik_shelf.values?.map((x, index) => (
         {
             stt: index + 1,
@@ -32,12 +35,11 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
         }
     )) || []
 
-    console.log('data_shelf', formik_shelf.values)
-
     const HandleAddStack = () => {
         var array = [...get(formik_shelf, 'values') || [], initDetailModel()]
         formik_shelf.setValues(array)
     }
+
     const HandleAddSlot = (stack_index) => {
         console.log('formik_shelf.values[stack_index].slots', formik_shelf.values[stack_index].slots)
         var array = [...get(formik_shelf.values[stack_index], 'slots').map(x => Object.assign({}, x)), initDetailModelSlot()]
@@ -46,6 +48,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
 
     const HandleClickDetail = (stack_index, slot_index) => {
         var data = !isNaN(parseInt(slot_index)) ? `[${stack_index}].slots[${slot_index}]` : `[${stack_index}]`
+        console.log({ data, stack_index, slot_index });
         setPrefix(data)
         setStackIndex(stack_index)
         setSlotIndex(slot_index)
