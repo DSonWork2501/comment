@@ -6,6 +6,8 @@ import { useCallback } from "react"
 import { useState } from "react"
 import noImage from '@widgets/images/noImage.jpg';
 import clsx from "clsx"
+import ShelfContent from "app/main/product/components/product/edit/classify/Shelf"
+import { returnModelPr } from "app/main/product/components/product/edit/ClassifyInfo"
 
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
@@ -24,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 function DetailShelfContent({ value, img, index, handleClickBread, classes, HandleAddData }) {
     return (
         <div onClick={handleClickBread}>
-            <Tooltip title={<CmsLabel content={'Click vào để hiển thị thông tin chi tiết !'} className="text-14"/>}>
+            <Tooltip title={<CmsLabel content={'Click vào để hiển thị thông tin chi tiết !'} className="text-14" />}>
                 <div key={`div-0-detail-${index}`}
                     className={clsx("border-1 border-collapse rounded-2 w-full grid justify-items-center space-y-8 hover:shadow-4", classes.shelf)}
                 >
@@ -56,13 +58,13 @@ function TooltipProduct({ value, index }) {
 }
 // chi tiết ngăn tủ
 function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
-    const [quantity, setQuantity] = useState(1)
+    const quantity = 1;
     const value = data?.item || null
     const img = value.img ? `${baseurl}${value.img}` : noImage
     return (
         <div
             key={`div-0-detai-${index}`}
-            className={clsx("w-full shadow-2 hover:shadow-4 p-4 self-center h-192 space-y-8", classes.shelf)}
+            className={clsx("w-full shadow-2 hover:shadow-4 p-4 self-center space-y-8", classes.shelf)}
         >
             <div className="h-64 text-center m-auto">
                 <img src={img} alt="image_detail" className="object-center w-full h-full" />
@@ -74,7 +76,7 @@ function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
                 </div>
             </Tooltip>
             <div className="flex flex-col space-y-8 self-center">
-                <CmsTextField
+                {/* <CmsTextField
                     key={`quantity-${index}-labelInfo`}
                     isNumber
                     inputProps={{ inputProps: { min: 0, max: 1000 } }}
@@ -83,7 +85,7 @@ function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
                     onChange={(event) => setQuantity(event.target.value)}
                     name="quantity"
                     label="Số lượng"
-                />
+                /> */}
                 <CmsButton
                     key={`add-${index}-button`}
                     size="small"
@@ -194,10 +196,42 @@ function DetailModelContent({ value, classes, HandleAddData }) {
     )
 }
 
+const OpenDialog = ({ model, handleClose }) => {
+    const [openDialog, setOpenDialog] = useState("");
+
+    const HandleCloseShelfModal = (value) => {
+        const data = returnModelPr(value);
+        setOpenDialog("");
+        handleClose(data);
+    }
+
+    return <>
+
+        {
+            openDialog === "open"
+            &&
+            <ShelfContent
+                open={true}
+                handleClose={HandleCloseShelfModal}
+                data_shelf={JSON.stringify(model)}
+            />
+        }
+
+        <CmsButton
+            color="primary"
+            startIcon="edit"
+            size="small"
+            label="Chỉnh sửa tủ"
+            onClick={() => setOpenDialog("open")}
+        />
+    </>
+
+}
+
 function ShelfProductContent({ img, HandleAddData, data }) {
-    const classes = useStyles()
-    const [breadValue, setBreadValue] = useState('danh_sach_tu')
-    const [model, setModel] = useState([])
+    const classes = useStyles();
+    const [breadValue, setBreadValue] = useState('danh_sach_tu');
+    const [model, setModel] = useState([]);
 
     const handleClickBread = useCallback((name, item) => {
         switch (name) {
@@ -214,7 +248,10 @@ function ShelfProductContent({ img, HandleAddData, data }) {
         }
     }, [])
 
-    console.log('model', model)
+    const handleClose = (value) => {
+
+    }
+
     return (
         <div className="w-full space-y-8">
             {breadValue === 'danh_sach_tu' &&
@@ -232,16 +269,19 @@ function ShelfProductContent({ img, HandleAddData, data }) {
                 </div>}
             {breadValue === 'chi_tiet_san_pham' &&
                 <div className="w-full space-y-8">
-                    <div className="w-full flex-row-reverse">
+                    <div className="w-full flex justify-between items-center">
                         <div>
                             <CmsButton
                                 color="default"
                                 startIcon="arrow_back"
+                                size="small"
                                 label="Danh sách tủ"
                                 onClick={() => handleClickBread('danh_sach_tu')}
                             />
                         </div>
-
+                        <OpenDialog
+                            handleClose={handleClose}
+                            model={model} />
                     </div>
                     <div className="max-h-384 overflow-y-auto">
                         {model?.map((item, index) =>

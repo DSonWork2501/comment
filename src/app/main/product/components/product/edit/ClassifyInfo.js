@@ -19,6 +19,14 @@ const columns = [
     new initColumn({ field: "thaotac", label: "Thao tác", alignHeader: "left", alignValue: "left", sortable: false, classHeader: 'w-32' }),
 ]
 
+export const returnModelPr = (value) => {
+    return value.map(x => ({
+        ...x,
+        capacity: parseInt(x.capacity),
+        slots: x.slots.map(val => ({ ...val, capacity: parseInt(val?.capacity) || 0, heightlimit: parseInt(val?.heightlimit) || 0 }))
+    }))
+}
+
 const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex }) => {
     const colorRes = useSelector(store => store[keyStore].product.color)
     const sizeRes = useSelector(store => store[keyStore].product.size)
@@ -161,17 +169,12 @@ function ClassifyInfo({ formik }) {
     }
 
     const HandleCloseShelfModal = (value) => {
-        var model = value.map(x => ({
-            ...x,
-            capacity: parseInt(x.capacity),
-            slots: x.slots.map(val => ({ ...val, capacity: parseInt(val?.capacity) || 0, heightlimit: parseInt(val?.heightlimit) || 0 }))
-        }))
+        var model = returnModelPr(value);
 
         formik.setFieldValue(`detail[${parseInt(modalIndex)}].model`, JSON.stringify(model))
         setModalIndex('')
     }
 
-    console.log('detail', formik.values.detail)
     const model = formik?.values?.detail[modalIndex]?.model
     const ishs = parseInt(formik?.values?.ishs) && parseInt(formik?.values?.ishs)
     const data = detail?.map((x, index) => ({
