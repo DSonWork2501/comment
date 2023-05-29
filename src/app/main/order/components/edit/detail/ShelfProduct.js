@@ -228,7 +228,7 @@ const OpenDialog = ({ model, handleClose }) => {
 
 }
 
-function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog }) {
+function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, handleSelectItem }) {
     const classes = useStyles();
     const [breadValue, setBreadValue] = useState('danh_sach_tu');
     const [model, setModel] = useState([]);
@@ -244,6 +244,7 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog }) {
                 setBreadValue(name)
                 setModel(JSON.parse(item.model) ? JSON.parse(item.model) : [])
                 setItem(item)
+                handleSelectItem(item)
                 break
             default:
                 break
@@ -286,10 +287,10 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog }) {
                             handleClose={handleClose}
                             model={model} />
                     </div>
-                    <div className="max-h-384 overflow-y-auto">
+                    <div className="max-h-384 overflow-y-auto flex flex-wrap justify-between -mx-8">
                         {model?.map((item, index) =>
                         (
-                            <div className="max-w-400 m-auto">
+                            <div className="max-w-500 m-auto w-1/2 px-8 mb-8" key={index}>
                                 <DetailModelContent
                                     key={`DetailModelContent_${index}`}
                                     value={item}

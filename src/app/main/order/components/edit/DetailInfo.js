@@ -82,8 +82,12 @@ export default function DetailProductContent({ formik }) {
     }
 
     const handleCloseDialog = (crModal, product) => {
-        let pro = { ...product, model: crModal };
-        console.log(InitProductOrder(pro));
+        let pro = { ...product, model: JSON.stringify(crModal) };
+        console.log(crModal, InitProductOrder(pro), 'card-item');
+    }
+
+    const handleSelectItemInList = (value) => {
+        console.log(InitProductOrder(value), 'card-item');
     }
 
     return (
@@ -114,6 +118,7 @@ export default function DetailProductContent({ formik }) {
                     </CmsBoxLine>
                 }
                 <LisProductContent
+                    handleSelectItem={handleSelectItemInList}
                     handleCloseDialog={handleCloseDialog}
                     data={detail_entities}
                     img={selected?.image || ''}
