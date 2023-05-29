@@ -81,7 +81,12 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
         dispatch(searchDetail({ sku: sku }))
     }, [dispatch, sku])
 
-    const product_data = useMemo(() => product_entities?.map(x => ({ ...x, img: x.image, image: `${baseurl}${x?.image}` || noImage })) || [], [product_entities])
+    const product_data = useMemo(() => product_entities?.map(x => ({
+        ...x,
+        img: x.image,
+        image: `${baseurl}${x?.image}` || noImage,
+        id: x.sku
+    })) || [], [product_entities])
     const item = product_data?.find(x => x.sku === sku) || null
 
     const detail_data = useMemo(() => detail_entities || [], [detail_entities])
@@ -136,7 +141,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     }
 
     const values = formik_entity?.values
-    console.log('item_product', item_product)
+    console.log('item_product_selected', item)
     console.log('product_data', product_data)
     const disabledHs = useMemo(() => values?.productorder?.length > 0 ? true : false, [values])
     return (
