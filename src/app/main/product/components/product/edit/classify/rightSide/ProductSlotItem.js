@@ -15,14 +15,21 @@ const View = {
     uniqueIdList: { id: '2', name: 'danh sách uniqueId list' },
 }
 
+const initialSearch = {
+    pageNumber: 1,
+    rowsPage: 10,
+    homeSubscription: 2
+}
+
 function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
     const dispatch = useDispatch()
     const [chosenSku, setChosenSku] = useState(null)
     const [view, setView] = useState(View.skuList.id)
+    const [search, setSearch] = useState(initialSearch);
 
     useEffect(() => {
-        dispatch(getListHS({ homeSubscription: 2 }))
-    }, [dispatch])
+        dispatch(getListHS(search))
+    }, [dispatch, search])
 
     const handleClickSku = (event, value) => {
         console.log('value', value)
@@ -36,7 +43,17 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
         otherProps.onChosenView && otherProps.onChosenView()
     }
 
-    console.log('formik', formik)
+    // const setSearch = (value) => {
+
+    // }
+
+    const handleKeyPressSearch = (event) => {
+        if (event.key === 'Enter') {
+            setSearch(prev => ({ ...prev, search: event.target.value }))
+            // /dispatch(getListHS({ search: valueSearch, homeSubscription: 2 }))
+        }
+    }
+
     const sku = chosenSku?.sku || null
     const img = chosenSku?.img ? `${baseurl}${chosenSku?.img}` : noImage
     const name = chosenSku?.name || null
@@ -44,10 +61,11 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
         <div className="space-y-16 w-full">
             {view === View.skuList.id &&
                 <>
-                    <ProductSearch keyStore={keyStore} />
+                    <ProductSearch keyStore={keyStore} handleKeyPressSearch={handleKeyPressSearch} />
                     <ProductSearchList
                         keyStore={keyStore}
                         onClickSku={handleClickSku}
+                        setSearch={(value) => setSearch((prev) => ({ ...prev, ...value }))}
                     />
                 </>
             }
