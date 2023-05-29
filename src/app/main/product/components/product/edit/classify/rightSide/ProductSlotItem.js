@@ -32,7 +32,7 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
     }
 
     const handleChooseUniqueID = ({ uniqueid }) => {
-        formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: chosenSku?.name, img: chosenSku?.img, sku: chosenSku?.sku, uniqueid: uniqueid })
+        formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: chosenSku?.name, img: chosenSku?.img, sku: chosenSku?.sku, uniqueid: uniqueid, type: "wine" })
         otherProps.onChosenView && otherProps.onChosenView()
     }
 

@@ -45,7 +45,8 @@ function EditOrderContent() {
             text: 'Bạn có muốn lưu thông tin ?',
             data: values,
             confirm: (item) => {
-                dispatch(insertOrder(customModal(item)))
+                console.log(customModal(item));
+                //dispatch(insertOrder(customModal(item)))
             }
         })
     }

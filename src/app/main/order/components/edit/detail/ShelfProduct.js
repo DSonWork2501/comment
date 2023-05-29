@@ -86,12 +86,12 @@ function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
                     name="quantity"
                     label="Số lượng"
                 /> */}
-                <CmsButton
+                {/* <CmsButton
                     key={`add-${index}-button`}
                     size="small"
                     label="thêm"
                     onClick={() => HandleAddData({ quantity, index: 0, item: value })}
-                />
+                /> */}
             </div>
             {/* <div className="w-2/3 flex flex-row">
                 <div className="flex self-center w-1/5">
@@ -228,10 +228,11 @@ const OpenDialog = ({ model, handleClose }) => {
 
 }
 
-function ShelfProductContent({ img, HandleAddData, data }) {
+function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog }) {
     const classes = useStyles();
     const [breadValue, setBreadValue] = useState('danh_sach_tu');
     const [model, setModel] = useState([]);
+    const [item, setItem] = useState(null);
 
     const handleClickBread = useCallback((name, item) => {
         switch (name) {
@@ -242,6 +243,7 @@ function ShelfProductContent({ img, HandleAddData, data }) {
             case 'chi_tiet_san_pham':
                 setBreadValue(name)
                 setModel(JSON.parse(item.model) ? JSON.parse(item.model) : [])
+                setItem(item)
                 break
             default:
                 break
@@ -249,7 +251,8 @@ function ShelfProductContent({ img, HandleAddData, data }) {
     }, [])
 
     const handleClose = (value) => {
-
+        setModel(value);
+        handleCloseDialog(value, item);
     }
 
     return (
@@ -285,12 +288,16 @@ function ShelfProductContent({ img, HandleAddData, data }) {
                     </div>
                     <div className="max-h-384 overflow-y-auto">
                         {model?.map((item, index) =>
-                        (<DetailModelContent
-                            key={`DetailModelContent_${index}`}
-                            value={item}
-                            classes={classes}
-                            HandleAddData={HandleAddData}
-                        />))}
+                        (
+                            <div className="max-w-400 m-auto">
+                                <DetailModelContent
+                                    key={`DetailModelContent_${index}`}
+                                    value={item}
+                                    classes={classes}
+                                    HandleAddData={HandleAddData}
+                                />
+                            </div>
+                        ))}
                     </div>
                 </div>}
         </div>)

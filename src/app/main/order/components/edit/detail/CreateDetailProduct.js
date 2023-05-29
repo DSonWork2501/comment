@@ -7,7 +7,7 @@ import { CmsAlert } from "@widgets/components"
 
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
-export default function CreateDetailProduct({ formik }) {
+export default function CreateDetailProduct({ formik, handleSelectItem }) {
     const formik_item = useFormik({
         initialValues: InitProductOrder(),
         keepDirtyOnReinitialize: true,
@@ -39,6 +39,6 @@ export default function CreateDetailProduct({ formik }) {
     }
     // console.log('formik_item', formik_item)
     return (
-        <ProductSlotSKUItem formik_entity={formik} formik={formik_item} keyStore={keyStore} HandleAddData={HandleAddData} />
+        <ProductSlotSKUItem formik_entity={formik} formik={formik_item} keyStore={keyStore} HandleAddData={HandleAddData} handleSelectItem={handleSelectItem} />
     )
 }

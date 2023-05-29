@@ -126,20 +126,23 @@ export const initDetailModel = (data) => {
 }
 export const initDetailModelSlot = (data) => {
     if (data) {
-        return {
+        let ob = {
             "parentid": data.parentid || null,
             "name": data.name || '',
             "type": data.type || 'slot',
             "active": data.active || 1,
             "capacity": data.capacity || 0,
             "heightlimit": data.heightlimit || 0,
-            item: {
-                "uniqueid": "",
-                "name": "",
-                "img": "",
-                "type": "wine"
-            }
         }
+        if (data?.item)
+            ob.item = {
+                "uniqueid": data?.item?.uniqueid || "",
+                "name": data?.item?.name || "",
+                "img": data?.item?.img || "",
+                "type": "wine",
+                "sku": data?.item?.sku || ""
+            }
+        return ob
     }
     return {
         "parentid": null,
@@ -147,6 +150,6 @@ export const initDetailModelSlot = (data) => {
         "type": "slot",
         "active": 1,
         "capacity": 0,
-        "heightlimit": 0
+        "heightlimit": 0,
     }
 }

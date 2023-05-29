@@ -42,8 +42,9 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     }
 
     const HandleAddSlot = (stack_index) => {
-        console.log('formik_shelf.values[stack_index].slots', formik_shelf.values[stack_index].slots)
-        var array = [...get(formik_shelf.values[stack_index], 'slots').map(x => Object.assign({}, x)), initDetailModelSlot()]
+        var array = [...get(formik_shelf.values[stack_index], 'slots').map(x => Object.assign({}, initDetailModelSlot(x))), initDetailModelSlot()]
+        console.log('formik_shelf.values[stack_index].slots', array)
+
         formik_shelf.setFieldValue(`[${stack_index}].slots`, array)
     }
 
