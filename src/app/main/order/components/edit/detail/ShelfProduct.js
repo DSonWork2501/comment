@@ -1,5 +1,5 @@
 import { Tooltip, makeStyles } from "@material-ui/core"
-import { CmsButton, CmsIconButton, CmsLabel, CmsTextField } from "@widgets/components"
+import { CmsButton, CmsIconButton, CmsLabel } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import React from "react"
 import { useCallback } from "react"
@@ -58,7 +58,7 @@ function TooltipProduct({ value, index }) {
 }
 // chi tiết ngăn tủ
 function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
-    const quantity = 1;
+    //const quantity = 1;
     const value = data?.item || null
     const img = value.img ? `${baseurl}${value.img}` : noImage
     return (
@@ -249,7 +249,7 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, hand
             default:
                 break
         }
-    }, [])
+    }, [handleSelectItem])
 
     const handleClose = (value) => {
         setModel(value);

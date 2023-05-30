@@ -12,7 +12,6 @@ import { useState } from "react";
 import LisProductContent from './detail/ListProduct'
 import { keyStore } from "../../common";
 import { useSelector } from "react-redux";
-import { InitProductOrder } from "../../model/modal";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const columns = [
@@ -48,6 +47,7 @@ export default function DetailProductContent({ formik }) {
     const { hs } = React.useContext(OrderContext) || null;
     const [showTb, setShowTb] = useState(true);
     const detail_entities = useSelector(store => store[keyStore].product.searchDetailEntities)?.detail || [];
+    const product_entities = useSelector(store => store[keyStore].product.searchDetailEntities);
     const [selected, setSelected] = useState(null);
 
 
@@ -82,12 +82,33 @@ export default function DetailProductContent({ formik }) {
     }
 
     const handleCloseDialog = (crModal, product) => {
-        let pro = { ...product, model: JSON.stringify(crModal) };
-        console.log(crModal, InitProductOrder(pro), 'card-item');
+        const data = {
+            uniqueid: product.uniqueid,
+            sku: product_entities.sku,
+            name: product_entities.name,
+            imei_hs: product_entities.ishs,
+            model: JSON.stringify(crModal),
+            quantity: 1,
+            capacity: product.capacity,
+            price: product.retailprice
+        }
+
+        formik.setFieldValue('productorder', [data])
     }
 
     const handleSelectItemInList = (value) => {
-        console.log(InitProductOrder(value), 'card-item');
+        const data = {
+            uniqueid: value.uniqueid,
+            sku: product_entities.sku,
+            name: product_entities.name,
+            imei_hs: product_entities.ishs,
+            model: value.model,
+            quantity: 1,
+            capacity: value.capacity,
+            price: value.retailprice
+        }
+
+        formik.setFieldValue('productorder', [data])
     }
 
     return (
