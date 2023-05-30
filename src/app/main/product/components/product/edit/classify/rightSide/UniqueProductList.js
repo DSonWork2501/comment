@@ -50,9 +50,10 @@ const DetailUniqueProductComponent = React.memo(({ item, index, skuItem, onClick
 })
 
 function UniqueProductListComponent({ sku, onClickView, skuItem, onClickChooseUniqueId }) {
+    const key = window.location.pathname.split('/')[1] === 'order' ? 'orders' : keyStore;
     const dispatch = useDispatch()
-    const entities = useSelector(store => store[keyStore].product.searchDetailEntities)?.detail
-    const loading = useSelector(store => store[keyStore].product.searchDetailLoading)
+    const entities = useSelector(store => store[key].product.searchDetailEntities)?.detail
+    const loading = useSelector(store => store[key].product.searchDetailLoading)
 
     useEffect(() => {
         if (sku) {

@@ -23,6 +23,7 @@ function DetailProduct({ value, index, HandleAddData, img }) {
                     <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min text-10' }} info={{ content: value?.color || '-', className: 'text-10' }} />
                     <LabelInfo key={`quantity-${index}-labelInfo`} label={{ content: 'tồn', className: 'min-w-min text-10' }} info={{ content: value?.quantity || '-', className: 'text-10' }} />
                 </div>
+
                 <div className="flex flex-col space-y-8">
                     {/* <CmsTextField
                         key={`quantity-${index}-labelInfo`}
@@ -46,7 +47,7 @@ function DetailProduct({ value, index, HandleAddData, img }) {
     )
 }
 
-function LisProductContent({ data, HandleAddData, img, hs }) {
+function LisProductContent({ data, HandleAddData, img, hs, handleCloseDialog, handleSelectItem }) {
 
     return (
         <FuseAnimate animation="transition.expandIn" delay={500}>
@@ -67,6 +68,8 @@ function LisProductContent({ data, HandleAddData, img, hs }) {
                 {hs === parseInt(HomeSubscription[1].id) &&
                     <div className="w-full">
                         <ShelfProductContent
+                            handleSelectItem={handleSelectItem}
+                            handleCloseDialog={handleCloseDialog}
                             img={img}
                             HandleAddData={HandleAddData}
                             data={data}

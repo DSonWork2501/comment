@@ -17,7 +17,7 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
     // const [isHs, setIsHs] = useState(null)
     useEffect(() => {
         setType(Object.keys(ProductType[3]?.type).map(x => (parseInt(x))).includes(parseInt(hs)) ? ProductType[3].id : ProductType[0].id)
-        Object.keys(ProductType[3].type).map(x => (parseInt(x))).includes(parseInt(hs)) 
+        Object.keys(ProductType[3].type).map(x => (parseInt(x))).includes(parseInt(hs))
         // && setIsHs(parseInt(hs))
     }, [hs])
 
@@ -61,13 +61,14 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
     )
 }
 
-export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, HandleAddData }) {
+export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, HandleAddData, handleSelectItem }) {
+    const key = window.location.pathname.split('/')[1] === 'order' ? 'orders' : keyStore;
     const { hs, setHs } = React.useContext(OrderContext) || null
     const dispatch = useDispatch()
-    const product_entities = useSelector(store => store[keyStore].product.hsEntities)?.data
-    const loading = useSelector(store => store[keyStore].product.hsLoading)
-    const detail_entities = useSelector(store => store[keyStore].product.searchDetailEntities)?.detail
-    const detail_loading = useSelector(store => store[keyStore].product.searchDetailLoading)
+    const product_entities = useSelector(store => store[key].product.hsEntities)?.data
+    const loading = useSelector(store => store[key].product.hsLoading)
+    const detail_entities = useSelector(store => store[key].product.searchDetailEntities)?.detail
+    const detail_loading = useSelector(store => store[key].product.searchDetailLoading)
     const item_product = formik.values || null
     const sku = item_product ? item_product?.sku : null
     const [timer, setTimer] = useState()
@@ -80,12 +81,19 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
         dispatch(searchDetail({ sku: sku }))
     }, [dispatch, sku])
 
-    const product_data = useMemo(() => product_entities?.map(x => ({ ...x, img: x.image, image: `${baseurl}${x?.image}` || noImage })) || [], [product_entities])
+    const product_data = useMemo(() => product_entities?.map(x => ({
+        ...x,
+        img: x.image,
+        image: `${baseurl}${x?.image}` || noImage,
+        id: x.sku
+    })) || [], [product_entities])
     const item = product_data?.find(x => x.sku === sku) || null
 
     const detail_data = useMemo(() => detail_entities || [], [detail_entities])
 
     const onChangeSku = (event, value) => {
+        handleSelectItem(value);
+
         if (value) {
             formik.setValues((prev) => ({
                 ...prev,
@@ -95,7 +103,8 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                 image: value.image,
                 'uniqueid': '',
                 'model': '',
-                'price': 0
+                'price': 0,
+                ishs: value.ishs
             }))
         } else {
             formik.setValues((prev) => ({
@@ -106,7 +115,8 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                 image: '',
                 'uniqueid': '',
                 'model': '',
-                'price': 0
+                'price': 0,
+                ishs: 0
             }))
         }
     }
@@ -131,7 +141,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     }
 
     const values = formik_entity?.values
-    console.log('item_product', item_product)
+    console.log('item_product_selected', item)
     console.log('product_data', product_data)
     const disabledHs = useMemo(() => values?.productorder?.length > 0 ? true : false, [values])
     return (
@@ -164,7 +174,9 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                     }}
                 />
             </div>
-            {(formik?.values?.sku && Array.isArray(detail_data)) &&
+
+            {(formik?.values?.sku && Array.isArray(detail_data) && formik?.values?.ishs !== 1)
+                &&
                 (<>
                     <CmsLoadingOverlay loading={detail_loading} />
                     <LisProductContent

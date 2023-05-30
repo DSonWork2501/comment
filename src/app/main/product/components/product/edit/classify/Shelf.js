@@ -16,7 +16,6 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     const [prefix, setPrefix] = useState('[0]')
     const [stackIndex, setStackIndex] = useState(0)
     const [slotIndex, setSlotIndex] = useState('')
-    console.log(data_shelf);
 
     const formik_shelf = useFormik({
         initialValues: data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })],
@@ -27,6 +26,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
         })
     })
 
+    const { values } = formik_shelf;
 
     const data = formik_shelf.values?.map((x, index) => (
         {
@@ -36,17 +36,19 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     )) || []
 
     const HandleAddStack = () => {
-        var array = [...get(formik_shelf, 'values') || [], initDetailModel()]
+        const leg = values?.length;
+        var array = [...get(formik_shelf, 'values') || [], initDetailModel({ name: 'Ngăn ' + (leg + 1) })]
         formik_shelf.setValues(array)
     }
 
     const HandleAddSlot = (stack_index) => {
-        console.log('formik_shelf.values[stack_index].slots', formik_shelf.values[stack_index].slots)
-        var array = [...get(formik_shelf.values[stack_index], 'slots').map(x => Object.assign({}, x)), initDetailModelSlot()]
+        var array = [...get(formik_shelf.values[stack_index], 'slots').map(x => Object.assign({}, initDetailModelSlot(x))), initDetailModelSlot()]
+        console.log('formik_shelf.values[stack_index].slots', array)
+
         formik_shelf.setFieldValue(`[${stack_index}].slots`, array)
     }
 
-    const HandleClickDetail = (stack_index, slot_index) => {
+    const HandleClickDetail = (event, stack_index, slot_index) => {
         var data = !isNaN(parseInt(slot_index)) ? `[${stack_index}].slots[${slot_index}]` : `[${stack_index}]`
         console.log({ data, stack_index, slot_index });
         setPrefix(data)

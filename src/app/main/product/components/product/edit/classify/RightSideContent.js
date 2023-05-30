@@ -12,8 +12,9 @@ const TabType = {
 }
 
 function RightSideContent({ formik, prefix }) {
-    const [tabValue, setTabValue] = useState(TabType.da_chon.id)
-    const item = get(formik?.values, `[${prefix}].item`) || null
+    const [tabValue, setTabValue] = useState(TabType.da_chon.id);
+    const item = get(formik?.values, `[${prefix}].item`) || null;
+    const key = window.location.pathname.split('/')[1] === 'order' ? 'orders' : keyStore;
     // const sku = get(formik?.values, `[${prefix}].item.sku`) ? get(formik?.values, `[${prefix}].item.sku`) : null
 
     function handleChangeTab(event, value) {
@@ -33,7 +34,7 @@ function RightSideContent({ formik, prefix }) {
                         {tabValue === TabType.danh_sach.id &&
                             <CmsBoxLine label="Lựa chọn sản phẩm">
                                 <ProductSlotItemComponent
-                                    keyStore={keyStore}
+                                    keyStore={key}
                                     formik={formik}
                                     prefix={prefix}
                                     onChosenView={() => setTabValue(TabType.da_chon.id)}

@@ -8,6 +8,10 @@ import { get } from "lodash";
 import ContractInfo from "./basic/ContractInfo";
 import { ProductType } from "app/main/product/model/product/homeSubscription";
 import { OrderContext } from "../../context/OrderContext";
+import { useState } from "react";
+import LisProductContent from './detail/ListProduct'
+import { keyStore } from "../../common";
+import { useSelector } from "react-redux";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const columns = [
@@ -40,8 +44,12 @@ const InfoProductDetail = React.memo(({ data, index }) => {
 
 export default function DetailProductContent({ formik }) {
     const { productorder, moneytotal } = formik.values
-    // console.log('productorder', productorder)
     const { hs } = React.useContext(OrderContext) || null;
+    const [showTb, setShowTb] = useState(true);
+    const detail_entities = useSelector(store => store[keyStore].product.searchDetailEntities)?.detail || [];
+    const product_entities = useSelector(store => store[keyStore].product.searchDetailEntities);
+    const [selected, setSelected] = useState(null);
+
 
     const HandleDelete = (index_item) => {
         formik.setFieldValue('productorder', productorder.filter((x, index) => index !== index_item))
@@ -66,30 +74,77 @@ export default function DetailProductContent({ formik }) {
             <CmsButton label="xóa" className="bg-red-500 hover:bg-red-700 hover:shadow-2" onClick={() => HandleDelete(index)} />
         </div>
     }))
-    const isContract = parseInt(ProductType[3].type['1'].id) === hs
+    const isContract = parseInt(ProductType[3].type['1'].id) === hs;
+    const handleSelectItem = (value) => {
+        setSelected(value);
+        if (value.ishs === 1)
+            setShowTb(false);
+    }
+
+    const handleCloseDialog = (crModal, product) => {
+        const data = {
+            uniqueid: product.uniqueid,
+            sku: product_entities.sku,
+            name: product_entities.name,
+            imei_hs: product_entities.ishs,
+            model: JSON.stringify(crModal),
+            quantity: 1,
+            capacity: product.capacity,
+            price: product.retailprice
+        }
+
+        formik.setFieldValue('productorder', [data])
+    }
+
+    const handleSelectItemInList = (value) => {
+        const data = {
+            uniqueid: value.uniqueid,
+            sku: product_entities.sku,
+            name: product_entities.name,
+            imei_hs: product_entities.ishs,
+            model: value.model,
+            quantity: 1,
+            capacity: value.capacity,
+            price: value.retailprice
+        }
+
+        formik.setFieldValue('productorder', [data])
+    }
+
     return (
         <div className="flex flex-row p-20 pb-40 space-x-8">
             <div className="w-4/12 space-y-16">
                 <CmsBoxLine label={'Tìm kiếm sản phẩm'}>
-                    <CreateDetailProduct formik={formik} />
+                    <CreateDetailProduct formik={formik} handleSelectItem={handleSelectItem} />
                 </CmsBoxLine>
             </div>
             <div className="w-8/12 space-y-8">
                 {isContract && <CmsBoxLine label={"Thông tin hợp đồng"}>
                     <ContractInfo formik={formik} />
                 </CmsBoxLine>}
-                <CmsBoxLine label={'Danh sách chi tiết sản phẩm'}>
-                    <div className="space-y-8">
-                        <CmsTableBasic
-                            tableClassName="overflow-hidden"
-                            // className=""
-                            columns={columns}
-                            data={data}
-                            isPagination={false}
-                            footerData={data?.length > 0 ? { quantity: 'Tổng tiền', totalprice: !isNaN(parseInt(moneytotal)) ? moneytotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' } : null}
-                        />
-                    </div>
-                </CmsBoxLine>
+                {
+                    showTb
+                    &&
+                    <CmsBoxLine label={'Danh sách chi tiết sản phẩm'}>
+                        <div className="space-y-8">
+                            <CmsTableBasic
+                                tableClassName="overflow-hidden"
+                                // className=""
+                                columns={columns}
+                                data={data}
+                                isPagination={false}
+                                footerData={data?.length > 0 ? { quantity: 'Tổng tiền', totalprice: !isNaN(parseInt(moneytotal)) ? moneytotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 || '-' } : null}
+                            />
+                        </div>
+                    </CmsBoxLine>
+                }
+                <LisProductContent
+                    handleSelectItem={handleSelectItemInList}
+                    handleCloseDialog={handleCloseDialog}
+                    data={detail_entities}
+                    img={selected?.image || ''}
+                    hs={hs}
+                />
             </div>
         </div>
     )

@@ -62,11 +62,17 @@ const CheckIndex = (type, stack, slot, stack_index, slot_index) => {
 }
 
 function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes }) {
+
+    const handleChildClick = (e, stack_index, index) => {
+        e.stopPropagation()
+        HandleClickDetail(e, stack_index, index);
+    }
+
     return data?.map((item, index) =>
     (
         <div className="flex flex-row-reverse  w-1/3 item-card px-4" key={`${index}_div_slot_5`}>
             <div key={`${index}_div_slot_0`}
-                onClick={() => HandleClickDetail(stack_index, index)}
+                onClick={(e) => handleChildClick(e, stack_index, index)}
                 className={clsx(CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}
             //className={clsx("w-4/5 flex flex-row focus:shadow-outline cursor-pointer pl-6 justify-between  bg-green-300 hover:bg-green-500 text-white rounded-12", CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}
             >
@@ -127,7 +133,7 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
         <BoxCustom label={'Thông tin tủ'}>
             <div className="w-full space-y-8" key={`div_stack_0`}>
                 {data?.map((item, index) => (
-                    <div key={`${index}_div_stack_1`} className={clsx("contain-stack w-full")}>
+                    <div key={`${index}_div_stack_1`} className={clsx("contain-stack w-full")} onClick={(e) => HandleClickDetail(e, index)}>
                         <div className="w-full flex flex-row space-x-4 head-stack" key={`${index}_div_stack_7`}>
                             <div
                                 key={`${index}_div_2_stack`}
