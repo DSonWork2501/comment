@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
-import {showMessage} from 'app/store/fuse/messageSlice'
+import { showMessage } from 'app/store/fuse/messageSlice'
 // import {storage} from '@widgets/functions'
 // import {KeyStorage} from '@widgets/metadatas'
 
@@ -12,44 +12,44 @@ const moduleName = "product";
  */
 export const getOrigin = createAsyncThunk(`${appName}/${moduleName}/getOrigin`, async (params, thunkAPI) => {
     try {
-        const response = await connect.live.product.filter.get({...params, type: 1})
+        const response = await connect.live.product.filter.get({ ...params, type: 1 })
         const data = await response.data.data;
         return data
     } catch (error) {
-        thunkAPI.dispatch(showMessage({variant: "error", message: error.message}))
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
     }
 });
 
 export const getType = createAsyncThunk(`${appName}/${moduleName}/getType`, async (params, thunkAPI) => {
     try {
-        const response = await connect.live.product.filter.get({...params, type: 2})
+        const response = await connect.live.product.filter.get({ ...params, type: 2 })
         const data = await response.data.data;
         return data
     } catch (error) {
-        thunkAPI.dispatch(showMessage({variant: "error", message: error.message}))
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
     }
 });
 
 export const getConcentration = createAsyncThunk(`${appName}/${moduleName}/getConcentration`, async (params, thunkAPI) => {
     try {
-        const response = await connect.live.product.filter.get({...params, type: 3})
+        const response = await connect.live.product.filter.get({ ...params, type: 3 })
         const data = await response.data.data;
         return data
     } catch (error) {
-        thunkAPI.dispatch(showMessage({variant: "error", message: error.message}))
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
     }
 });
 
 const widgetFiltersSlice = createSlice({
-	name: `${appName}/${moduleName}`,
-	initialState: {
+    name: `${appName}/${moduleName}`,
+    initialState: {
         loading: false,
-        xuatxu: null,
+        xuatxu: [],
         phanloai: null,
         nongdo: null,
         error: null,
     },
-	extraReducers: {
+    extraReducers: {
         /**
          * @description getOrigin
          */
@@ -66,7 +66,7 @@ const widgetFiltersSlice = createSlice({
                 error: null
             }
         },
-        [getOrigin.rejected]: (state, {error}) => ({
+        [getOrigin.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error
@@ -87,7 +87,7 @@ const widgetFiltersSlice = createSlice({
                 error: null
             }
         },
-        [getType.rejected]: (state, {error}) => ({
+        [getType.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error
@@ -108,13 +108,13 @@ const widgetFiltersSlice = createSlice({
                 error: null
             }
         },
-        [getConcentration.rejected]: (state, {error}) => ({
+        [getConcentration.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error
         }),
-        
-	}
+
+    }
 });
 
 export default widgetFiltersSlice.reducer;
