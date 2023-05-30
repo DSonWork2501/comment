@@ -17,6 +17,7 @@ import { colors } from "@material-ui/core"
 import { alertInformation } from "@widgets/functions"
 import * as Yup from 'yup'
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
+import { getOrigin } from "@widgets/store/filtersSlice"
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
@@ -28,6 +29,7 @@ function EditProduct(props) {
     const dispatch = useDispatch()
     const entity = useSelector(store => store[keyStore].product.entity)
     const loading = useSelector(store => store[keyStore].product.loading)
+    const origins = useSelector(store => store['widgets'].filter.xuatxu)
     const [data, setData] = useState(null)
     const [tabValue, setTabValue] = useState(TabType.co_ban.id)
 
@@ -36,6 +38,10 @@ function EditProduct(props) {
             dispatch(getDetail({ sku: params?.id }))
         }
     }, [params, dispatch])
+
+    useEffect(() => {
+        dispatch(getOrigin());
+    }, [dispatch])
 
     useEffect(() => {
         setData(entity?.data)
@@ -124,7 +130,7 @@ function EditProduct(props) {
                         <CmsLoadingOverlay loading={loading} />
                         {tabValue === TabType.co_ban.id &&
                             <CmsBoxLine label="Thông tin cơ bản">
-                                <BasicInfo formik={formik} />
+                                <BasicInfo formik={formik} options={{ origins }} />
                             </CmsBoxLine>}
                         {tabValue === TabType.phan_loai.id &&
                             <CmsBoxLine label="Thông tin phân loại">

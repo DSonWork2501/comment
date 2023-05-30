@@ -1,5 +1,5 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup"
-import { CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/components"
+import { CmsFormikAutocomplete, CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/components"
 import React, { } from "react"
 import MutipleImagePathLink from "../../common/MultipleImagePathLink"
 import noImage from '@widgets/images/noImage.jpg';
@@ -10,10 +10,10 @@ import { keyStore } from "app/main/product/common";
 import CmsFormikProductType from '@widgets/components/product-type/index'
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
-function BasicInfo({ formik, SaveData, }) {
+function BasicInfo({ formik, SaveData, options }) {
+    const { origins } = options;
     const dispatch = useDispatch()
     const imageLoading = useSelector(store => store[keyStore].product.imgLoading)
-    console.log('formik', formik)
 
     const HandleUploadImage = async (file) => {
 
@@ -34,7 +34,24 @@ function BasicInfo({ formik, SaveData, }) {
                 <CmsFormikTextField size="small" formik={formik} name="shortname" label="tên ngắn" />
                 <CmsFormikTextField size="small" formik={formik} name="barcode" label="barcode" />
                 <CmsFormikTextField size="small" formik={formik} name="sku" label="sku" />
-                <CmsFormikTextField size="small" formik={formik} name="brand" label="thương hiệu" />
+                {/* <CmsFormikTextField size="small" formik={formik} name="brand" label="thương hiệu" /> */}
+
+                <CmsFormikAutocomplete
+                    name="brand"
+                    formik={formik}
+                    label="thương hiệu"
+                    data={origins}
+                    size="small"
+                    autocompleteProps={{
+                        getOptionLabel: (option) => option?.name || '',
+                        ChipProps: {
+                            size: 'small'
+                        },
+                        size: 'small',
+                    }}
+                    setOption={(option) => option?.name || ''}
+                    valueIsId="name" />
+
                 <CmsFormikTextField size="small" multiline={true} formik={formik} name="description" label="Mô tả" />
                 <CmsFormikTextField size="small" formik={formik} name="unit" label="đơn vị" />
                 <CmsFormikTextField size="small" formik={formik} name="classify" label="phân loại" />
