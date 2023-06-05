@@ -1,4 +1,4 @@
-import { CmsDialog, CmsFormikSelect, CmsFormikTextField } from "@widgets/components"
+import { CmsDialog, CmsFormikAutocomplete, CmsFormikSelect, CmsFormikTextField, CmsTinyMceEditor } from "@widgets/components"
 import { useFormik } from "formik"
 import React from "react"
 import { ContractType } from 'app/main/contract/model/type'
@@ -16,7 +16,10 @@ const initData = (item) => {
             "title": "",
             "content": "",
             "status": 1,
-            "type": 1
+            "type": 1,
+            DATA1: 0,
+            DATA2: "",
+            DATA3: ""
         }
     }
 }
@@ -48,17 +51,70 @@ function EditDialogComponent({ open, handleClose, item = null }) {
             handleClose={handleClose}
             handleSave={formik.handleSubmit}
             isCloseDialogSubmit={false}
+            size="xl"
 
         >
             <div className="w-full space-y-8">
-                <CmsFormikTextField formik={formik} label="Tiêu đề" name="title" />
-                <CmsFormikTextField multiline rows={5} formik={formik} label="Nội dung" name="content" />
-                <CmsFormikSelect
-                    data={Object.values(ContractType)}
+                <div className="py-4">
+                    <CmsFormikTextField
+                        formik={formik}
+                        label="Tiêu đề"
+                        size="small"
+                        name="title" />
+                </div>
+
+                <div className="py-4">
+                    <CmsFormikTextField
+                        formik={formik}
+                        size="small"
+                        label="Mã hợp đồng"
+                        name="DATA2" />
+                </div>
+
+                <div className="py-4">
+                    <CmsFormikTextField
+                        formik={formik}
+                        size="small"
+                        label="Thời gian có hiệu lực"
+                        isNumber name="DATA1" />
+                </div>
+
+                <CmsFormikAutocomplete
+                    className="my-8 inline-flex"
+                    label="Điều kiện"
+                    name="DATA3"
                     formik={formik}
-                    label="Loại"
-                    name="type"
-                />
+                    autocompleteProps={{
+                        getOptionLabel: (option) => option?.subPlatformName,
+                        ChipProps: {
+                            size: 'small'
+                        }
+                    }}
+                    data={[]}
+                    valueIsId
+                    multiple
+                    size="small" />
+
+                <div className="py-4">
+                    <CmsFormikSelect
+                        data={Object.values(ContractType)}
+                        formik={formik}
+                        size="small"
+                        label="Loại"
+                        name="type"
+                    />
+                </div>
+
+                <div className="py-4">
+                    <CmsTinyMceEditor
+                        value={formik.values['content']}
+                        onChange={(event) => { formik.setFieldValue('content', event.target.getContent()) }} />
+                </div>
+
+                {/* <CmsFormikTextField multiline rows={5} formik={formik} label="Nội dung" name="content" /> */}
+
+
+
                 {/* {item && <CmsFormikSelect
                     data={Object.values(ContractStatus).map(x=>({...x, id: parseInt(x.id)}))}
                     formik={formik}
