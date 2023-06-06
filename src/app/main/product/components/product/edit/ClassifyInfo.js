@@ -12,6 +12,7 @@ import { useState } from "react"
 import { useSelector } from "react-redux"
 import ShelfContent from "./classify/Shelf"
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
+import * as Yup from 'yup'
 
 const columns = [
     new initColumn({ field: "stt", label: "STT", alignHeader: "left", alignValue: "left", sortable: false }),
@@ -27,21 +28,36 @@ export const returnModelPr = (value) => {
     }))
 }
 
-const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex }) => {
+const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex, ishs }) => {
     const colorRes = useSelector(store => store[keyStore].product.color)
     const sizeRes = useSelector(store => store[keyStore].product.size)
+
+    const handleSave = (values) => {
+        handleSaveData(values, index)
+    }
+
     const formik_item = useFormik({
         initialValues: formik.values.detail[index] || initDetail(),
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
-        // onSubmit: handleSaveData
+        onSubmit: handleSave,
+        validationSchema: Yup.object({
+            capacity: Yup.number().when('$ishs', {
+                is: (value) => {
+                    return ishs === 1
+                },
+                then: Yup.number().nullable().required("Nhập dung tích").min(1, "Nhập dung tích").typeError("Nhập dung tích")
+            }),
+            subname: Yup.string().nullable().required("Nhập tên sản phẩm")
+        })
     })
+
     return (
         <div className="grid grid-cols-4 gap-10 w-11/12">
             <CmsFormikTextField key={`${index}_uniqueid`} size="small" name={`uniqueid`} formik={formik_item} label="uniqueid" />
             <CmsFormikTextField key={`${index}_subname`} size="small" name={`subname`} formik={formik_item} label="Tên Sub" />
             <CmsFormikTextField isNumberFormat key={`${index}_capacity`} isNumber size="small" name={`capacity`} formik={formik_item} label="dung tích" />
-            <CmsFormikTextField key={`${index}_nhanhid`} size="small" name={`nhanhid`} formik={formik_item} label="nhanhid" />
+            {/* <CmsFormikTextField key={`${index}_nhanhid`} size="small" name={`nhanhid`} formik={formik_item} label="nhanhid" /> */}
             <CmsFormikAutocomplete
                 valueIsId
                 data={colorRes}
@@ -75,7 +91,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
             <CmsFormikTextField key={`${index}_height`} isNumber size="small" name={`height`} formik={formik_item} label="chiều cao" />
             <CmsFormikDateTimePicker key={`${index}_maketime`} size="small" name={`maketime`} formik={formik_item} label="ngày sản xuất" />
             <CmsFormikDateTimePicker key={`${index}_expiretime`} size="small" name={`expiretime`} formik={formik_item} label="ngày hết hạn" />
-            <CmsFormikTextField key={`${index}_code`} size="small" name={`Code`} formik={formik_item} label="mã Code" />
+            {/* <CmsFormikTextField key={`${index}_code`} size="small" name={`Code`} formik={formik_item} label="mã Code" /> */}
             <CmsFormikTextField key={`${index}_sizename`} size="small" name={`sizename`} formik={formik_item} label="kích thước" />
             <CmsFormikTextField isNumberFormat key={`${index}_price`} size="small" name={`price`} formik={formik_item} label="giá" />
             <CmsFormikTextField isNumberFormat key={`${index}_retailprice`} size="small" name={`retailprice`} formik={formik_item} label="giá bán lẻ" />
@@ -84,7 +100,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex })
                 <CmsFormikRadioGroup fieldsetclass="m-0" className="border-0 m-0 p-0" vertical={false} key={`${index}_status`} size="small" name={`status`} formik={formik_item} label="" data={Object.values(ProductStatus)} />
             </div>
             <div className="col-span-4 flex flex-row space-x-12 items-start justify-end">
-                <CmsButton type="button" size="small" label={"Lưu tạm"} startIcon="save" className="text-white bg-blue-500 hover:bg-green-700" onClick={() => handleSaveData(formik_item.values, index)} />
+                <CmsButton type="button" size="small" label={"Lưu tạm"} startIcon="save" className="text-white bg-blue-500 hover:bg-green-700" onClick={() => formik_item.handleSubmit()} />
                 <CmsButton size="small" label={"Hủy"} startIcon="cancel" className="text-white bg-grey-500 hover:bg-grey-700" onClick={() => handleCancelSetIndex()} />
             </div>
         </div>
@@ -179,7 +195,7 @@ function ClassifyInfo({ formik }) {
     const ishs = parseInt(formik?.values?.ishs) && parseInt(formik?.values?.ishs)
     const data = detail?.map((x, index) => ({
         stt: index + 1,
-        info: editIndex === index ? <EditRowContent index={index} formik={formik} handleSaveData={HandleSaveItem} handleCancelSetIndex={() => setEditIndex('')} /> : <InfoContent index={index} formik={formik} />,
+        info: editIndex === index ? <EditRowContent index={index} formik={formik} ishs={ishs} handleSaveData={HandleSaveItem} handleCancelSetIndex={() => setEditIndex('')} /> : <InfoContent index={index} formik={formik} />,
         thaotac:
             <div className="flex flex-row space-x-8">
                 {editIndex !== index &&

@@ -104,10 +104,25 @@ function DetailShelfProductContent({ data, index, classes }) {
     const img = value.img ? `${baseurl}${value.img}` : noImage
 
     const handleDownload = ({ qrcode, name, uniqueid }) => {
-        var a = document.createElement("a"); //Create <a>
-        a.href = `data:image/png;base64, ${qrcode}`; //Image Base64 Goes here
-        a.download = `${name}_${uniqueid?.replace('.', '_')}.png`; //File name Here
-        a.click(); //Downloaded file
+        // var a = document.createElement("a"); //Create <a>
+        // a.href = `data:image/png;base64, ${qrcode}`; //Image Base64 Goes here
+        // a.download = `${name}_${uniqueid?.replace('.', '_')}.png`; //File name Here
+        // a.click(); //Downloaded file
+        var qrImage = new Image();
+
+        qrImage.src = `data:image/png;base64, ${qrcode}`;
+
+        qrImage.onload = function () {
+            var printWindow = window.open('', '_blank');
+            printWindow.document.open();
+            printWindow.document.write(`<html><head><title>${name}</title></head><body style="display:flex;align-items:center;justify-content:center"><img style="width:100%;margin:auto" src="${qrImage.src}" alt="QR Code"></body></html>`);
+            printWindow.document.close();
+
+            printWindow.onload = function () {
+                printWindow.print();
+                printWindow.close();
+            };
+        };
     }
 
     return (
@@ -130,7 +145,7 @@ function DetailShelfProductContent({ data, index, classes }) {
             </div>
             <div className="w-1/5 self-center space-y-2 text-center">
                 <img alt={`qrcord_${index}`} src={value.qrcode ? `data:image/png;base64, ${value.qrcode}` : noImage} className="" />
-                {value.qrcode && <CmsButton variant="outlined" size="small" label="tải về" component={Link} onClick={() => handleDownload(value)} />}
+                {value.qrcode && <CmsButton variant="outlined" size="small" label="In" component={Link} onClick={() => handleDownload(value)} />}
             </div>
         </div>
     )
