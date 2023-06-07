@@ -1,4 +1,4 @@
-import { CmsButton, CmsDialog, CmsLabel, } from "@widgets/components"
+import { CmsButton, CmsButtonProgress, CmsDialog, CmsLabel, } from "@widgets/components"
 import React, { } from "react"
 import { keyStore } from "../../common"
 import { useSelector } from "react-redux"
@@ -126,27 +126,51 @@ function DetailShelfProductContent({ data, index, classes }) {
     }
 
     return (
-        <div
-            key={`div-0-detai-${index}`}
-            className={clsx("w-full flex flex-row shadow-2 hover:shadow-4 p-4 min-h-64", classes.shelf)}
-        >
-            <div className="w-1/5 self-center">
-                <img src={img} alt="image_detail" className="object-cover h-92" />
-            </div>
-            <div className="w-full self-center space-y-16">
-                <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min' }} info={{ content: value?.uniqueid || '-' }} />
-                <LabelInfo key={`imei_ord-${index}-labelInfo`} label={{ content: 'imei đơn hàng', className: 'min-w-min' }} info={{ content: value?.imei_ord || '-' }} />
+        <div className="px-4 relative">
+            <div
+                key={`div-0-detai-${index}`}
+                className={clsx("w-full flex flex-row shadow-2 hover:shadow-4 p-4 min-h-64", classes.shelf, value?.status === 0 && 'opacity-10')}
+            >
+                <div className="w-1/5 self-center">
+                    <img src={img} alt="image_detail" className="object-cover h-92" />
+                </div>
+                <div className="w-full self-center space-y-16">
+                    <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min' }} info={{ content: value?.uniqueid || '-' }} />
+                    <LabelInfo key={`imei_ord-${index}-labelInfo`} label={{ content: 'imei đơn hàng', className: 'min-w-min' }} info={{ content: value?.imei_ord || '-' }} />
 
+                </div>
+                <div className="w-full self-center space-y-16">
+                    <LabelInfo key={`name-${index}-labelInfo`} label={{ content: 'tên', className: 'min-w-min' }} info={{ content: value?.name || '-' }} />
+                    {/* <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min' }} info={{ content: value?.color || '-' }} /> */}
+                    <LabelInfo key={`sku-${index}-labelInfo`} label={{ content: 'sku', className: 'min-w-min' }} info={{ content: value?.sku || '-' }} />
+                </div>
+                <div className="w-1/5 self-center space-y-2 text-center">
+                    <img alt={`qrcord_${index}`} src={value.qrcode ? `data:image/png;base64, ${value.qrcode}` : noImage} className="" />
+                    {value.qrcode && <CmsButton variant="outlined" size="small" label="In" component={Link} onClick={() => handleDownload(value)} />}
+                </div>
             </div>
-            <div className="w-full self-center space-y-16">
-                <LabelInfo key={`name-${index}-labelInfo`} label={{ content: 'tên', className: 'min-w-min' }} info={{ content: value?.name || '-' }} />
-                {/* <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min' }} info={{ content: value?.color || '-' }} /> */}
-                <LabelInfo key={`sku-${index}-labelInfo`} label={{ content: 'sku', className: 'min-w-min' }} info={{ content: value?.sku || '-' }} />
-            </div>
-            <div className="w-1/5 self-center space-y-2 text-center">
-                <img alt={`qrcord_${index}`} src={value.qrcode ? `data:image/png;base64, ${value.qrcode}` : noImage} className="" />
-                {value.qrcode && <CmsButton variant="outlined" size="small" label="In" component={Link} onClick={() => handleDownload(value)} />}
-            </div>
+            {
+                value?.status === 0
+                &&
+                <div className="absolute top-1/2  transform  -translate-y-1/2 right-8">
+                    <CmsButtonProgress
+                        className="w-96 mb-4"
+                        size="small"
+                        label="Làm mới"
+                        startIcon="undo"
+                        color="default"
+                        onClick={() => { }}
+                    />
+                    <CmsButtonProgress
+                        className="w-96"
+                        size="small"
+                        label="Thay thế"
+                        startIcon="refresh"
+                        color="primary"
+                        onClick={() => { }}
+                    />
+                </div>
+            }
         </div>
     )
 }
