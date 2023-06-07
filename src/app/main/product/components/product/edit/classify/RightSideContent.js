@@ -21,8 +21,6 @@ function RightSideContent({ formik, prefix }) {
         setTabValue(value);
     }
 
-    console.log(formik);
-
     return (
         <div className="w-full space-y-16">
             {get(formik?.values, `${prefix}.type`) === 'slot' &&

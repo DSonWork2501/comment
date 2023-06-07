@@ -1,11 +1,16 @@
 import { CmsButton, CmsButtonProgress, CmsDialog, CmsLabel, } from "@widgets/components"
-import React, { } from "react"
+import React, { useState } from "react"
 import { keyStore } from "../../common"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import clsx from "clsx"
 import noImage from '@widgets/images/noImage.jpg';
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { Link, makeStyles } from "@material-ui/core"
+import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup/FuseAnimateGroup"
+import { getListHS } from "app/main/product/store/productSlice"
+import ProductSearch from "app/main/product/components/product/edit/classify/rightSide/ProductSearch"
+import ProductSearchList from "app/main/product/components/product/edit/classify/rightSide/ProductSearchList"
+import { useEffect } from "react"
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const useStyles = makeStyles((theme) => ({
@@ -21,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // Ngăn tủ
-function DetailModelContent({ value }) {
+function DetailModelContent({ value, setTab }) {
     const classes = useStyles()
     const slots = value?.slots || []
 
@@ -41,6 +46,7 @@ function DetailModelContent({ value }) {
                     <DetailShelfProductContent
                         data={item}
                         index={index}
+                        setTab={setTab}
                         key={`DetailShelfProductContent-${index}`}
                         classes={classes}
                     />
@@ -51,8 +57,43 @@ function DetailModelContent({ value }) {
     )
 }
 
+const initialSearch = {
+    pageNumber: 1,
+    rowsPage: 10,
+    homeSubscription: 2
+}
+
+export const ProductPopup = () => {
+    const [search, setSearch] = useState(initialSearch);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getListHS(search))
+    }, [dispatch, search])
+
+    const handleClickSku = (event, value) => {
+        console.log('value', value)
+    }
+
+    const handleKeyPressSearch = (event) => {
+        if (event.key === 'Enter') {
+            setSearch(prev => ({ ...prev, search: event.target.value }))
+        }
+    }
+
+    return <>
+        <ProductSearch keyStore={keyStore} handleKeyPressSearch={handleKeyPressSearch} />
+        <ProductSearchList
+            keyStore={keyStore}
+            onClickSku={handleClickSku}
+            setSearch={(value) => setSearch((prev) => ({ ...prev, ...value }))}
+        />
+    </>
+}
+
 function ShelfDetailContent({ open, handleClose }) {
-    const entities = useSelector(store => store[keyStore]?.cusShelf?.detailEntities)
+    const entities = useSelector(store => store[keyStore]?.cusShelf?.detailEntities);
+    const [tab, setTab] = useState(-1);
 
     const handleDownloadAll = () => {
         for (let index = 0; index < entities?.data?.length; index++) {
@@ -76,30 +117,39 @@ function ShelfDetailContent({ open, handleClose }) {
             handleClose={handleClose}
             size="md"
         >
-            <div className="w-full space-y-4">
-                <div className="text-right">
-                    {entities?.data.length > 0 && <CmsButton className="" variant="outlined" size="small" label="Tải All" component={Link} onClick={() => handleDownloadAll()} />}
-                </div>
-                {entities?.data?.length > 0 ? entities?.data?.map((item, index) => (
-                    <DetailModelContent
-                        value={item}
-                        index={index}
-                        key={`DetailShelf-${index}`}
-                    />
-                )) : <div className="border-collapse border-2 border-green-500">
-                    <CmsLabel
-                        content={'Không có dữ liệu !'}
-                        className="text-red-500 text-center"
-                    />
-                </div>
-                }
-            </div>
+            {
+                tab === -1
+                    ? <FuseAnimateGroup enter={{ animation: 'transition.fadeIn' }} className="w-full">
+                        <div className="w-full space-y-4">
+                            <div className="text-right">
+                                {entities?.data.length > 0 && <CmsButton className="" variant="outlined" size="small" label="Tải All" component={Link} onClick={() => handleDownloadAll()} />}
+                            </div>
+                            {entities?.data?.length > 0 ? entities?.data?.map((item, index) => (
+                                <DetailModelContent
+                                    value={item}
+                                    index={index}
+                                    setTab={setTab}
+                                    key={`DetailShelf-${index}`}
+                                />
+                            )) : <div className="border-collapse border-2 border-green-500">
+                                <CmsLabel
+                                    content={'Không có dữ liệu !'}
+                                    className="text-red-500 text-center"
+                                />
+                            </div>
+                            }
+                        </div>
+                    </FuseAnimateGroup>
+                    : <FuseAnimateGroup enter={{ animation: 'transition.fadeIn' }} className="w-full">
+                        <ProductPopup />
+                    </FuseAnimateGroup>
+            }
         </CmsDialog>
     )
 }
 
 // chi tiết ngăn tủ
-function DetailShelfProductContent({ data, index, classes }) {
+function DetailShelfProductContent({ data, index, classes, setTab }) {
     const value = data?.item || null
     const img = value.img ? `${baseurl}${value.img}` : noImage
 
@@ -167,7 +217,7 @@ function DetailShelfProductContent({ data, index, classes }) {
                         label="Thay thế"
                         startIcon="refresh"
                         color="primary"
-                        onClick={() => { }}
+                        onClick={() => { setTab(index) }}
                     />
                 </div>
             }

@@ -1,5 +1,6 @@
 import Connect from "@connect/@connect";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getListHS } from "app/main/product/store/productSlice";
 import { showMessage } from "app/store/fuse/messageSlice";
 
 const appName = "cusShelf";
@@ -48,6 +49,8 @@ const customerShelfSlice = createSlice({
         selected: null,
         response: null,
         search: initSearchState,
+        // hsLoading: false,
+        // hsEntities: null,
     },
     reducers: {
         /**
@@ -138,6 +141,25 @@ const customerShelfSlice = createSlice({
         [getWine.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
+            error: error
+        }),
+
+        [getListHS.pending]: state => ({
+            ...state,
+            hsLoading: true,
+            error: null
+        }),
+        [getListHS.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                hsLoading: false,
+                hsEntities: payload,
+                error: null
+            }
+        },
+        [getListHS.rejected]: (state, { error }) => ({
+            ...state,
+            hsLoading: false,
             error: error
         }),
     }
