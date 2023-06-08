@@ -67,9 +67,9 @@ function EditOrderContent() {
     }
     const setValue = formik.setFieldValue
     const productorder = formik?.values?.productorder
-    
+
     useEffect(() => {
-        if (Array.isArray(productorder)){
+        if (Array.isArray(productorder)) {
             var total = productorder?.map(x => x.quantity * x.price)
             let sum = 0;
             total.map(x => sum += x);
@@ -98,7 +98,8 @@ function EditOrderContent() {
                     {tabValue === TabType.chitiet.id && (
                         <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }}>
                             <DetailProductContent formik={formik} />
-                        </FuseAnimateGroup>)}
+                        </FuseAnimateGroup>
+                    )}
                 </OrderContext.Provider>
             }
             toolbar={

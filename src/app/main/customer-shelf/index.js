@@ -23,6 +23,7 @@ function CustomerShelfContent() {
     const entities = useSelector(store => store[keyStore]?.cusShelf?.entities)
     const loading = useSelector(store => store[keyStore]?.cusShelf?.loading)
     const search = useSelector(store => store[keyStore]?.cusShelf?.search)
+    const [detail, setDetail] = useState(null);
     const [open, setOpen] = useState('')
 
     useEffect(() => {
@@ -34,7 +35,7 @@ function CustomerShelfContent() {
         dispatch(getWine({ cusId: cusid, parentId: id, cms: 1 }))
     }, [dispatch])
 
-    const handleDownloadQRCode = useCallback(({qrcode, name, uniqueid}) => {
+    const handleDownloadQRCode = useCallback(({ qrcode, name, uniqueid }) => {
         var a = document.createElement("a"); //Create <a>
         a.href = `data:image/png;base64, ${qrcode}`; //Image Base64 Goes here
         a.download = `${name}_${uniqueid?.replace('.', '_')}.png`; //File name Here
@@ -57,7 +58,10 @@ function CustomerShelfContent() {
                 </div>,
             image: <img alt={`image_${index}`} src={x.img ? `${baseurl}${x.img}` : noImage} className="h-64" />,
             action: <div>
-                {x.parentid === 0 && <CmsIconButton icon="info" onClick={() => handleShowDetail(x.cusid, x.id)} tooltip={'chi tiết'} />}
+                {x.type === "household" && <CmsIconButton icon="info" onClick={() => {
+                    handleShowDetail(x.cusid, x.id);
+                    setDetail(x);
+                }} tooltip={'chi tiết'} />}
             </div>
         })) || []
         , [entities, handleShowDetail, handleDownloadQRCode])
@@ -96,6 +100,7 @@ function CustomerShelfContent() {
                     />
                     {open === 'detail' &&
                         <ShelfDetailContent
+                            detail={detail}
                             open={open === 'detail'}
                             handleClose={() => setOpen('')}
                         />}

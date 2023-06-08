@@ -26,6 +26,7 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
     const [chosenSku, setChosenSku] = useState(null)
     const [view, setView] = useState(View.skuList.id)
     const [search, setSearch] = useState(initialSearch);
+    
 
     useEffect(() => {
         dispatch(getListHS(search))

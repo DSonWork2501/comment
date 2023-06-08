@@ -20,7 +20,7 @@ const DetailUniqueProductComponent = React.memo(({ item, index, skuItem, onClick
             <img src={img} alt={`image_detail_${index}`} key={`${index}_img_DetailUniqueProductComponent`} />
         </div>
         <div className="w-full px-4 py-6 rounded-6 space-y-8">
-            <CmsLabel content={name} className="text-16" key={`${index}_name_DetailUniqueProductComponent`}/>
+            <CmsLabel content={name} className="text-16" key={`${index}_name_DetailUniqueProductComponent`} />
             <div className="w-full flex flex-row space-x-8">
                 <div className="w-full">
                     <LabelInfo label={{ content: 'IMEI' }} key={`${index}_unique_DetailUniqueProductComponent`} info={{ content: item?.uniqueid }} />
@@ -49,11 +49,22 @@ const DetailUniqueProductComponent = React.memo(({ item, index, skuItem, onClick
     </div>)
 })
 
+const turnStorePath = (keyStore, store) => {
+    if (keyStore === "cusShelf")
+        return store[keyStore].cusShelf;
+    return store[keyStore].product;
+}
+
 function UniqueProductListComponent({ sku, onClickView, skuItem, onClickChooseUniqueId }) {
-    const key = window.location.pathname.split('/')[1] === 'order' ? 'orders' : keyStore;
+    let key = keyStore;
+    if (window.location.pathname.split('/')[1] === 'order')
+        key = 'orders';
+    if (window.location.pathname.split('/')[1] === 'customer-shelf')
+        key = 'cusShelf';
+
     const dispatch = useDispatch()
-    const entities = useSelector(store => store[key].product.searchDetailEntities)?.detail
-    const loading = useSelector(store => store[key].product.searchDetailLoading)
+    const entities = useSelector(store => turnStorePath(key, store).searchDetailEntities)?.detail
+    const loading = useSelector(store => turnStorePath(key, store).searchDetailLoading)
 
     useEffect(() => {
         if (sku) {

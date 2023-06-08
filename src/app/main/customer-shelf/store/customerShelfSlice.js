@@ -1,5 +1,6 @@
 import Connect from "@connect/@connect";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getListHS, searchDetail } from "app/main/product/store/productSlice";
 import { showMessage } from "app/store/fuse/messageSlice";
 
 const appName = "cusShelf";
@@ -31,6 +32,22 @@ export const getWine = createAsyncThunk(`${appName}/${moduleName}/getWine`, asyn
     }
 });
 
+export const customerShelf = {
+    other: {
+        reOrder: createAsyncThunk(`${appName}/${moduleName}/customerShelf/other/reOrder`, async (params, thunkAPI) => {
+            try {
+                const response = await Connect.live.customer.other.reOrder(params);
+                const data = await response.data;
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        })
+    }
+}
+
 const initSearchState = {
     CusID: null,//=> id khách hàng
     Type: "household",//=> loại (household - tủ/ wine- chai rượu)
@@ -42,12 +59,14 @@ const customerShelfSlice = createSlice({
     initialState: {
         loading: false,
         entities: null,
-        detailEntities: null, 
+        detailEntities: null,
         entity: null,
         error: null,
         selected: null,
         response: null,
         search: initSearchState,
+        // hsLoading: false,
+        // hsEntities: null,
     },
     reducers: {
         /**
@@ -132,12 +151,51 @@ const customerShelfSlice = createSlice({
                 ...state,
                 loading: false,
                 detailEntities: payload,
+                //detailEntities: { ...payload, data: payload.data.map(val => ({ ...val, slots: val.slots.map((va, e) => ({ ...va, item: { ...va.item, status: e === 1 ? 0 : 1 } })) })) },
                 error: null
             }
         },
         [getWine.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
+            error: error
+        }),
+
+        [getListHS.pending]: state => ({
+            ...state,
+            hsLoading: true,
+            error: null
+        }),
+        [getListHS.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                hsLoading: false,
+                hsEntities: payload,
+                error: null
+            }
+        },
+        [getListHS.rejected]: (state, { error }) => ({
+            ...state,
+            hsLoading: false,
+            error: error
+        }),
+
+        [searchDetail.pending]: state => ({
+            ...state,
+            searchDetailLoading: true,
+            error: null
+        }),
+        [searchDetail.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                searchDetailLoading: false,
+                searchDetailEntities: payload,
+                error: null
+            }
+        },
+        [searchDetail.rejected]: (state, { error }) => ({
+            ...state,
+            searchDetailLoading: false,
             error: error
         }),
     }

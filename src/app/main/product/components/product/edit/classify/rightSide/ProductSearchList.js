@@ -30,13 +30,18 @@ export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 //     )
 // })
 
+const turnStorePath = (keyStore, store) => {
+    if (keyStore === "cusShelf")
+        return store[keyStore].cusShelf;
+    return store[keyStore].product;
+}
+
 // danh sách sản phẩm
 function ProductSearchListComponent({ keyStore, onClickSku, setSearch }) {
-    //const product_entities = useSelector(store => store[keyStore].product.hsEntities)?.data
     const key = window.location.pathname.split('/')[1] === 'order' ? 'orders' : keyStore;
-    const loading = useSelector(store => store[key].product.hsLoading)
-    const entities = useSelector(store => store[key].product.hsEntities)
-    //const data = React.useMemo(() => product_entities || [], [product_entities])
+
+    const loading = useSelector(store => turnStorePath(key, store).hsLoading);
+    const entities = useSelector(store => turnStorePath(key, store).hsEntities);
 
     const columns = [
         new initColumn({ field: "sku", label: "SKU", alignHeader: "left", alignValue: "left", sortable: false }),
