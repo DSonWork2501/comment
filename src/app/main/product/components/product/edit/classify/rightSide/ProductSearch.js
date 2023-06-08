@@ -14,8 +14,8 @@ function ProductSearchComponent({ keyStore, formik, prefix, handleKeyPressSearch
     //         dispatch(getListHS({ search: valueSearch, homeSubscription: 2 }))
     //     }
     // }
-    const handleClickSearch = (event) => {
-        console.log('event', event)
+    const handleClickSearch = () => {
+        handleKeyPressSearch(valueSearch)
     }
 
     return (
@@ -27,7 +27,7 @@ function ProductSearchComponent({ keyStore, formik, prefix, handleKeyPressSearch
             onKeyPress={handleKeyPressSearch}
             values={valueSearch || ''}
             label=""
-            isSearch
+            //isSearch
             endNode={<CmsIconButton icon="search" tooltip={'tìm kiếm'} onClick={(event) => handleClickSearch(event)} />}
         />
     )
