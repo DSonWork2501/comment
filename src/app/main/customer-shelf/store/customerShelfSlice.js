@@ -150,7 +150,8 @@ const customerShelfSlice = createSlice({
             return {
                 ...state,
                 loading: false,
-                detailEntities: { ...payload, data: payload.data.map(val => ({ ...val, slots: val.slots.map((va, e) => ({ ...va, item: { ...va.item, status: e === 0 ? 0 : 1 } })) })) },
+                detailEntities: payload,
+                //detailEntities: { ...payload, data: payload.data.map(val => ({ ...val, slots: val.slots.map((va, e) => ({ ...va, item: { ...va.item, status: e === 1 ? 0 : 1 } })) })) },
                 error: null
             }
         },

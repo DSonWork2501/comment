@@ -12,7 +12,7 @@ import ProductSearch from "app/main/product/components/product/edit/classify/rig
 import ProductSearchList from "app/main/product/components/product/edit/classify/rightSide/ProductSearchList"
 import { useEffect } from "react"
 import UniqueProductList from "app/main/product/components/product/edit/classify/rightSide/UniqueProductList"
-import customerShelfSlice, { customerShelf, getWine } from "../../store/customerShelfSlice"
+import { customerShelf, getWine } from "../../store/customerShelfSlice"
 import { alertInformation } from "@widgets/functions"
 import { unwrapResult } from "@reduxjs/toolkit"
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // Ngăn tủ
-function DetailModelContent({ value, setTab }) {
+function DetailModelContent({ value, setTab, handleChooseUniqueID }) {
     const classes = useStyles()
     const slots = value?.slots || []
 
@@ -51,6 +51,7 @@ function DetailModelContent({ value, setTab }) {
                         data={item}
                         index={index}
                         setTab={setTab}
+                        handleChooseUniqueID={handleChooseUniqueID}
                         key={`DetailShelfProductContent-${index}`}
                         classes={classes}
                     />
@@ -139,21 +140,23 @@ function ShelfDetailContent({ open, handleClose, detail }) {
         }
     }
 
-    const handleChooseUniqueID = ({ value, setChosenSku }) => {
+    const handleChooseUniqueID = ({ value, oldValue, setChosenSku }) => {
+
+        const oldItem = oldValue ? oldValue : tab;
         const data = {
             "olditem": {
-                "id": tab.id,
+                "id": oldItem.id,
                 "cusid": detail.cusid,
                 "parentid": detail.id,
-                "uniqueid": tab.uniqueid,
-                "imei_ord": tab.imei_ord,
-                "name": tab.name,
-                "img": tab.img,
-                "capacity": tab.capacity,
-                "note": tab.note,
-                "qrcode": tab.qrcode,
-                "status": tab.status,
-                "type": tab.type
+                "uniqueid": oldItem.uniqueid,
+                "imei_ord": oldItem.imei_ord,
+                "name": oldItem.name,
+                "img": oldItem.img,
+                "capacity": oldItem.capacity,
+                "note": oldItem.note,
+                "qrcode": oldItem.qrcode,
+                "status": oldItem.status,
+                "type": oldItem.type
             },
             "newitem": {
                 "id": 0,
@@ -178,9 +181,10 @@ function ShelfDetailContent({ open, handleClose, detail }) {
                 try {
                     const resultAction = await dispatch(customerShelf.other.reOrder(data));
                     unwrapResult(resultAction);
-                    setChosenSku(null);
+                    if (setChosenSku)
+                        setChosenSku(null);
                     setTab(null);
-                    dispatch(getWine({ cusId: tab.cusid, parentId: tab.parentid, cms: 1 }))
+                    dispatch(getWine({ cusId: detail.cusid, parentId: detail.id, cms: 1 }))
                 } catch (error) { }
             },
         })
@@ -204,6 +208,7 @@ function ShelfDetailContent({ open, handleClose, detail }) {
                                 <DetailModelContent
                                     value={item}
                                     index={index}
+                                    handleChooseUniqueID={handleChooseUniqueID}
                                     setTab={setTab}
                                     key={`DetailShelf-${index}`}
                                 />
@@ -227,7 +232,7 @@ function ShelfDetailContent({ open, handleClose, detail }) {
 }
 
 // chi tiết ngăn tủ
-function DetailShelfProductContent({ data, index, classes, setTab }) {
+function DetailShelfProductContent({ data, index, classes, setTab, handleChooseUniqueID }) {
     const value = data?.item || null
     const img = value.img ? `${baseurl}${value.img}` : noImage
 
@@ -287,7 +292,18 @@ function DetailShelfProductContent({ data, index, classes, setTab }) {
                         label="Làm mới"
                         startIcon="undo"
                         color="default"
-                        onClick={() => { }}
+                        onClick={() => {
+                            handleChooseUniqueID({
+                                value: {
+                                    uniqueid: value?.uniqueid,
+                                    skuItem: {
+                                        img: value?.image,
+                                        name: value?.name
+                                    }
+                                },
+                                oldValue: value
+                            });
+                        }}
                     />
                     <CmsButtonProgress
                         className="w-96"
