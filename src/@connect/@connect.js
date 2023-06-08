@@ -48,7 +48,7 @@ export default {
             price: {
                 insert: entity => axios.post(`${baseurl}/product/insert-price`, entity),
             },
-            filter:{
+            filter: {
                 get: params => axios.get(`${baseurl}/product/get-filter`, { params }),
             }
         },
@@ -62,6 +62,9 @@ export default {
             getList: params => axios.get(`${baseurl}/customer/get-account`, { params }),
         },
         customer: {
+            other: {
+                reOrder: entity => axios.post(`${baseurl}/order/re-order`, entity),
+            },
             getList: params => axios.get(`${baseurl}/customer/get-customer`, { params }),
             insert: entity => axios.post(`${baseurl}/customer/insert-customer`, entity),
             getShelf: params => axios.get(`${baseurl}/customer/get-households`, { params }),
@@ -80,7 +83,7 @@ export default {
             getList: params => axios.get(`${baseurl}/contract/get-contracts`, { params }),
             insert: entity => axios.post(`${baseurl}/contract/insert-contract`, entity),
             update: entity => axios.put(`${baseurl}/contract/update-contract`, entity),
-            changeStatus:  entity => axios.put(`${baseurl}/contract/status-contract`, entity),
+            changeStatus: entity => axios.put(`${baseurl}/contract/status-contract`, entity),
         },
         signedContract: {
             getContract: params => axios.get(`${baseurl}/contract/get-cus-contracts`, { params }),

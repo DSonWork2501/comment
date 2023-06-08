@@ -51,7 +51,7 @@ function LisProductContent({ data, HandleAddData, img, hs, handleCloseDialog, ha
 
     return (
         <FuseAnimate animation="transition.expandIn" delay={500}>
-            <>
+            <div>
                 {hs === parseInt(HomeSubscription[2].id) &&
                     <CmsBoxLine label={'Thông tin sản phẩm'}>
                         <div className="grid grid-cols-3 gap-4 place-items-start">
@@ -76,7 +76,7 @@ function LisProductContent({ data, HandleAddData, img, hs, handleCloseDialog, ha
                         />
                     </div>
                 }
-            </>
+            </div>
         </FuseAnimate>
     )
 }
