@@ -248,7 +248,16 @@ function DetailShelfProductContent({ data, index, classes, setTab, handleChooseU
         qrImage.onload = function () {
             var printWindow = window.open('', '_blank');
             printWindow.document.open();
-            printWindow.document.write(`<html><head><title>${name}</title></head><body style="display:flex;align-items:center;justify-content:center"><img style="width:100%;margin:auto" src="${qrImage.src}" alt="QR Code"></body></html>`);
+            printWindow.document.write(`<html>
+                <head>
+                <title>${name}</title>
+                </head>
+                <body style="display:flex;align-items:center;justify-content:center">
+                    <div style="width:100%">
+                        <img style="width:100%;margin:auto" src="${qrImage.src}" alt="QR Code">
+                    </div>
+                </body>
+            </html>`);
             printWindow.document.close();
 
             printWindow.onload = function () {
