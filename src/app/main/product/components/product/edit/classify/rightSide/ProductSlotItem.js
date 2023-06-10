@@ -26,7 +26,7 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
     const [chosenSku, setChosenSku] = useState(null)
     const [view, setView] = useState(View.skuList.id)
     const [search, setSearch] = useState(initialSearch);
-    
+
 
     useEffect(() => {
         dispatch(getListHS(search))
@@ -49,10 +49,13 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
     // }
 
     const handleKeyPressSearch = (event) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter')
             setSearch(prev => ({ ...prev, search: event.target.value }))
-            // /dispatch(getListHS({ search: valueSearch, homeSubscription: 2 }))
-        }
+        // /dispatch(getListHS({ search: valueSearch, homeSubscription: 2 }))
+
+        if (typeof event === 'string')
+            setSearch(prev => ({ ...prev, search: event }))
+
     }
 
     const sku = chosenSku?.sku || null
