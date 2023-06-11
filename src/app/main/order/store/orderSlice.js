@@ -73,6 +73,21 @@ export const updateOrderStatus = createAsyncThunk(`${appName}/${moduleName}/stat
     }
 });
 
+export const order = {
+    other: {
+        getSummary: createAsyncThunk(`${appName}/${moduleName}/order/other/getSummary`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.other.getSummary(params);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        })
+    }
+}
+
 const initSearchState = {
     cusId: null,
     orderId: '',
@@ -162,6 +177,27 @@ const orderSlice = createSlice({
             }
         },
         [getList.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        /**
+        * @description getEditors
+        */
+        [order.other.getSummary.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [order.other.getSummary.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                summary: payload,
+                error: null
+            }
+        },
+        [order.other.getSummary.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

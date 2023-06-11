@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { keyStore, links } from "../../common";
 import FilterOptionView from "./filterOptionView";
 import reducer from "../../store";
-import { getList as getOrder, resetSearch, setSearch, updateOrderStatus } from "../../store/orderSlice";
+import { getList as getOrder, order, resetSearch, setSearch, updateOrderStatus } from "../../store/orderSlice";
 import clsx from "clsx";
 import { orderStatus } from "../../model/status";
 import OrderDetailContent from "./orderDetail";
@@ -44,18 +44,21 @@ function OrderView() {
     const search = useSelector(store => store[keyStore].order.search)
     const loading = useSelector(store => store[keyStore].order.loading)
     const entities = useSelector(store => store[keyStore].order.entities)
+    const summary = useSelector(store => store[keyStore].order?.summary?.data)
     const params = useParams(), status = parseInt(params.status);
     const [filterOptions, setFilterOptions] = useState(null);
     const [open, setOpen] = useState('');
     const [info, setInfo] = useState(null);
     const totalValues = {
-        0: 90,
-        6: '1000,000',
-        5: 99,
-        4: 98,
-        3: 111,
-        2: 199,
-        1: 299
+        0: summary?.da_huy ? summary?.da_huy?.toLocaleString('en-US') : 0,
+        6: (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)
+            ? (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)?.toLocaleString('en-US')
+            : 0,
+        5: summary?.cho_thanh_toan ? summary?.cho_thanh_toan?.toLocaleString('en-US') : 0,
+        4: summary?.hoan_tat ? summary?.hoan_tat?.toLocaleString('en-US') : 0,
+        3: summary?.da_thanh_toan ? summary?.da_thanh_toan?.toLocaleString('en-US') : 0,
+        2: summary?.da_xac_nhan ? summary?.da_xac_nhan?.toLocaleString('en-US') : 0,
+        1: summary?.da_tao ? summary?.da_tao?.toLocaleString('en-US') : 0
     }
 
     useEffect(() => {
@@ -64,8 +67,10 @@ function OrderView() {
             if (status !== 6)
                 filter.status = status;
             dispatch(getOrder(filter))
+            dispatch(order.other.getSummary())
         }
     }, [dispatch, search, status])
+
 
     const HandleClickDetail = (item) => {
         setInfo(item)

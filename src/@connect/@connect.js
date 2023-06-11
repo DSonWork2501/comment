@@ -75,6 +75,9 @@ export default {
             getDetail: (cusId, orderId) => axios.get(`${baseurl}/order/get-order-detail/${cusId}/${orderId}`),
             insert: entity => axios.post(`${baseurl}/order/insert-order`, entity),
             update: entity => axios.put(`${baseurl}/order/update-order`, entity),
+            other: {
+                getSummary: params => axios.get(`${baseurl}/order/summary-order`, { params }),
+            }
         },
         location: {
             getList: params => axios.get(`${baseurl}/location/get-locations`, { params }),
@@ -90,5 +93,13 @@ export default {
             insert: entity => axios.post(`${baseurl}/contract/insert-cus-contract`, entity),
             update: entity => axios.post(`${baseurl}/contract/update-cus-contract`, entity),
         },
+        productMeta: {
+            meta: {
+                getList: (params) => axios.get(`${baseurl}/product/get-unity`, { params }),
+                create: (data, type) => axios.post(`${baseurl}/product/insert-unity?type=${type}`, data),
+                update: (entity, type) => axios.put(`${baseurl}/product/update-unity?type=${type}`, entity),
+                delete: (data) => axios.delete(`${baseurl}/product/insert-unity`, { data }),
+            }
+        }
     },
 }
