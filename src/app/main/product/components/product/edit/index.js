@@ -18,6 +18,7 @@ import { alertInformation } from "@widgets/functions"
 import * as Yup from 'yup'
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
 import { getOrigin } from "@widgets/store/filtersSlice"
+import { productMeta } from "app/main/product-meta/store"
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
@@ -41,6 +42,8 @@ function EditProduct(props) {
 
     useEffect(() => {
         dispatch(getOrigin());
+        dispatch(productMeta.meta.getList({ type: 2 }))
+        dispatch(productMeta.meta.getList({ type: 4 }))
     }, [dispatch])
 
     useEffect(() => {
@@ -48,9 +51,13 @@ function EditProduct(props) {
     }, [entity])
 
     const handleSaveData = (values) => {
+        let value = { ...values };
+        if (value?.certification)
+            value.certification = value.certification.join(',');
+
         alertInformation({
             text: 'Bạn có muốn lưu thao tác',
-            data: values,
+            data: value,
             confirm: async (data) => {
                 var model = {
                     products: [

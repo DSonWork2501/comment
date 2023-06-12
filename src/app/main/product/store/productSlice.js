@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 import { getErrorMessage } from '@widgets/functions';
+import { productMeta } from 'app/main/product-meta/store';
 
 
 const appName = "products";
@@ -203,7 +204,9 @@ const productSlice = createSlice({
         search: initSearchState,
         color: null,
         size: null,
-        insertPrice: null
+        insertPrice: null,
+        certification: [],
+        madeIn: []
     },
     reducers: {
         /**
@@ -443,6 +446,32 @@ const productSlice = createSlice({
             loading: false,
             error: error
         }),
+
+
+        [productMeta.meta.getList.fulfilled]: (state, { payload, meta }) => {
+            let { arg } = meta;
+            
+            if (arg?.type === 2 && payload?.data)
+                return {
+                    ...state,
+                    loading: false,
+                    certification: payload?.data,
+                    error: null
+                }
+
+            if (arg?.type === 4 && payload?.data)
+                return {
+                    ...state,
+                    loading: false,
+                    madeIn: payload?.data,
+                    error: null
+                }
+            return {
+                ...state,
+                loading: false,
+                error: null
+            }
+        },
     }
 });
 
