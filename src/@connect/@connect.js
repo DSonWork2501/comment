@@ -98,7 +98,7 @@ export default {
                 getList: (params) => axios.get(`${baseurl}/product/get-unity`, { params }),
                 create: (data, type) => axios.post(`${baseurl}/product/insert-unity?type=${type}`, data),
                 update: (entity, type) => axios.put(`${baseurl}/product/update-unity?type=${type}`, entity),
-                delete: (data) => axios.delete(`${baseurl}/product/insert-unity`, { data }),
+                delete: (entity, type) => axios.put(`${baseurl}/product/update-unity?type=${type}`, entity),
             }
         }
     },

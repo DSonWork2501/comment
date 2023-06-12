@@ -51,7 +51,7 @@ export const productMeta = {
         }),
         delete: createAsyncThunk(`${appName}/${moduleName}/productMeta/meta/delete`, async (params, thunkAPI) => {
             try {
-                const response = await connect.live.productMeta.meta.delete(params);
+                const response = await connect.live.productMeta.meta.delete(params.value, params.type);
                 thunkAPI.dispatch(showMessage({ variant: "success", message: "Xóa thành công!" }))
                 return response.data
             } catch (error) {

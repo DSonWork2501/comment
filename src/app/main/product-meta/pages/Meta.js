@@ -164,6 +164,32 @@ function Meta() {
                         setOpenDialog('meta');
                         setDetail(item);
                     }} />
+                <CmsIconButton
+                    tooltip="Xóa"
+                    delay={50}
+                    icon="delete"
+                    className="bg-red-500 text-white shadow-3  hover:bg-red-900"
+                    onClick={
+                        () =>
+                            alertInformation({
+                                text: `Xác nhận thao tác`,
+                                data: { item },
+                                confirm: async () => {
+                                    try {
+                                        const resultAction = await dispatch(productMeta.meta.delete({
+                                            value: [{
+                                                id: item.id,
+                                                status: 0
+                                            }],
+                                            type
+                                        }));
+                                        unwrapResult(resultAction);
+                                        getListTable(search);
+                                    } catch (error) {
+                                    }
+                                }
+                            })
+                    } />
             </div>
         )
     }))
