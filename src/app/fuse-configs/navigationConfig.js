@@ -50,6 +50,14 @@ const navigationConfig = [
 				icon: 'category',
 				url: '/product-category',
 			},
+			{
+				id: 'nvi-manager-meta',
+				title: 'Quản Lý Thuộc Tính Sản Phẩm',
+				translate: 'PRODUCT_META_MANAGEMENT',
+				type: 'item',
+				icon: 'reorder',
+				url: '/product-meta/meta/1',
+			},
 		],
 	},
 	{
