@@ -1,5 +1,5 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup"
-import { CmsFormikAutocomplete, CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/components"
+import { CmsCheckboxGroup, CmsFormikAutocomplete, CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/components"
 import React, { } from "react"
 import MutipleImagePathLink from "../../common/MultipleImagePathLink"
 import noImage from '@widgets/images/noImage.jpg';
@@ -14,6 +14,7 @@ function BasicInfo({ formik, SaveData, options }) {
     const { origins } = options;
     const dispatch = useDispatch()
     const imageLoading = useSelector(store => store[keyStore].product.imgLoading)
+    const { certification, madeIn } = useSelector(store => store[keyStore].product);
 
     const HandleUploadImage = async (file) => {
 
@@ -26,6 +27,10 @@ function BasicInfo({ formik, SaveData, options }) {
         }
     }
 
+    const { values, setFieldValue } = formik;
+    const cerValue = (typeof values.certification !== 'object' || !Array.isArray(values.certification) ? (values?.certification ? values.certification.split(',') : []) : values.certification);
+
+    console.log(madeIn);
     return (
         <FuseAnimateGroup className="flex flex-wrap p-20 overflow-hidden w-full h-full" enter={{ animation: 'transition.slideUpBigIn' }}>
             <div className="w-full space-y-16">
@@ -55,7 +60,35 @@ function BasicInfo({ formik, SaveData, options }) {
                 <CmsFormikTextField size="small" multiline={true} formik={formik} name="description" label="Mô tả" />
                 <CmsFormikTextField size="small" formik={formik} name="unit" label="đơn vị" />
                 <CmsFormikTextField size="small" formik={formik} name="classify" label="phân loại" />
-                <CmsFormikTextField size="small" formik={formik} name="certification" label="chứng nhận" />
+                {/* <CmsFormikTextField size="small" formik={formik} name="certification" label="chứng nhận" /> */}
+
+                <CmsCheckboxGroup
+                    label="Chứng nhận"
+                    className="py-0 m-0 w-full"
+                    name="certification"
+                    onChange={(array) => { setFieldValue('certification', array) }}
+                    vertical={false}
+                    data={certification}
+                    value={cerValue}
+                />
+
+
+                <CmsFormikAutocomplete
+                    name="madeinid"
+                    formik={formik}
+                    label="Xuất sứ"
+                    data={madeIn}
+                    size="small"
+                    autocompleteProps={{
+                        getOptionLabel: (option) => option?.name || '',
+                        ChipProps: {
+                            size: 'small'
+                        },
+                        size: 'small',
+                    }}
+                    setOption={(option) => option?.name || ''}
+                    valueIsId />
+
                 <CmsFormikTextField size="small" formik={formik} name="suggest" label="gợi ý" />
                 <CmsFormikTextField size="small" formik={formik} name="note" label="ghi chú" />
                 <div className="w-full self-center px-224 my-0">
