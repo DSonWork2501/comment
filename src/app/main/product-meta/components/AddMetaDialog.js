@@ -77,6 +77,7 @@ function AddMetaDialog({ type, detail, handleSubmit, handleClose, open, title = 
                         getOptionLabel: (option) => option?.name,
                         size: 'small'
                     }}
+                    disabled
                     data={metaStatus}
                     acceptZero
                     valueIsId

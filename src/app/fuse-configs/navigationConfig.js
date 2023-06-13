@@ -56,7 +56,7 @@ const navigationConfig = [
 				translate: 'PRODUCT_META_MANAGEMENT',
 				type: 'item',
 				icon: 'reorder',
-				url: '/product-meta/meta',
+				url: '/product-meta/meta/1',
 			},
 		],
 	},
