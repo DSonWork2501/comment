@@ -42,8 +42,9 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     }
 
     const HandleAddSlot = (stack_index) => {
-        var array = [...get(formik_shelf.values[stack_index], 'slots').map(x => Object.assign({}, initDetailModelSlot(x))), initDetailModelSlot()]
-        console.log('formik_shelf.values[stack_index].slots', array)
+        const leg = formik_shelf.values[stack_index]?.slots?.length || 0;
+
+        var array = [...get(formik_shelf.values[stack_index], 'slots').map(x => Object.assign({}, initDetailModelSlot(x))), initDetailModelSlot({ name: 'Vị trí ' + (leg + 1) })]
 
         formik_shelf.setFieldValue(`[${stack_index}].slots`, array)
     }

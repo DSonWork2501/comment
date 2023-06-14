@@ -44,6 +44,8 @@ function EditProduct(props) {
         dispatch(getOrigin());
         dispatch(productMeta.meta.getList({ type: 2 }))
         dispatch(productMeta.meta.getList({ type: 4 }))
+        dispatch(productMeta.meta.getList({ type: 3 }))
+        dispatch(productMeta.meta.getList({ type: 5 }))
     }, [dispatch])
 
     useEffect(() => {
@@ -80,9 +82,8 @@ function EditProduct(props) {
                             "discount": parseInt(x.discount) || 0,
                             "vat": parseInt(x.vat) || 0
                         }
-                    ))
-
-
+                    )),
+                    properties: data?.properties
                 }
                 console.log('model', model)
                 params?.id === '0' ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))

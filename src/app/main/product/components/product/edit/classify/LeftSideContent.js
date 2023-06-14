@@ -85,7 +85,7 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
                     <div key={`${index}_div_1_slot`} className={clsx("flex items-center justify-items-start")}>
                         <CmsLabel content={item.name || 'New slot'} key={`${index}_name_slot`} />
                         {/* <CmsLabel content={item.type ? `(${item.type})` : ''} key={`${index}_type_slot`} /> */}
-                        <CmsLabel content={item.capacity ? `Dung tích: ${item.capacity}` : ''} key={`${index}_capacity_slot`} />
+                        {/* <CmsLabel content={item.capacity ? `Dung tích: ${item.capacity}` : ''} key={`${index}_capacity_slot`} /> */}
                     </div>
                 }
 

@@ -25,7 +25,8 @@ const LayoutCustom = styled(Box)({
         background: 'rgb(215 247 250)'
     },
     "& .inner-scroll >div:first-child": {
-        height: 90
+        height: 90,
+        minHeight:'initial'
     }
 });
 
@@ -127,7 +128,7 @@ function OrderView() {
                             isServerSide={true}
                             data={data}
                             search={search}
-                            setSearch={(value) => dispatch(setSearch({ ...search, value }))}
+                            setSearch={(value) => dispatch(setSearch({ ...search, ...value }))}
                             columns={columns}
                             loading={loading}
                             filterOptions={
@@ -140,7 +141,7 @@ function OrderView() {
                                 />
                             }
                             openFilterOptions={Boolean(filterOptions)}
-                            pagination={data?.pagination}
+                            pagination={entities?.pagination}
                         />
                         <OrderDetailContent
                             open={open === 'detail'}

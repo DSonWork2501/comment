@@ -23,7 +23,8 @@ export const initData = (data) => {
         "isfreeship": 0,
         "status": 0,
         "detail": [],
-        "ishs": 0
+        "ishs": 0,
+        "properties": []
     }
 }
 export const initProduct = (data) => {
@@ -131,7 +132,7 @@ export const initDetailModelSlot = (data) => {
             "name": data.name || '',
             "type": data.type || 'slot',
             "active": data.active || 1,
-            "capacity": data.capacity || 0,
+            "capacity": data.capacity || 1,
             "heightlimit": data.heightlimit || 0,
         }
         if (data?.item)
@@ -149,7 +150,7 @@ export const initDetailModelSlot = (data) => {
         "name": "",
         "type": "slot",
         "active": 1,
-        "capacity": 0,
+        "capacity": 1,
         "heightlimit": 0,
     }
 }
