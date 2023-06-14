@@ -46,10 +46,9 @@ const BoxCustom = styled(Box)({
 });
 
 function BasicInfo({ formik, SaveData, options }) {
-    const { origins } = options;
     const dispatch = useDispatch()
     const imageLoading = useSelector(store => store[keyStore].product.imgLoading)
-    const { certification, madeIn, unit, classify } = useSelector(store => store[keyStore].product);
+    const { certification, madeIn, unit, classify,brands } = useSelector(store => store[keyStore].product);
 
     const HandleUploadImage = async (file) => {
 
@@ -77,10 +76,10 @@ function BasicInfo({ formik, SaveData, options }) {
                 {/* <CmsFormikTextField size="small" formik={formik} name="brand" label="thương hiệu" /> */}
 
                 <CmsFormikAutocomplete
-                    name="brand"
+                    name="brandid"
                     formik={formik}
                     label="thương hiệu"
-                    data={origins}
+                    data={brands}
                     size="small"
                     autocompleteProps={{
                         getOptionLabel: (option) => option?.name || '',
@@ -90,14 +89,14 @@ function BasicInfo({ formik, SaveData, options }) {
                         size: 'small',
                     }}
                     setOption={(option) => option?.name || ''}
-                    valueIsId="name" />
+                    valueIsId />
 
                 <CmsFormikTextField size="small" multiline={true} formik={formik} name="description" label="Mô tả" />
                 {/* <CmsFormikTextField size="small" formik={formik} name="unit" label="đơn vị" />
                 <CmsFormikTextField size="small" formik={formik} name="classify" label="phân loại" /> */}
                 {/* <CmsFormikTextField size="small" formik={formik} name="certification" label="chứng nhận" /> */}
                 <CmsFormikAutocomplete
-                    name="unit"
+                    name="unitid"
                     formik={formik}
                     label="Đơn vị"
                     data={unit}
@@ -113,7 +112,7 @@ function BasicInfo({ formik, SaveData, options }) {
                     valueIsId />
 
                 <CmsFormikAutocomplete
-                    name="classify"
+                    name="classifyid"
                     formik={formik}
                     label="Phân loại"
                     data={classify}
@@ -137,7 +136,6 @@ function BasicInfo({ formik, SaveData, options }) {
                     data={certification}
                     value={cerValue}
                 />
-
 
                 <CmsFormikAutocomplete
                     name="madeinid"

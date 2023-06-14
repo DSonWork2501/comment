@@ -42,6 +42,7 @@ function EditProduct(props) {
 
     useEffect(() => {
         dispatch(getOrigin());
+        dispatch(productMeta.meta.getList({ type: 1 }))
         dispatch(productMeta.meta.getList({ type: 2 }))
         dispatch(productMeta.meta.getList({ type: 4 }))
         dispatch(productMeta.meta.getList({ type: 3 }))
@@ -54,7 +55,7 @@ function EditProduct(props) {
 
     const handleSaveData = (values) => {
         let value = { ...values };
-        if (value?.certification)
+        if (value?.certification && Array.isArray(value?.certification))
             value.certification = value.certification.join(',');
 
         alertInformation({
@@ -83,9 +84,9 @@ function EditProduct(props) {
                             "vat": parseInt(x.vat) || 0
                         }
                     )),
-                    properties: data?.properties
+                    properties: data?.properties?.length ? data?.properties.map(val => ({ ...val, sku: data.sku })) : []
                 }
-                console.log('model', model)
+
                 params?.id === '0' ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))
             },
         })

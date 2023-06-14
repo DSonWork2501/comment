@@ -208,7 +208,8 @@ const productSlice = createSlice({
         certification: [],
         madeIn: [],
         classify: [],
-        unit: []
+        unit: [],
+        brands: []
     },
     reducers: {
         /**
@@ -452,7 +453,15 @@ const productSlice = createSlice({
 
         [productMeta.meta.getList.fulfilled]: (state, { payload, meta }) => {
             let { arg } = meta;
-            console.log(arg);
+
+            if (arg?.type === 1 && payload?.data)
+                return {
+                    ...state,
+                    loading: false,
+                    brands: payload?.data,
+                    error: null
+                }
+
             if (arg?.type === 2 && payload?.data)
                 return {
                     ...state,

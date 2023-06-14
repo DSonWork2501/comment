@@ -49,7 +49,11 @@ export const initProduct = (data) => {
             "isfastsale": data.isfastsale,
             "isfreeship": data.isfreeship,
             "status": data.status,
-            "ishs": data.ishs || 0
+            "ishs": data.ishs || 0,
+            unitid: data.unitid || null,
+            classifyid: data.classifyid || null,
+            brandid: data.brandid || null,
+            madeinid: data.madeinid || null,
         }
     }
     return {
@@ -60,7 +64,10 @@ export const initProduct = (data) => {
         "brand": "",
         "description": "",
         "unit": "",
+        unitid: null,
+        brandid: null,
         "classify": "",
+        classifyid: null,
         "certification": "",
         "suggest": "",
         "note": "",
@@ -72,7 +79,8 @@ export const initProduct = (data) => {
         "isfastsale": 0,
         "isfreeship": 0,
         "status": 0,
-        "ishs": 0
+        "ishs": 0,
+        madeinid: null
     }
 }
 
