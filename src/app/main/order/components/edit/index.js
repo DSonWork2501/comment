@@ -38,6 +38,9 @@ function EditOrderContent() {
     useEffect(() => {
         dispatch(getDetail({ cusId, orderId }))
         dispatch(getCustomers())
+        if (cusId && orderId) {
+            setHs(1);
+        }
     }, [dispatch, cusId, orderId])
 
     const handleSaveData = (values) => {
@@ -110,7 +113,11 @@ function EditOrderContent() {
                         </div>
                     </div>
                     <div className="flex items-center justify-end space-x-8">
-                        <CmsButtonProgress label="Lưu" onClick={formik.handleSubmit} loading={loading} />
+                        {
+                            (!Boolean(cusId && orderId))
+                            &&
+                            <CmsButtonProgress label="Lưu" onClick={formik.handleSubmit} loading={loading} />
+                        }
                     </div>
                 </div>
             }

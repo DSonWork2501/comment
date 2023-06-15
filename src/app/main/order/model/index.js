@@ -1,6 +1,6 @@
 export const orderType = {
-    Shipping: { id: 'Shipping', name: 'Shipping' },
-    Shopping: { id: 'Shopping', name: 'Shopping' },
+    Shipping: { id: 'shipping', name: 'Shipping' },
+    Shopping: { id: 'shopping', name: 'Shopping' },
 }
 export const orderPaymentMethod = {
     'COD': { id: 'COD', name: 'COD' },

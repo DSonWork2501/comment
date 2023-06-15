@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 import { getErrorMessage } from '@widgets/functions';
+import { productMeta } from 'app/main/product-meta/store';
 
 
 const appName = "products";
@@ -203,7 +204,12 @@ const productSlice = createSlice({
         search: initSearchState,
         color: null,
         size: null,
-        insertPrice: null
+        insertPrice: null,
+        certification: [],
+        madeIn: [],
+        classify: [],
+        unit: [],
+        brands: []
     },
     reducers: {
         /**
@@ -443,6 +449,58 @@ const productSlice = createSlice({
             loading: false,
             error: error
         }),
+
+
+        [productMeta.meta.getList.fulfilled]: (state, { payload, meta }) => {
+            let { arg } = meta;
+
+            if (arg?.type === 1 && payload?.data)
+                return {
+                    ...state,
+                    loading: false,
+                    brands: payload?.data,
+                    error: null
+                }
+
+            if (arg?.type === 2 && payload?.data)
+                return {
+                    ...state,
+                    loading: false,
+                    certification: payload?.data,
+                    error: null
+                }
+
+            if (arg?.type === 4 && payload?.data)
+                return {
+                    ...state,
+                    loading: false,
+                    madeIn: payload?.data,
+                    error: null
+                }
+
+
+            if (arg?.type === 3 && payload?.data)
+                return {
+                    ...state,
+                    loading: false,
+                    classify: payload?.data,
+                    error: null
+                }
+
+
+            if (arg?.type === 5 && payload?.data)
+                return {
+                    ...state,
+                    loading: false,
+                    unit: payload?.data,
+                    error: null
+                }
+            return {
+                ...state,
+                loading: false,
+                error: null
+            }
+        },
     }
 });
 

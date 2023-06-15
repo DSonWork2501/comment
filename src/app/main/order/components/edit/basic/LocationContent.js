@@ -38,6 +38,7 @@ export default function LocationContent({ formik }) {
         setDistrictIdNhanh(null)
         formik.setFieldValue('customerdistrict', '')
         formik.setFieldValue('customerward', '')
+        console.log(value);
     }
 
     const HandleChangeDistrict = (event, value) => {

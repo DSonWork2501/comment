@@ -23,7 +23,8 @@ export const initData = (data) => {
         "isfreeship": 0,
         "status": 0,
         "detail": [],
-        "ishs": 0
+        "ishs": 0,
+        "properties": []
     }
 }
 export const initProduct = (data) => {
@@ -48,7 +49,11 @@ export const initProduct = (data) => {
             "isfastsale": data.isfastsale,
             "isfreeship": data.isfreeship,
             "status": data.status,
-            "ishs": data.ishs || 0
+            "ishs": data.ishs || 0,
+            unitid: data.unitid || null,
+            classifyid: data.classifyid || null,
+            brandid: data.brandid || null,
+            madeinid: data.madeinid || null,
         }
     }
     return {
@@ -59,7 +64,10 @@ export const initProduct = (data) => {
         "brand": "",
         "description": "",
         "unit": "",
+        unitid: null,
+        brandid: null,
         "classify": "",
+        classifyid: null,
         "certification": "",
         "suggest": "",
         "note": "",
@@ -71,7 +79,8 @@ export const initProduct = (data) => {
         "isfastsale": 0,
         "isfreeship": 0,
         "status": 0,
-        "ishs": 0
+        "ishs": 0,
+        madeinid: null
     }
 }
 
@@ -131,7 +140,7 @@ export const initDetailModelSlot = (data) => {
             "name": data.name || '',
             "type": data.type || 'slot',
             "active": data.active || 1,
-            "capacity": data.capacity || 0,
+            "capacity": data.capacity || 1,
             "heightlimit": data.heightlimit || 0,
         }
         if (data?.item)
@@ -149,7 +158,7 @@ export const initDetailModelSlot = (data) => {
         "name": "",
         "type": "slot",
         "active": 1,
-        "capacity": 0,
+        "capacity": 1,
         "heightlimit": 0,
     }
 }

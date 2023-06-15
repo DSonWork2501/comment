@@ -126,18 +126,46 @@ function ShelfDetailContent({ open, handleClose, detail }) {
     const dispatch = useDispatch();
 
     const handleDownloadAll = () => {
+        let listQR = "";
         for (let index = 0; index < entities?.data?.length; index++) {
             const slots = entities?.data[index].slots;
             for (let i = 0; i < slots?.length; i++) {
                 const item = slots[i].item;
                 if (item.qrcode) {
-                    var a = document.createElement("a"); //Create <a>
-                    a.href = `data:image/png;base64, ${item.qrcode}`; //Image Base64 Goes here
-                    a.download = `${item.name}_${item.uniqueid?.replace('.', '_')}.png`; //File name Here
-                    a.click(); //Downloaded file
+                    // var a = document.createElement("a"); //Create <a>
+                    // a.href = `data:image/png;base64, ${item.qrcode}`; //Image Base64 Goes here
+                    // a.download = `${item.name}_${item.uniqueid?.replace('.', '_')}.png`; //File name Here
+                    // a.click(); //Downloaded file
+
+                    listQR = listQR + `<div style="width:100%;height:100%">
+                        <H2 style="text-align:center">${item.name}</H2>
+                        <img style="width:100%;margin:auto" src="data:image/png;base64,${item.qrcode}" alt="QR Code">
+                    </div>`;
                 }
             }
         }
+        // var qrImage = new Image();
+
+        // qrImage.src = `data:image/png;base64, ${qrcode}`;
+
+        // qrImage.onload = function () {
+        var printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        printWindow.document.write(`<html>
+                <head>
+                <title>QrCodeList</title>
+                </head>
+                <body style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;height:100%">
+                    ${listQR}
+                </body>
+            </html>`);
+        printWindow.document.close();
+
+        printWindow.onload = function () {
+            printWindow.print();
+            printWindow.close();
+        };
+        //};
     }
 
     const handleChooseUniqueID = ({ value, oldValue, setChosenSku }) => {
@@ -202,7 +230,7 @@ function ShelfDetailContent({ open, handleClose, detail }) {
                     ? <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }} className="w-full">
                         <div className="w-full space-y-4">
                             <div className="text-right">
-                                {entities?.data.length > 0 && <CmsButton className="" variant="outlined" size="small" label="Tải All" component={Link} onClick={() => handleDownloadAll()} />}
+                                {entities?.data.length > 0 && <CmsButton className="" variant="outlined" size="small" label="Print All" component={Link} onClick={() => handleDownloadAll()} />}
                             </div>
                             {entities?.data?.length > 0 ? entities?.data?.map((item, index) => (
                                 <DetailModelContent

@@ -12,6 +12,7 @@ import { useState } from "react";
 import LisProductContent from './detail/ListProduct'
 import { keyStore } from "../../common";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const columns = [
@@ -80,6 +81,10 @@ export default function DetailProductContent({ formik }) {
         if (value.ishs === 1)
             setShowTb(false);
     }
+
+    useEffect(() => {
+        setShowTb(false)
+    }, [hs])
 
     const handleCloseDialog = (crModal, product) => {
         const data = {
