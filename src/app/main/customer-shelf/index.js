@@ -13,7 +13,8 @@ import GenFilterOptionContent from './components/index/GenFilterOption'
 import { LabelInfo } from "@widgets/components/common/LabelInfo";
 import ShelfDetailContent from "./components/detail/ShelfDetail";
 import { CustomerProductType } from "./model/CustomerProductType";
-import { Link } from "@material-ui/core";
+import { Link } from 'react-router-dom';
+import { useParams } from "react-router";
 
 
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
@@ -23,12 +24,14 @@ function CustomerShelfContent() {
     const entities = useSelector(store => store[keyStore]?.cusShelf?.entities)
     const loading = useSelector(store => store[keyStore]?.cusShelf?.loading)
     const search = useSelector(store => store[keyStore]?.cusShelf?.search)
+    const params = useParams(), type = parseInt(params.type);
     const [detail, setDetail] = useState(null);
     const [open, setOpen] = useState('')
 
     useEffect(() => {
-        dispatch(getShelf(search))
-    }, [search, dispatch])
+        if (type)
+            dispatch(getShelf({ ...search, Type: Object.values(CustomerProductType).find(val => val.rawID === type)?.id }))
+    }, [search, type, dispatch])
 
     const handleShowDetail = useCallback((cusid, id) => {
         setOpen('detail')
@@ -41,8 +44,6 @@ function CustomerShelfContent() {
         a.download = `${name}_${uniqueid?.replace('.', '_')}.png`; //File name Here
         a.click(); //
     }, [])
-
-
 
     const data = useMemo(() =>
         entities?.data?.map((x, index) => ({
@@ -57,11 +58,28 @@ function CustomerShelfContent() {
                     {x.qrcode && <CmsButton className="text-center" variant="outlined" size="small" label="tải về" component={Link} onClick={() => handleDownloadQRCode(x)} />}
                 </div>,
             image: <img alt={`image_${index}`} src={x.img ? `${baseurl}${x.img}` : noImage} className="h-64" />,
-            action: <div>
-                {x.type === "household" && <CmsIconButton icon="info" onClick={() => {
-                    handleShowDetail(x.cusid, x.id);
-                    setDetail(x);
-                }} tooltip={'chi tiết'} />}
+            action: <div className="flex space-x-3 ">
+                {x.type === "household" &&
+                    <>
+                        <CmsIconButton
+                            tooltip="Chi tiết"
+                            delay={50}
+                            icon="visibility"
+                            className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
+                            onClick={() => {
+                                handleShowDetail(x.cusid, x.id);
+                                setDetail(x);
+                            }} />
+                        <CmsIconButton
+                            tooltip="Chi tiết đơn hàng"
+                            delay={50}
+                            icon="format_list_bulleted"
+                            className="bg-green-500 text-white shadow-3  hover:bg-green-900"
+                            component={Link}
+                            to={`/order/edit/${x.cusid}/${x.id}`} />
+                    </>
+                }
+
             </div>
         })) || []
         , [entities, handleShowDetail, handleDownloadQRCode])

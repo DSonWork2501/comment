@@ -7,7 +7,7 @@ const CustomerShelfConfig = {
 	// auth: authRoles.onlyGuest,
 	routes: [
 		{
-			path: '/customer-shelf',
+			path: '/customer-shelf/:type',
 			exact: true,
 			component: React.lazy(() => import('./index'))
 		},

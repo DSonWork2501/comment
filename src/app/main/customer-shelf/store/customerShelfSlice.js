@@ -44,7 +44,17 @@ export const customerShelf = {
                 thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
                 return (thunkAPI.rejectWithValue(error))
             }
-        })
+        }),
+        getSummary: createAsyncThunk(`${appName}/${moduleName}/customerShelf/other/getSummary`, async (params, thunkAPI) => {
+            try {
+                const response = await Connect.live.customer.other.getSummary(params);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     }
 }
 
@@ -65,6 +75,7 @@ const customerShelfSlice = createSlice({
         selected: null,
         response: null,
         search: initSearchState,
+        summary: null
         // hsLoading: false,
         // hsEntities: null,
     },
@@ -138,6 +149,26 @@ const customerShelfSlice = createSlice({
             loading: false,
             error: error
         }),
+
+        [customerShelf.other.getSummary.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [customerShelf.other.getSummary.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                summary: payload,
+                error: null
+            }
+        },
+        [customerShelf.other.getSummary.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+
         /**
          * @description getWines
          */

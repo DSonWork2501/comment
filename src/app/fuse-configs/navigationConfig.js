@@ -108,7 +108,7 @@ const navigationConfig = [
 				translate: 'CUSTOM_SHELF',
 				type: 'item',
 				icon: 'call_to_action',
-				url: '/customer-shelf',
+				url: '/customer-shelf/1',
 			},
 		],
 	},
