@@ -64,7 +64,7 @@ export default {
         customer: {
             other: {
                 reOrder: entity => axios.post(`${baseurl}/order/re-order`, entity),
-                getSummary:params => axios.get(`${baseurl}/order/summary-order`, { params }),
+                getSummary:params => axios.get(`${baseurl}/customer/summary-cus-hs`, { params }),
             },
             getList: params => axios.get(`${baseurl}/customer/get-customer`, { params }),
             insert: entity => axios.post(`${baseurl}/customer/insert-customer`, entity),
