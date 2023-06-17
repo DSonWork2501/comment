@@ -17,7 +17,7 @@ import clsx from 'clsx'
  * @param onRequestSort func
  */
 function TableHeaderBasic(props) {
-	const { columns, order, onRequestSort, onOffHover, numSelected, rowCount, onSelectAllClick, isMultiSelect, isCollapsible } = props;
+	const { columns, order, onRequestSort, onOffHover, numSelected, rowCount, onSelectAllClick, isMultiSelect, isCollapsible, upperHead } = props;
 	const { t } = useTranslation('UserMngPage');
 
 	/**
@@ -29,6 +29,7 @@ function TableHeaderBasic(props) {
 
 	return (
 		<TableHead onMouseOver={() => { onOffHover() }}>
+			{upperHead}
 			<TableRow key="tr_thead" className="h-36">
 				{isCollapsible && (
 					<TableCell key="collapse_th"></TableCell>

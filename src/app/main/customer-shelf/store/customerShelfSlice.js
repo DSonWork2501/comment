@@ -159,7 +159,7 @@ const customerShelfSlice = createSlice({
             return {
                 ...state,
                 loading: false,
-                summary: payload,
+                summary: payload?.data,
                 error: null
             }
         },

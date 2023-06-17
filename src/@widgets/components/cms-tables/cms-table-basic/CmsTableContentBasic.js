@@ -63,7 +63,8 @@ function TableContentBasic(props) {
 		panigationDefault,
 		isFuseScrollbars,
 		isColorSelectRow,
-		isSelectOnClickRow
+		isSelectOnClickRow,
+		upperHead
 	} = props;
 	const [hover, setHover] = useState(null)
 	const [page, setPage] = useState(panigationDefault?.page || 0);
@@ -275,6 +276,7 @@ function TableContentBasic(props) {
 					onSelectAllClick={handleSelectAllClick}
 					isMultiSelect={isMultiSelect}
 					isCollapsible={isCollapsible}
+					upperHead={upperHead}
 				/>
 				{data.length > 0 && <TableBody>{genTableCell()}</TableBody>}
 				{footerData && <TableFooter>{genTableFooterCell()}</TableFooter>}
