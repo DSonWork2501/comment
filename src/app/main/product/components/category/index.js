@@ -106,7 +106,35 @@ function CategoryView() {
             }
             content={
                 <div className="w-full h-full">
-                    <CmsTableBasic
+                    <div className="flex space-x-8 px-8 pt-8">
+                        {
+                            entities?.data?.length && entities?.data.map(val => (
+                                <div className="w-1/4">
+                                    <div className="item">
+                                        <img src="https://drinksretailingnews.co.uk/files/TWEUWM0002_WB_1080x1080px_V2.jpg" />
+                                        <div>
+                                            <b>
+                                                Tên:
+                                            </b>
+                                            {val.name}
+                                        </div>
+                                        <div>
+                                            <b>
+                                                Loại:
+                                            </b>
+                                            {
+                                                val.type === 1 && "Home subcription"
+                                            }
+                                            {
+                                                val.type === 0 && "Thường"
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                    {/* <CmsTableBasic
                         className="w-full h-full"
                         isServerSide={true}
                         data={data}
@@ -123,7 +151,7 @@ function CategoryView() {
                             />
                         }
                         openFilterOptions={Boolean(filterOptions)}
-                    />
+                    /> */}
                     <EditCateContent
                         id={editId}
                         open={open === 'edit'}

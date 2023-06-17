@@ -57,6 +57,7 @@ export default {
             insert: entity => axios.post(`${baseurl}/product/insert-category`, entity),
             update: entity => axios.put(`${baseurl}/product/update-category`, entity),
             changeStatus: entity => axios.put(`${baseurl}/product/delete-category`, entity),
+            uploadImage: (entity) => axios.post(`${baseurl}/product/upload-image-cate`, entity, { headers: { 'Content-Type': 'multipart/form-data' } }),
         },
         account: {
             getList: params => axios.get(`${baseurl}/customer/get-account`, { params }),
