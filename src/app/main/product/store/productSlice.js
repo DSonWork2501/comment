@@ -174,7 +174,7 @@ export const insertProPrice = createAsyncThunk(`${appName}/${moduleName}/insertP
     }
 });
 
-const initSearchState = {
+export const initSearchState = {
     search: '',
     cate: '',
     branch: '',

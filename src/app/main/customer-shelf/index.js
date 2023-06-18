@@ -15,7 +15,7 @@ import ShelfDetailContent from "./components/detail/ShelfDetail";
 import { CustomerProductType } from "./model/CustomerProductType";
 import { Link } from 'react-router-dom';
 import { useParams } from "react-router";
-import { Box, TableCell, TableRow, styled } from "@material-ui/core";
+import { Box, Chip, TableCell, TableRow, styled } from "@material-ui/core";
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -36,6 +36,7 @@ function CustomerShelfContent() {
     const loading = useSelector(store => store[keyStore]?.cusShelf?.loading)
     const search = useSelector(store => store[keyStore]?.cusShelf?.search)
     const summary = useSelector(store => store[keyStore]?.cusShelf?.summary)
+    const summaryHousehold = useSelector(store => store[keyStore]?.cusShelf?.summaryHousehold)
     const params = useParams(), type = parseInt(params.type);
     const [detail, setDetail] = useState(null);
     const [open, setOpen] = useState('')
@@ -44,6 +45,8 @@ function CustomerShelfContent() {
         if (type)
             dispatch(getShelf({ ...search, Type: Object.values(CustomerProductType).find(val => val.rawID === type)?.id }))
         if (type === 1)
+            dispatch(customerShelf.other.getSummaryHousehold());
+        if (type === 2)
             dispatch(customerShelf.other.getSummary());
     }, [search, type, dispatch])
 
@@ -66,6 +69,11 @@ function CustomerShelfContent() {
                 <LabelInfo label={{ content: 'SKU' }} info={{ content: x.sku }} />
                 <LabelInfo label={{ content: 'Unique ID' }} info={{ content: x.uniqueid }} />
             </div>,
+            isexpire: (
+                x.isexpire === 1 && <Chip label="Đang sử dụng" className="bg-green-400 text-white" />,
+                x.isexpire === 2 && <Chip label="Sắp hết hạn" className="bg-orange-400 text-white" />,
+                x.isexpire === 3 && <Chip label="Hết hạn" className="bg-red-400 text-white" />
+            ),
             qrcode:
                 <div className="space-y-4 w-60">
                     <img alt={`image_${index}`} src={x.qrcode ? `data:image/png;base64, ${x.qrcode}` : noImage} className="text-center" />
@@ -103,6 +111,7 @@ function CustomerShelfContent() {
         new initColumn({ field: "info", style: { top: type === 1 ? 78 : 0 }, label: "Thông tin", alignHeader: "left", alignValue: "left", sortable: false }),
         new initColumn({ field: "name", style: { top: type === 1 ? 78 : 0 }, label: "Tên sản phẩm", alignHeader: "left", alignValue: "left", sortable: false }),
         new initColumn({ field: "cusname", style: { top: type === 1 ? 78 : 0 }, label: "Tên khách hàng", alignHeader: "left", alignValue: "left", sortable: false }),
+        type === 1 && new initColumn({ field: "isexpire", style: { top: type === 1 ? 78 : 0 }, label: "Trạng thái hợp đồng", alignHeader: "center", alignValue: "center", sortable: false }),
         CustomerProductType['wine'].id === search.Type && new initColumn({ field: "qrcode", label: "QRCode", alignHeader: "left", alignValue: "left", sortable: false }),
         new initColumn({ field: "image", style: { top: type === 1 ? 78 : 0 }, label: "Hình ảnh", alignHeader: "left", alignValue: "left", sortable: false }),
     ]
@@ -114,11 +123,6 @@ function CustomerShelfContent() {
                 subTitle={'Quản lý thông tin sản phâm của khách hàng'}
                 icon="whatshot"
                 // leftBottomHeader={leftBottomHeader}
-                rightHeaderButton={
-                    <div>
-
-                    </div>
-                }
                 content={
                     <>
                         <CmsTableBasic
@@ -131,46 +135,93 @@ function CustomerShelfContent() {
                             loading={loading}
                             pagination={data?.pagination}
                             upperHead={
-                                type === 1
-                                &&
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={5}
-                                    >
-                                        <div className="flex space-x-32 px-20">
-                                            <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">
-                                                CHƯA SỬ DỤNG:
-                                                <span>
-                                                    {
-                                                        summary?.chua_su_dung
-                                                            ? summary?.chua_su_dung.toLocaleString('en-US')
-                                                            : 0
-                                                    }
-                                                </span>
-                                            </div>
-                                            <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">
-                                                ĐÃ NẠP LẠI:
-                                                <span>
-                                                    {
-                                                        summary?.da_nap_lai
-                                                            ? summary?.da_nap_lai.toLocaleString('en-US')
-                                                            : 0
-                                                    }
-                                                </span>
-                                            </div>
-                                            <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">
-                                                ĐÃ UỐNG:
-                                                <span>
-                                                    {
-                                                        summary?.da_uong
-                                                            ? summary?.da_uong.toLocaleString('en-US')
-                                                            : 0
-                                                    }
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
+                                <>
+                                    {
+                                        type === 2
+                                        &&
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={5}
+                                            >
+                                                <div className="flex space-x-32 px-20">
+                                                    <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">
+                                                        CHƯA SỬ DỤNG:
+                                                        <span>
+                                                            {
+                                                                summary?.chua_su_dung
+                                                                    ? summary?.chua_su_dung.toLocaleString('en-US')
+                                                                    : 0
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">
+                                                        ĐÃ NẠP LẠI:
+                                                        <span>
+                                                            {
+                                                                summary?.da_nap_lai
+                                                                    ? summary?.da_nap_lai.toLocaleString('en-US')
+                                                                    : 0
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">
+                                                        ĐÃ UỐNG:
+                                                        <span>
+                                                            {
+                                                                summary?.da_uong
+                                                                    ? summary?.da_uong.toLocaleString('en-US')
+                                                                    : 0
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    }
+
+                                    {
+                                        type === 1
+                                        &&
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={6}
+                                            >
+                                                <div className="flex space-x-32 px-20">
+                                                    <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">
+                                                        ĐANG SỬ DỤNG:
+                                                        <span>
+                                                            {
+                                                                summaryHousehold?.dang_su_dung
+                                                                    ? summaryHousehold?.dang_su_dung.toLocaleString('en-US')
+                                                                    : 0
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">
+                                                        HẾT HẠN HĐ:
+                                                        <span>
+                                                            {
+                                                                summaryHousehold?.het_han_hd
+                                                                    ? summaryHousehold?.het_han_hd.toLocaleString('en-US')
+                                                                    : 0
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">
+                                                        SẮP HẾT HẠN:
+                                                        <span>
+                                                            {
+                                                                summaryHousehold?.sap_het_han
+                                                                    ? summaryHousehold?.sap_het_han.toLocaleString('en-US')
+                                                                    : 0
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    }
+                                </>
                             }
                         />
                         {open === 'detail' &&

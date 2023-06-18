@@ -40,15 +40,13 @@ function EditCateContent({ id, open, handleClose, handleSave }) {
         handleClose && handleClose()
     }
 
-    console.log(entity);
-
     useEffect(() => {
         return () => {
             dispatch(setStateRedux({
                 entity: null
             }))
         }
-    }, [])
+    }, [dispatch])
 
     const formik = useFormik({
         initialValues: initData(id, entity),

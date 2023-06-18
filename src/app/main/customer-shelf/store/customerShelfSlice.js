@@ -55,6 +55,16 @@ export const customerShelf = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        getSummaryHousehold: createAsyncThunk(`${appName}/${moduleName}/customerShelf/other/getSummaryHousehold`, async (params, thunkAPI) => {
+            try {
+                const response = await Connect.live.customer.other.getSummaryHousehold(params);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     }
 }
 
@@ -75,7 +85,8 @@ const customerShelfSlice = createSlice({
         selected: null,
         response: null,
         search: initSearchState,
-        summary: null
+        summary: null,
+        summaryHousehold: null
         // hsLoading: false,
         // hsEntities: null,
     },
@@ -164,6 +175,25 @@ const customerShelfSlice = createSlice({
             }
         },
         [customerShelf.other.getSummary.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+
+        [customerShelf.other.getSummaryHousehold.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [customerShelf.other.getSummaryHousehold.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                summaryHousehold: payload?.data,
+                error: null
+            }
+        },
+        [customerShelf.other.getSummaryHousehold.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

@@ -1,18 +1,17 @@
-import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsLabel, CmsTableBasic } from "@widgets/components";
+import { CmsButton, CmsCardedPage, CmsFormikTextField, CmsIconButton, CmsLabel, CmsTableBasic } from "@widgets/components";
 import { initColumn } from "@widgets/functions";
-import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
-import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect } from "react";
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
-import FilterOptionView from "./filterOptionView";
 import reducer from "../../store";
-import { getList as getProduct, resetSearch, setSearch } from "../../store/productSlice";
-import { getList as getCategory } from "../../store/categorySlice";
+import { getList as getProduct, initSearchState, setSearch, setStateRedux } from "../../store/productSlice";
 import History from "@history";
+import { useLocation, useParams } from "react-router";
+import { useFormik } from "formik";
+import { Button, Icon } from "@material-ui/core";
+import { Link } from 'react-router-dom';
 
 const columns = [
     new initColumn({ field: "sku", label: "SKU", alignHeader: "left", alignValue: "left", sortable: false }),
@@ -23,12 +22,69 @@ const columns = [
     new initColumn({ field: "price", label: "Giá", alignHeader: "center", alignValue: "center", sortable: false }),
 ]
 
+const Filter = ({ onSearch, search }) => {
+
+    const formik = useFormik({
+        initialValues: search,
+        onSubmit: handleSubmit
+    })
+
+    function handleSubmit(value) {
+        let values = { ...value };
+        onSearch(values);
+    }
+
+    return <form onSubmit={formik.handleSubmit} className="flex items-center justify-items-start w-1/4 space-x-8 px-8" >
+        <CmsFormikTextField
+            label={`Tên sản phẩm`}
+            name="search"
+            className="my-8"
+            size="small"
+            clearBlur
+            formik={formik} />
+        <Button
+            style={{
+                background: '#FF6231',
+                color: 'white',
+                height: 36,
+                position: 'relative',
+                top: -1,
+                paddingTop: 8
+            }}
+            size='small'
+            variant="contained"
+            type='submit'
+        >
+            <Icon>
+                search
+            </Icon>
+        </Button>
+        <Button
+            style={{
+                color: 'black',
+                height: 36,
+                position: 'relative',
+                top: -1,
+                paddingTop: 8
+            }}
+            size='small'
+            variant="contained"
+            type='submit'
+            onClick={() => formik.handleReset()}
+        >
+            <Icon>
+                refresh
+            </Icon>
+        </Button>
+    </form>
+}
+
 function ProductList() {
     const dispatch = useDispatch()
     const search = useSelector(store => store[keyStore].product.search)
     const loading = useSelector(store => store[keyStore].product.loading)
     const entities = useSelector(store => store[keyStore].product.entities)
-    const [filterOptions, setFilterOptions] = useState(null);
+    const location = useLocation(), params = useParams(), id = params.id;
 
     const JsonParseString = (str) => {
         try {
@@ -39,12 +95,18 @@ function ProductList() {
     }
 
     useEffect(() => {
-        dispatch(getProduct(search))
-    }, [dispatch, search])
+        return () => {
+            dispatch(setStateRedux({
+                search: initSearchState,
+                entities: null
+            }));
+        }
+    }, [dispatch])
 
     useEffect(() => {
-        dispatch(getCategory())
-    }, [dispatch])
+        if (id)
+            dispatch(getProduct({ ...search, cate: id }))
+    }, [dispatch, search, id])
 
     const data = useMemo(() => entities?.data?.map(item => ({
         id: item.id,
@@ -72,7 +134,17 @@ function ProductList() {
             subTitle={'Quản lý thông tin sản phẩm'}
             icon="whatshot"
             rightHeaderButton={
-                <div>
+                <div className="flex items-center space-x-4">
+                    <CmsButton
+                        label={"Trở về"}
+                        variant="text"
+                        color="default"
+                        component={Link}
+                        to={location?.state?.prevPath
+                            ? location?.state?.prevPath
+                            : '/product-category'}
+                        className="mx-2 flex-none"
+                        startIcon="arrow_back" />
                 </div>
             }
             content={
@@ -86,6 +158,16 @@ function ProductList() {
                     setSearch={(value) => dispatch(setSearch({ ...search, ...value }))}
                     pagination={entities?.pagination}
                 />
+            }
+            toolbar={
+                <>
+                    <div className='flex justify-between w-full items-center'>
+                        <Filter
+                            onSearch={(value) => dispatch(setSearch({ ...search, ...value }))}
+                            search={search}
+                        />
+                    </div>
+                </>
             }
         />
     )
