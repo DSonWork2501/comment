@@ -57,6 +57,7 @@ export default {
             insert: entity => axios.post(`${baseurl}/product/insert-category`, entity),
             update: entity => axios.put(`${baseurl}/product/update-category`, entity),
             changeStatus: entity => axios.put(`${baseurl}/product/delete-category`, entity),
+            uploadImage: (entity) => axios.post(`${baseurl}/product/upload-image-cate`, entity, { headers: { 'Content-Type': 'multipart/form-data' } }),
         },
         account: {
             getList: params => axios.get(`${baseurl}/customer/get-account`, { params }),
@@ -64,7 +65,8 @@ export default {
         customer: {
             other: {
                 reOrder: entity => axios.post(`${baseurl}/order/re-order`, entity),
-                getSummary:params => axios.get(`${baseurl}/customer/summary-cus-hs`, { params }),
+                getSummary: params => axios.get(`${baseurl}/customer/summary-cus-hs`, { params }),
+                getSummaryHousehold: params => axios.get(`${baseurl}/customer/summary-household-cus-hs`, { params }),
             },
             getList: params => axios.get(`${baseurl}/customer/get-customer`, { params }),
             insert: entity => axios.post(`${baseurl}/customer/insert-customer`, entity),

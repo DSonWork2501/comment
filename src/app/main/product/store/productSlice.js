@@ -174,7 +174,7 @@ export const insertProPrice = createAsyncThunk(`${appName}/${moduleName}/insertP
     }
 });
 
-const initSearchState = {
+export const initSearchState = {
     search: '',
     cate: '',
     branch: '',
@@ -257,6 +257,15 @@ const productSlice = createSlice({
                     isEdit: payload
                 }
             }
+        },
+
+        setStateRedux: {
+            reducer: (state, { payload }) => {
+                return {
+                    ...state,
+                    ...payload
+                }
+            },
         },
     },
     extraReducers: {
@@ -504,6 +513,6 @@ const productSlice = createSlice({
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setIsEdit } = productSlice.actions;
+export const { setSelected, setSearch, resetSearch, setIsEdit, setStateRedux } = productSlice.actions;
 
 export default productSlice.reducer;

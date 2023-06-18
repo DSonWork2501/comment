@@ -1,32 +1,18 @@
-import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTableBasic, CmsLabel } from "@widgets/components";
-import { alertInformation, initColumn } from "@widgets/functions";
+import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton } from "@widgets/components";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
-import FilterOptionView from "./filterOptionView";
 import reducer from "../../store";
-import { changeStatus, editCate, getById, getList as getCategory, resetSearch, setSearch } from "../../store/categorySlice";
-import { status, type as CateType } from "../../model/category/Type";
-import { get } from "lodash";
-import { useCallback } from "react";
+import { editCate, getById, getList as getCategory } from "../../store/categorySlice";
 import EditCateContent from "./edit";
-
-const columns = [
-    new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "name", label: "Tên Danh Mục", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "type", label: "Loại", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "status", label: "Trạng thái", alignHeader: "left", alignValue: "left", sortable: false }),
-]
+import { Link } from 'react-router-dom';
 
 function CategoryView() {
     const dispatch = useDispatch()
     const search = useSelector(store => store[keyStore].category.search)
-    const loading = useSelector(store => store[keyStore].category.loading)
     const entities = useSelector(store => store[keyStore].category.entities)
     const [filterOptions, setFilterOptions] = useState(null);
     const [open, setOpen] = useState(null);
@@ -36,43 +22,20 @@ function CategoryView() {
         dispatch(getCategory(search))
     }, [dispatch, search])
 
-    const HandleGetInfoCate = useCallback((id) => {
-        dispatch(getById(id))
-        setOpen('edit')
-        setEditId(id)
-    }, [dispatch])
+    // const HandleChangeStatus = useCallback((status, item) => {
+    //     alertInformation({
+    //         text: `Bạn có muốn ${status === 1 ? 'BẬT' : 'TẮT'} trạng thái thể loại ?`,
+    //         data: [
+    //             {
+    //                 ...item, status: status
+    //             }
+    //         ],
+    //         confirm: (data) => {
+    //             dispatch(changeStatus(data))
+    //         }
+    //     })
+    // }, [dispatch]);
 
-    const HandleChangeStatus = useCallback((status, item) => {
-        alertInformation({
-            text: `Bạn có muốn ${status === 1 ? 'BẬT' : 'TẮT'} trạng thái thể loại ?`,
-            data: [
-                {
-                    ...item, status: status
-                }
-            ],
-            confirm: (data) => {
-                dispatch(changeStatus(data))
-            }
-        })
-    }, [dispatch]);
-
-    const data = useMemo(() => entities?.data?.map(item => ({
-        id: item.id,
-        name: item.name,
-        type: !isNaN(parseInt(item.type)) ? get(CateType.find(x => x.id === item.type), 'name') || '' : '',
-        status: <CmsLabel component={'span'} content={status[item.status].name} className={status[item.status].className} />,
-        action: (
-            <div className="flex flex-row space-x-8">
-                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => HandleGetInfoCate(item.id)} />
-                {
-                    item.status === 1 ?
-                        <CmsIconButton tooltip={'Tắt thể loại'} icon="close" className="bg-red-500 hover:bg-red-700 hover:shadow-2 text-white" onClick={() => HandleChangeStatus(0, item)} />
-                        :
-                        <CmsIconButton tooltip={'Hiện thể loại'} icon="check_circle" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => HandleChangeStatus(1, item)} />
-                }
-            </div>
-        ) || []
-    })), [entities, HandleGetInfoCate, HandleChangeStatus])
 
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
@@ -91,12 +54,11 @@ function CategoryView() {
         dispatch(getCategory(search))
     };
 
-    // console.log('filterOptions', filterOptions)
 
     return (
         <CmsCardedPage
-            title={'Danh sách sản phẩm'}
-            subTitle={'Quản lý thông tin sản phẩm'}
+            title={'Quản lý danh mục'}
+            subTitle={'Quản lý danh mục'}
             icon="whatshot"
             // leftBottomHeader={leftBottomHeader}
             rightHeaderButton={
@@ -105,8 +67,57 @@ function CategoryView() {
                 </div>
             }
             content={
-                <div className="w-full h-full">
-                    <CmsTableBasic
+                <div className="w-full h-full overflow-x-hidden">
+                    <div className="flex  px-8 pt-8 -mx-8 flex-wrap">
+                        {
+                            entities?.data?.length && entities?.data.map(val => (
+                                <div className="lg:w-1/5 md:w-1/4 sm:w-1/2 w-full p-8" key={val.id}>
+                                    <div className="item shadow-4 rounded-8 p-8 relative">
+                                        <img className="object-contain h-256 m-auto" src={`${process.env.REACT_APP_BASE_URL_IMG}${val.image}`} alt="imageProduct" />
+                                        <div>
+                                            <b>
+                                                Tên:
+                                            </b>
+                                            {val.name}
+                                        </div>
+                                        <div>
+                                            <b>
+                                                Loại:
+                                            </b>
+                                            {
+                                                val.type === 1 && "Home subcription"
+                                            }
+                                            {
+                                                val.type === 0 && "Thường"
+                                            }
+                                        </div>
+                                        <div className="flex absolute flex-col-reverse top-8 right-8">
+                                            <CmsIconButton
+                                                tooltip="Chỉnh sửa"
+                                                delay={50}
+                                                icon="edit"
+                                                onClick={() => {
+                                                    dispatch(getById(val.id))
+                                                    setOpen('edit')
+                                                    setEditId(val.id)
+                                                }}
+                                                className="bg-green-500 text-white shadow-3  hover:bg-green-900 opacity-0"
+                                            />
+                                            <CmsIconButton
+                                                tooltip="Danh sách sản phẩm"
+                                                delay={50}
+                                                icon="format_list_numbered"
+                                                className="bg-blue-500 text-white shadow-3  hover:bg-blue-900 mb-4 opacity-0"
+                                                component={Link}
+                                                to={`/product-category/${val.id}`}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                    {/* <CmsTableBasic
                         className="w-full h-full"
                         isServerSide={true}
                         data={data}
@@ -123,13 +134,16 @@ function CategoryView() {
                             />
                         }
                         openFilterOptions={Boolean(filterOptions)}
-                    />
-                    <EditCateContent
-                        id={editId}
-                        open={open === 'edit'}
-                        handleClose={() => setOpen('')}
-                        handleSave={HandleSaveData}
-                    />
+                    /> */}
+                    {
+                        open === 'edit' &&
+                        <EditCateContent
+                            id={editId}
+                            open={open === 'edit'}
+                            handleClose={() => setOpen('')}
+                            handleSave={HandleSaveData}
+                        />
+                    }
                 </div>
             }
             toolbar={
