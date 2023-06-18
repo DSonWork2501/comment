@@ -135,6 +135,14 @@ const categorySlice = createSlice({
                 }
             }
         },
+        setStateRedux: {
+            reducer: (state, { payload }) => {
+                return {
+                    ...state,
+                    ...payload
+                }
+            },
+        },
     },
     extraReducers: {
         /**
@@ -224,6 +232,6 @@ const categorySlice = createSlice({
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setIsEdit } = categorySlice.actions;
+export const { setSelected, setSearch, resetSearch, setIsEdit, setStateRedux } = categorySlice.actions;
 
 export default categorySlice.reducer;

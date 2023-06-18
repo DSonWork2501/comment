@@ -258,6 +258,15 @@ const productSlice = createSlice({
                 }
             }
         },
+
+        setStateRedux: {
+            reducer: (state, { payload }) => {
+                return {
+                    ...state,
+                    ...payload
+                }
+            },
+        },
     },
     extraReducers: {
         /**
@@ -504,6 +513,6 @@ const productSlice = createSlice({
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setIsEdit } = productSlice.actions;
+export const { setSelected, setSearch, resetSearch, setIsEdit, setStateRedux } = productSlice.actions;
 
 export default productSlice.reducer;

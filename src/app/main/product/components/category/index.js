@@ -15,6 +15,7 @@ import { status, type as CateType } from "../../model/category/Type";
 import { get } from "lodash";
 import { useCallback } from "react";
 import EditCateContent from "./edit";
+import { Link } from 'react-router-dom';
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -105,13 +106,13 @@ function CategoryView() {
                 </div>
             }
             content={
-                <div className="w-full h-full">
-                    <div className="flex space-x-8 px-8 pt-8">
+                <div className="w-full h-full overflow-x-hidden">
+                    <div className="flex  px-8 pt-8 -mx-8 flex-wrap">
                         {
                             entities?.data?.length && entities?.data.map(val => (
-                                <div className="w-1/4">
-                                    <div className="item">
-                                        <img src="https://drinksretailingnews.co.uk/files/TWEUWM0002_WB_1080x1080px_V2.jpg" />
+                                <div className="lg:w-1/5 md:w-1/4 sm:w-1/2 w-full p-8" key={val.id}>
+                                    <div className="item shadow-4 rounded-8 p-8 relative">
+                                        <img className="object-contain h-256 m-auto" src={`${process.env.REACT_APP_BASE_URL_IMG}${val.image}`} />
                                         <div>
                                             <b>
                                                 Tên:
@@ -128,6 +129,27 @@ function CategoryView() {
                                             {
                                                 val.type === 0 && "Thường"
                                             }
+                                        </div>
+                                        <div className="flex absolute flex-col-reverse top-8 right-8">
+                                            <CmsIconButton
+                                                tooltip="Chỉnh sửa"
+                                                delay={50}
+                                                icon="edit"
+                                                onClick={() => {
+                                                    dispatch(getById(val.id))
+                                                    setOpen('edit')
+                                                    setEditId(val.id)
+                                                }}
+                                                className="bg-green-500 text-white shadow-3  hover:bg-green-900 opacity-0"
+                                            />
+                                            <CmsIconButton
+                                                tooltip="Danh sách sản phẩm"
+                                                delay={50}
+                                                icon="format_list_numbered"
+                                                className="bg-blue-500 text-white shadow-3  hover:bg-blue-900 mb-4 opacity-0"
+                                                component={Link}
+                                                to={`/product-category/${val.id}`}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -152,12 +174,15 @@ function CategoryView() {
                         }
                         openFilterOptions={Boolean(filterOptions)}
                     /> */}
-                    <EditCateContent
-                        id={editId}
-                        open={open === 'edit'}
-                        handleClose={() => setOpen('')}
-                        handleSave={HandleSaveData}
-                    />
+                    {
+                        open === 'edit' &&
+                        <EditCateContent
+                            id={editId}
+                            open={open === 'edit'}
+                            handleClose={() => setOpen('')}
+                            handleSave={HandleSaveData}
+                        />
+                    }
                 </div>
             }
             toolbar={

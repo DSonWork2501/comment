@@ -1,12 +1,14 @@
 import { keyStore } from "../../common"
 import React from "react"
 import { useFormik } from "formik"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import * as Yup from 'yup'
 import { get } from "lodash"
 import { ImageCapacity } from "@widgets/metadatas"
 import Connect from "@connect/@connect"
 import noImage from '@widgets/images/noImage.jpg';
+import { useEffect } from "react"
+import { setStateRedux } from "../../store/categorySlice"
 const { CmsDialog, CmsFormikTextField, CmsFormikSelect, CmsImageBox } = require("@widgets/components")
 
 const initData = (id, data) => {
@@ -30,12 +32,23 @@ const initData = (id, data) => {
 }
 
 function EditCateContent({ id, open, handleClose, handleSave }) {
-    const entity = useSelector(store => store[keyStore].category.entity)
+    const entity = useSelector(store => store[keyStore].category.entity);
+    const dispatch = useDispatch();
 
     const handleSaveData = (values) => {
         handleSave && handleSave(values)
         handleClose && handleClose()
     }
+
+    console.log(entity);
+
+    useEffect(() => {
+        return () => {
+            dispatch(setStateRedux({
+                entity: null
+            }))
+        }
+    }, [])
 
     const formik = useFormik({
         initialValues: initData(id, entity),
@@ -61,7 +74,7 @@ function EditCateContent({ id, open, handleClose, handleSave }) {
             formik.setFieldValue('image', result.data.message);
         }
     }
-
+    console.log(formik);
     return (
         <CmsDialog
             title={`${formik?.values?.id === 0 ? 'Thêm mới thể loại' : 'Cập nhật thể loại'}`}
