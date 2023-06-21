@@ -48,7 +48,7 @@ const BoxCustom = styled(Box)({
 function BasicInfo({ formik, SaveData, options }) {
     const dispatch = useDispatch()
     const imageLoading = useSelector(store => store[keyStore].product.imgLoading)
-    const { certification, madeIn, unit, classify, brands } = useSelector(store => store[keyStore].product);
+    const { certification, madeIn, unit, classify, brands, cates } = useSelector(store => store[keyStore].product);
 
     const HandleUploadImage = async (file) => {
 
@@ -64,7 +64,6 @@ function BasicInfo({ formik, SaveData, options }) {
     const { values, setFieldValue } = formik;
     const cerValue = (typeof values.certification !== 'object' || !Array.isArray(values.certification) ? (values?.certification ? values.certification.split(',') : []) : values.certification);
 
-    console.log(formik);
     return (
         <FuseAnimateGroup className="flex flex-wrap p-20 overflow-hidden w-full h-full" enter={{ animation: 'transition.slideUpBigIn' }}>
             <div className="w-full space-y-16">
@@ -74,6 +73,22 @@ function BasicInfo({ formik, SaveData, options }) {
                 <CmsFormikTextField size="small" formik={formik} name="barcode" label="barcode" />
                 <CmsFormikTextField size="small" formik={formik} name="sku" label="sku" />
                 {/* <CmsFormikTextField size="small" formik={formik} name="brand" label="thương hiệu" /> */}
+
+                <CmsFormikAutocomplete
+                    className="my-8 inline-flex"
+                    label="Loại sản phẩm"
+                    name="cateID"
+                    formik={formik}
+                    autocompleteProps={{
+                        getOptionLabel: (option) => option?.name,
+                        ChipProps: {
+                            size: 'small'
+                        }
+                    }}
+                    data={cates}
+                    valueIsId
+                    multiple
+                    size="small" />
 
                 <CmsFormikAutocomplete
                     name="brandid"

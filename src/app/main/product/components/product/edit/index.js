@@ -19,6 +19,7 @@ import * as Yup from 'yup'
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
 import { getOrigin } from "@widgets/store/filtersSlice"
 import { productMeta } from "app/main/product-meta/store"
+import { getList as getCategory } from "../../../store/categorySlice";
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
@@ -30,6 +31,7 @@ function EditProduct(props) {
     const dispatch = useDispatch()
     const entity = useSelector(store => store[keyStore].product.entity)
     const loading = useSelector(store => store[keyStore].product.loading)
+    const cates = useSelector(store => store[keyStore].product.cates)
     const origins = useSelector(store => store['widgets'].filter.xuatxu)
     const [data, setData] = useState(null)
     const [tabValue, setTabValue] = useState(TabType.co_ban.id)
@@ -42,11 +44,12 @@ function EditProduct(props) {
 
     useEffect(() => {
         dispatch(getOrigin());
-        dispatch(productMeta.meta.getList({ type: 1 }))
-        dispatch(productMeta.meta.getList({ type: 2 }))
-        dispatch(productMeta.meta.getList({ type: 4 }))
-        dispatch(productMeta.meta.getList({ type: 3 }))
-        dispatch(productMeta.meta.getList({ type: 5 }))
+        dispatch(productMeta.meta.getList({ type: 1 }));
+        dispatch(productMeta.meta.getList({ type: 2 }));
+        dispatch(productMeta.meta.getList({ type: 4 }));
+        dispatch(productMeta.meta.getList({ type: 3 }));
+        dispatch(productMeta.meta.getList({ type: 5 }));
+        dispatch(getCategory({ pageNumber: 1, rowsPage: 10000 }));
     }, [dispatch])
 
     useEffect(() => {
@@ -139,7 +142,7 @@ function EditProduct(props) {
                         <CmsLoadingOverlay loading={loading} />
                         {tabValue === TabType.co_ban.id &&
                             <CmsBoxLine label="Thông tin cơ bản">
-                                <BasicInfo formik={formik} options={{ origins }} />
+                                <BasicInfo formik={formik} options={{ origins, cates }} />
                             </CmsBoxLine>}
                         {tabValue === TabType.phan_loai.id &&
                             <CmsBoxLine label="Thông tin phân loại">
