@@ -6,7 +6,7 @@ import { useEffect } from "react"
 import CmsSelect from "../CmsSelect"
 import clsx from "clsx"
 
-function CmsFormikProductType({ formik, onChangeProductType, onChangeSetHome, otherProps}) {
+function CmsFormikProductType({ formik, onChangeProductType, onChangeSetHome, ...otherProps }) {
     const [type, setType] = useState(null)
     const [isHs, setIsHs] = useState(null)
     const value = formik.values.ishs
@@ -22,7 +22,7 @@ function CmsFormikProductType({ formik, onChangeProductType, onChangeSetHome, ot
         setType(value)
         if (value === ProductType[0].id) {
             formik.setFieldValue('ishs', parseInt(value))
-        }else{
+        } else {
             formik.setFieldValue('ishs', parseInt(ProductType[3]?.type['2'].id))
         }
         onChangeProductType && onChangeProductType(value === ProductType[0].id ? parseInt(value) : parseInt(ProductType[3]?.type['2'].id))
@@ -39,6 +39,7 @@ function CmsFormikProductType({ formik, onChangeProductType, onChangeSetHome, ot
                 onChange={(value) => handleChangeProductType(value)}
                 value={type || ''}
                 label='Loại sản phẩm'
+                className="p-8"
                 name="type"
                 data={Object.values(ProductType).map(x => ({
                     ...x,

@@ -217,7 +217,7 @@ function BasicInfo({ formik, SaveData, options }) {
                         vertical={false}
                     /> */}
                     <CmsFormikProductType
-                        divClassName={`flex-1 p-8`}
+                        divClassName={`flex-1`}
                         formik={formik}
                     />
                 </div>
