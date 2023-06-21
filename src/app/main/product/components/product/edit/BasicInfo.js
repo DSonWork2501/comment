@@ -1,5 +1,5 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup";
-import { CmsButton, CmsCheckboxGroup, CmsFormikAutocomplete, CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/components";
+import { CmsButton, CmsCheckboxGroup, CmsFormikAutocomplete, CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2, CmsTinyMceEditor } from "@widgets/components";
 import React, { } from "react";
 import MutipleImagePathLink from "../../common/MultipleImagePathLink";
 import noImage from '@widgets/images/noImage.jpg';
@@ -48,7 +48,7 @@ const BoxCustom = styled(Box)({
 function BasicInfo({ formik, SaveData, options }) {
     const dispatch = useDispatch()
     const imageLoading = useSelector(store => store[keyStore].product.imgLoading)
-    const { certification, madeIn, unit, classify,brands } = useSelector(store => store[keyStore].product);
+    const { certification, madeIn, unit, classify, brands } = useSelector(store => store[keyStore].product);
 
     const HandleUploadImage = async (file) => {
 
@@ -91,7 +91,8 @@ function BasicInfo({ formik, SaveData, options }) {
                     setOption={(option) => option?.name || ''}
                     valueIsId />
 
-                <CmsFormikTextField size="small" multiline={true} formik={formik} name="description" label="Mô tả" />
+                {/* <CmsFormikTextField size="small" multiline={true} formik={formik} name="description" label="Mô tả" /> */}
+
                 {/* <CmsFormikTextField size="small" formik={formik} name="unit" label="đơn vị" />
                 <CmsFormikTextField size="small" formik={formik} name="classify" label="phân loại" /> */}
                 {/* <CmsFormikTextField size="small" formik={formik} name="certification" label="chứng nhận" /> */}
@@ -174,39 +175,39 @@ function BasicInfo({ formik, SaveData, options }) {
                 />
                 <div className="flex flex-row w-full space-x-8 justify-between">
                     <CmsFormikRadioGroup
+                        className="flex-1 p-8"
                         name="isnew"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
                         label={'Hàng Mới'}
-                        vertical={false}
                     />
                     <CmsFormikRadioGroup
+                        className="flex-1 p-8"
                         name="ishot"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
                         label={'Hàng Hot'}
-                        vertical={false}
                     />
                     <CmsFormikRadioGroup
+                        className="flex-1 p-8"
                         name="ishome"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
                         label={'Trang Home'}
-                        vertical={false}
                     />
                     <CmsFormikRadioGroup
+                        className="flex-1 p-8"
                         name="ishome"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
                         label={'Bán Chạy'}
-                        vertical={false}
                     />
                     <CmsFormikRadioGroup
+                        className="flex-1 p-8"
                         name="isfreeship"
                         data={[{ id: 1, name: 'Có' }, { id: 0, name: 'Không' }]}
                         formik={formik}
                         label={'Miễn phí vận chuyển'}
-                        vertical={false}
                     />
                     {/* <CmsFormikRadioGroup
                         name="ishs"
@@ -216,6 +217,7 @@ function BasicInfo({ formik, SaveData, options }) {
                         vertical={false}
                     /> */}
                     <CmsFormikProductType
+                        divClassName={`flex-1 p-8`}
                         formik={formik}
                     />
                 </div>
@@ -259,7 +261,7 @@ function BasicInfo({ formik, SaveData, options }) {
                                                             onClick={() => { remove(index); }}
                                                             label="Xóa"
                                                             size="small"
-                                                            className="mt-8 text-white bg-red-600 hover:bg-red-600" 
+                                                            className="mt-8 text-white bg-red-600 hover:bg-red-600"
                                                             startIcon="delete" />
                                                     </div>
                                                 </div>
@@ -294,6 +296,16 @@ function BasicInfo({ formik, SaveData, options }) {
 
                 </BoxCustom>
 
+                <BoxCustom
+                    className="p-16 py-20 mt-25 border-1 rounded-4 black-label">
+                    <InputLabel
+                        className='custom-label'>
+                        Mô tả
+                    </InputLabel>
+                    <CmsTinyMceEditor
+                        value={formik.values['description']}
+                        onChange={(event) => { formik.setFieldValue('description', event.target.getContent()) }} />
+                </BoxCustom>
             </div>
         </FuseAnimateGroup>
     )
