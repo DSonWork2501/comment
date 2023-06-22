@@ -155,41 +155,46 @@ function Meta() {
         ),
         action: (
             <div className="flex space-x-3 ">
-                <CmsIconButton
-                    tooltip="Chỉnh sửa"
-                    delay={50}
-                    icon="edit"
-                    className="bg-green-500 text-white shadow-3  hover:bg-green-900"
-                    onClick={() => {
-                        setOpenDialog('meta');
-                        setDetail(item);
-                    }} />
-                <CmsIconButton
-                    tooltip="Xóa"
-                    delay={50}
-                    icon="delete"
-                    className="bg-red-500 text-white shadow-3  hover:bg-red-900"
-                    onClick={
-                        () =>
-                            alertInformation({
-                                text: `Xác nhận thao tác`,
-                                data: { item },
-                                confirm: async () => {
-                                    try {
-                                        const resultAction = await dispatch(productMeta.meta.delete({
-                                            value: [{
-                                                id: item.id,
-                                                status: 0
-                                            }],
-                                            type
-                                        }));
-                                        unwrapResult(resultAction);
-                                        getListTable(search);
-                                    } catch (error) {
-                                    }
-                                }
-                            })
-                    } />
+                {
+                    item.status === 1 &&
+                    <>
+                        <CmsIconButton
+                            tooltip="Chỉnh sửa"
+                            delay={50}
+                            icon="edit"
+                            className="bg-green-500 text-white shadow-3  hover:bg-green-900"
+                            onClick={() => {
+                                setOpenDialog('meta');
+                                setDetail(item);
+                            }} />
+                        <CmsIconButton
+                            tooltip="Xóa"
+                            delay={50}
+                            icon="delete"
+                            className="bg-red-500 text-white shadow-3  hover:bg-red-900"
+                            onClick={
+                                () =>
+                                    alertInformation({
+                                        text: `Xác nhận thao tác`,
+                                        data: { item },
+                                        confirm: async () => {
+                                            try {
+                                                const resultAction = await dispatch(productMeta.meta.delete({
+                                                    value: [{
+                                                        id: item.id,
+                                                        status: 0
+                                                    }],
+                                                    type
+                                                }));
+                                                unwrapResult(resultAction);
+                                                getListTable(search);
+                                            } catch (error) {
+                                            }
+                                        }
+                                    })
+                            } />
+                    </>
+                }
             </div>
         )
     }))
