@@ -18,6 +18,7 @@ import ChangeOderStatusContent from "./changeOrderStatus";
 import History from "@history";
 import { useParams } from "react-router";
 import { Box, styled } from "@material-ui/core";
+import PackageDialog from "./PackageDialog";
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -26,7 +27,7 @@ const LayoutCustom = styled(Box)({
     },
     "& .inner-scroll >div:first-child": {
         height: 90,
-        minHeight:'initial'
+        minHeight: 'initial'
     }
 });
 
@@ -50,6 +51,8 @@ function OrderView() {
     const [filterOptions, setFilterOptions] = useState(null);
     const [open, setOpen] = useState('');
     const [info, setInfo] = useState(null);
+    const [openDialog, setOpenDialog] = useState("");
+    const [detail, setDetail] = useState(null);
     const totalValues = {
         0: summary?.da_huy ? summary?.da_huy?.toLocaleString('en-US') : 0,
         6: (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)
@@ -97,7 +100,19 @@ function OrderView() {
         status: <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} />,
         action: (
             <div className="w-full flex flex-row">
-                <CmsIconButton tooltip={'Edit Trạng thái'} icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => HandleChangeStatus(item)} />
+                <CmsIconButton
+                    tooltip={'Edit Trạng thái'}
+                    icon="edit"
+                    className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
+                    onClick={() => HandleChangeStatus(item)} />
+                <CmsIconButton
+                    tooltip={'Đóng gói'}
+                    icon="wrap_text"
+                    className="bg-blue-500 hover:bg-blue-700 hover:shadow-2 text-white"
+                    onClick={() => {
+                        setOpenDialog('package');
+                        setDetail(item);
+                    }} />
             </div>
         ) || []
     })), [entities])
@@ -105,11 +120,24 @@ function OrderView() {
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
     };
+
     const HandleRefresh = () => {
         dispatch(getOrder(search))
     };
+
+    const handleCloseDialog = () => {
+        setOpenDialog('');
+        setDetail(null);
+    }
+
     return (
         <LayoutCustom>
+            {open === 'package' &&
+                <PackageDialog
+                    detail={detail}
+                    open={open === 'package'}
+                    handleClose={() => handleCloseDialog()}
+                />}
             <CmsCardedPage
                 title={'Danh sách đơn hàng'}
                 subTitle={'Quản lý thông tin đơn hàng'}
