@@ -42,7 +42,7 @@ function CmsTab(props) {
                 if (item?.auth && !item?.auth.some((value) => authObjects[value])) {
                     return null;
                 }
-                return <Tab key={index} className="normal-case" label={item.name} value={item.id} icon={item.otherComp ? item.otherComp : (item.icon && <Icon>{item.icon}</Icon>)} />
+                return <Tab key={index} disabled={Boolean(item.disabled)} className="normal-case" label={item.name} value={item.id} icon={item.otherComp ? item.otherComp : (item.icon && <Icon>{item.icon}</Icon>)} />
             })}
         </Tabs>
     )
