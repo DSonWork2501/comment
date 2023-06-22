@@ -93,6 +93,7 @@ function EditProduct(props) {
                 params?.id === '0' ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))
                 if (data?.newCates?.length)
                     await dispatch(product.other.addProductCate(data?.newCates))
+                dispatch(getDetail({ sku: value.sku }))
             },
         })
     }
@@ -157,7 +158,7 @@ function EditProduct(props) {
                             </CmsBoxLine>}
                         {tabValue === TabType.cate.id &&
                             <CmsBoxLine label="Thông tin danh mục">
-                                <CateInfo formikParent={formik} sku={sku} ishs={ishs} dataOb={entity?.data?.categorys} />
+                                <CateInfo formikParent={formik} sku={sku} ishs={ishs} dataOb={entity?.data?.categorys || []} />
                             </CmsBoxLine>}
                     </div>
                 }
@@ -165,7 +166,7 @@ function EditProduct(props) {
                     <div className="w-full flex items-center justify-between px-12">
                         <div className="flex items-center justify-items-start">
                             <div className="overflow-y-auto">
-                                <CmsTab data={Object.values(TabType)} value={tabValue} onChange={handleChangeTab} />
+                                <CmsTab data={Object.values(TabType).map(val => ({ ...val, disabled: Boolean(val.id === '3' && (!sku || ishs === null)) ? true : false }))} value={tabValue} onChange={handleChangeTab} />
                             </div>
                         </div>
                         <div className="flex items-center justify-end space-x-8">
