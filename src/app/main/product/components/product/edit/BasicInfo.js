@@ -48,7 +48,7 @@ const BoxCustom = styled(Box)({
 function BasicInfo({ formik, SaveData, options }) {
     const dispatch = useDispatch()
     const imageLoading = useSelector(store => store[keyStore].product.imgLoading)
-    const { certification, madeIn, unit, classify, brands, cates } = useSelector(store => store[keyStore].product);
+    const { certification, madeIn, unit, classify, brands } = useSelector(store => store[keyStore].product);
 
     const HandleUploadImage = async (file) => {
 
@@ -73,22 +73,6 @@ function BasicInfo({ formik, SaveData, options }) {
                 <CmsFormikTextField size="small" formik={formik} name="barcode" label="barcode" />
                 <CmsFormikTextField size="small" formik={formik} name="sku" label="sku" />
                 {/* <CmsFormikTextField size="small" formik={formik} name="brand" label="thương hiệu" /> */}
-
-                <CmsFormikAutocomplete
-                    className="my-8 inline-flex"
-                    label="Loại sản phẩm"
-                    name="cateID"
-                    formik={formik}
-                    autocompleteProps={{
-                        getOptionLabel: (option) => option?.name,
-                        ChipProps: {
-                            size: 'small'
-                        }
-                    }}
-                    data={cates}
-                    valueIsId
-                    multiple
-                    size="small" />
 
                 <CmsFormikAutocomplete
                     name="brandid"
@@ -147,7 +131,8 @@ function BasicInfo({ formik, SaveData, options }) {
                     label="Chứng nhận"
                     className="py-0 m-0 w-full"
                     name="certification"
-                    onChange={(array) => { setFieldValue('certification', array) }}
+                    onChange={(array) => { 
+                        setFieldValue('certification', array) }}
                     vertical={false}
                     data={certification}
                     value={cerValue}
