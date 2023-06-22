@@ -3,7 +3,7 @@ import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 import { getErrorMessage } from '@widgets/functions';
 import { productMeta } from 'app/main/product-meta/store';
-
+import { getList as getCategory } from "./categorySlice";
 
 const appName = "products";
 const moduleName = "product";
@@ -209,7 +209,8 @@ const productSlice = createSlice({
         madeIn: [],
         classify: [],
         unit: [],
-        brands: []
+        brands: [],
+        cates: [],
     },
     reducers: {
         /**
@@ -507,6 +508,15 @@ const productSlice = createSlice({
             return {
                 ...state,
                 loading: false,
+                error: null
+            }
+        },
+        
+        [getCategory.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                cates: payload?.data,
                 error: null
             }
         },

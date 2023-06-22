@@ -3,8 +3,8 @@ import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 
 
-const appName = "contracts";
-const moduleName = "contract";
+const appName = "contractsOrder";
+const moduleName = "contractsOrder";
 /**
  * @description lấy danh sách customer
  */
