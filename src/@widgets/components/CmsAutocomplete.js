@@ -106,6 +106,7 @@ function CmsAutocomplete(props) {
                 disabled={disabled}
                 groupBy={(option) => option.group}
                 getOptionSelected={(option, value) => option.id === value.id}
+                getOptionDisabled={(option) => option.disabled}
                 onKeyPress={onKeyPress}
                 loading={loading}
                 renderOption={(option, props) =>

@@ -174,6 +174,31 @@ export const insertProPrice = createAsyncThunk(`${appName}/${moduleName}/insertP
     }
 });
 
+export const product = {
+    other: {
+        addProductCate: createAsyncThunk(`${appName}/${moduleName}/other/addProductCate`, async (entity, thunkAPI) => {
+            try {
+                const response = await connect.live.product.other.addProductCate(entity);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return thunkAPI.rejectWithValue(error)
+            }
+        }),
+        removeProductCate: createAsyncThunk(`${appName}/${moduleName}/other/removeProductCate`, async (entity, thunkAPI) => {
+            try {
+                const response = await connect.live.product.other.removeProductCate(entity);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return thunkAPI.rejectWithValue(error)
+            }
+        }),
+    }
+}
+
 export const initSearchState = {
     search: '',
     cate: '',
@@ -303,7 +328,7 @@ const productSlice = createSlice({
             return {
                 ...state,
                 loading: false,
-                entity: payload,
+                entity: { ...payload, data: { ...payload.data, certification: payload.data.certificationid } },
                 error: null
             }
         },
@@ -511,12 +536,12 @@ const productSlice = createSlice({
                 error: null
             }
         },
-        
+
         [getCategory.fulfilled]: (state, { payload }) => {
             return {
                 ...state,
                 loading: false,
-                cates: payload?.data,
+                cates: payload,
                 error: null
             }
         },

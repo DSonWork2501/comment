@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router"
 import { Link } from "react-router-dom"
 import BasicInfo from "./BasicInfo"
-import { getDetail, insertProduct, updateProduct } from "../../../store/productSlice";
+import { getDetail, insertProduct, product, updateProduct } from "../../../store/productSlice";
 import { initData, initProduct } from '../../../model/product/model'
 import { useFormik } from "formik"
 import ClassifyInfo from "./ClassifyInfo"
@@ -19,11 +19,12 @@ import * as Yup from 'yup'
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription"
 import { getOrigin } from "@widgets/store/filtersSlice"
 import { productMeta } from "app/main/product-meta/store"
-import { getList as getCategory } from "../../../store/categorySlice";
+import CateInfo from "./CateInfo"
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
     phan_loai: { id: '2', name: 'Thông tin phân loại' },
+    cate: { id: '3', name: 'Thông tin danh mục' },
 }
 
 function EditProduct(props) {
@@ -49,7 +50,6 @@ function EditProduct(props) {
         dispatch(productMeta.meta.getList({ type: 4 }));
         dispatch(productMeta.meta.getList({ type: 3 }));
         dispatch(productMeta.meta.getList({ type: 5 }));
-        dispatch(getCategory({ pageNumber: 1, rowsPage: 10000 }));
     }, [dispatch])
 
     useEffect(() => {
@@ -91,9 +91,13 @@ function EditProduct(props) {
                 }
 
                 params?.id === '0' ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))
+                if (data?.newCates?.length)
+                    await dispatch(product.other.addProductCate(data?.newCates))
             },
         })
     }
+
+
     const handleResetData = () => {
         CmsAlert.fire({
             icon: 'question',
@@ -108,6 +112,7 @@ function EditProduct(props) {
         })
 
     }
+
     function handleChangeTab(event, value) {
         setTabValue(value);
     }
@@ -124,6 +129,8 @@ function EditProduct(props) {
             barcode: Yup.string().typeError("Barcode không được bỏ trống !").required("Barcode không được bỏ trống !"),
         })
     })
+
+    const { values } = formik, { sku, ishs } = values;
 
     return (
         (
@@ -147,6 +154,10 @@ function EditProduct(props) {
                         {tabValue === TabType.phan_loai.id &&
                             <CmsBoxLine label="Thông tin phân loại">
                                 <ClassifyInfo formik={formik} />
+                            </CmsBoxLine>}
+                        {tabValue === TabType.cate.id &&
+                            <CmsBoxLine label="Thông tin danh mục">
+                                <CateInfo formikParent={formik} sku={sku} ishs={ishs} dataOb={entity?.data?.categorys} />
                             </CmsBoxLine>}
                     </div>
                 }
