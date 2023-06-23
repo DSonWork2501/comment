@@ -100,7 +100,7 @@ const navigationConfig = [
 				translate: 'ORDER_MANAGEMENT',
 				type: 'item',
 				icon: 'reorder',
-				url: '/order/6',
+				url: '/order/100',
 			},
 			{
 				id: 'nvi-manager-shelf',

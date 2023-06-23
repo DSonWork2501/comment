@@ -1,5 +1,5 @@
 import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsLabel, CmsTab, CmsTableBasic } from "@widgets/components";
-import { ConvertDateTime, initColumn, NumberWithCommas } from "@widgets/functions";
+import { alertInformation, ConvertDateTime, initColumn, NumberWithCommas } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
 import React from "react";
@@ -21,6 +21,8 @@ import { Box, styled } from "@material-ui/core";
 import PackageDialog from "./PackageDialog";
 import { getShelf, getWine } from "app/main/customer-shelf/store/customerShelfSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
+import { product } from "app/main/product/store/productSlice";
+import { useCallback } from "react";
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -68,7 +70,7 @@ function OrderView() {
         1: summary?.da_tao ? summary?.da_tao?.toLocaleString('en-US') : 0
     }
 
-    useEffect(() => {
+    const getListTable = useCallback((search, status) => {
         if (typeof status === 'number' && !isNaN(status)) {
             let filter = { ...search };
             if (status !== 100)
@@ -76,7 +78,12 @@ function OrderView() {
             dispatch(getOrder(filter))
             dispatch(order.other.getSummary())
         }
-    }, [dispatch, search, status])
+
+    }, [dispatch,])
+
+    useEffect(() => {
+        getListTable(search, status);
+    }, [dispatch, search, status, getListTable])
 
 
     const HandleClickDetail = (item) => {
@@ -90,7 +97,22 @@ function OrderView() {
     }
 
     const HandleSaveStatus = (value) => {
+        console.log(value);
         dispatch(updateOrderStatus(value))
+    }
+
+    const returnName = (status) => {
+        if (status === 1)
+            return 'Xác Nhận';
+        if (status === 2)
+            return 'Chuyển Qua Đóng Gói';
+        if (status === 6)
+            return 'Đóng Gói';
+        if (status === 5)
+            return 'Xác Nhận Thanh Toán';
+        if (status === 3)
+            return 'Hoàn Thành';
+        return '';
     }
 
     const data = useMemo(() => entities?.data?.map(item => ({
@@ -102,7 +124,34 @@ function OrderView() {
         detail: <CmsIconButton onClick={() => HandleClickDetail(item)} size="small" tooltip={'Thông tin chi tiết'} icon="info" className="text-16 hover:shadow-2 text-grey-500 hover:text-grey-700" />,
         status: <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} />,
         action: (
-            <div className="w-full flex flex-row">
+            <div className="w-full flex flex-row space-x-4">
+                <CmsIconButton
+                    tooltip={returnName(item.status)}
+                    icon="navigate_next"
+                    className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
+                    onClick={() => alertInformation({
+                        text: `Xác nhận thao tác`,
+                        data: { item },
+                        confirm: async () => {
+                            let form = {
+                                id: item.id,
+                                cusID: item.cusId
+                            }
+                            if (status === 1)
+                                form.status = 2
+                            if (status === 2)
+                                form.status = 6
+                            if (status === 6)
+                                form.status = 5
+                            if (status === 5)
+                                form.status = 3
+                            if (status === 3)
+                                form.status = 4
+                            const resultAction = await dispatch(updateOrderStatus(form))
+                            unwrapResult(resultAction);
+                            getListTable(search, status);
+                        },
+                    })} />
                 <CmsIconButton
                     tooltip={'Edit Trạng thái'}
                     icon="edit"
@@ -114,10 +163,10 @@ function OrderView() {
                     className="bg-blue-500 hover:bg-blue-700 hover:shadow-2 text-white"
                     onClick={() => {
                         setDetail(item);
+                        setOpenDialog('package');
                         if (item.parentid === 1) {
                             dispatch(getShelf({ cusID: item.cusId, type: 'wine', orderID: item.id }))
                         } else {
-                            setOpenDialog('package');
                             dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
                         }
                     }} />
@@ -138,13 +187,16 @@ function OrderView() {
         setDetail(null);
     }
 
-    const handleCheck = async (check) => {
+    const handleCheck = async (check, id) => {
         const resultAction = await dispatch(product.other.wineArrange([{
-            id: value.id,
+            id,
             ispacked: check ? 1 : 0
         }]))
         unwrapResult(resultAction);
-        dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
+
+        detail.parentid === 1
+            ? dispatch(getShelf({ cusID: detail.cusId, type: 'wine', orderID: detail.id }))
+            : dispatch(getWine({ cusId: detail.cusId, parentId: detail.hhid, cms: 1 }))
     }
 
     return (
@@ -155,6 +207,10 @@ function OrderView() {
                     open={openDialog === 'package'}
                     handleCheck={handleCheck}
                     handleClose={() => handleCloseDialog()}
+                    handlePackage={() => {
+                        console.log(123);
+                    }}
+
                 />}
             <CmsCardedPage
                 title={'Danh sách đơn hàng'}
@@ -170,7 +226,7 @@ function OrderView() {
                 content={
                     <>
                         <CmsTableBasic
-                            className="w-full"
+                            className="w-full h-full"
                             isServerSide={true}
                             data={data}
                             search={search}

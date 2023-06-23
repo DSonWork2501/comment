@@ -1,5 +1,5 @@
 import { CmsButton, CmsButtonProgress, CmsCheckbox, CmsDialog, CmsLabel, } from "@widgets/components"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { keyStore } from "../../common"
 import { useDispatch, useSelector } from "react-redux"
 import clsx from "clsx"
@@ -118,53 +118,32 @@ export const ProductPopup = ({ setTab, handleChooseUniqueID }) => {
     </>
 }
 
-function PackageDialog({ open, handleClose, detail, handleCheck }) {
+function PackageDialog({ open, handleClose, detail, handleCheck, handlePackage }) {
+    const popupLoading = useSelector(store => store[keyStore]?.order?.popupLoading);
     const entities = useSelector(store => store[keyStore]?.order?.detailEntities);
     const [tab, setTab] = useState(null);
     const dispatch = useDispatch();
+    const classes = useStyles();
+    const isFullCheck = useMemo(() => {
+        let totalWine = 0, totalCheck = 0;
+        detail?.parentid !== 1
+            ? entities.data?.length && entities.data.forEach(element => {
+                element.slots?.length && element.slots.forEach(val => {
+                    if (val?.item?.id) {
+                        totalWine = totalWine + 1;
+                        if (val?.item?.ispacked === 1)
+                            totalCheck = totalCheck + 1;
+                    }
+                })
+            })
+            : entities.data?.length && entities.data.forEach(element => {
+                totalWine = totalWine + 1;
+                if (element?.ispacked === 1)
+                    totalCheck = totalCheck + 1;
+            })
 
-    const handleDownloadAll = () => {
-        let listQR = "";
-        for (let index = 0; index < entities?.data?.length; index++) {
-            const slots = entities?.data[index].slots;
-            for (let i = 0; i < slots?.length; i++) {
-                const item = slots[i].item;
-                if (item.qrcode) {
-                    // var a = document.createElement("a"); //Create <a>
-                    // a.href = `data:image/png;base64, ${item.qrcode}`; //Image Base64 Goes here
-                    // a.download = `${item.name}_${item.uniqueid?.replace('.', '_')}.png`; //File name Here
-                    // a.click(); //Downloaded file
-
-                    listQR = listQR + `<div style="width:100%;height:100%">
-                        <H2 style="text-align:center">${item.name}</H2>
-                        <img style="width:100%;margin:auto" src="data:image/png;base64,${item.qrcode}" alt="QR Code">
-                    </div>`;
-                }
-            }
-        }
-        // var qrImage = new Image();
-
-        // qrImage.src = `data:image/png;base64, ${qrcode}`;
-
-        // qrImage.onload = function () {
-        var printWindow = window.open('', '_blank');
-        printWindow.document.open();
-        printWindow.document.write(`<html>
-                <head>
-                <title>QrCodeList</title>
-                </head>
-                <body style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;height:100%">
-                    ${listQR}
-                </body>
-            </html>`);
-        printWindow.document.close();
-
-        printWindow.onload = function () {
-            printWindow.print();
-            printWindow.close();
-        };
-        //};
-    }
+        return totalWine !== totalCheck;
+    }, [entities, detail])
 
     const handleChooseUniqueID = ({ value, oldValue, setChosenSku }) => {
 
@@ -215,33 +194,59 @@ function PackageDialog({ open, handleClose, detail, handleCheck }) {
             },
         })
     }
-
+    
     return (
         <CmsDialog
-            title="Thông tin chi tiết tủ"
+            title={`Thông tin chi tiết ${detail?.parentid === 1 ? 'chai rượu' : 'tủ rượu'}`}
             open={open}
+            loading={popupLoading}
             handleClose={handleClose}
+            handleSave={handlePackage}
+            disabledSave={isFullCheck}
             size="md"
         >
             {
                 tab === null
                     ? <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }} className="w-full">
                         <div className="w-full space-y-4">
-                            {entities?.data?.length > 0 ? entities?.data?.map((item, index) => (
-                                <DetailModelContent
-                                    value={item}
-                                    index={index}
-                                    handleChooseUniqueID={handleChooseUniqueID}
-                                    setTab={setTab}
-                                    key={`DetailShelf-${index}`}
-                                    handleCheck={handleCheck}
-                                />
-                            )) : <div className="border-collapse border-2 border-green-500">
-                                <CmsLabel
-                                    content={'Không có dữ liệu !'}
-                                    className="text-red-500 text-center"
-                                />
-                            </div>
+                            {
+                                detail?.parentid === 1
+                                    ? <>
+                                        {entities?.data?.length > 0 ? entities?.data?.map(val => ({ item: { ...val } })).map((item, index) => (
+                                            <DetailShelfProductContent
+                                                data={item}
+                                                index={index}
+                                                setTab={setTab}
+                                                key={`DetailShelfProductContent-${index}`}
+                                                classes={classes}
+                                                handleCheck={handleCheck}
+                                            />
+                                        )) : <div className="border-collapse border-2 border-green-500">
+                                            <CmsLabel
+                                                content={'Không có dữ liệu !'}
+                                                className="text-red-500 text-center"
+                                            />
+                                        </div>
+                                        }
+                                    </>
+                                    : <>
+                                        {entities?.data?.length > 0 ? entities?.data?.map((item, index) => (
+                                            <DetailModelContent
+                                                value={item}
+                                                index={index}
+                                                handleChooseUniqueID={handleChooseUniqueID}
+                                                setTab={setTab}
+                                                key={`DetailShelf-${index}`}
+                                                handleCheck={handleCheck}
+                                            />
+                                        )) : <div className="border-collapse border-2 border-green-500">
+                                            <CmsLabel
+                                                content={'Không có dữ liệu !'}
+                                                className="text-red-500 text-center"
+                                            />
+                                        </div>
+                                        }
+                                    </>
                             }
                         </div>
                     </FuseAnimateGroup>
@@ -259,14 +264,6 @@ function PackageDialog({ open, handleClose, detail, handleCheck }) {
 function DetailShelfProductContent({ data, index, classes, setTab, handleChooseUniqueID, handleCheck }) {
     const value = data?.item || null
     const img = value.img ? `${baseurl}${value.img}` : noImage
-    const dispatch = useDispatch();
-
-    // const handleCheck = (check) => {
-    //     dispatch(product.other.wineArrange([{
-    //         id: value.id,
-    //         ispacked: check ? 1 : 0
-    //     }]))
-    // }
 
     const handleDownload = ({ qrcode, name, uniqueid }) => {
         // var a = document.createElement("a"); //Create <a>
@@ -330,7 +327,7 @@ function DetailShelfProductContent({ data, index, classes, setTab, handleChooseU
                         label="Đã Gói"
                         value={false}
                         onChange={e => {
-                            handleCheck(e.target.checked)
+                            handleCheck(e.target.checked, value.id)
                         }}
                         name="status"
                     />

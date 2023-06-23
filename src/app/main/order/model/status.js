@@ -13,9 +13,9 @@ export const orderStatusArray = [
     { id: '1', name: 'Đã tạo', className: 'bg-gray-500' },
     { id: '2', name: 'Đã xác nhận', className: 'bg-orange-500' },
     { id: '6', name: 'Đã đóng gói', className: 'bg-pink-500' },
+    { id: '5', name: 'Chờ thanh toán', className: 'bg-purple-500' },
     { id: '3', name: 'Đã thanh toán', className: 'bg-green-500' },
     { id: '4', name: 'Hoàn thành', className: 'bg-blue-500' },
-    { id: '5', name: 'Chờ thanh toán', className: 'bg-purple-500' },
     { id: '0', name: 'Đã hủy', className: 'bg-red-500' },
 ]
 

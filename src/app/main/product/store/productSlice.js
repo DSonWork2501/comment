@@ -166,7 +166,6 @@ export const getHistoryPrice = createAsyncThunk(`${appName}/${moduleName}/getHis
 export const insertProPrice = createAsyncThunk(`${appName}/${moduleName}/insertProPrice`, async (entity, thunkAPI) => {
     try {
         const response = await connect.live.product.price.insert(entity);
-        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Đóng gói sản phẩm thành công !' }))
         const data = await response.data;
         return data
     } catch (error) {
@@ -200,6 +199,7 @@ export const product = {
         wineArrange: createAsyncThunk(`${appName}/${moduleName}/other/wineArrange`, async (entity, thunkAPI) => {
             try {
                 const response = await connect.live.product.other.wineArrange(entity);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: `${entity[0]?.ispacked ? 'Đóng gói sản phẩm' : 'Thao tác'}  thành công !` }))
                 const data = await response.data;
                 return data
             } catch (error) {

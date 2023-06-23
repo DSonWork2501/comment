@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 import { InitOrderModal } from '../model/modal';
-import { getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
+import { getWine, getShelf } from 'app/main/customer-shelf/store/customerShelfSlice';
 // import { getErrorMessage } from '@widgets/functions';
 
 
@@ -61,11 +61,11 @@ export const insertOrder = createAsyncThunk(`${appName}/${moduleName}/insertOrde
  */
 export const updateOrderStatus = createAsyncThunk(`${appName}/${moduleName}/status`, async (params, thunkAPI) => {
     try {
-        const search = thunkAPI.getState().orders.order.search
+        //const search = thunkAPI.getState().orders.order.search
         const response = await connect.live.order.update(params);
         const data = await response.data;
         thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
-        thunkAPI.dispatch(getList(search))
+        //thunkAPI.dispatch(getList(search))
         return data
     } catch (error) {
         // console.log('error', error)
@@ -111,6 +111,7 @@ const orderSlice = createSlice({
         selected: null,
         response: null,
         search: initSearchState,
+        popupLoading: false
     },
     reducers: {
         /**
@@ -267,14 +268,68 @@ const orderSlice = createSlice({
             error: error
         }),
 
+        [getWine.pending]: (state, { payload }) => {
+            return {
+                ...state,
+                popupLoading: true,
+                detailEntities: {
+                    data: []
+                },
+                error: null
+            }
+        },
+
         [getWine.fulfilled]: (state, { payload }) => {
             return {
                 ...state,
-                loading: false,
+                popupLoading: false,
                 detailEntities: payload,
                 error: null
             }
         },
+
+        [getWine.rejected]: (state, { payload }) => {
+            return {
+                ...state,
+                popupLoading: false,
+                detailEntities: {
+                    data: []
+                },
+                error: null
+            }
+        },
+
+        [getShelf.pending]: (state, { payload }) => {
+            return {
+                ...state,
+                popupLoading: true,
+                detailEntities: {
+                    data: []
+                },
+                error: null
+            }
+        },
+
+        [getShelf.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                popupLoading: false,
+                detailEntities: payload,
+                error: null
+            }
+        },
+
+        [getShelf.rejected]: (state, { payload }) => {
+            return {
+                ...state,
+                popupLoading: false,
+                detailEntities: {
+                    data: []
+                },
+                error: null
+            }
+        },
+
     }
 });
 
