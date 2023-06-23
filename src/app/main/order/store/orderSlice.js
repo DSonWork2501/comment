@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 import { InitOrderModal } from '../model/modal';
+import { getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
 // import { getErrorMessage } from '@widgets/functions';
 
 
@@ -265,6 +266,15 @@ const orderSlice = createSlice({
             loading: false,
             error: error
         }),
+
+        [getWine.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                detailEntities: payload,
+                error: null
+            }
+        },
     }
 });
 

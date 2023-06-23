@@ -12,9 +12,9 @@ import ProductSearch from "app/main/product/components/product/edit/classify/rig
 import ProductSearchList from "app/main/product/components/product/edit/classify/rightSide/ProductSearchList"
 import { useEffect } from "react"
 import UniqueProductList from "app/main/product/components/product/edit/classify/rightSide/UniqueProductList"
-import { customerShelf, getWine } from "../../store/customerShelfSlice"
 import { alertInformation } from "@widgets/functions"
 import { unwrapResult } from "@reduxjs/toolkit"
+import { getWine, customerShelf } from "app/main/customer-shelf/store/customerShelfSlice"
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const useStyles = makeStyles((theme) => ({
@@ -121,7 +121,7 @@ export const ProductPopup = ({ setTab, handleChooseUniqueID }) => {
 }
 
 function PackageDialog({ open, handleClose, detail }) {
-    const entities = useSelector(store => store[keyStore]?.cusShelf?.detailEntities);
+    const entities = useSelector(store => store[keyStore]?.order?.detailEntities);
     const [tab, setTab] = useState(null);
     const dispatch = useDispatch();
 

@@ -19,6 +19,7 @@ import History from "@history";
 import { useParams } from "react-router";
 import { Box, styled } from "@material-ui/core";
 import PackageDialog from "./PackageDialog";
+import { getWine } from "app/main/customer-shelf/store/customerShelfSlice";
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -112,6 +113,7 @@ function OrderView() {
                     onClick={() => {
                         setOpenDialog('package');
                         setDetail(item);
+                        dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
                     }} />
             </div>
         ) || []
@@ -132,10 +134,10 @@ function OrderView() {
 
     return (
         <LayoutCustom>
-            {open === 'package' &&
+            {openDialog === 'package' &&
                 <PackageDialog
                     detail={detail}
-                    open={open === 'package'}
+                    open={openDialog === 'package'}
                     handleClose={() => handleCloseDialog()}
                 />}
             <CmsCardedPage
