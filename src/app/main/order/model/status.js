@@ -1,6 +1,7 @@
 export const orderStatus = {
     1: { id: '1', name: 'Đã tạo', className: 'bg-gray-500' },
     2: { id: '2', name: 'Đã xác nhận', className: 'bg-orange-500' },
+    6: { id: '6', name: 'Đã đóng gói', className: 'bg-pink-500' },
     3: { id: '3', name: 'Đã thanh toán', className: 'bg-green-500' },
     4: { id: '4', name: 'Hoàn thành', className: 'bg-blue-500' },
     5: { id: '5', name: 'Chờ thanh toán', className: 'bg-purple-500' },
@@ -8,9 +9,10 @@ export const orderStatus = {
 }
 
 export const orderStatusArray = [
-    { id: '6', name: 'Tất cả', className: 'bg-pink-500' },
+    { id: '100', name: 'Tất cả', className: 'bg-pink-500' },
     { id: '1', name: 'Đã tạo', className: 'bg-gray-500' },
     { id: '2', name: 'Đã xác nhận', className: 'bg-orange-500' },
+    { id: '6', name: 'Đã đóng gói', className: 'bg-pink-500' },
     { id: '3', name: 'Đã thanh toán', className: 'bg-green-500' },
     { id: '4', name: 'Hoàn thành', className: 'bg-blue-500' },
     { id: '5', name: 'Chờ thanh toán', className: 'bg-purple-500' },

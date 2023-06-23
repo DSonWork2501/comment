@@ -51,9 +51,10 @@ export default {
             filter: {
                 get: params => axios.get(`${baseurl}/product/get-filter`, { params }),
             },
-            other:{
-                addProductCate:entity => axios.post(`${baseurl}/product/insert-cate-product`, entity),
+            other: {
+                addProductCate: entity => axios.post(`${baseurl}/product/insert-cate-product`, entity),
                 removeProductCate: entity => axios.put(`${baseurl}/product/update-cate-product`, entity),
+                wineArrange: entity => axios.put(`${baseurl}/customer/wine-arrange`, entity),
             }
         },
         category: {

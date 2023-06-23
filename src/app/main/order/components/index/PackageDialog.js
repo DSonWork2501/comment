@@ -1,13 +1,13 @@
-import { CmsButton, CmsButtonProgress, CmsDialog, CmsLabel, } from "@widgets/components"
+import { CmsButton, CmsButtonProgress, CmsCheckbox, CmsDialog, CmsLabel, } from "@widgets/components"
 import React, { useState } from "react"
 import { keyStore } from "../../common"
 import { useDispatch, useSelector } from "react-redux"
 import clsx from "clsx"
 import noImage from '@widgets/images/noImage.jpg';
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
-import { Link, makeStyles } from "@material-ui/core"
+import { Divider, Link, makeStyles } from "@material-ui/core"
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup/FuseAnimateGroup"
-import { getListHS } from "app/main/product/store/productSlice"
+import { getListHS, product } from "app/main/product/store/productSlice"
 import ProductSearch from "app/main/product/components/product/edit/classify/rightSide/ProductSearch"
 import ProductSearchList from "app/main/product/components/product/edit/classify/rightSide/ProductSearchList"
 import { useEffect } from "react"
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // Ngăn tủ
-function DetailModelContent({ value, setTab, handleChooseUniqueID }) {
+function DetailModelContent({ value, setTab, handleChooseUniqueID, handleCheck }) {
     const classes = useStyles()
     const slots = value?.slots || []
 
@@ -43,9 +43,6 @@ function DetailModelContent({ value, setTab, handleChooseUniqueID }) {
                 />
             </div>
             <div className="w-full space-y-8">
-                <div>
-
-                </div>
                 {slots.map((item, index) => (
                     <DetailShelfProductContent
                         data={item}
@@ -54,6 +51,7 @@ function DetailModelContent({ value, setTab, handleChooseUniqueID }) {
                         handleChooseUniqueID={handleChooseUniqueID}
                         key={`DetailShelfProductContent-${index}`}
                         classes={classes}
+                        handleCheck={handleCheck}
                     />
                 ))}
             </div>
@@ -120,7 +118,7 @@ export const ProductPopup = ({ setTab, handleChooseUniqueID }) => {
     </>
 }
 
-function PackageDialog({ open, handleClose, detail }) {
+function PackageDialog({ open, handleClose, detail, handleCheck }) {
     const entities = useSelector(store => store[keyStore]?.order?.detailEntities);
     const [tab, setTab] = useState(null);
     const dispatch = useDispatch();
@@ -229,9 +227,6 @@ function PackageDialog({ open, handleClose, detail }) {
                 tab === null
                     ? <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }} className="w-full">
                         <div className="w-full space-y-4">
-                            <div className="text-right">
-                                {entities?.data.length > 0 && <CmsButton className="" variant="outlined" size="small" label="Print All" component={Link} onClick={() => handleDownloadAll()} />}
-                            </div>
                             {entities?.data?.length > 0 ? entities?.data?.map((item, index) => (
                                 <DetailModelContent
                                     value={item}
@@ -239,6 +234,7 @@ function PackageDialog({ open, handleClose, detail }) {
                                     handleChooseUniqueID={handleChooseUniqueID}
                                     setTab={setTab}
                                     key={`DetailShelf-${index}`}
+                                    handleCheck={handleCheck}
                                 />
                             )) : <div className="border-collapse border-2 border-green-500">
                                 <CmsLabel
@@ -260,9 +256,17 @@ function PackageDialog({ open, handleClose, detail }) {
 }
 
 // chi tiết ngăn tủ
-function DetailShelfProductContent({ data, index, classes, setTab, handleChooseUniqueID }) {
+function DetailShelfProductContent({ data, index, classes, setTab, handleChooseUniqueID, handleCheck }) {
     const value = data?.item || null
     const img = value.img ? `${baseurl}${value.img}` : noImage
+    const dispatch = useDispatch();
+
+    // const handleCheck = (check) => {
+    //     dispatch(product.other.wineArrange([{
+    //         id: value.id,
+    //         ispacked: check ? 1 : 0
+    //     }]))
+    // }
 
     const handleDownload = ({ qrcode, name, uniqueid }) => {
         // var a = document.createElement("a"); //Create <a>
@@ -301,7 +305,7 @@ function DetailShelfProductContent({ data, index, classes, setTab, handleChooseU
                 key={`div-0-detai-${index}`}
                 className={clsx("w-full flex flex-row shadow-2 hover:shadow-4 p-4 min-h-64", classes.shelf, value?.status === 0 && 'opacity-10')}
             >
-                <div className="w-1/5 self-center">
+                <div className="w-2/6 self-center">
                     <img src={img} alt="image_detail" className="object-cover h-92" />
                 </div>
                 <div className="w-full self-center space-y-16">
@@ -314,9 +318,22 @@ function DetailShelfProductContent({ data, index, classes, setTab, handleChooseU
                     {/* <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min' }} info={{ content: value?.color || '-' }} /> */}
                     <LabelInfo key={`sku-${index}-labelInfo`} label={{ content: 'sku', className: 'min-w-min' }} info={{ content: value?.sku || '-' }} />
                 </div>
-                <div className="w-1/5 self-center space-y-2 text-center">
+                <div className="w-1/6 self-center space-y-2 text-center">
                     <img alt={`qrcord_${index}`} src={value.qrcode ? `data:image/png;base64, ${value.qrcode}` : noImage} className="" />
                     {value.qrcode && <CmsButton variant="outlined" size="small" label="In" component={Link} onClick={() => handleDownload(value)} />}
+                </div>
+                <Divider className="h-92 mx-8" orientation="vertical" />
+                <div className="w-2/6 self-center space-y-2 text-center">
+                    <CmsCheckbox
+                        key={`box`}
+                        checked={Boolean(value.ispacked)}
+                        label="Đã Gói"
+                        value={false}
+                        onChange={e => {
+                            handleCheck(e.target.checked)
+                        }}
+                        name="status"
+                    />
                 </div>
             </div>
             {

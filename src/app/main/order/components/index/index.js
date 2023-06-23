@@ -19,7 +19,8 @@ import History from "@history";
 import { useParams } from "react-router";
 import { Box, styled } from "@material-ui/core";
 import PackageDialog from "./PackageDialog";
-import { getWine } from "app/main/customer-shelf/store/customerShelfSlice";
+import { getShelf, getWine } from "app/main/customer-shelf/store/customerShelfSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -56,7 +57,8 @@ function OrderView() {
     const [detail, setDetail] = useState(null);
     const totalValues = {
         0: summary?.da_huy ? summary?.da_huy?.toLocaleString('en-US') : 0,
-        6: (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)
+        6: summary?.da_dong_goi ? summary?.da_dong_goi?.toLocaleString('en-US') : 0,
+        100: (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)
             ? (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)?.toLocaleString('en-US')
             : 0,
         5: summary?.cho_thanh_toan ? summary?.cho_thanh_toan?.toLocaleString('en-US') : 0,
@@ -69,7 +71,7 @@ function OrderView() {
     useEffect(() => {
         if (typeof status === 'number' && !isNaN(status)) {
             let filter = { ...search };
-            if (status !== 6)
+            if (status !== 100)
                 filter.status = status;
             dispatch(getOrder(filter))
             dispatch(order.other.getSummary())
@@ -111,9 +113,13 @@ function OrderView() {
                     icon="wrap_text"
                     className="bg-blue-500 hover:bg-blue-700 hover:shadow-2 text-white"
                     onClick={() => {
-                        setOpenDialog('package');
                         setDetail(item);
-                        dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
+                        if (item.parentid === 1) {
+                            dispatch(getShelf({ cusID: item.cusId, type: 'wine', orderID: item.id }))
+                        } else {
+                            setOpenDialog('package');
+                            dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
+                        }
                     }} />
             </div>
         ) || []
@@ -132,12 +138,22 @@ function OrderView() {
         setDetail(null);
     }
 
+    const handleCheck = async (check) => {
+        const resultAction = await dispatch(product.other.wineArrange([{
+            id: value.id,
+            ispacked: check ? 1 : 0
+        }]))
+        unwrapResult(resultAction);
+        dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
+    }
+
     return (
         <LayoutCustom>
             {openDialog === 'package' &&
                 <PackageDialog
                     detail={detail}
                     open={openDialog === 'package'}
+                    handleCheck={handleCheck}
                     handleClose={() => handleCloseDialog()}
                 />}
             <CmsCardedPage
