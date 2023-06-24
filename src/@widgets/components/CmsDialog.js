@@ -7,6 +7,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import * as PropTypes from 'prop-types'
 import CmsButtonProgress from './CmsButtonProgress';
+import { LinearProgress } from '@material-ui/core';
 
 function CmsDialog(props) {
     const {
@@ -47,6 +48,9 @@ function CmsDialog(props) {
             BackdropProps={backdropProps}
             className={className}
         >
+            {
+                loading &&  <LinearProgress />
+            }
             <DialogTitle className={titleClass} id="form-dialog-title">{title}</DialogTitle>
             {!isForm ? <>
                 <DialogContent className={contentClass}>
