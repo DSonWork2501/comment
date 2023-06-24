@@ -5,7 +5,6 @@ import withReducer from "app/store/withReducer";
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { keyStore, links } from "../../common";
 import FilterOptionView from "./filterOptionView";
@@ -91,11 +90,6 @@ function OrderView() {
         setOpen('detail')
     }
 
-    const HandleChangeStatus = (item) => {
-        setOpen('changeStatus')
-        setInfo(item)
-    }
-
     const HandleSaveStatus = (value) => {
         console.log(value);
         dispatch(updateOrderStatus(value))
@@ -115,7 +109,33 @@ function OrderView() {
         return '';
     }
 
-    const data = useMemo(() => entities?.data?.map(item => ({
+    const handleStatus = (item) => {
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: { item },
+            confirm: async () => {
+                let form = {
+                    id: item.id,
+                    cusID: item.cusId
+                }
+                if (status === 1)
+                    form.status = 2
+                if (status === 2)
+                    form.status = 6
+                if (status === 6)
+                    form.status = 5
+                if (status === 5)
+                    form.status = 3
+                if (status === 3)
+                    form.status = 4
+                const resultAction = await dispatch(updateOrderStatus(form))
+                unwrapResult(resultAction);
+                getListTable(search, status);
+            },
+        })
+    }
+
+    const data = entities?.data?.map(item => ({
         id: item.id,
         createdate: ConvertDateTime.DisplayDateTime(item.createdate),
         moneydiscount: item.moneydiscount,
@@ -125,54 +145,49 @@ function OrderView() {
         status: <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} />,
         action: (
             <div className="w-full flex flex-row space-x-4">
-                <CmsIconButton
-                    tooltip={returnName(item.status)}
-                    icon="navigate_next"
-                    className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
-                    onClick={() => alertInformation({
-                        text: `Xác nhận thao tác`,
-                        data: { item },
-                        confirm: async () => {
-                            let form = {
-                                id: item.id,
-                                cusID: item.cusId
-                            }
-                            if (status === 1)
-                                form.status = 2
-                            if (status === 2)
-                                form.status = 6
-                            if (status === 6)
-                                form.status = 5
-                            if (status === 5)
-                                form.status = 3
-                            if (status === 3)
-                                form.status = 4
-                            const resultAction = await dispatch(updateOrderStatus(form))
-                            unwrapResult(resultAction);
-                            getListTable(search, status);
-                        },
-                    })} />
-                <CmsIconButton
+                {
+                    (item.status !== 2 && item.status !== 0 && item.status !== 4)
+                    &&
+                    <CmsIconButton
+                        tooltip={returnName(item.status)}
+                        icon="navigate_next"
+                        className={clsx("hover:shadow-2 text-white"
+                            , status === 1 ? "bg-orange-500 hover:bg-orange-700" : ''
+                            , status === 2 ? "bg-pink-500 hover:bg-pink-500" : ''
+                            , status === 6 ? "bg-purple-500 hover:bg-purple-500" : ''
+                            , status === 5 ? "bg-green-500 hover:bg-green-500" : ''
+                            , status === 3 ? "bg-blue-500 hover:bg-blue-500" : ''
+                        )}
+                        onClick={() => handleStatus(item)} />
+                }
+
+                {/* <CmsIconButton
                     tooltip={'Edit Trạng thái'}
                     icon="edit"
                     className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
-                    onClick={() => HandleChangeStatus(item)} />
-                <CmsIconButton
-                    tooltip={'Đóng gói'}
-                    icon="wrap_text"
-                    className="bg-blue-500 hover:bg-blue-700 hover:shadow-2 text-white"
-                    onClick={() => {
-                        setDetail(item);
-                        setOpenDialog('package');
-                        if (item.parentid === 1) {
-                            dispatch(getShelf({ cusID: item.cusId, type: 'wine', orderID: item.id }))
-                        } else {
-                            dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
-                        }
-                    }} />
+                    onClick={() => HandleChangeStatus(item)} /> */}
+
+                {
+                    item.status === 2
+                    &&
+                    <CmsIconButton
+                        tooltip={'Đóng gói'}
+                        icon="wrap_text"
+                        className="bg-blue-500 hover:bg-blue-700 hover:shadow-2 text-white"
+                        onClick={() => {
+                            setDetail(item);
+                            setOpenDialog('package');
+                            if (item.parentid === 1) {
+                                dispatch(getShelf({ cusID: item.cusId, type: 'wine', orderID: item.id }))
+                            } else {
+                                dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
+                            }
+                        }} />
+                }
+
             </div>
         ) || []
-    })), [entities])
+    }))
 
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
@@ -208,7 +223,7 @@ function OrderView() {
                     handleCheck={handleCheck}
                     handleClose={() => handleCloseDialog()}
                     handlePackage={() => {
-                        console.log(123);
+                        handleStatus(detail)
                     }}
 
                 />}

@@ -7,7 +7,7 @@ import noImage from '@widgets/images/noImage.jpg';
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { Divider, Link, makeStyles } from "@material-ui/core"
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup/FuseAnimateGroup"
-import { getListHS, product } from "app/main/product/store/productSlice"
+import { getListHS } from "app/main/product/store/productSlice"
 import ProductSearch from "app/main/product/components/product/edit/classify/rightSide/ProductSearch"
 import ProductSearchList from "app/main/product/components/product/edit/classify/rightSide/ProductSearchList"
 import { useEffect } from "react"
@@ -194,7 +194,7 @@ function PackageDialog({ open, handleClose, detail, handleCheck, handlePackage }
             },
         })
     }
-    
+
     return (
         <CmsDialog
             title={`Thông tin chi tiết ${detail?.parentid === 1 ? 'chai rượu' : 'tủ rượu'}`}
