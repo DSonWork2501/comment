@@ -35,6 +35,7 @@ function CategoryView() {
     const dispatch = useDispatch()
     const search = useSelector(store => store[keyStore].category.search)
     const loading = useSelector(store => store[keyStore].category.loading)
+    //const popupLoading = useSelector(store => store[keyStore].category.popupLoading)
     const entities = useSelector(store => store[keyStore].category.entities)
     const [open, setOpen] = useState(null);
     const [editId, setEditId] = useState(0);
@@ -50,7 +51,7 @@ function CategoryView() {
     useEffect(() => {
         if (typeof parseInt(type) === 'number')
             getListTable({ ...search, type: parseInt(type) === 1 ? 0 : 1 })
-    }, [getListTable, dispatch, search, type])
+    }, [getListTable, dispatch, search,type])
 
     // const HandleChangeStatus = useCallback((status, item) => {
     //     alertInformation({
@@ -155,7 +156,7 @@ function CategoryView() {
                                                     val.status === 0
                                                     &&
                                                     <CmsIconButton
-                                                        tooltip="Tắt"
+                                                        tooltip="Mở"
                                                         delay={50}
                                                         icon="launch"
                                                         className="bg-blue-500 text-white shadow-3  hover:bg-blue-900 mb-4 opacity-0"

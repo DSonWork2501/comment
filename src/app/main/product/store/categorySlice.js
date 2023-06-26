@@ -207,20 +207,20 @@ const categorySlice = createSlice({
          */
         [getById.pending]: state => ({
             ...state,
-            loading: true,
+            popupLoading: true,
             error: null
         }),
         [getById.fulfilled]: (state, { payload }) => {
             return {
                 ...state,
-                loading: false,
+                popupLoading: false,
                 entity: payload,
                 error: null
             }
         },
         [getById.rejected]: (state, { error }) => ({
             ...state,
-            loading: false,
+            popupLoading: false,
             error: error
         }),
         /**
