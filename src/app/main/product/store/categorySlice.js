@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
+import { getErrorMessage } from '@widgets/functions';
 
 
 const appName = "products";
@@ -67,6 +68,20 @@ export const changeStatus = createAsyncThunk(`${appName}/${moduleName}/changeSta
         return error
     }
 });
+
+export const category = {
+    updateStatus: createAsyncThunk(`${appName}/${moduleName}/other/updateStatus`, async (entity, thunkAPI) => {
+        try {
+            const response = await connect.live.category.updateStatus(entity);
+            thunkAPI.dispatch(showMessage({ variant: "success", message: `Thao tác thành công !` }))
+            const data = await response.data;
+            return data
+        } catch (error) {
+            thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+            return thunkAPI.rejectWithValue(error)
+        }
+    }),
+}
 
 const initSearchState = {
     id: '',
