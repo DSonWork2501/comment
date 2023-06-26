@@ -1,6 +1,6 @@
 import { CmsButton, CmsCardedPage, CmsIconButton, CmsTab } from "@widgets/components";
 import withReducer from "app/store/withReducer";
-import React,{ useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
@@ -22,13 +22,9 @@ const links = [
 
 const LayoutCustom = styled(Box)({
     height: "100%",
-    "& .Mui-selected": {
-        background: 'rgb(215 247 250)'
+    "& .inner-scroll>div": {
+        minHeight: '70px'
     },
-    "& .inner-scroll >div:first-child": {
-        height: 90,
-        minHeight: 'initial'
-    }
 });
 
 function CategoryView() {
@@ -51,7 +47,7 @@ function CategoryView() {
     useEffect(() => {
         if (typeof parseInt(type) === 'number')
             getListTable({ ...search, type: parseInt(type) === 1 ? 0 : 1 })
-    }, [getListTable, dispatch, search,type])
+    }, [getListTable, dispatch, search, type])
 
     // const HandleChangeStatus = useCallback((status, item) => {
     //     alertInformation({
@@ -191,7 +187,14 @@ function CategoryView() {
                                                     icon="format_list_numbered"
                                                     className="bg-blue-500 text-white shadow-3  hover:bg-blue-900 mb-4 opacity-0"
                                                     component={Link}
-                                                    to={`/product-category/${val.id}`}
+                                                    to={
+                                                        {
+                                                            pathname: `/product-category/product/${val.id}`,
+                                                            state: {
+                                                                prevPath: `/product-category/${type}`
+                                                            }
+                                                        }
+                                                    }
                                                 />
                                             </div>
                                         </div>
