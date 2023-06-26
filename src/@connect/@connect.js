@@ -63,6 +63,7 @@ export default {
             update: entity => axios.put(`${baseurl}/product/update-category`, entity),
             changeStatus: entity => axios.put(`${baseurl}/product/delete-category`, entity),
             uploadImage: (entity) => axios.post(`${baseurl}/product/upload-image-cate`, entity, { headers: { 'Content-Type': 'multipart/form-data' } }),
+            updateStatus: entity => axios.put(`${baseurl}/product/delete-category`, entity),
         },
         account: {
             getList: params => axios.get(`${baseurl}/customer/get-account`, { params }),
