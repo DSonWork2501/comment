@@ -5,11 +5,13 @@ import MutipleImagePathLink from "../../common/MultipleImagePathLink";
 import noImage from '@widgets/images/noImage.jpg';
 import { FocusError } from "focus-formik-error";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadImage } from "app/main/product/store/productSlice";
+import { product, uploadImage } from "app/main/product/store/productSlice";
 import { keyStore } from "app/main/product/common";
 import CmsFormikProductType from '@widgets/components/product-type/index';
 import { FieldArray, FormikProvider } from "formik";
 import { Box, InputLabel, styled } from "@material-ui/core";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { alertInformation } from "@widgets/functions";
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 const BoxCustom = styled(Box)({
@@ -45,7 +47,7 @@ const BoxCustom = styled(Box)({
     }
 });
 
-function BasicInfo({ formik, SaveData, options }) {
+function BasicInfo({ formik, SaveData, options, handleFresh }) {
     const dispatch = useDispatch()
     const imageLoading = useSelector(store => store[keyStore].product.imgLoading)
     const { certification, madeIn, unit, classify, brands } = useSelector(store => store[keyStore].product);
@@ -61,7 +63,7 @@ function BasicInfo({ formik, SaveData, options }) {
         }
     }
 
-    const { values, setFieldValue } = formik;
+    const { values, setFieldValue } = formik, { properties } = values;
     const cerValue = (typeof values.certification !== 'object' || !Array.isArray(values.certification) ? (values?.certification ? values.certification.split(',') : []) : values.certification);
 
     return (
@@ -131,8 +133,9 @@ function BasicInfo({ formik, SaveData, options }) {
                     label="Chứng nhận"
                     className="py-0 m-0 w-full"
                     name="certification"
-                    onChange={(array) => { 
-                        setFieldValue('certification', array) }}
+                    onChange={(array) => {
+                        setFieldValue('certification', array)
+                    }}
                     vertical={false}
                     data={certification}
                     value={cerValue}
@@ -258,7 +261,28 @@ function BasicInfo({ formik, SaveData, options }) {
                                                     </div>
                                                     <div className='text-right pt-8'>
                                                         <CmsButton
-                                                            onClick={() => { remove(index); }}
+                                                            onClick={() => {
+                                                                if (properties[index]?.id) {
+                                                                    alertInformation({
+                                                                        text: `Xác nhận xóa`,
+                                                                        data: {},
+                                                                        confirm: async () => {
+                                                                            const resultAction = await dispatch(product.other.removeProperties(
+                                                                                {
+                                                                                    properties: [
+                                                                                        { ...properties[index] }
+                                                                                    ]
+                                                                                }
+                                                                            ));
+                                                                            unwrapResult(resultAction);
+                                                                            handleFresh()
+                                                                        },
+                                                                    });
+                                                                }
+                                                                else {
+                                                                    remove(index);
+                                                                }
+                                                            }}
                                                             label="Xóa"
                                                             size="small"
                                                             className="mt-8 text-white bg-red-600 hover:bg-red-600"

@@ -55,6 +55,7 @@ export default {
                 addProductCate: entity => axios.post(`${baseurl}/product/insert-cate-product`, entity),
                 removeProductCate: entity => axios.put(`${baseurl}/product/update-cate-product`, entity),
                 wineArrange: entity => axios.put(`${baseurl}/customer/wine-arrange`, entity),
+                removeProperties: entity => axios.put(`${baseurl}/product/delete-product`, entity),
             }
         },
         category: {
