@@ -61,7 +61,7 @@ const CheckIndex = (type, stack, slot, stack_index, slot_index) => {
     }
 }
 
-function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes }) {
+function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes, isCanFix }) {
 
     const handleChildClick = (e, stack_index, index) => {
         e.stopPropagation()
@@ -76,9 +76,14 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
                 className={clsx(CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}
             //className={clsx("w-4/5 flex flex-row focus:shadow-outline cursor-pointer pl-6 justify-between  bg-green-300 hover:bg-green-500 text-white rounded-12", CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}
             >
-                <div className="close-card">
-                    <CmsIconButton icon="close" onClick={() => HandleDeleteSlot(stack_index, index)} size="small" tooltip={'xóa slot'} className="text-red hover:shadow-2 border-red-500" key={`${index}_delete_slot`} />
-                </div>
+                {
+                    !isCanFix
+                    &&
+                    <div className="close-card">
+                        <CmsIconButton icon="close" onClick={() => HandleDeleteSlot(stack_index, index)} size="small" tooltip={'xóa slot'} className="text-red hover:shadow-2 border-red-500" key={`${index}_delete_slot`} />
+                    </div>
+                }
+
                 {
                     !item?.item
                     &&
@@ -126,9 +131,10 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
     ))
 }
 
-function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex }) {
+function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix }) {
     const classes = useStyles()
 
+    console.log(data);
     return (
         <BoxCustom label={'Thông tin tủ'}>
             <div className="w-full space-y-8" key={`div_stack_0`}>
@@ -145,9 +151,13 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 {/* <div key={`${index}_div_4_stack`} className="flex items-center justify-end space-x-8">
                                 </div> */}
                             </div>
-                            <div className="close-stack">
-                                <CmsIconButton icon="close" onClick={() => HandleDeleteStack(index)} size="small" tooltip={'xóa stack'} className="text-red " key={`${index}_delete_stack`} />
-                            </div>
+                            {
+                                !isCanFix
+                                &&
+                                <div className="close-stack">
+                                    <CmsIconButton icon="close" onClick={() => HandleDeleteStack(index)} size="small" tooltip={'xóa stack'} className="text-red " key={`${index}_delete_stack`} />
+                                </div>
+                            }
                         </div>
                         <div key={`${index}_div_5_stack`} className='w-full p-8 flex flex-wrap'>
                             <SlotContent
@@ -160,16 +170,25 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 stackIndex={stackIndex}
                                 slotIndex={slotIndex}
                                 classes={classes}
+                                isCanFix={isCanFix}
                             />
-                            <div className="w-full text-center m-0">
-                                <CmsButton size="small" startIcon="add" label="Slot" className="bg-yellow-700 hover:bg-yellow-900" onClick={() => HandleAddSlot(index)} />
-                            </div>
+                            {
+                                !isCanFix
+                                &&
+                                <div className="w-full text-center m-0">
+                                    <CmsButton size="small" startIcon="add" label="Slot" className="bg-yellow-700 hover:bg-yellow-900" onClick={() => HandleAddSlot(index)} />
+                                </div>
+                            }
                         </div>
                     </div>
                 ))}
-                <div className="w-full text-center m-0">
-                    <CmsButton size="small" startIcon="add" label="stack" className="bg-orange-700 hover:bg-orange-900" onClick={() => HandleAddStack()} />
-                </div>
+                {
+                    !isCanFix
+                    &&
+                    <div className="w-full text-center m-0">
+                        <CmsButton size="small" startIcon="add" label="stack" className="bg-orange-700 hover:bg-orange-900" onClick={() => HandleAddStack()} />
+                    </div>
+                }
             </div>
 
         </BoxCustom>)
