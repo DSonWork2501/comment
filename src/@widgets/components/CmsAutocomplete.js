@@ -3,6 +3,7 @@ import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import * as PropTypes from 'prop-types';
 import { Box, CircularProgress } from '@material-ui/core';
+import { useRef } from 'react';
 
 function sleep(delay = 0) {
     return new Promise((resolve) => {
@@ -33,6 +34,7 @@ function CmsAutocomplete(props) {
         ...textFieldProps
     } = props;
     const [options, setOptions] = React.useState([]);
+    const autocompleteRef = useRef(null);
 
     React.useEffect(() => {
         setOptions(loading ? [] : data)
@@ -91,6 +93,7 @@ function CmsAutocomplete(props) {
                                 </div>
                             ),
                         }}
+                        inputRef={autocompleteRef}
                     />
                 )}
                 {...autocompleteProps}
@@ -146,6 +149,7 @@ function CmsAutocomplete(props) {
                                 </div>
                             ),
                         }}
+                        inputRef={autocompleteRef}
                     />
                 )}
                 {...autocompleteProps}

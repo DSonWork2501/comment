@@ -15,7 +15,7 @@ const filterOptions = (options) => {
     return true;
 };
 
-const CustomOptionComponent = ({ innerProps, innerRef, children, options, value, onGetMore, totalRows, isGetMore }) => {
+const CustomOptionComponent = ({ innerProps, innerRef, children, options, value, onGetMore, totalRows, isGetMore, dropdownOption, data }) => {
     return <>
         {value === options[0]?.id && isGetMore
             ? <>
@@ -53,12 +53,12 @@ const CustomOptionComponent = ({ innerProps, innerRef, children, options, value,
                 zIndex: 9
             }}
         >
-            {children}
+            {dropdownOption ? dropdownOption(data) : children}
         </ListItem>
     </>
 }
 
-function CmcFormikLazySelect({ lazyLoading, formik, name = "default", multiple = false, label = "Select something", options = [], onSearch, debounceTime = 0, onChange, onGetMore, totalRows, valueOption, ...props }) {
+function CmcFormikLazySelect({ lazyLoading, formik, name = "default", multiple = false, label = "Select something", options = [], onSearch, debounceTime = 0, onChange, onGetMore, totalRows, valueOption, dropdownOption, ...props }) {
     const [inputValue, setInputValue] = useState('');
     const keyValueOption = valueOption ? valueOption : 'id';
     const valueForm = get(formik.values, name);
@@ -136,6 +136,7 @@ function CmcFormikLazySelect({ lazyLoading, formik, name = "default", multiple =
                     onGetMore={() => handleGetMore()}
                     isGetMore={onGetMore}
                     totalRows={totalRows || 0}
+                    dropdownOption={dropdownOption}
                 />,
             }}
             isLoading={lazyLoading}

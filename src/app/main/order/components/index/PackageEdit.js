@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { CmsButton, CmsCardedPage } from '@widgets/components';
+import React, { useMemo, useState } from 'react';
+import { CmsButton, CmsCardedPage, CmsFormikAutocomplete } from '@widgets/components';
 import { useFormik } from 'formik';
 import * as Yup from 'yup'
 import { Box, InputLabel, styled } from '@material-ui/core';
@@ -12,6 +12,7 @@ import { getList } from '../../store/orderSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getShelf, getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
 import LeftSideContent from 'app/main/product/components/product/edit/classify/LeftSideContent';
+import RightSideContent from 'app/main/product/components/product/edit/classify/RightSideContent';
 
 const BoxCustom = styled(Box)({
     border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -73,6 +74,21 @@ function FormEdit() {
     const orders = useSelector(store => store[keyStore].order.entities?.data) || [];
     const detailEntities = useSelector(store => store[keyStore]?.order?.detailEntities?.data) || [];
     const [loading, setLoading] = useState();
+    const listWine = useMemo(() => {
+        let data = [];
+        detailEntities?.length && detailEntities.forEach((element, index) => {
+            element?.slots?.length && element.slots.forEach(e => {
+                data.push({
+                    id: e.item.id,
+                    img: e.item.img,
+                    sku: e.item.sku,
+                    name: e.item.name,
+                })
+            });
+        });
+        return data
+    }, [detailEntities])
+
 
     const handleSave = () => {
 
@@ -87,7 +103,7 @@ function FormEdit() {
         })
     })
 
-    console.log(detailEntities?.length);
+    const { values } = formik, { orderID, productID } = values;
 
     return (
         <React.Fragment>
@@ -113,10 +129,10 @@ function FormEdit() {
                 //     <></>
                 // }
                 content={
-                    <div className="w-full flex justify-between p-8">
+                    <div className="w-full h-full flex justify-between p-8">
                         <div style={{ width: '39%' }}>
                             <BoxCustom
-                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label">
+                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label h-full">
                                 <InputLabel
                                     className='custom-label'>
                                     Thông tin đơn hàng
@@ -130,8 +146,29 @@ function FormEdit() {
                                             formik={formik}
                                             label='ID đơn hàng'
                                             getOptionLabel={(option) => option?.id + ' | ' + option?.cusname}
-                                            getOptionValue={(option) => option?.id + ' | ' + option?.cusname}
-                                            // valueOption='movieID'
+                                            dropdownOption={(option) => {
+                                                return (
+                                                    <div className='flex items-center'>
+                                                        <img style={{ height: 60, margin: '0 auto' }} src={`${option?.productorders[0]?.image ? `${process.env.REACT_APP_BASE_URL}api/product/img/${option?.productorders[0].image}` : 'assets/images/etc/no-image-icon.png'}`} alt={option?.img} />
+                                                        <div className='p-2'>
+                                                        </div>
+                                                        <div className='text-12'>
+                                                            <div>
+                                                                <b>
+                                                                    {
+                                                                        option?.id + ' | ' + option?.cusname
+                                                                    }
+                                                                </b>
+                                                            </div>
+                                                            <div >
+                                                                {
+                                                                    option?.productorders[0]?.name
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }}
                                             onSearch={async (value) => {
                                                 setLoading(true);
                                                 if (value)
@@ -156,27 +193,23 @@ function FormEdit() {
                                         />
                                     </div>
                                     <div style={{ width: '49%' }}>
-                                        <CmcFormikLazySelect
-                                            name="contractID"
-                                            debounceTime={500}
-                                            options={[]}
+                                        <CmsFormikAutocomplete
+                                            className="my-8"
+                                            name="productID"
                                             formik={formik}
-                                            label='QrCode/BarCode'
-                                            getOptionLabel={(option) => option.contract}
-                                            // getOptionValue={(option) => option.movieID}
-                                            // valueOption='movieID'
-                                            onSearch={async (value) => {
-                                                // setLoading(true);
-                                                // await dispatch(ads.contract.getList({ page: 1, limit: 20, partnerID, contract: value }));
-                                                // setLoading(false);
+                                            label="BarCode/QrCode SP"
+                                            data={listWine}
+                                            disabled={!Boolean(detailEntities?.length)}
+                                            size="small"
+                                            autocompleteProps={{
+                                                getOptionLabel: (option) => option?.id + ' | ' + option?.name || '',
+                                                ChipProps: {
+                                                    size: 'small'
+                                                },
+                                                size: 'small',
                                             }}
-                                            onChange={(value) => {
-                                                //formik.setFieldValue('campainID', null);
-
-                                            }}
-                                            lazyLoading={true}
-                                            classes="my-8 small"
-                                        />
+                                            setOption={(option) => option?.id + ' | ' + option?.name || ''}
+                                            valueIsId />
                                     </div>
                                 </div>
                                 <div>
@@ -186,6 +219,7 @@ function FormEdit() {
                                         <LeftSideContent
                                             data={detailEntities}
                                             isCanFix
+                                            productID={productID}
                                         // HandleAddStack={HandleAddStack}
                                         // HandleAddSlot={HandleAddSlot}
                                         // HandleClickDetail={HandleClickDetail}
@@ -200,12 +234,47 @@ function FormEdit() {
                         </div>
                         <div style={{ width: '59%' }}>
                             <BoxCustom
-                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label">
+                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label h-full">
                                 <InputLabel
                                     className='custom-label'>
                                     Thông chi tiết
                                 </InputLabel>
-
+                                {
+                                    Boolean(orderID)
+                                    &&
+                                    <div className='flex'>
+                                        <div className='w-1/2'>
+                                            <div>
+                                                <b>
+                                                    ID đơn hàng:
+                                                </b>
+                                                {orders[0].id}
+                                            </div>
+                                            <div>
+                                                <b>
+                                                    Khách hàng:
+                                                </b>
+                                                {orders[0].cusname}
+                                            </div>
+                                        </div>
+                                        <div className='w-1/2'>
+                                            <div>
+                                                <b>
+                                                    Số điện thoại:
+                                                </b>
+                                                {orders[0].cusname}
+                                            </div>
+                                            <div>
+                                                <b>
+                                                    Hợp đồng:
+                                                </b>
+                                                {orders[0].cusname}
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                <RightSideContent
+                                />
                             </BoxCustom>
                         </div>
                     </div>

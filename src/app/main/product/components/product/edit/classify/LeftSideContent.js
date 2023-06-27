@@ -35,6 +35,12 @@ const BoxCustom = styled(CmsBoxLine)({
         width: "100%",
         marginBottom: 8
     },
+    "& .item-card >div.isSearchBC": {
+        "box-shadow": " 1px 3px 7px #9ab11d",
+    },
+    "& .item-card >div.isSearchBC p": {
+        color: '#b1b145'
+    },
     "& .item-card .close-card": {
         "position": "absolute",
         "right": "2px",
@@ -61,7 +67,7 @@ const CheckIndex = (type, stack, slot, stack_index, slot_index) => {
     }
 }
 
-function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes, isCanFix }) {
+function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes, isCanFix, productID }) {
 
     const handleChildClick = (e, stack_index, index) => {
         e.stopPropagation()
@@ -73,7 +79,7 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
         <div className="flex flex-row-reverse  w-1/3 item-card px-4" key={`${index}_div_slot_5`}>
             <div key={`${index}_div_slot_0`}
                 onClick={(e) => handleChildClick(e, stack_index, index)}
-                className={clsx(CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}
+                className={clsx(CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen, productID === item?.item?.id ? 'isSearchBC' : '')}
             //className={clsx("w-4/5 flex flex-row focus:shadow-outline cursor-pointer pl-6 justify-between  bg-green-300 hover:bg-green-500 text-white rounded-12", CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}
             >
                 {
@@ -117,7 +123,7 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
                                 </div>
                             </>}>
                                 <div className="w-full flex flex-row items-center">
-                                    <CmsIconButton size="small" icon="info" className="" />
+                                    <CmsIconButton size="small" icon="info" color={productID === item?.item?.id ? 'secondary' : 'primary'} />
                                     <CmsLabel content={item.item?.name} className="text-10 w-88 truncate" />
                                 </div>
                             </Tooltip>
@@ -131,7 +137,7 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
     ))
 }
 
-function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix }) {
+function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix, productID }) {
     const classes = useStyles()
 
     console.log(data);
@@ -171,6 +177,7 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 slotIndex={slotIndex}
                                 classes={classes}
                                 isCanFix={isCanFix}
+                                productID={productID}
                             />
                             {
                                 !isCanFix
