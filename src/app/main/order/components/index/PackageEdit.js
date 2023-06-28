@@ -213,37 +213,39 @@ function FormEdit() {
 
     const updateItems = useCallback(
         (rest) => {
-            if (rest?.payload && rest?.payload?.result) {
-                const values = rest?.payload?.data;
-                if (values?.length && current) {
-                    if (current?.parentid === 1) {
-                        setReList([
-                            {
-                                name: 'Rượu Lẻ',
-                                slots: [
-                                    {
-                                        type: 'slot',
-                                        isNotShow: true,
-                                        item: values[0]
-                                    }
-                                ]
-                            }
-                        ])
-                    } else {
-                        setReList(values.map(val => ({
-                            ...val, slots: val.slots.map(e => ({
-                                ...e,
-                                type: e.slot_type,
-                                name: e.slot_name,
-                                active: e.slot_active,
-                                capacity: e.slot_capacity,
-                                heightlimit: e.slot_heightlimit,
-                            }))
-                        })))
+            try {
+                if (rest?.payload && rest?.payload?.result) {
+                    const values = rest?.payload?.data;
+                    if (values?.length && current) {
+                        if (current?.parentid === 1) {
+                            setReList([
+                                {
+                                    name: 'Rượu Lẻ',
+                                    slots: [
+                                        {
+                                            type: 'slot',
+                                            isNotShow: true,
+                                            item: values[0]
+                                        }
+                                    ]
+                                }
+                            ])
+                        } else {
+                            setReList(values.map(val => ({
+                                ...val, slots: val.slots.map(e => ({
+                                    ...e,
+                                    type: e.slot_type,
+                                    name: e.slot_name,
+                                    active: e.slot_active,
+                                    capacity: e.slot_capacity,
+                                    heightlimit: e.slot_heightlimit,
+                                }))
+                            })))
+                        }
                     }
-                }
 
-            }
+                }
+            } catch { }
         }, [current])
 
     useEffect(() => {
