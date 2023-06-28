@@ -45,7 +45,7 @@ function CategoryView() {
     }, [dispatch])
 
     useEffect(() => {
-        if (typeof parseInt(type) === 'number')
+        if (parseInt(type) === 1 || parseInt(type) === 2)
             getListTable({ ...search, type: parseInt(type) === 1 ? 0 : 1 })
     }, [getListTable, dispatch, search, type])
 

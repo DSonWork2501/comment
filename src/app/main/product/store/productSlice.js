@@ -210,7 +210,6 @@ export const product = {
         wineArrange: createAsyncThunk(`${appName}/${moduleName}/other/wineArrange`, async (entity, thunkAPI) => {
             try {
                 const response = await connect.live.product.other.wineArrange(entity);
-                thunkAPI.dispatch(showMessage({ variant: "success", message: `${entity[0]?.ispacked ? 'Đóng gói sản phẩm' : 'Thao tác'}  thành công !` }))
                 const data = await response.data;
                 return data
             } catch (error) {

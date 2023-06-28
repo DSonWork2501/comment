@@ -1,4 +1,4 @@
-import { CmsBoxLine, CmsButton, CmsIconButton, CmsLabel } from "@widgets/components"
+import { CmsBoxLine, CmsButton, CmsCheckbox, CmsIconButton, CmsLabel } from "@widgets/components"
 import React from "react"
 import { Tooltip, makeStyles, styled } from "@material-ui/core"
 import clsx from "clsx"
@@ -50,6 +50,11 @@ const BoxCustom = styled(CmsBoxLine)({
     },
     "& .item-card:hover .close-card": {
         opacity: 1
+    },
+    "& .checkBoxPack": {
+        position: "absolute",
+        top: 0,
+        right: 0
     }
 });
 
@@ -67,7 +72,7 @@ const CheckIndex = (type, stack, slot, stack_index, slot_index) => {
     }
 }
 
-function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes, isCanFix, productID }) {
+function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes, isCanFix, productID, handleCheckBox }) {
 
     const handleChildClick = (e, stack_index, index) => {
         e.stopPropagation()
@@ -104,7 +109,24 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
                     item?.item
                     &&
                     <div key={`${index}_div_2_slot`}  >
-                        <div className="h-84 text-center m-auto">
+                        {
+                            handleCheckBox
+                            &&
+                            <div className="checkBoxPack" onClick={(e) => e.stopPropagation()}>
+                                <CmsCheckbox
+                                    key={`box`}
+                                    checked={Boolean(item?.item.ispacked)}
+                                    value={false}
+                                    onChange={(e) => {
+                                        handleCheckBox(e.target.checked, item?.item, () => {
+                                            HandleClickDetail(e, stack_index, index)
+                                        })
+                                    }}
+                                    name="status"
+                                />
+                            </div>
+                        }
+                        <div className="h-128 text-center m-auto">
                             <img style={{ objectFit: 'contain', height: '100%', margin: 'auto' }} src={`${process.env.REACT_APP_BASE_URL}api/product/img/${item?.item?.img}`} alt="imageforitem" />
                         </div>
                         <div>
@@ -137,10 +159,18 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
     ))
 }
 
-function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix, productID, label }) {
+function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix, productID, label, handleCheckBox, detailCheck }) {
     const classes = useStyles()
     return (
         <BoxCustom label={label || 'Thông tin tủ'}>
+            {
+                detailCheck
+                &&
+                <h3 className="text-right pb-8">
+                    Đã gói {detailCheck.totalCheck}/{detailCheck.totalWine}
+                </h3>
+            }
+
             <div className="w-full space-y-8" key={`div_stack_0`}>
                 {data?.map((item, index) => (
                     <div key={`${index}_div_stack_1`} className={clsx("contain-stack w-full")} onClick={(e) => HandleClickDetail(e, index)}>
@@ -176,6 +206,7 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 classes={classes}
                                 isCanFix={isCanFix}
                                 productID={productID}
+                                handleCheckBox={handleCheckBox}
                             />
                             {
                                 !isCanFix

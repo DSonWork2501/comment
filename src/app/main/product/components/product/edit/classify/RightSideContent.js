@@ -45,7 +45,6 @@ function RightSideContent({ formik, prefix, isCanSelect }) {
                                 />
                             </CmsBoxLine>
                         }
-
                     </FuseAnimateGroup>
                 </>
             }
