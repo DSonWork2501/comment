@@ -2,7 +2,7 @@ import { CmsAlert, CmsBoxLine, CmsButton, CmsButtonProgress, CmsCardedPage, CmsL
 import { keyStore } from "app/main/product/common"
 import reducer from "app/main/product/store"
 import withReducer from "app/store/withReducer"
-import React from "react"
+import React, { useCallback } from "react"
 import { useEffect } from "react"
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -37,11 +37,19 @@ function EditProduct(props) {
     const [data, setData] = useState(null)
     const [tabValue, setTabValue] = useState(TabType.co_ban.id)
 
+    const getListTable = useCallback((params) => {
+        dispatch(getDetail({ sku: params?.id }))
+    }, [dispatch])
+
     useEffect(() => {
         if (params?.id) {
-            dispatch(getDetail({ sku: params?.id }))
+            getListTable(params)
         }
-    }, [params, dispatch])
+    }, [params, dispatch, getListTable])
+
+    const handleFresh = () => {
+        getListTable(params)
+    }
 
     useEffect(() => {
         dispatch(getOrigin());
@@ -150,7 +158,9 @@ function EditProduct(props) {
                         <CmsLoadingOverlay loading={loading} />
                         {tabValue === TabType.co_ban.id &&
                             <CmsBoxLine label="Thông tin cơ bản">
-                                <BasicInfo formik={formik} options={{ origins, cates }} />
+                                <BasicInfo
+                                    handleFresh={handleFresh}
+                                    formik={formik} options={{ origins, cates }} />
                             </CmsBoxLine>}
                         {tabValue === TabType.phan_loai.id &&
                             <CmsBoxLine label="Thông tin phân loại">

@@ -135,6 +135,11 @@ function OrderView() {
         })
     }
 
+    const HandleChangeStatus = (item) => {
+        setOpen('changeStatus')
+        setInfo(item)
+    }
+
     const data = entities?.data?.map(item => ({
         id: item.id,
         createdate: ConvertDateTime.DisplayDateTime(item.createdate),
@@ -161,11 +166,11 @@ function OrderView() {
                         onClick={() => handleStatus(item)} />
                 }
 
-                {/* <CmsIconButton
+                <CmsIconButton
                     tooltip={'Edit Trạng thái'}
                     icon="edit"
                     className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
-                    onClick={() => HandleChangeStatus(item)} /> */}
+                    onClick={() => HandleChangeStatus(item)} />
 
                 {
                     item.status === 2

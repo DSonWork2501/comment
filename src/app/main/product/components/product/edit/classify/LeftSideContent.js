@@ -1,4 +1,4 @@
-import { CmsBoxLine, CmsButton, CmsIconButton, CmsLabel } from "@widgets/components"
+import { CmsBoxLine, CmsButton, CmsCheckbox, CmsIconButton, CmsLabel } from "@widgets/components"
 import React from "react"
 import { Tooltip, makeStyles, styled } from "@material-ui/core"
 import clsx from "clsx"
@@ -35,6 +35,12 @@ const BoxCustom = styled(CmsBoxLine)({
         width: "100%",
         marginBottom: 8
     },
+    "& .item-card >div.isSearchBC": {
+        "box-shadow": " 1px 3px 7px #9ab11d",
+    },
+    "& .item-card >div.isSearchBC p": {
+        color: '#b1b145'
+    },
     "& .item-card .close-card": {
         "position": "absolute",
         "right": "2px",
@@ -44,6 +50,11 @@ const BoxCustom = styled(CmsBoxLine)({
     },
     "& .item-card:hover .close-card": {
         opacity: 1
+    },
+    "& .checkBoxPack": {
+        position: "absolute",
+        top: 0,
+        right: 0
     }
 });
 
@@ -61,7 +72,7 @@ const CheckIndex = (type, stack, slot, stack_index, slot_index) => {
     }
 }
 
-function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes }) {
+function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes, isCanFix, productID, handleCheckBox }) {
 
     const handleChildClick = (e, stack_index, index) => {
         e.stopPropagation()
@@ -73,12 +84,17 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
         <div className="flex flex-row-reverse  w-1/3 item-card px-4" key={`${index}_div_slot_5`}>
             <div key={`${index}_div_slot_0`}
                 onClick={(e) => handleChildClick(e, stack_index, index)}
-                className={clsx(CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}
+                className={clsx(CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen, (Boolean(productID && productID === item?.item?.id)) ? 'isSearchBC' : '')}
             //className={clsx("w-4/5 flex flex-row focus:shadow-outline cursor-pointer pl-6 justify-between  bg-green-300 hover:bg-green-500 text-white rounded-12", CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}
             >
-                <div className="close-card">
-                    <CmsIconButton icon="close" onClick={() => HandleDeleteSlot(stack_index, index)} size="small" tooltip={'xóa slot'} className="text-red hover:shadow-2 border-red-500" key={`${index}_delete_slot`} />
-                </div>
+                {
+                    !isCanFix
+                    &&
+                    <div className="close-card">
+                        <CmsIconButton icon="close" onClick={() => HandleDeleteSlot(stack_index, index)} size="small" tooltip={'xóa slot'} className="text-red hover:shadow-2 border-red-500" key={`${index}_delete_slot`} />
+                    </div>
+                }
+
                 {
                     !item?.item
                     &&
@@ -93,7 +109,24 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
                     item?.item
                     &&
                     <div key={`${index}_div_2_slot`}  >
-                        <div className="h-84 text-center m-auto">
+                        {
+                            handleCheckBox
+                            &&
+                            <div className="checkBoxPack" onClick={(e) => e.stopPropagation()}>
+                                <CmsCheckbox
+                                    key={`box`}
+                                    checked={Boolean(item?.item.ispacked)}
+                                    value={false}
+                                    onChange={(e) => {
+                                        handleCheckBox(e.target.checked, item?.item, () => {
+                                            HandleClickDetail(e, stack_index, index)
+                                        })
+                                    }}
+                                    name="status"
+                                />
+                            </div>
+                        }
+                        <div className="h-128 text-center m-auto">
                             <img style={{ objectFit: 'contain', height: '100%', margin: 'auto' }} src={`${process.env.REACT_APP_BASE_URL}api/product/img/${item?.item?.img}`} alt="imageforitem" />
                         </div>
                         <div>
@@ -112,7 +145,7 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
                                 </div>
                             </>}>
                                 <div className="w-full flex flex-row items-center">
-                                    <CmsIconButton size="small" icon="info" className="" />
+                                    <CmsIconButton size="small" icon="info" color={(Boolean(productID && productID === item?.item?.id)) ? 'secondary' : 'primary'} />
                                     <CmsLabel content={item.item?.name} className="text-10 w-88 truncate" />
                                 </div>
                             </Tooltip>
@@ -126,11 +159,18 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
     ))
 }
 
-function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex }) {
+function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix, productID, label, handleCheckBox, detailCheck }) {
     const classes = useStyles()
-
     return (
-        <BoxCustom label={'Thông tin tủ'}>
+        <BoxCustom label={label || 'Thông tin tủ'}>
+            {
+                detailCheck
+                &&
+                <h3 className="text-right pb-8">
+                    Đã gói {detailCheck.totalCheck}/{detailCheck.totalWine}
+                </h3>
+            }
+
             <div className="w-full space-y-8" key={`div_stack_0`}>
                 {data?.map((item, index) => (
                     <div key={`${index}_div_stack_1`} className={clsx("contain-stack w-full")} onClick={(e) => HandleClickDetail(e, index)}>
@@ -145,9 +185,13 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 {/* <div key={`${index}_div_4_stack`} className="flex items-center justify-end space-x-8">
                                 </div> */}
                             </div>
-                            <div className="close-stack">
-                                <CmsIconButton icon="close" onClick={() => HandleDeleteStack(index)} size="small" tooltip={'xóa stack'} className="text-red " key={`${index}_delete_stack`} />
-                            </div>
+                            {
+                                !isCanFix
+                                &&
+                                <div className="close-stack">
+                                    <CmsIconButton icon="close" onClick={() => HandleDeleteStack(index)} size="small" tooltip={'xóa stack'} className="text-red " key={`${index}_delete_stack`} />
+                                </div>
+                            }
                         </div>
                         <div key={`${index}_div_5_stack`} className='w-full p-8 flex flex-wrap'>
                             <SlotContent
@@ -160,16 +204,27 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 stackIndex={stackIndex}
                                 slotIndex={slotIndex}
                                 classes={classes}
+                                isCanFix={isCanFix}
+                                productID={productID}
+                                handleCheckBox={handleCheckBox}
                             />
-                            <div className="w-full text-center m-0">
-                                <CmsButton size="small" startIcon="add" label="Slot" className="bg-yellow-700 hover:bg-yellow-900" onClick={() => HandleAddSlot(index)} />
-                            </div>
+                            {
+                                !isCanFix
+                                &&
+                                <div className="w-full text-center m-0">
+                                    <CmsButton size="small" startIcon="add" label="Slot" className="bg-yellow-700 hover:bg-yellow-900" onClick={() => HandleAddSlot(index)} />
+                                </div>
+                            }
                         </div>
                     </div>
                 ))}
-                <div className="w-full text-center m-0">
-                    <CmsButton size="small" startIcon="add" label="stack" className="bg-orange-700 hover:bg-orange-900" onClick={() => HandleAddStack()} />
-                </div>
+                {
+                    !isCanFix
+                    &&
+                    <div className="w-full text-center m-0">
+                        <CmsButton size="small" startIcon="add" label="stack" className="bg-orange-700 hover:bg-orange-900" onClick={() => HandleAddStack()} />
+                    </div>
+                }
             </div>
 
         </BoxCustom>)
