@@ -11,7 +11,7 @@ const TabType = {
     danh_sach: { id: '2', name: 'Danh sách sản phẩm' },
 }
 
-function RightSideContent({ formik, prefix, isCanSelect }) {
+function RightSideContent({ formik, prefix, isCanSelect, handleCheck }) {
     const [tabValue, setTabValue] = useState(TabType.da_chon.id);
     const item = get(formik?.values, `[${prefix}].item`) || null;
     const key = window.location.pathname.split('/')[1] === 'order' ? 'orders' : keyStore;
@@ -34,7 +34,7 @@ function RightSideContent({ formik, prefix, isCanSelect }) {
                     })} value={tabValue} onChange={handleChangeTab} />
                     <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }} className="w-full">
 
-                        {tabValue === TabType.da_chon.id && <InfoProductDetail data={item} handleViewList={() => setTabValue(TabType.danh_sach.id)} />}
+                        {tabValue === TabType.da_chon.id && <InfoProductDetail handleCheck={handleCheck} data={item} handleViewList={() => setTabValue(TabType.danh_sach.id)} />}
                         {tabValue === TabType.danh_sach.id &&
                             <CmsBoxLine label="Lựa chọn sản phẩm">
                                 <ProductSlotItemComponent
