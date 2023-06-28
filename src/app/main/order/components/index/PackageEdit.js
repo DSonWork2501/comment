@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { CmsButton, CmsButtonProgress, CmsCardedPage, CmsCheckbox, CmsFormikAutocomplete } from '@widgets/components';
+import { CmsButton, CmsButtonProgress, CmsCardedPage, CmsFormikAutocomplete } from '@widgets/components';
 import { useFormik } from 'formik';
-import * as Yup from 'yup'
+import * as Yup from 'yup';
 import { Box, InputLabel, styled } from '@material-ui/core';
 import { Link, useLocation } from 'react-router-dom';
 import withReducer from 'app/store/withReducer';
@@ -17,6 +17,10 @@ import { useEffect } from 'react';
 import { product } from 'app/main/product/store/productSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { alertInformation } from '@widgets/functions';
+import clsx from 'clsx';
+import { useCallback } from 'react';
+import { get } from 'lodash';
+import History from '@history/@history';
 
 const BoxCustom = styled(Box)({
     border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -55,22 +59,6 @@ const initialValues = {
     id: 0,
     orderID: null
 }
-
-const fillDefaultForm = (def, detail, setId = true) => {
-    if (!detail)
-        return null;
-
-    let newDef = {};
-    for (const key in def) {
-        newDef[key] = detail[key] || def[key]
-    }
-
-    if (setId && detail.id)
-        newDef.id = detail.id;
-
-    return newDef;
-}
-
 
 function FormEdit() {
     const location = useLocation();
@@ -142,7 +130,8 @@ function FormEdit() {
                     img: e?.item?.img,
                     sku: e?.item?.sku,
                     name: e?.item?.name,
-                    currentIndex: `[${parent}].slots[${child}]`
+                    currentIndex: `[${parent}].slots[${child}]`,
+                    ispacked: e?.item?.ispacked
                 })
             });
         });
@@ -164,7 +153,7 @@ function FormEdit() {
 
                     const resultAction = await dispatch(updateOrderStatus(form))
                     unwrapResult(resultAction);
-
+                    History.push('/order/6');
                 } catch (error) { }
                 finally {
                     formik.setSubmitting(false);
@@ -183,7 +172,7 @@ function FormEdit() {
         })
     })
 
-    const { values } = formik, { orderID, productID } = values;
+    const { values, setFieldValue } = formik, { orderID, productID } = values;
 
     const formik_shelf = useFormik({
         initialValues: detailEntities,
@@ -194,7 +183,7 @@ function FormEdit() {
         })
     })
 
-    const { values: vl, setValues: setVl } = formik_shelf;
+    const { setValues: setVl } = formik_shelf;
 
     useEffect(() => {
         setVl(reList);
@@ -203,6 +192,8 @@ function FormEdit() {
     const HandleClickDetail = (event, stack_index, slot_index) => {
         var data = !isNaN(parseInt(slot_index)) ? `[${stack_index}].slots[${slot_index}]` : `[${stack_index}]`
         setPrefix(data)
+        if (!isNaN(parseInt(slot_index)) && get(reList, data))
+            setFieldValue('productID', get(reList, data)?.item.id)
     }
 
     const handleCheck = async (check, item, trigger) => {
@@ -217,48 +208,49 @@ function FormEdit() {
             : await dispatch(getWine({ cusId: current?.cusId, parentId: current?.hhid, cms: 1 }))
 
         updateItems(rest)
-        trigger();
+        trigger && trigger();
     }
+
+    const updateItems = useCallback(
+        (rest) => {
+            if (rest?.payload && rest?.payload?.result) {
+                const values = rest?.payload?.data;
+                if (values?.length && current) {
+                    if (current?.parentid === 1) {
+                        setReList([
+                            {
+                                name: 'Rượu Lẻ',
+                                slots: [
+                                    {
+                                        type: 'slot',
+                                        isNotShow: true,
+                                        item: values[0]
+                                    }
+                                ]
+                            }
+                        ])
+                    } else {
+                        setReList(values.map(val => ({
+                            ...val, slots: val.slots.map(e => ({
+                                ...e,
+                                type: e.slot_type,
+                                name: e.slot_name,
+                                active: e.slot_active,
+                                capacity: e.slot_capacity,
+                                heightlimit: e.slot_heightlimit,
+                            }))
+                        })))
+                    }
+                }
+
+            }
+        }, [current])
 
     useEffect(() => {
         if (current) {
             updateItems({ payload: { data: detailEntities, result: true } })
         }
-    }, [current, detailEntities])
-
-    const updateItems = (rest) => {
-        if (rest?.payload && rest?.payload?.result) {
-            const values = rest?.payload?.data;
-            if (values?.length && current) {
-                if (current?.parentid === 1) {
-                    setReList([
-                        {
-                            name: 'Rượu Lẻ',
-                            slots: [
-                                {
-                                    type: 'slot',
-                                    isNotShow: true,
-                                    item: values[0]
-                                }
-                            ]
-                        }
-                    ])
-                } else {
-                    setReList(values.map(val => ({
-                        ...val, slots: val.slots.map(e => ({
-                            ...e,
-                            type: e.slot_type,
-                            name: e.slot_name,
-                            active: e.slot_active,
-                            capacity: e.slot_capacity,
-                            heightlimit: e.slot_heightlimit,
-                        }))
-                    })))
-                }
-            }
-
-        }
-    }
+    }, [current, detailEntities, updateItems])
 
     return (
         <React.Fragment>
@@ -352,7 +344,7 @@ function FormEdit() {
                                                 setLoading(false);
                                             }}
                                             onChange={async (id, value) => {
-                                                const rest = value.parentid === 1
+                                                value.parentid === 1
                                                     ? await dispatch(getShelf({ cusID: value.cusId, type: 'wine', orderID: value.id }))
                                                     : await dispatch(getWine({ cusId: value.cusId, parentId: value.hhid, cms: 1 }))
                                                 //updateItems(rest)
@@ -380,7 +372,9 @@ function FormEdit() {
                                                 },
                                                 size: 'small',
                                             }}
-                                            setOption={(option) => option?.id + ' | ' + option?.name || ''}
+                                            setOption={(option) => <div className={clsx(option?.ispacked === 1 ? 'text-green-900 font-bold' : '')}>
+                                                {option?.id + ' | ' + option?.name}
+                                            </div> || ''}
                                             valueIsId />
                                     </div>
                                 </div>
@@ -419,7 +413,7 @@ function FormEdit() {
                                     &&
                                     <>
                                         <div className='flex mb-8'>
-                                            <div className='w-2/5'>
+                                            <div className='w-1/3'>
                                                 <div>
                                                     <b className='mr-8'>
                                                         ID đơn hàng:
@@ -432,15 +426,9 @@ function FormEdit() {
                                                     </b>
                                                     {current?.cusname}
                                                 </div>
-                                                <div>
-                                                    <b className='mr-8'>
-                                                        Trạng thái đơn hàng:
-                                                    </b>
-                                                    {current?.status === 2 && 'Đã xác nhận'}
-                                                    {current?.status === 6 && 'Đã đóng gói'}
-                                                </div>
+
                                             </div>
-                                            <div className='w-2/5'>
+                                            <div className='w-1/3'>
                                                 <div>
                                                     <b className='mr-8'>
                                                         Số điện thoại:
@@ -455,8 +443,15 @@ function FormEdit() {
                                                 </div>
 
                                             </div>
-                                            <div className='w-1/5'>
-                                                <CmsCheckbox
+                                            <div className='w-1/3'>
+                                                <div>
+                                                    <b className='mr-8'>
+                                                        Trạng thái đơn hàng:
+                                                    </b>
+                                                    {current?.status === 2 && 'Đã xác nhận'}
+                                                    {current?.status === 6 && 'Đã đóng gói'}
+                                                </div>
+                                                {/* <CmsCheckbox
                                                     key={`box`}
                                                     //checked={Boolean(item?.item.ispacked)}
                                                     value={false}
@@ -467,7 +462,7 @@ function FormEdit() {
                                                         // })
                                                     }}
                                                     name="status"
-                                                />
+                                                /> */}
                                             </div>
                                         </div>
                                         {
@@ -477,6 +472,7 @@ function FormEdit() {
                                                 formik={formik_shelf}
                                                 prefix={prefix}
                                                 isCanSelect
+                                                handleCheck={handleCheck}
                                             />
                                         }
                                     </>
