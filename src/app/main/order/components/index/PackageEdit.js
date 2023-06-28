@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getShelf, getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
 import LeftSideContent from 'app/main/product/components/product/edit/classify/LeftSideContent';
 import RightSideContent from 'app/main/product/components/product/edit/classify/RightSideContent';
+import { useEffect } from 'react';
 
 const BoxCustom = styled(Box)({
     border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -72,23 +73,55 @@ function FormEdit() {
     const location = useLocation();
     const dispatch = useDispatch();
     const orders = useSelector(store => store[keyStore].order.entities?.data) || [];
-    const detailEntities = useSelector(store => store[keyStore]?.order?.detailEntities?.data) || [];
+    const detailEntities = useSelector(store => store[keyStore]?.order?.detailEntities?.data
+        ? store[keyStore].order.detailEntities.data
+        : []);
+    // const reList = useMemo(() => {
+    //     if (detailEntities?.length && orders?.length) {
+    //         if (orders[0]?.parentid === 1)
+    //             return [
+    //                 {
+    //                     name: 'Rượu Lẻ',
+    //                     slots: [
+    //                         {
+    //                             type: 'slot',
+    //                             isNotShow: true,
+    //                             item: detailEntities[0]
+    //                         }
+    //                     ]
+    //                 }
+    //             ]
+    //         return detailEntities.map(val => ({
+    //             ...val, slots: val.slots.map(e => ({
+    //                 ...e,
+    //                 type: e.slot_type,
+    //                 name: e.slot_name,
+    //                 active: e.slot_active,
+    //                 capacity: e.slot_capacity,
+    //                 heightlimit: e.slot_heightlimit,
+    //             }))
+    //         }))
+    //     }
+    //     return []
+    // }, [detailEntities, orders])
+    const [reList, setReList] = useState([]);
+    console.log(detailEntities, reList);
     const [loading, setLoading] = useState();
+    const [prefix, setPrefix] = useState(null);
     const listWine = useMemo(() => {
         let data = [];
-        detailEntities?.length && detailEntities.forEach((element, index) => {
+        reList?.length && reList.forEach((element, index) => {
             element?.slots?.length && element.slots.forEach(e => {
                 data.push({
-                    id: e.item.id,
-                    img: e.item.img,
-                    sku: e.item.sku,
-                    name: e.item.name,
+                    id: e?.item?.id,
+                    img: e?.item?.img,
+                    sku: e?.item?.sku,
+                    name: e?.item?.name,
                 })
             });
         });
         return data
-    }, [detailEntities])
-
+    }, [reList])
 
     const handleSave = () => {
 
@@ -104,6 +137,26 @@ function FormEdit() {
     })
 
     const { values } = formik, { orderID, productID } = values;
+
+    const formik_shelf = useFormik({
+        initialValues: detailEntities,
+        keepDirtyOnReinitialize: true,
+        enableReinitialize: true,
+        onSubmit: handleSave,
+        validationSchema: Yup.object({
+        })
+    })
+
+    const { values: vl, setValues: setVl } = formik_shelf;
+
+    useEffect(() => {
+        setVl(reList);
+    }, [reList, setVl])
+
+    const HandleClickDetail = (event, stack_index, slot_index) => {
+        var data = !isNaN(parseInt(slot_index)) ? `[${stack_index}].slots[${slot_index}]` : `[${stack_index}]`
+        setPrefix(data)
+    }
 
     return (
         <React.Fragment>
@@ -181,11 +234,38 @@ function FormEdit() {
                                                     }))
                                                 setLoading(false);
                                             }}
-                                            onChange={(id, value) => {
-                                                if (value.parentid === 1) {
-                                                    dispatch(getShelf({ cusID: value.cusId, type: 'wine', orderID: value.id }))
-                                                } else {
-                                                    dispatch(getWine({ cusId: value.cusId, parentId: value.hhid, cms: 1 }))
+                                            onChange={async (id, value) => {
+                                                const rest = value.parentid === 1
+                                                    ? await dispatch(getShelf({ cusID: value.cusId, type: 'wine', orderID: value.id }))
+                                                    : await dispatch(getWine({ cusId: value.cusId, parentId: value.hhid, cms: 1 }))
+
+                                                if (rest?.payload && rest?.payload?.result) {
+                                                    const values = rest?.payload?.data;
+                                                    if (value?.parentid === 1) {
+                                                        setReList([
+                                                            {
+                                                                name: 'Rượu Lẻ',
+                                                                slots: [
+                                                                    {
+                                                                        type: 'slot',
+                                                                        isNotShow: true,
+                                                                        item: values[0]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ])
+                                                    } else {
+                                                        setReList(values.map(val => ({
+                                                            ...val, slots: val.slots.map(e => ({
+                                                                ...e,
+                                                                type: e.slot_type,
+                                                                name: e.slot_name,
+                                                                active: e.slot_active,
+                                                                capacity: e.slot_capacity,
+                                                                heightlimit: e.slot_heightlimit,
+                                                            }))
+                                                        })))
+                                                    }
                                                 }
                                             }}
                                             lazyLoading={loading}
@@ -199,7 +279,7 @@ function FormEdit() {
                                             formik={formik}
                                             label="BarCode/QrCode SP"
                                             data={listWine}
-                                            disabled={!Boolean(detailEntities?.length)}
+                                            disabled={!Boolean(reList?.length)}
                                             size="small"
                                             autocompleteProps={{
                                                 getOptionLabel: (option) => option?.id + ' | ' + option?.name || '',
@@ -214,15 +294,16 @@ function FormEdit() {
                                 </div>
                                 <div>
                                     {
-                                        Boolean(detailEntities?.length)
+                                        Boolean(orderID)
                                         &&
                                         <LeftSideContent
-                                            data={detailEntities}
+                                            data={reList}
                                             isCanFix
                                             productID={productID}
-                                        // HandleAddStack={HandleAddStack}
-                                        // HandleAddSlot={HandleAddSlot}
-                                        // HandleClickDetail={HandleClickDetail}
+                                            // HandleAddStack={HandleAddStack}
+                                            // HandleAddSlot={HandleAddSlot}
+                                            HandleClickDetail={HandleClickDetail}
+                                            label={orders[0].parentid === 1 ? 'Thông tin rượu' : 'Thông tin tủ'}
                                         // HandleDeleteSlot={HandleDeleteSlot}
                                         // HandleDeleteStack={HandleDeleteStack}
                                         // stackIndex={stackIndex}
@@ -242,39 +323,48 @@ function FormEdit() {
                                 {
                                     Boolean(orderID)
                                     &&
-                                    <div className='flex'>
-                                        <div className='w-1/2'>
-                                            <div>
-                                                <b>
-                                                    ID đơn hàng:
-                                                </b>
-                                                {orders[0].id}
+                                    <>
+                                        <div className='flex mb-8'>
+                                            <div className='w-1/2'>
+                                                <div>
+                                                    <b>
+                                                        ID đơn hàng:
+                                                    </b>
+                                                    {orders[0].id}
+                                                </div>
+                                                <div>
+                                                    <b>
+                                                        Khách hàng:
+                                                    </b>
+                                                    {orders[0].cusname}
+                                                </div>
                                             </div>
-                                            <div>
-                                                <b>
-                                                    Khách hàng:
-                                                </b>
-                                                {orders[0].cusname}
+                                            <div className='w-1/2'>
+                                                <div>
+                                                    <b>
+                                                        Số điện thoại:
+                                                    </b>
+                                                    {orders[0].cusname}
+                                                </div>
+                                                <div>
+                                                    <b>
+                                                        Hợp đồng:
+                                                    </b>
+                                                    {orders[0].cusname}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className='w-1/2'>
-                                            <div>
-                                                <b>
-                                                    Số điện thoại:
-                                                </b>
-                                                {orders[0].cusname}
-                                            </div>
-                                            <div>
-                                                <b>
-                                                    Hợp đồng:
-                                                </b>
-                                                {orders[0].cusname}
-                                            </div>
-                                        </div>
-                                    </div>
+                                        {
+                                            Boolean(prefix)
+                                            &&
+                                            <RightSideContent
+                                                formik={formik_shelf}
+                                                prefix={prefix}
+                                                isCanSelect
+                                            />
+                                        }
+                                    </>
                                 }
-                                <RightSideContent
-                                />
                             </BoxCustom>
                         </div>
                     </div>
