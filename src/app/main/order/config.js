@@ -12,7 +12,12 @@ const ProductConfig = {
 			component: React.lazy(() => import('./components/index'))
 		},
 		{
-			path: '/order/package/:id',
+			path: '/package/:id',
+			exact: true,
+			component: React.lazy(() => import('./components/index/PackageEdit'))
+		},
+		{
+			path: '/package',
 			exact: true,
 			component: React.lazy(() => import('./components/index/PackageEdit'))
 		},

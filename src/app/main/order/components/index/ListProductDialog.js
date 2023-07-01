@@ -71,7 +71,7 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
             setSelects(data.map(value => value.currentIndex))
     }, [data])
 
-    const handleDownload = ({ qrcode, name, uniqueid }) => {
+    const handleDownload = ({ qrcode, name, sku }) => {
         var qrImage = new Image();
 
         qrImage.src = `data:image/png;base64, ${qrcode}`;
@@ -85,6 +85,8 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
                 </head>
                 <body style="display:flex;align-items:center;justify-content:center">
                     <div style="width:100%">
+                        <H2 style="text-align:center">${name}</H2>
+                        <H2 style="text-align:center">${sku}</H2>
                         <img style="width:100%;margin:auto" src="${qrImage.src}" alt="QR Code">
                     </div>
                 </body>
@@ -93,18 +95,21 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
 
             printWindow.onload = function () {
                 printWindow.print();
-                printWindow.close();
+                printWindow.onafterprint = function () {
+                    printWindow.close();
+                };
             };
         };
     }
 
-    const handleDownloadAll = (data) => {
+    const handleDownloadAll = (data, selects) => {
         let listQR = "";
         for (let index = 0; index < data?.length; index++) {
             const item = data[index];
-            if (item.qrcode) {
+            if (item.qrcode && selects.find(val => val === item.currentIndex)) {
                 listQR = listQR + `<div style="width:100%;height:100%">
                         <H2 style="text-align:center">${item.name}</H2>
+                        <H2 style="text-align:center">${item.sku}</H2>
                         <img style="width:100%;margin:auto" src="data:image/png;base64,${item.qrcode}" alt="QR Code">
                     </div>`;
             }
@@ -112,18 +117,35 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
         var printWindow = window.open('', '_blank');
         printWindow.document.open();
         printWindow.document.write(`<html>
-                <head>
-                <title>QrCodeList</title>
-                </head>
-                <body style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;height:100%">
-                    ${listQR}
-                </body>
-            </html>`);
+        <head>
+        <title>QR Code List</title>
+        <style>
+            @media print {
+                body {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    height: 100%;
+                }
+                
+                div {
+                    page-break-inside: avoid;
+                }
+            }
+        </style>
+        </head>
+        <body>
+            ${listQR}
+        </body>
+        </html>`);
         printWindow.document.close();
 
         printWindow.onload = function () {
             printWindow.print();
-            printWindow.close();
+            printWindow.onafterprint = function () {
+                printWindow.close();
+            };
         };
     }
 
@@ -141,7 +163,7 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
         >
             <div className='my-8'>
                 <div className="text-right pb-8">
-                    {data.length > 0 && <CmsButton className="" variant="outlined" size="small" label="Print All Check" component={Link} onClick={() => handleDownloadAll(data)} />}
+                    {data.length > 0 && <CmsButton className="" variant="outlined" size="small" label="Print All Check" component={Link} onClick={() => handleDownloadAll(data, selects)} />}
                 </div>
                 <CmsTableBasic
                     data={fields}
