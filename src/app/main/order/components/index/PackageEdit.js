@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { CmsButton, CmsButtonProgress, CmsCardedPage, CmsFormikTextField, CmsTextField } from '@widgets/components';
+import { CmsAlert, CmsButton, CmsButtonProgress, CmsCardedPage, CmsFormikTextField, CmsTextField } from '@widgets/components';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Box, InputLabel, Table, TableBody, TableCell, TableHead, TableRow, styled } from '@material-ui/core';
@@ -84,6 +84,7 @@ const SelectDetail = ({ prefix, detail }) => {
                                             value={get(detail, `${prefix.split('.')[0]}`)?.name}
                                             disabled
                                             size="small"
+                                            className='bg-blue-100 rounded-4'
                                         />
                                     </div>
                                     <div style={{ width: '49%' }}>
@@ -92,6 +93,7 @@ const SelectDetail = ({ prefix, detail }) => {
                                             value={get(detail, `${prefix}`)?.slot_name}
                                             disabled
                                             size="small"
+                                            className='bg-blue-100 rounded-4'
                                         />
                                     </div>
                                 </>
@@ -146,7 +148,10 @@ function FormEdit() {
     const detailEntities = useSelector(store => store[keyStore]?.order?.detailEntities?.data
         ? store[keyStore].order.detailEntities.data
         : []);
-    const params = useParams(), ID = params.id.split('?')[0];
+    const params = useParams(), ID = params.id;
+    if (!ID) {
+        History.push('package/0')
+    }
     const paramsURL = new URLSearchParams(location.search), step = paramsURL.get('step');
     const detailCheck = useMemo(() => {
         let totalWine = 0, totalCheck = 0;
@@ -191,6 +196,15 @@ function FormEdit() {
         });
         return data
     }, [reList])
+    const [numberReceive, setNumberReceive] = useState(null);
+    const receive = useMemo(() => {
+        let total = 0;
+        if (numberReceive)
+            Object.values(numberReceive).forEach(val => {
+                total = total + val;
+            })
+        return total
+    }, [numberReceive])
     const uniqueList = useMemo(() => {
         const uniqueItems = {};
         for (let item of listWine) {
@@ -201,12 +215,14 @@ function FormEdit() {
                 uniqueItems[sku] = {
                     item,
                     number: 1,
+                    numberReceive: numberReceive && numberReceive[sku] ? numberReceive[sku] : 0
                 };
             }
         }
-        return uniqueItems
-    }, [listWine])
 
+        return uniqueItems
+    }, [listWine, numberReceive])
+    console.log(uniqueList, numberReceive);
     const handleSave = (values) => {
         alertInformation({
             text: `Xác nhận thao tác`,
@@ -246,7 +262,7 @@ function FormEdit() {
         })
     })
 
-    const { values, setFieldValue } = formik, { orderID, productID, qrCode } = values;
+    const { values, setFieldValue } = formik, { orderID, productID, qrCode, barCodeSearch, numberProduct } = values;
 
     const formik_shelf = useFormik({
         initialValues: detailEntities,
@@ -361,7 +377,7 @@ function FormEdit() {
             state: {
                 prevPath: window.location.pathname + window.location.search
             },
-            pathname: `/order/package/${ID}`
+            pathname: `/package/${ID}`
         })
         setOpenDialog('');
     }
@@ -374,6 +390,37 @@ function FormEdit() {
 
     }, [step, openDialog])
 
+    const updateNumber = (num, key) => {
+        setNumberReceive(prev => {
+            if (!Boolean(uniqueList[key])) {
+                CmsAlert.fire({ heightAuto: false, text: 'Sản phẩm không tồn tại trong giỏ hàng !', icon: 'warning' })
+                return prev
+            }
+
+            if (!Boolean(prev) || !prev[key]) {
+                if (uniqueList[key].number < (num)) {
+                    CmsAlert.fire({ heightAuto: false, text: 'Vượt quá số lượng !', icon: 'warning' })
+                    return prev
+                }
+
+                return {
+                    ...prev,
+                    [key]: num
+                }
+            } else {
+                if (uniqueList[key].number < (numberReceive[key] + num)) {
+                    CmsAlert.fire({ heightAuto: false, text: 'Vượt quá số lượng !', icon: 'warning' })
+                    return prev
+                }
+
+                return {
+                    ...prev,
+                    [key]: prev[key] + num
+                }
+            }
+        })
+    }
+
     return (
         <React.Fragment>
             {openDialog === 'productList' &&
@@ -383,9 +430,9 @@ function FormEdit() {
                     open={true}
                     loading={popupLoading}
                     handleSave={() => {
-                        //History.push(`/order/package/${ID}?step=3`)
+                        //History.push(`/package/${ID}?step=3`)
                         History.push({
-                            pathname: `/order/package/${ID}`,
+                            pathname: `/package/${ID}`,
                             search: `?step=3`,
                             state: {
                                 prevPath: window.location.pathname + window.location.search
@@ -393,6 +440,15 @@ function FormEdit() {
                         })
                     }}
                 />}
+
+            {openDialog === 'printQr' &&
+                <ListProductDialog
+                    handleClose={() => setOpenDialog('')}
+                    data={listWine}
+                    open={true}
+                    loading={popupLoading}
+                />}
+
             <CmsCardedPage
                 classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
                 title={"Gói sản phẩm"}
@@ -423,14 +479,24 @@ function FormEdit() {
                                     className="mx-2"
                                     onClick={() => {
                                         History.push({
-                                            pathname: `/order/package/${ID}`,
+                                            pathname: `/package/${ID}`,
                                             search: `?step=2`,
                                             state: {
                                                 prevPath: window.location.pathname + window.location.search
                                             }
                                         })
                                     }}
-                                    disabled={step || ID === '0'}
+                                    disabled={step || ID === '0' || listWine?.length !== receive || !receive}
+                                    size="small" />
+                                <CmsButtonProgress
+                                    loading={formik.isSubmitting}
+                                    type="submit"
+                                    label={"In QrCode"}
+                                    startIcon="vertical_align_bottom"
+                                    className="mx-2"
+                                    onClick={() => {
+                                        setOpenDialog('printQr')
+                                    }}
                                     size="small" />
                                 <CmsButtonProgress
                                     loading={formik.isSubmitting}
@@ -447,14 +513,14 @@ function FormEdit() {
                 }
                 content={
                     <div className="w-full h-full flex justify-between p-8">
-                        <div style={{ width: '39%' }} className='grid'>
+                        <div style={{ width: '39%', display: 'inline-table' }} >
                             <BoxCustom
-                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label h-full" style={{ minHeight: 650 }}>
+                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label h-full" style={{ minHeight: 600 }}>
                                 <InputLabel
                                     className='custom-label'>
                                     Thông tin đơn hàng
                                 </InputLabel>
-                                <div className='flex flex-wrap justify-between'>
+                                <div className='flex flex-wrap justify-between sticky top-0 pt-10 bg-white z-10'>
                                     <CmcFormikLazySelect
                                         name="orderID"
                                         debounceTime={500}
@@ -505,7 +571,7 @@ function FormEdit() {
                                             setCurrent(value)
                                             setPrefix(null)
                                             History.push({
-                                                pathname: `/order/package/${id}`,
+                                                pathname: `/package/${id}`,
                                                 state: {
                                                     prevPath: window.location.pathname + window.location.search
                                                 }
@@ -514,6 +580,74 @@ function FormEdit() {
                                         lazyLoading={loading}
                                         classes="my-8 small"
                                     />
+                                    {
+                                        !step 
+                                        &&
+                                        <div className='flex justify-between items-center w-full'>
+                                            <div style={{ width: '49%' }} className='pb-8'>
+                                                <CmsFormikTextField
+                                                    label={`BarCode`}
+                                                    name="barCodeSearch"
+                                                    className="my-8"
+                                                    size="small"
+                                                    onKeyPress={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            // setNumberReceive(prev => {
+                                                            //     if (!Boolean(uniqueList[e.target.value])) {
+                                                            //         CmsAlert.fire({ heightAuto: false, text: 'Sản phẩm không tồn tại trong giỏ hàng !', icon: 'warning' })
+                                                            //         return prev
+                                                            //     }
+
+                                                            //     if (!Boolean(prev) || !prev[e.target.value]) {
+                                                            //         return {
+                                                            //             ...prev,
+                                                            //             [e.target.value]: 1
+                                                            //         }
+                                                            //     } else {
+                                                            //         if (uniqueList[e.target.value].number < prev[e.target.value] + 1) {
+                                                            //             CmsAlert.fire({ heightAuto: false, text: 'Vượt quá số lượng !', icon: 'warning' })
+                                                            //             return prev
+                                                            //         }
+                                                            //         return {
+                                                            //             ...prev,
+                                                            //             [e.target.value]: prev[e.target.value] + 1
+                                                            //         }
+                                                            //     }
+                                                            // })
+                                                            updateNumber(1, e.target.value);
+                                                        }
+                                                    }}
+                                                    formik={formik} />
+                                            </div>
+                                            <div style={{ width: '24%' }} className='pb-8'>
+                                                <CmsFormikTextField
+                                                    label={`Số lượng`}
+                                                    name="numberProduct"
+                                                    className="my-8"
+                                                    size="small"
+                                                    disabled={!Boolean(barCodeSearch)}
+                                                    isNumber
+                                                    onKeyPress={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            updateNumber(parseInt(e.target.value), barCodeSearch)
+                                                        }
+                                                    }}
+                                                    formik={formik} />
+                                            </div>
+                                            <div style={{ width: '24%' }} className='pb-8 text-right'>
+                                                <CmsButtonProgress
+                                                    label={"Lưu"}
+                                                    startIcon="vertical_align_bottom"
+                                                    className="my-8 bg-green-500"
+                                                    disabled={!Boolean(barCodeSearch) || !Boolean(numberProduct)}
+                                                    onClick={() => {
+                                                        updateNumber(parseInt(numberProduct), barCodeSearch)
+                                                    }}
+                                                    size="small" />
+                                            </div>
+                                        </div>
+                                    }
+
                                     {
                                         step === '3'
                                         &&
@@ -633,7 +767,14 @@ function FormEdit() {
                                                         size='small'
                                                         component="th"
                                                         className='text-right'>
-                                                        Số lượng
+                                                        SL
+                                                    </TableCell>
+                                                    <TableCell
+                                                        style={{ background: 'aliceblue' }}
+                                                        size='small'
+                                                        component="th"
+                                                        className='text-right'>
+                                                        Nhặt
                                                     </TableCell>
                                                 </TableRow>
                                             </TableHead>
@@ -641,13 +782,23 @@ function FormEdit() {
                                                 {
                                                     Object.values(uniqueList).map((val, i) => (
                                                         <TableRow key={val?.item?.sku}>
-                                                            <TableCell style={{ width: 130 }}>
+                                                            <TableCell
+                                                                size='small'
+                                                                style={{
+                                                                    width: 130,
+                                                                    background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
+                                                                }}>
                                                                 <img
+                                                                    className='rounded-6 shadow-4'
                                                                     style={{ objectFit: 'contain', height: '110px', maxWidth: 150, margin: 'auto' }}
                                                                     src={`${process.env.REACT_APP_BASE_URL}api/product/img/${val?.item?.img}`}
                                                                     alt={`imageforitem${i}`} />
                                                             </TableCell>
-                                                            <TableCell>
+                                                            <TableCell
+                                                                style={{
+                                                                    background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
+                                                                }}
+                                                                size='small'>
                                                                 <div>
                                                                     <b>
                                                                         - {val?.item?.name}
@@ -657,8 +808,21 @@ function FormEdit() {
                                                                     -  {val?.item?.sku}
                                                                 </div>
                                                             </TableCell>
-                                                            <TableCell className='text-right'>
+                                                            <TableCell
+                                                                style={{
+                                                                    background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
+                                                                }}
+                                                                size='small'
+                                                                className='text-right'>
                                                                 {val.number}
+                                                            </TableCell>
+                                                            <TableCell
+                                                                style={{
+                                                                    background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
+                                                                }}
+                                                                size='small'
+                                                                className='text-right'>
+                                                                {val.numberReceive || 0}
                                                             </TableCell>
                                                         </TableRow>
                                                     ))
@@ -667,6 +831,7 @@ function FormEdit() {
                                             <TableBody>
                                                 <TableRow>
                                                     <TableCell
+                                                        size='small'
                                                         style={{ background: 'aliceblue' }}
                                                         className='text-center'
                                                         colSpan={2}>
@@ -675,9 +840,16 @@ function FormEdit() {
                                                         </b>
                                                     </TableCell>
                                                     <TableCell
+                                                        size='small'
                                                         style={{ background: 'aliceblue' }}
                                                         className='text-right'>
                                                         {listWine?.length}
+                                                    </TableCell>
+                                                    <TableCell
+                                                        size='small'
+                                                        style={{ background: 'aliceblue' }}
+                                                        className='text-right'>
+                                                        {receive}
                                                     </TableCell>
                                                 </TableRow>
                                             </TableBody>
@@ -707,7 +879,7 @@ function FormEdit() {
                         </div>
                         <div style={{ width: '59%', display: 'inline-table' }} >
                             <BoxCustom
-                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label h-full" style={{ minHeight: 650 }}>
+                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label h-full" style={{ minHeight: 600 }}>
                                 <InputLabel
                                     className='custom-label'>
                                     Thông chi tiết
@@ -770,7 +942,7 @@ function FormEdit() {
                                             </div>
                                         </div>
                                         {
-                                            Boolean(prefix)
+                                            Boolean(prefix && step === '3')
                                             &&
                                             <SelectDetail
                                                 detail={reList}

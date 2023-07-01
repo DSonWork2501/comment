@@ -110,6 +110,14 @@ const navigationConfig = [
 				icon: 'call_to_action',
 				url: '/customer-shelf/1',
 			},
+			{
+				id: 'nvi-manager-pack',
+				title: 'Đóng gói',
+				translate: 'CUSTOM_PACK',
+				type: 'item',
+				icon: 'call_to_action',
+				url: '/package',
+			},
 		],
 	},
 	{
