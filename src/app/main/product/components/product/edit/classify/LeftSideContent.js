@@ -29,14 +29,15 @@ const BoxCustom = styled(CmsBoxLine)({
         "textAlign": "center",
         "position": "relative",
         "alignItems": "center",
-        "display": "flex",
+        //"display": "flex",
         "justifyContent": "center",
         "borderRadius": "5px",
         width: "100%",
         marginBottom: 8
     },
     "& .item-card >div.isSearchBC": {
-        "box-shadow": " 1px 3px 7px #9ab11d",
+        "box-shadow": " 1px 3px 7px orange",
+        border:'1px solid orange'
     },
     "& .item-card >div.isSearchBC p": {
         color: '#b1b145'
