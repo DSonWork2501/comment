@@ -14,3 +14,13 @@ export const links = (valueOb) => orderStatusArray.map(val => (
         }}>{valueOb[val.id]}</div>
     }
 ));
+
+export function playMusic() {
+    var audio = new Audio('assets/upload/correct.mp3');
+    audio.play();
+}
+
+export function playMusicW() {
+    var audio = new Audio('assets/upload/wrong.wav');
+    audio.play();
+}

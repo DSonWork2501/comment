@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { Box, InputLabel, Table, TableBody, TableCell, TableHead, TableRow, styled } from '@material-ui/core';
 import { Link, useLocation } from 'react-router-dom';
 import withReducer from 'app/store/withReducer';
-import { keyStore } from '../../common';
+import { keyStore, playMusic, playMusicW } from '../../common';
 import reducer from '../../store';
 import CmcFormikLazySelect from '@widgets/components/cms-formik/CmcFormikLazySelect';
 import { getList, updateOrderStatus } from '../../store/orderSlice';
@@ -176,6 +176,7 @@ function FormEdit() {
     const [reList, setReList] = useState([]);
     const [loading, setLoading] = useState();
     const [prefix, setPrefix] = useState(null);
+    const [checkFirst, setCheckFirst] = useState(true);
     const listWine = useMemo(() => {
         let data = [], parent = 0, child = 0;
         reList?.length && reList.forEach((element, index) => {
@@ -298,8 +299,10 @@ function FormEdit() {
         trigger && trigger();
     }
 
+    const crString = JSON.stringify(current)
     const updateItems = useCallback(
         (rest) => {
+            const current = JSON.parse(crString)
             try {
                 if (rest?.payload && rest?.payload?.result) {
                     const values = rest?.payload?.data;
@@ -334,7 +337,7 @@ function FormEdit() {
 
                 }
             } catch { }
-        }, [current])
+        }, [crString])
 
     const getWines = useCallback(async (currentT) => {
         const rest = currentT?.parentid === 1
@@ -351,7 +354,8 @@ function FormEdit() {
     }, [current, detailEntities, updateItems])
 
     useEffect(() => {
-        if (ID !== '0' && current?.id !== parseInt(ID)) {
+        if (ID !== '0' && current?.id !== parseInt(ID) && checkFirst) {
+            setCheckFirst(false);
             setTimeout(() => {
                 setFieldValue('orderID', parseInt(ID))
             }, 0);
@@ -370,7 +374,7 @@ function FormEdit() {
                 }
             })
         }
-    }, [ID, setFieldValue, dispatch, current, getWines])
+    }, [ID, setFieldValue, dispatch, current, getWines, checkFirst])
 
     const handleCloseDialog = () => {
         History.push({
@@ -394,15 +398,17 @@ function FormEdit() {
         setNumberReceive(prev => {
             if (!Boolean(uniqueList[key])) {
                 CmsAlert.fire({ heightAuto: false, text: 'Sản phẩm không tồn tại trong giỏ hàng !', icon: 'warning' })
+                playMusicW();
                 return prev
             }
 
             if (!Boolean(prev) || !prev[key]) {
                 if (uniqueList[key].number < (num)) {
                     CmsAlert.fire({ heightAuto: false, text: 'Vượt quá số lượng !', icon: 'warning' })
+                    playMusicW();
                     return prev
                 }
-
+                playMusic()
                 return {
                     ...prev,
                     [key]: num
@@ -410,9 +416,10 @@ function FormEdit() {
             } else {
                 if (uniqueList[key].number < (numberReceive[key] + num)) {
                     CmsAlert.fire({ heightAuto: false, text: 'Vượt quá số lượng !', icon: 'warning' })
+                    playMusicW();
                     return prev
                 }
-
+                playMusic()
                 return {
                     ...prev,
                     [key]: prev[key] + num
@@ -462,7 +469,7 @@ function FormEdit() {
                             component={Link}
                             to={location?.state?.prevPath
                                 ? location?.state?.prevPath
-                                : '/legal/form'}
+                                : '/order/2'}
                             className="mx-2 flex-none"
                             startIcon="arrow_back" />
                     </div>
@@ -486,7 +493,7 @@ function FormEdit() {
                                             }
                                         })
                                     }}
-                                    disabled={step || ID === '0' || listWine?.length !== receive || !receive}
+                                    disabled={Boolean(step || ID === '0' || listWine?.length !== receive || !receive)}
                                     size="small" />
                                 <CmsButtonProgress
                                     loading={formik.isSubmitting}
@@ -504,7 +511,7 @@ function FormEdit() {
                                     label={"Đóng gói"}
                                     startIcon="vertical_align_bottom"
                                     className="mx-2"
-                                    disabled={detailCheck?.totalWine !== detailCheck?.totalCheck || step !== '3'}
+                                    disabled={Boolean(detailCheck?.totalWine !== detailCheck?.totalCheck || step !== '3')}
                                     onClick={formik.handleSubmit}
                                     size="small" />
                             </div>
@@ -567,7 +574,6 @@ function FormEdit() {
                                             value.parentid === 1
                                                 ? await dispatch(getShelf({ cusID: value.cusId, type: 'wine', orderID: value.id }))
                                                 : await dispatch(getWine({ cusId: value.cusId, parentId: value.hhid, cms: 1 }))
-                                            //updateItems(rest)
                                             setCurrent(value)
                                             setPrefix(null)
                                             History.push({
@@ -581,7 +587,7 @@ function FormEdit() {
                                         classes="my-8 small"
                                     />
                                     {
-                                        !step 
+                                        !step
                                         &&
                                         <div className='flex justify-between items-center w-full'>
                                             <div style={{ width: '49%' }} className='pb-8'>
@@ -661,6 +667,8 @@ function FormEdit() {
                                                     size="small"
                                                     onKeyPress={(e) => {
                                                         if (e.key === 'Enter') {
+                                                            setFieldValue('qrCode', e.target.value)
+
                                                             const value = e.target.value, pre = listWine.find(val => val.qrcodenonhash === value)?.currentIndex,
                                                                 idPro = listWine.find(val => val.qrcodenonhash === value)?.id;
                                                             if (pre) {
@@ -671,6 +679,7 @@ function FormEdit() {
                                                                 }, 0);
                                                                 setFieldValue('productID', idPro)
                                                             } else {
+                                                                playMusicW()
                                                                 setPrefix('noProduct');
                                                             }
                                                         }
@@ -707,10 +716,13 @@ function FormEdit() {
                                                     size="small"
                                                     onKeyPress={(e) => {
                                                         if (e.key === 'Enter') {
+                                                            setFieldValue('barcode', e.target.value)
+
                                                             const value = e.target.value, pre = listWine.find(val => val.qrcodenonhash === qrCode)?.sku,
                                                                 crIndex = listWine.find(val => val.qrcodenonhash === qrCode)?.currentIndex;
                                                             if (value !== pre) {
                                                                 setPrefix('noProduct');
+                                                                playMusicW()
                                                             } else {
                                                                 setPrefix(crIndex);
                                                             }
@@ -858,21 +870,23 @@ function FormEdit() {
                                     {
                                         Boolean(orderID && step === '3')
                                         &&
-                                        <LeftSideContent
-                                            data={reList}
-                                            isCanFix
-                                            productID={productID}
-                                            handleCheckBox={handleCheck}
-                                            detailCheck={detailCheck}
-                                            // HandleAddStack={HandleAddStack}
-                                            // HandleAddSlot={HandleAddSlot}
-                                            HandleClickDetail={HandleClickDetail}
-                                            label={current?.parentid === 1 ? 'Thông tin rượu' : 'Thông tin tủ'}
-                                        // HandleDeleteSlot={HandleDeleteSlot}
-                                        // HandleDeleteStack={HandleDeleteStack}
-                                        // stackIndex={stackIndex}
-                                        // slotIndex={slotIndex}
-                                        />
+                                        <div className='pt-8'>
+                                            <LeftSideContent
+                                                data={reList}
+                                                isCanFix
+                                                productID={productID}
+                                                handleCheckBox={handleCheck}
+                                                detailCheck={detailCheck}
+                                                // HandleAddStack={HandleAddStack}
+                                                // HandleAddSlot={HandleAddSlot}
+                                                HandleClickDetail={HandleClickDetail}
+                                                label={current?.parentid === 1 ? 'Thông tin rượu' : 'Thông tin tủ'}
+                                            // HandleDeleteSlot={HandleDeleteSlot}
+                                            // HandleDeleteStack={HandleDeleteStack}
+                                            // stackIndex={stackIndex}
+                                            // slotIndex={slotIndex}
+                                            />
+                                        </div>
                                     }
                                 </div>
                             </BoxCustom>
