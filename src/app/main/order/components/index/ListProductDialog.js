@@ -71,7 +71,7 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
             setSelects(data.map(value => value.currentIndex))
     }, [data])
 
-    const handleDownload = ({ qrcode, name, sku }) => {
+    const handleDownload = ({ qrcode, name, sku, qrcodenonhash }) => {
         var qrImage = new Image();
 
         qrImage.src = `data:image/png;base64, ${qrcode}`;
@@ -88,6 +88,7 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
                         <H2 style="text-align:center">${name}</H2>
                         <H2 style="text-align:center">${sku}</H2>
                         <img style="width:100%;margin:auto" src="${qrImage.src}" alt="QR Code">
+                        <H2 style="text-align:center">${qrcodenonhash}</H2>
                     </div>
                 </body>
             </html>`);
@@ -111,6 +112,7 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
                         <H2 style="text-align:center">${item.name}</H2>
                         <H2 style="text-align:center">${item.sku}</H2>
                         <img style="width:100%;margin:auto" src="data:image/png;base64,${item.qrcode}" alt="QR Code">
+                        <H2 style="text-align:center">${item.qrcodenonhash}</H2>
                     </div>`;
             }
         }
