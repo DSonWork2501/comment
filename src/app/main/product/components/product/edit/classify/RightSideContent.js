@@ -52,7 +52,7 @@ function RightSideContent({ formik, prefix, isCanSelect, handleCheck }) {
             {
                 !Boolean(get(formik?.values, `${prefix}.isNotShow`))
                 &&
-                <CmsBoxLine label={'Thông tin chi tiết'} className="p-16">
+                <CmsBoxLine label={'Thông tin chi tiết'} className="p-16 sticky top-0">
                     <div className="w-full flex flex-row space-x-8">
                         <CmsFormikTextField
                             disabled={isCanSelect}

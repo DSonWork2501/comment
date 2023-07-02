@@ -89,7 +89,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
             open={open}
             size="xl"
         >
-            <div className={clsx(prefix && 'flex flex-row', "w-full space-x-8")}>
+            <div className={clsx(prefix && 'flex flex-row', "w-full space-x-8 relative")}>
                 <FuseAnimate animation="transition.slideLeftIn" delay={50}>
                     <div className={prefix ? 'w-1/3' : 'w-full'}>
                         <LeftSideContent
@@ -105,7 +105,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
                     </div>
                 </FuseAnimate>
                 {prefix && <FuseAnimate animation="transition.slideLeftIn" delay={50}>
-                    <div className="w-2/3">
+                    <div className="w-2/3 sticky top-0 max-h-320">
                         <RightSideContent
                             formik={formik_shelf}
                             prefix={prefix}
