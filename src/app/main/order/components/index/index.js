@@ -142,6 +142,7 @@ function OrderView() {
 
     const data = entities?.data?.map(item => ({
         id: item.id,
+        rowSpan: 2,
         createdate: ConvertDateTime.DisplayDateTime(item.createdate),
         moneydiscount: item.moneydiscount,
         cusname: item.cusname,
