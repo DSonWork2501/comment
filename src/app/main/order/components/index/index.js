@@ -2,7 +2,7 @@ import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsLabel, CmsT
 import { alertInformation, ConvertDateTime, initColumn, NumberWithCommas } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
-import React from "react";
+import React, { useMemo } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -42,6 +42,9 @@ const columns = [
     new initColumn({ field: "moneytotal", label: "Tổng tiền", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "detail", label: "Chi tiết", alignHeader: "center", alignValue: "center", sortable: false }),
     new initColumn({ field: "status", label: "Trạng thái", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "product", style: { width: 250 }, label: "Sản phẩm", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "unitPR", label: "Đơn vị", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "right", label: "Giá", alignHeader: "right", alignValue: "right", sortable: false }),
 ]
 
 function OrderView() {
@@ -49,6 +52,18 @@ function OrderView() {
     const search = useSelector(store => store[keyStore].order.search)
     const loading = useSelector(store => store[keyStore].order.loading)
     const entities = useSelector(store => store[keyStore].order.entities)
+    const reEntities = useMemo(() => {
+        let data = [];
+        entities?.data?.length && entities.data.forEach((element, index) => {
+            element?.productorders?.length ? element.productorders.forEach((e, keyRow) => {
+                data.push({ ...element, detail: e, keyRow: (keyRow + 1) })
+            }) : data.push({ ...element, keyRow: 1 })
+        });
+        return {
+            ...entities,
+            data
+        }
+    }, [entities])
     const summary = useSelector(store => store[keyStore].order?.summary?.data)
     const params = useParams(), status = parseInt(params.status);
     const [filterOptions, setFilterOptions] = useState(null);
@@ -140,14 +155,39 @@ function OrderView() {
         setInfo(item)
     }
 
-    const data = entities?.data?.map(item => ({
+    const data = reEntities?.data?.map(item => ({
         id: item.id,
+        keyRow: item.keyRow,
         createdate: ConvertDateTime.DisplayDateTime(item.createdate),
         moneydiscount: item.moneydiscount,
         cusname: item.cusname,
         moneytotal: NumberWithCommas(item.moneytotal),
         detail: <CmsIconButton onClick={() => HandleClickDetail(item)} size="small" tooltip={'Thông tin chi tiết'} icon="info" className="text-16 hover:shadow-2 text-grey-500 hover:text-grey-700" />,
         status: <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} />,
+        product: (
+            <div>
+                {item?.detail?.name}
+            </div>
+        ),
+        unitPR: (
+            <>
+                {item?.hhid ? 'Tủ' : 'Chai'}
+            </>
+        ),
+        right: (
+            <>
+                {(item?.detail?.price) ? item?.detail?.price.toLocaleString('en-US') : '-'}
+            </>
+        ),
+        rowSpan: {
+            id: item?.productorders?.length || 1,
+            createdate: item?.productorders?.length || 1,
+            moneydiscount: item?.productorders?.length || 1,
+            cusname: item?.productorders?.length || 1,
+            moneytotal: item?.productorders?.length || 1,
+            detail: item?.productorders?.length || 1,
+            status: item?.productorders?.length || 1
+        },
         action: (
             <div className="w-full flex flex-row space-x-4">
                 {
@@ -193,7 +233,7 @@ function OrderView() {
             </div>
         ) || []
     }))
-
+    console.log(data, 123);
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
     };
@@ -263,7 +303,8 @@ function OrderView() {
                                 />
                             }
                             openFilterOptions={Boolean(filterOptions)}
-                            pagination={entities?.pagination}
+                            pagination={reEntities?.pagination}
+                            isClearHoverBg
                         />
                         <OrderDetailContent
                             open={open === 'detail'}

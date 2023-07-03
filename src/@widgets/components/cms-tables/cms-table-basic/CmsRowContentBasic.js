@@ -1,4 +1,4 @@
-import { Checkbox, Collapse, TableCell, TableRow, IconButton } from '@material-ui/core';
+import { Checkbox, Collapse, TableCell, TableRow, IconButton, makeStyles } from '@material-ui/core';
 import React, { useState } from 'react';
 import * as PropTypes from 'prop-types'
 import clsx from 'clsx'
@@ -6,27 +6,38 @@ import dateformat from 'dateformat'
 import { KeyboardArrowUp, KeyboardArrowDown } from '@material-ui/icons';
 // Sự kiện row hover
 function handleRowHover(event, row, index, name) {
-    if(row.action){
+    if (row.action) {
         let control = document.getElementById(`${index}_row_table_edit${name}`);
         control.style.display = 'table-cell';
     }
 }
 // Sự kiện row hover Leave
 function handleRowHoverLeave(event, row, index, name) {
-    if(row.action){
+    if (row.action) {
         let control = document.getElementById(`${index}_row_table_edit${name}`);
         control.style.display = 'none';
     }
 }
+
+const useStyles = makeStyles({
+    tableCell: {
+        '&:hover': {
+            backgroundColor: 'transparent !important', // Change this to the desired background color
+        },
+    },
+});
+
 function RowContentBasic(props) {
-    const { index, isMultiSelect, item, handleSelectRow, isSelected, cols, isCollapsible, name, isSelectOnClickRow, handleSetColorRow } = props
+    const { index, isMultiSelect, item, handleSelectRow, isSelected, cols, isCollapsible, name, isSelectOnClickRow, handleSetColorRow, isClearHoverBg } = props
     const [openCollapse, setOpenCollapse] = useState(false)
+    const classes = useStyles();
+
     return (
         <>
             <TableRow
                 id={`${index}_row_table${name}`}
                 key={`${index}_row_table${name}`}
-                className="h-64 cursor-pointer"
+                className={clsx("h-64 cursor-pointer", isClearHoverBg && classes.tableCell)}
                 style={item.style}
                 hover
                 role="checkbox"
@@ -51,20 +62,32 @@ function RowContentBasic(props) {
                 )}
                 {isMultiSelect && (
                     <TableCell padding="checkbox" key={`${index}_checkbox${name}`}>
-                        <Checkbox checked={isSelected(item)} onClick={!isSelectOnClickRow ? handleSelectRow(item, `${index}_row_table${name}`, index) : null}/>
+                        <Checkbox checked={isSelected(item)} onClick={!isSelectOnClickRow ? handleSelectRow(item, `${index}_row_table${name}`, index) : null} />
                     </TableCell>
                 )}
-                {cols.map((col, colIndex) => (
-                    <TableCell key={`${col.field}_${colIndex}`} component="td" scope="row" align={col.alignValue} className={clsx("relative p-8", col.classValue)}>
-                        {
-                            col.isDate
-                                ? item[col.field] && !isNaN(Date.parse(item[col.field]))
-                                    ? dateformat(Date.parse(item[col.field]), col.formatDate)
-                                    : "-"
-                                : (item[col.field] || "")
-                        }
-                    </TableCell>
-                ))}
+                {cols.map((col, colIndex) => {
+                    const returnRow = () => {
+                        return item?.rowSpan[col.field] ? (item.keyRow === 1 ? item.rowSpan[col.field] : 0) : 1
+                    }
+
+                    return (
+                        <TableCell
+                            rowSpan={returnRow()}
+                            key={`${col.field}_${colIndex}`}
+                            component="td"
+                            scope="row"
+                            align={col.alignValue}
+                            className={clsx("relative p-8", col.classValue, returnRow() === 0 ? 'hidden' : '', item.keyRow > 1 ? 'pointer-events-none' : '')}>
+                            {
+                                col.isDate
+                                    ? item[col.field] && !isNaN(Date.parse(item[col.field]))
+                                        ? dateformat(Date.parse(item[col.field]), col.formatDate)
+                                        : "-"
+                                    : (item[col.field] || "")
+                            }
+                        </TableCell>
+                    )
+                })}
                 {item.action
                     && <TableCell
                         id={`${index}_row_table_edit${name}`}

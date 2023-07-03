@@ -64,7 +64,8 @@ function TableContentBasic(props) {
 		isFuseScrollbars,
 		isColorSelectRow,
 		isSelectOnClickRow,
-		upperHead
+		upperHead,
+		isClearHoverBg
 	} = props;
 	const [hover, setHover] = useState(null)
 	const [page, setPage] = useState(panigationDefault?.page || 0);
@@ -249,6 +250,7 @@ function TableContentBasic(props) {
 					isCollapsible={isCollapsible}
 					isSelectOnClickRow={isSelectOnClickRow}
 					handleSetColorRow={handleSetColorRow}
+					isClearHoverBg={isClearHoverBg}
 				/>
 			)))
 	}
@@ -265,7 +267,7 @@ function TableContentBasic(props) {
 
 	const tableContent = () => (
 		<>
-			<Table stickyHeader className={tableClassName} aria-labelledby="tableTitle">
+			<Table stickyHeader className={tableClassName} aria-labelledby="tableTitle" >
 				<TableHeaderBasic
 					columns={columns}
 					order={order}
