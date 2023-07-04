@@ -15,6 +15,7 @@ import { Router } from 'react-router-dom';
 import AppContext from './AppContext';
 import { Auth } from './auth';
 import routes from './fuse-configs/routesConfig';
+import '@fortawesome/fontawesome-svg-core/styles.css';
 import store from './store';
 
 const jss = create({

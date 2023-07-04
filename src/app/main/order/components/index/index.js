@@ -22,6 +22,9 @@ import { getShelf, getWine } from "app/main/customer-shelf/store/customerShelfSl
 import { unwrapResult } from "@reduxjs/toolkit";
 import { product } from "app/main/product/store/productSlice";
 import { useCallback } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilePen, faFilter, faMoneyBill, faTruck } from "@fortawesome/free-solid-svg-icons";
+import { format } from "date-fns";
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -35,16 +38,22 @@ const LayoutCustom = styled(Box)({
 });
 
 const columns = [
-    new initColumn({ field: "id", label: "IMEI", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "createdate", label: "Ngày tạo", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "cusname", label: "Tên khách hàng", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "moneydiscount", label: "Giảm giá", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "moneytotal", label: "Tổng tiền", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "detail", label: "Chi tiết", alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "status", label: "Trạng thái", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "product", style: { width: 250 }, label: "Sản phẩm", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "unitPR", label: "Đơn vị", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "right", label: "Giá", alignHeader: "right", alignValue: "right", sortable: false }),
+    new initColumn({ field: "id", label: "ID", classHeader: "w-128", alignValue: "left", sortable: false }),
+    //new initColumn({ field: "createdate", label: "Ngày tạo", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "cusname", label: "Khách hàng", alignHeader: "center", alignValue: "center", sortable: false }),
+
+    new initColumn({ field: "product", style: { width: 250 }, label: "Sản phẩm", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "unitPR", label: "Đơn vị", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "right", label: "Giá SP", alignHeader: "right", alignValue: "right", sortable: false }),
+
+    new initColumn({
+        field: "moneydiscount", label: <FontAwesomeIcon icon={faTruck} />
+        , alignHeader: "center", alignValue: "center", sortable: false
+    }),
+    new initColumn({ field: "moneytotal", label: <FontAwesomeIcon icon={faMoneyBill} />, alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "detail", label: <FontAwesomeIcon icon={faFilePen} />, alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "status", label: <FontAwesomeIcon icon={faFilter} />, alignHeader: "center", alignValue: "center", sortable: false }),
+
 ]
 
 function OrderView() {
@@ -156,7 +165,14 @@ function OrderView() {
     }
 
     const data = reEntities?.data?.map(item => ({
-        id: item.id,
+        id: <div className="text-12">
+            <div>
+                {item.id}
+            </div>
+            <div>
+                {item.createdate ? format(new Date(item.createdate), 'HH:mm dd/MM/yyyy') : ''}
+            </div>
+        </div>,
         keyRow: item.keyRow,
         createdate: ConvertDateTime.DisplayDateTime(item.createdate),
         moneydiscount: item.moneydiscount,
@@ -302,6 +318,7 @@ function OrderView() {
                                     setSearch={(value) => dispatch(setSearch(value))}
                                 />
                             }
+                            showBorder
                             openFilterOptions={Boolean(filterOptions)}
                             pagination={reEntities?.pagination}
                             isClearHoverBg

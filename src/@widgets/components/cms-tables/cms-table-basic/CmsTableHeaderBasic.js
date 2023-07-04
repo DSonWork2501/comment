@@ -8,6 +8,19 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { useTranslation } from 'react-i18next';
 import * as PropTypes from 'prop-types';
 import clsx from 'clsx'
+import { makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles({
+	tableCell: {
+		'&:hover': {
+			backgroundColor: 'transparent !important', // Change this to the desired background color
+		},
+	},
+	border: {
+		borderRight: '1px solid #ddd'
+	}
+});
+
 
 /**
  * @description Component tạo header cho table
@@ -17,8 +30,9 @@ import clsx from 'clsx'
  * @param onRequestSort func
  */
 function TableHeaderBasic(props) {
-	const { columns, order, onRequestSort, onOffHover, numSelected, rowCount, onSelectAllClick, isMultiSelect, isCollapsible, upperHead } = props;
+	const { columns, order, onRequestSort, onOffHover, numSelected, rowCount, onSelectAllClick, isMultiSelect, isCollapsible, upperHead, showBorder } = props;
 	const { t } = useTranslation('UserMngPage');
+	const classes = useStyles();
 
 	/**
 	 * @description sắp xếp trên table
@@ -50,7 +64,8 @@ function TableHeaderBasic(props) {
 						align={item.alignHeader}
 						padding={item.disablePaddingHeader ? 'none' : 'default'}
 						sortDirection={order.field === item.field ? order.direction : false}
-						className={clsx('p-8', item.classHeader)}
+						className={clsx('p-8', item.classHeader,
+							showBorder && classes.border)}
 						style={item.style}
 					>
 						{item.onSelectAllClick && (
@@ -83,7 +98,7 @@ function TableHeaderBasic(props) {
 									{item.label}
 								</TableSortLabel>
 							</Tooltip>
-						) : t(item.label)}
+						) : (React.isValidElement(item.label) ? <>{item.label}</> : t(item.label))}
 					</TableCell>
 				))}
 			</TableRow>
