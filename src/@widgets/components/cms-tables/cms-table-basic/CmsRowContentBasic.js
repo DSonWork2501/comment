@@ -25,10 +25,13 @@ const useStyles = makeStyles({
             backgroundColor: 'transparent !important', // Change this to the desired background color
         },
     },
+    border: {
+        borderRight: '1px solid #ddd'
+    }
 });
 
 function RowContentBasic(props) {
-    const { index, isMultiSelect, item, handleSelectRow, isSelected, cols, isCollapsible, name, isSelectOnClickRow, handleSetColorRow, isClearHoverBg } = props
+    const { index, isMultiSelect, item, handleSelectRow, isSelected, cols, isCollapsible, name, isSelectOnClickRow, handleSetColorRow, isClearHoverBg, showBorder } = props
     const [openCollapse, setOpenCollapse] = useState(false)
     const classes = useStyles();
 
@@ -67,7 +70,11 @@ function RowContentBasic(props) {
                 )}
                 {cols.map((col, colIndex) => {
                     const returnRow = () => {
-                        return item?.rowSpan[col.field] ? (item.keyRow === 1 ? item.rowSpan[col.field] : 0) : 1
+                        try {
+                            return item?.rowSpan[col.field] ? (item.keyRow === 1 ? item.rowSpan[col.field] : 0) : 1
+                        } catch (error) {
+                            return 1
+                        }
                     }
 
                     return (
@@ -77,7 +84,9 @@ function RowContentBasic(props) {
                             component="td"
                             scope="row"
                             align={col.alignValue}
-                            className={clsx("relative p-8", col.classValue, returnRow() === 0 ? 'hidden' : '', item.keyRow > 1 ? 'pointer-events-none' : '')}>
+                            className={clsx("relative p-8", col.classValue, returnRow() === 0 ? 'hidden' : '',
+                                showBorder && classes.border,
+                                item.keyRow > 1 ? 'pointer-events-none' : '')}>
                             {
                                 col.isDate
                                     ? item[col.field] && !isNaN(Date.parse(item[col.field]))

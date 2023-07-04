@@ -65,7 +65,8 @@ function TableContentBasic(props) {
 		isColorSelectRow,
 		isSelectOnClickRow,
 		upperHead,
-		isClearHoverBg
+		isClearHoverBg,
+		showBorder
 	} = props;
 	const [hover, setHover] = useState(null)
 	const [page, setPage] = useState(panigationDefault?.page || 0);
@@ -251,6 +252,7 @@ function TableContentBasic(props) {
 					isSelectOnClickRow={isSelectOnClickRow}
 					handleSetColorRow={handleSetColorRow}
 					isClearHoverBg={isClearHoverBg}
+					showBorder={showBorder}
 				/>
 			)))
 	}
@@ -279,6 +281,7 @@ function TableContentBasic(props) {
 					isMultiSelect={isMultiSelect}
 					isCollapsible={isCollapsible}
 					upperHead={upperHead}
+					showBorder={showBorder}
 				/>
 				{data.length > 0 && <TableBody>{genTableCell()}</TableBody>}
 				{footerData && <TableFooter>{genTableFooterCell()}</TableFooter>}

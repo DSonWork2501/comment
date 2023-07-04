@@ -1,12 +1,12 @@
-import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsLabel, CmsTab, CmsTableBasic } from "@widgets/components";
-import { alertInformation, ConvertDateTime, initColumn, NumberWithCommas } from "@widgets/functions";
+import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTab, CmsTableBasic } from "@widgets/components";
+import { alertInformation, initColumn } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useEffect } from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { keyStore, links } from "../../common";
+import { btnStatus, keyStore, links } from "../../common";
 import FilterOptionView from "./filterOptionView";
 import reducer from "../../store";
 import { getList as getOrder, order, resetSearch, setSearch, updateOrderStatus } from "../../store/orderSlice";
@@ -16,12 +16,16 @@ import OrderDetailContent from "./orderDetail";
 import ChangeOderStatusContent from "./changeOrderStatus";
 import History from "@history";
 import { useParams } from "react-router";
-import { Box, styled } from "@material-ui/core";
+import { Box, Button, Menu, MenuItem, styled } from "@material-ui/core";
 import PackageDialog from "./PackageDialog";
 import { getShelf, getWine } from "app/main/customer-shelf/store/customerShelfSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { product } from "app/main/product/store/productSlice";
 import { useCallback } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilePen, faFilter, faMoneyBill, faTruck } from "@fortawesome/free-solid-svg-icons";
+import { format } from "date-fns";
+import { ArrowDropDown } from "@material-ui/icons";
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -35,17 +39,65 @@ const LayoutCustom = styled(Box)({
 });
 
 const columns = [
-    new initColumn({ field: "id", label: "IMEI", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "createdate", label: "Ngày tạo", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "cusname", label: "Tên khách hàng", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "moneydiscount", label: "Giảm giá", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "moneytotal", label: "Tổng tiền", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "detail", label: "Chi tiết", alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "status", label: "Trạng thái", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "product", style: { width: 250 }, label: "Sản phẩm", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "unitPR", label: "Đơn vị", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "right", label: "Giá", alignHeader: "right", alignValue: "right", sortable: false }),
+    new initColumn({ field: "id", label: "ID", classHeader: "w-128", alignValue: "left", sortable: false }),
+    //new initColumn({ field: "createdate", label: "Ngày tạo", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "cusname", label: "Khách hàng", alignHeader: "center", alignValue: "left", sortable: false }),
+
+    new initColumn({ field: "product", style: { width: 250 }, label: "Sản phẩm", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "unitPR", label: "Đơn vị", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "right", label: "Giá SP", alignHeader: "right", alignValue: "right", sortable: false }),
+    new initColumn({ field: "numberPr", label: "SL", style: { width: 50 }, alignHeader: "center", alignValue: "center", sortable: false }),
+
+    new initColumn({
+        field: "moneydiscount", label: <FontAwesomeIcon icon={faTruck} />
+        , alignHeader: "center", alignValue: "center", sortable: false
+    }),
+    new initColumn({ field: "moneytotal", style: { width: 140 }, label: <FontAwesomeIcon icon={faMoneyBill} />, alignHeader: "center", alignValue: "right", sortable: false }),
+    new initColumn({ field: "staffdescription", style: { width: 250 }, label: <FontAwesomeIcon icon={faFilePen} />, alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "status", label: <FontAwesomeIcon icon={faFilter} />, alignHeader: "center", alignValue: "center", sortable: false }),
 ]
+
+const DropMenu = ({ crName, data, handleClose, className }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    // const handleClose = () => {
+    //     setAnchorEl(null);
+    // };
+    console.log(data);
+    return (
+        <div>
+            <Button aria-controls="dropdown-menu" className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="contained" aria-haspopup="true" onClick={handleClick}>
+                {crName}
+                <ArrowDropDown />
+            </Button>
+            <Menu
+                id="dropdown-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={() => {
+                    handleClose(null, setAnchorEl)
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+            >
+                {
+                    data.map((val, index) => {
+                        return <MenuItem key={index} onClick={() => {
+                            handleClose(val, setAnchorEl, 0)
+                        }}>{val.name}</MenuItem>
+                    })
+                }
+            </Menu>
+        </div>
+    );
+}
 
 function OrderView() {
     const dispatch = useDispatch()
@@ -110,19 +162,19 @@ function OrderView() {
         dispatch(updateOrderStatus(value))
     }
 
-    const returnName = (status) => {
-        if (status === 1)
-            return 'Xác Nhận';
-        if (status === 2)
-            return 'Chuyển Qua Đóng Gói';
-        if (status === 6)
-            return 'Đóng Gói';
-        if (status === 5)
-            return 'Xác Nhận Thanh Toán';
-        if (status === 3)
-            return 'Hoàn Thành';
-        return '';
-    }
+    // const returnName = (status) => {
+    //     if (status === 1)
+    //         return 'Xác Nhận';
+    //     if (status === 2)
+    //         return 'Chuyển Qua Đóng Gói';
+    //     if (status === 6)
+    //         return 'Đóng Gói';
+    //     if (status === 5)
+    //         return 'Xác Nhận Thanh Toán';
+    //     if (status === 3)
+    //         return 'Hoàn Thành';
+    //     return '';
+    // }
 
     const handleStatus = (item) => {
         alertInformation({
@@ -150,34 +202,132 @@ function OrderView() {
         })
     }
 
-    const HandleChangeStatus = (item) => {
-        setOpen('changeStatus')
-        setInfo(item)
-    }
+    // const HandleChangeStatus = (item) => {
+    //     setOpen('changeStatus')
+    //     setInfo(item)
+    // }
 
     const data = reEntities?.data?.map(item => ({
-        id: item.id,
-        keyRow: item.keyRow,
-        createdate: ConvertDateTime.DisplayDateTime(item.createdate),
-        moneydiscount: item.moneydiscount,
-        cusname: item.cusname,
-        moneytotal: NumberWithCommas(item.moneytotal),
-        detail: <CmsIconButton onClick={() => HandleClickDetail(item)} size="small" tooltip={'Thông tin chi tiết'} icon="info" className="text-16 hover:shadow-2 text-grey-500 hover:text-grey-700" />,
-        status: <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} />,
-        product: (
+        id: <div className="text-12">
+            <div className="text-blue-500">
+                {item.id}
+            </div>
             <div>
+                {item.createdate ? format(new Date(item.createdate), 'HH:mm dd/MM/yyyy') : ''}
+            </div>
+        </div>,
+        staffdescription: (
+            <div className="text-12">
+            </div>
+        ),
+        numberPr: (
+            <div className="text-12">
+                1
+            </div>
+        ),
+        keyRow: item.keyRow,
+        cusname: <div className="text-12">
+            <div className="text-blue-500">
+                {
+                    item.phone
+                }
+            </div>
+            <div>
+                {
+                    item.cusname
+                }
+            </div>
+            <div>
+                {
+                    item.email
+                }
+            </div>
+            <div>
+                <i>
+                    {
+                        item.address + ',' + item.ward + ',' + item.district + ',' + item.city
+                    }
+                </i>
+            </div>
+        </div>,
+        moneytotal: (
+            <div>
+                <div className="text-10 text-orange-500">
+                    {(item?.moneydiscount) ? item.moneydiscount.toLocaleString('en-US') : ''}
+                </div>
+                <div className="text-12 text-green-500">
+                    {(item?.moneytotal) ? item.moneytotal.toLocaleString('en-US') : 0}
+                </div>
+            </div>
+        ),
+        detail: <CmsIconButton onClick={() => HandleClickDetail(item)} size="small" tooltip={'Thông tin chi tiết'} icon="info" className="text-16 hover:shadow-2 text-grey-500 hover:text-grey-700" />,
+        status: <div>
+            <DropMenu
+                crName={orderStatus[item.status].name}
+                className={clsx('text-white px-4 py-2  text-12'
+                    , `hover:${orderStatus[item.status].className}`
+                    , orderStatus[item.status].className
+                    , (item.status === 4 || item.status === 0) ? 'pointer-events-none' : '')}
+                data={btnStatus.map(val => {
+                    let hide = true;
+
+                    if (item.status === 1 && (val.status === 2 || val.status === 0))
+                        hide = false;
+
+                    if (item.status === 2 && val.status === 6)
+                        hide = false;
+
+                    if (item.status === 6 && val.status === 5)
+                        hide = false;
+
+                    if (item.status === 5 && val.status === 3)
+                        hide = false;
+
+                    if (item.status === 3 && val.status === 4)
+                        hide = false;
+
+                    return { ...val, hide }
+                }).filter(val => !val.hide)}
+
+                handleClose={(value, setAnchorEl) => {
+                    if (value) {
+                        if (value.status === 6) {
+                            History.push(`/package/${item.id}`)
+                        } else {
+                            alertInformation({
+                                text: `Xác nhận thao tác`,
+                                data: { value },
+                                confirm: async () => {
+                                    let form = {
+                                        id: item.id,
+                                        cusID: item.cusId,
+                                        status: value.status
+                                    }
+                                    const resultAction = await dispatch(updateOrderStatus(form))
+                                    unwrapResult(resultAction);
+                                    getListTable(search, status);
+                                },
+                            })
+                        }
+                    }
+                    setAnchorEl(null)
+                }} />
+            {/* <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} /> */}
+        </div>,
+        product: (
+            <div className="text-12">
                 {item?.detail?.name}
             </div>
         ),
         unitPR: (
-            <>
+            <div className="text-12">
                 {item?.hhid ? 'Tủ' : 'Chai'}
-            </>
+            </div>
         ),
         right: (
-            <>
+            <div className="text-12">
                 {(item?.detail?.price) ? item?.detail?.price.toLocaleString('en-US') : '-'}
-            </>
+            </div>
         ),
         rowSpan: {
             id: item?.productorders?.length || 1,
@@ -188,50 +338,50 @@ function OrderView() {
             detail: item?.productorders?.length || 1,
             status: item?.productorders?.length || 1
         },
-        action: (
-            <div className="w-full flex flex-row space-x-4">
-                {
-                    (item.status !== 2 && item.status !== 0 && item.status !== 4)
-                    &&
-                    <CmsIconButton
-                        tooltip={returnName(item.status)}
-                        icon="navigate_next"
-                        className={clsx("hover:shadow-2 text-white"
-                            , status === 1 ? "bg-orange-500 hover:bg-orange-700" : ''
-                            , status === 2 ? "bg-pink-500 hover:bg-pink-500" : ''
-                            , status === 6 ? "bg-purple-500 hover:bg-purple-500" : ''
-                            , status === 5 ? "bg-green-500 hover:bg-green-500" : ''
-                            , status === 3 ? "bg-blue-500 hover:bg-blue-500" : ''
-                        )}
-                        onClick={() => handleStatus(item)} />
-                }
+        // action: (
+        //     <div className="w-full flex flex-row space-x-4">
+        //         {
+        //             (item.status !== 2 && item.status !== 0 && item.status !== 4)
+        //             &&
+        //             <CmsIconButton
+        //                 tooltip={returnName(item.status)}
+        //                 icon="navigate_next"
+        //                 className={clsx("hover:shadow-2 text-white"
+        //                     , status === 1 ? "bg-orange-500 hover:bg-orange-700" : ''
+        //                     , status === 2 ? "bg-pink-500 hover:bg-pink-500" : ''
+        //                     , status === 6 ? "bg-purple-500 hover:bg-purple-500" : ''
+        //                     , status === 5 ? "bg-green-500 hover:bg-green-500" : ''
+        //                     , status === 3 ? "bg-blue-500 hover:bg-blue-500" : ''
+        //                 )}
+        //                 onClick={() => handleStatus(item)} />
+        //         }
 
-                <CmsIconButton
-                    tooltip={'Edit Trạng thái'}
-                    icon="edit"
-                    className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
-                    onClick={() => HandleChangeStatus(item)} />
+        //         <CmsIconButton
+        //             tooltip={'Edit Trạng thái'}
+        //             icon="edit"
+        //             className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
+        //             onClick={() => HandleChangeStatus(item)} />
 
-                {
-                    item.status === 2
-                    &&
-                    <CmsIconButton
-                        tooltip={'Đóng gói'}
-                        icon="wrap_text"
-                        className="bg-blue-500 hover:bg-blue-700 hover:shadow-2 text-white"
-                        onClick={() => {
-                            setDetail(item);
-                            setOpenDialog('package');
-                            if (item.parentid === 1) {
-                                dispatch(getShelf({ cusID: item.cusId, type: 'wine', orderID: item.id }))
-                            } else {
-                                dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
-                            }
-                        }} />
-                }
+        //         {
+        //             item.status === 2
+        //             &&
+        //             <CmsIconButton
+        //                 tooltip={'Đóng gói'}
+        //                 icon="wrap_text"
+        //                 className="bg-blue-500 hover:bg-blue-700 hover:shadow-2 text-white"
+        //                 onClick={() => {
+        //                     setDetail(item);
+        //                     setOpenDialog('package');
+        //                     if (item.parentid === 1) {
+        //                         dispatch(getShelf({ cusID: item.cusId, type: 'wine', orderID: item.id }))
+        //                     } else {
+        //                         dispatch(getWine({ cusId: item.cusId, parentId: item.hhid, cms: 1 }))
+        //                     }
+        //                 }} />
+        //         }
 
-            </div>
-        ) || []
+        //     </div>
+        // ) || []
     }))
     console.log(data, 123);
     const handleFilterType = (event, value) => {
@@ -302,6 +452,7 @@ function OrderView() {
                                     setSearch={(value) => dispatch(setSearch(value))}
                                 />
                             }
+                            showBorder
                             openFilterOptions={Boolean(filterOptions)}
                             pagination={reEntities?.pagination}
                             isClearHoverBg
