@@ -67,7 +67,11 @@ function RowContentBasic(props) {
                 )}
                 {cols.map((col, colIndex) => {
                     const returnRow = () => {
-                        return item?.rowSpan[col.field] ? (item.keyRow === 1 ? item.rowSpan[col.field] : 0) : 1
+                        try {
+                            return item?.rowSpan[col.field] ? (item.keyRow === 1 ? item.rowSpan[col.field] : 0) : 1
+                        } catch (error) {
+                            return 1
+                        }
                     }
 
                     return (
