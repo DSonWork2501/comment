@@ -85,7 +85,18 @@ export const order = {
                 thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
                 return (thunkAPI.rejectWithValue(error))
             }
-        })
+        }),
+        updateNote: createAsyncThunk(`${appName}/${moduleName}/order/other/updateNote`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.other.updateNote(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     }
 }
 

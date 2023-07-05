@@ -16,16 +16,25 @@ import OrderDetailContent from "./orderDetail";
 import ChangeOderStatusContent from "./changeOrderStatus";
 import History from "@history";
 import { useParams } from "react-router";
-import { Box, Button, Menu, MenuItem, styled } from "@material-ui/core";
+import { Box, Button, Menu, MenuItem, makeStyles, styled } from "@material-ui/core";
 import PackageDialog from "./PackageDialog";
 import { getShelf, getWine } from "app/main/customer-shelf/store/customerShelfSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { product } from "app/main/product/store/productSlice";
 import { useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilePen, faFilter, faMoneyBill, faTruck } from "@fortawesome/free-solid-svg-icons";
+import { faFilePen, faFilter, faMoneyBill, faPen, faTruck } from "@fortawesome/free-solid-svg-icons";
 import { format } from "date-fns";
 import { ArrowDropDown } from "@material-ui/icons";
+import ConfirmationDialog from "./ConfirmationDialog";
+
+const useStyles = makeStyles({
+    hoverOpenBtn: {
+        '&:hover .btn-fix': {
+            opacity: 1
+        },
+    }
+});
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -53,8 +62,8 @@ const columns = [
         , alignHeader: "center", alignValue: "center", sortable: false
     }),
     new initColumn({ field: "moneytotal", style: { width: 140 }, label: <FontAwesomeIcon icon={faMoneyBill} />, alignHeader: "center", alignValue: "right", sortable: false }),
-    new initColumn({ field: "staffdescription", style: { width: 250 }, label: <FontAwesomeIcon icon={faFilePen} />, alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "status", label: <FontAwesomeIcon icon={faFilter} />, alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "staffdescription", style: { width: 250 }, label: <FontAwesomeIcon icon={faFilePen} />, alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "status", style: { width: 150 }, label: <FontAwesomeIcon icon={faFilter} />, alignHeader: "center", alignValue: "center", sortable: false }),
 ]
 
 const DropMenu = ({ crName, data, handleClose, className }) => {
@@ -67,7 +76,7 @@ const DropMenu = ({ crName, data, handleClose, className }) => {
     // const handleClose = () => {
     //     setAnchorEl(null);
     // };
-    console.log(data);
+
     return (
         <div>
             <Button aria-controls="dropdown-menu" className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="contained" aria-haspopup="true" onClick={handleClick}>
@@ -104,6 +113,7 @@ function OrderView() {
     const search = useSelector(store => store[keyStore].order.search)
     const loading = useSelector(store => store[keyStore].order.loading)
     const entities = useSelector(store => store[keyStore].order.entities)
+    const classes = useStyles();
     const reEntities = useMemo(() => {
         let data = [];
         entities?.data?.length && entities.data.forEach((element, index) => {
@@ -123,6 +133,7 @@ function OrderView() {
     const [info, setInfo] = useState(null);
     const [openDialog, setOpenDialog] = useState("");
     const [detail, setDetail] = useState(null);
+    const [item, setItem] = useState(null);
     const totalValues = {
         0: summary?.da_huy ? summary?.da_huy?.toLocaleString('en-US') : 0,
         6: summary?.da_dong_goi ? summary?.da_dong_goi?.toLocaleString('en-US') : 0,
@@ -158,7 +169,6 @@ function OrderView() {
     }
 
     const HandleSaveStatus = (value) => {
-        console.log(value);
         dispatch(updateOrderStatus(value))
     }
 
@@ -217,7 +227,22 @@ function OrderView() {
             </div>
         </div>,
         staffdescription: (
-            <div className="text-12">
+            <div className={clsx("text-12  h-full w-full absolute top-8 right-8 bottom-8 left-8", classes.hoverOpenBtn)}>
+                <div
+                    onClick={() => {
+                        setOpenDialog('note');
+                        setItem(item);
+                    }}
+                    className="w-32 h-32 rounded-full cursor-pointer hover:bg-grey-300 flex items-center justify-center btn-fix absolute top-8 right-8 opacity-0">
+                    <FontAwesomeIcon icon={faPen} />
+                </div>
+                {item?.staffdescription}
+                {
+                    item.description
+                    &&
+                    <div style={{ borderBottom: '1px dashed black', width: '100%' }}></div>
+                }
+                {item?.description}
             </div>
         ),
         numberPr: (
@@ -383,7 +408,6 @@ function OrderView() {
         //     </div>
         // ) || []
     }))
-    console.log(data, 123);
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
     };
@@ -409,6 +433,26 @@ function OrderView() {
             : dispatch(getWine({ cusId: detail.cusId, parentId: detail.hhid, cms: 1 }))
     }
 
+    const handleSubmit = async (values, form) => {
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: { values, form },
+            confirm: async () => {
+                try {
+                    const resultAction = await dispatch(order.other.updateNote(values));
+                    unwrapResult(resultAction);
+                    form.resetForm();
+                    setOpenDialog('');
+                    getListTable(search, status);
+                } catch (error) {
+                } finally {
+                    form.setSubmitting(false)
+                }
+            },
+            close: () => form.setSubmitting(false)
+        });
+    }
+
     return (
         <LayoutCustom>
             {openDialog === 'package' &&
@@ -420,8 +464,19 @@ function OrderView() {
                     handlePackage={() => {
                         handleStatus(detail)
                     }}
-
                 />}
+
+            {
+                openDialog === 'note'
+                &&
+                <ConfirmationDialog
+                    title='Sửa ghi chú'
+                    detail={item}
+                    onSave={handleSubmit}
+                    open={true}
+                    handleClose={handleCloseDialog} />
+            }
+
             <CmsCardedPage
                 title={'Danh sách đơn hàng'}
                 subTitle={'Quản lý thông tin đơn hàng'}

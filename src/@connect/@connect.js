@@ -87,6 +87,7 @@ export default {
             update: entity => axios.put(`${baseurl}/order/update-order`, entity),
             other: {
                 getSummary: params => axios.get(`${baseurl}/order/summary-order`, { params }),
+                updateNote: entity => axios.put(`${baseurl}/order/update-order-des`, entity),
             }
         },
         location: {
