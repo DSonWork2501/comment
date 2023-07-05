@@ -179,6 +179,9 @@ const orderSlice = createSlice({
         [getList.pending]: state => ({
             ...state,
             loading: true,
+            entities:{
+                data:[]
+            },
             error: null
         }),
         [getList.fulfilled]: (state, { payload }) => {
@@ -192,6 +195,9 @@ const orderSlice = createSlice({
         [getList.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
+            entities:{
+                data:[]
+            },
             error: error
         }),
         /**

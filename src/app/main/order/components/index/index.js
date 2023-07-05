@@ -27,6 +27,7 @@ import { faFilePen, faFilter, faMoneyBill, faPen, faTruck } from "@fortawesome/f
 import { format } from "date-fns";
 import { ArrowDropDown } from "@material-ui/icons";
 import ConfirmationDialog from "./ConfirmationDialog";
+import FuseLoading from "@fuse/core/FuseLoading/FuseLoading";
 
 const useStyles = makeStyles({
     hoverOpenBtn: {
@@ -451,6 +452,10 @@ function OrderView() {
             },
             close: () => form.setSubmitting(false)
         });
+    }
+
+    if (!data) {
+        return <FuseLoading />
     }
 
     return (
