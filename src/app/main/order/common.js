@@ -15,7 +15,7 @@ export const btnStatus = [
     },
     {
         status: 5,
-        name: "Thanh toán"
+        name: "Chờ thanh toán"
     },
     {
         status: 3,
