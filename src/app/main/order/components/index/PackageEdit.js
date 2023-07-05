@@ -223,7 +223,6 @@ function FormEdit() {
         }
 
         return current ? {
-            ...uniqueItems,
             [current.productorders[0].uniqueid]: {
                 item: {
                     "id": current.productorders[0].id,
@@ -234,7 +233,8 @@ function FormEdit() {
                 },
                 number: 1,
                 numberReceive: numberReceive && numberReceive[current.productorders[0].uniqueid] ? numberReceive[current.productorders[0].uniqueid] : 0
-            }
+            },
+            ...uniqueItems
         } : uniqueItems
     }, [listWine, numberReceive, current])
     console.log(uniqueList);
@@ -447,7 +447,13 @@ function FormEdit() {
             {openDialog === 'productList' &&
                 <ListProductDialog
                     handleClose={() => handleCloseDialog()}
-                    data={listWine}
+                    data={[{
+                        "id": current.productorders[0].id,
+                        "img": current.productorders[0].image,
+                        "sku": current.productorders[0].uniqueid,
+                        "name": current.productorders[0].name,
+                        wine: 0
+                    }, ...listWine]}
                     open={true}
                     loading={popupLoading}
                     handleSave={() => {
@@ -465,7 +471,13 @@ function FormEdit() {
             {openDialog === 'printQr' &&
                 <ListProductDialog
                     handleClose={() => setOpenDialog('')}
-                    data={listWine}
+                    data={[{
+                        "id": current.productorders[0].id,
+                        "img": current.productorders[0].image,
+                        "sku": current.productorders[0].uniqueid,
+                        "name": current.productorders[0].name,
+                        wine: 0
+                    }, ...listWine]}
                     open={true}
                     loading={popupLoading}
                 />}
@@ -507,7 +519,7 @@ function FormEdit() {
                                             }
                                         })
                                     }}
-                                    disabled={Boolean(step || ID === '0' || (listWine?.length+1) !== receive || !receive)}
+                                    disabled={Boolean(step || ID === '0' || (listWine?.length + 1) !== receive || !receive)}
                                     size="small" />
                                 <CmsButtonProgress
                                     loading={formik.isSubmitting}
