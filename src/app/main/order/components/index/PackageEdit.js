@@ -22,6 +22,7 @@ import History from '@history/@history';
 import { useParams } from 'react-router';
 import ListProductDialog from './ListProductDialog';
 import noImage from '@widgets/images/noImage.jpg';
+import clsx from 'clsx';
 
 const BoxCustom = styled(Box)({
     border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -221,8 +222,22 @@ function FormEdit() {
             }
         }
 
-        return uniqueItems
-    }, [listWine, numberReceive])
+        return current ? {
+            ...uniqueItems,
+            [current.productorders[0].uniqueid]: {
+                item: {
+                    "id": current.productorders[0].id,
+                    "img": current.productorders[0].image,
+                    "sku": current.productorders[0].uniqueid,
+                    "name": current.productorders[0].name,
+                    wine: 0
+                },
+                number: 1,
+                numberReceive: numberReceive && numberReceive[current.productorders[0].uniqueid] ? numberReceive[current.productorders[0].uniqueid] : 0
+            }
+        } : uniqueItems
+    }, [listWine, numberReceive, current])
+    console.log(uniqueList);
     const handleSave = (values) => {
         alertInformation({
             text: `Xác nhận thao tác`,
@@ -492,7 +507,7 @@ function FormEdit() {
                                             }
                                         })
                                     }}
-                                    disabled={Boolean(step || ID === '0' || listWine?.length !== receive || !receive)}
+                                    disabled={Boolean(step || ID === '0' || (listWine?.length+1) !== receive || !receive)}
                                     size="small" />
                                 <CmsButtonProgress
                                     loading={formik.isSubmitting}
@@ -591,7 +606,7 @@ function FormEdit() {
                                         <div className='flex justify-between items-center w-full'>
                                             <div style={{ width: '49%' }} className='pb-8'>
                                                 <CmsFormikTextField
-                                                    label={`BarCode`}
+                                                    label={`Wine barCode/Uniqueid`}
                                                     name="barCodeSearch"
                                                     className="my-8"
                                                     size="small"
@@ -771,7 +786,7 @@ function FormEdit() {
                                                         size='small'
                                                         component="th"
                                                         className='text-left'>
-                                                        Tên rượu
+                                                        Tên sản phẩm
                                                     </TableCell>
                                                     <TableCell
                                                         style={{ background: 'aliceblue' }}
@@ -811,7 +826,7 @@ function FormEdit() {
                                                                 }}
                                                                 size='small'>
                                                                 <div>
-                                                                    <b>
+                                                                    <b className={clsx(val?.item?.wine === 0 ? 'text-blue-500' : '')}>
                                                                         - {val?.item?.name}
                                                                     </b>
                                                                 </div>
@@ -838,55 +853,6 @@ function FormEdit() {
                                                         </TableRow>
                                                     ))
                                                 }
-                                                {
-                                                    (current && current.parentid === 0)
-                                                    &&
-                                                    <TableRow>
-                                                        <TableCell
-                                                            size='small'
-                                                            style={{
-                                                                width: 130,
-                                                                //background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
-                                                            }}>
-                                                            <img
-                                                                className='rounded-6 shadow-4'
-                                                                style={{ objectFit: 'contain', height: '110px', maxWidth: 150, margin: 'auto' }}
-                                                                src={`${process.env.REACT_APP_BASE_URL}api/product/img/${current?.productorders[0]?.image}`}
-                                                                alt={`imageforitemsheft`} />
-                                                        </TableCell>
-                                                        <TableCell
-                                                            style={{
-                                                                //background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
-                                                            }}
-                                                            size='small'>
-                                                            <div>
-                                                                <b>
-                                                                    - {current?.productorders[0]?.name}
-                                                                </b>
-                                                            </div>
-                                                            <div>
-                                                                -  {current?.productorders[0]?.sku}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell
-                                                            style={{
-                                                                //background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
-                                                            }}
-                                                            size='small'
-                                                            className='text-right'>
-                                                            1
-                                                        </TableCell>
-                                                        <TableCell
-                                                            style={{
-                                                                //background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
-                                                            }}
-                                                            size='small'
-                                                            className='text-right'>
-                                                            0
-                                                        </TableCell>
-                                                    </TableRow>
-                                                }
-
                                             </TableBody>
                                             <TableBody>
                                                 <TableRow>
@@ -903,7 +869,7 @@ function FormEdit() {
                                                         size='small'
                                                         style={{ background: 'aliceblue' }}
                                                         className='text-right'>
-                                                        {listWine?.length}
+                                                        {listWine?.length + 1}
                                                     </TableCell>
                                                     <TableCell
                                                         size='small'
