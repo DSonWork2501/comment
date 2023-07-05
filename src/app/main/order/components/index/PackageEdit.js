@@ -223,7 +223,6 @@ function FormEdit() {
 
         return uniqueItems
     }, [listWine, numberReceive])
-    console.log(uniqueList, numberReceive);
     const handleSave = (values) => {
         alertInformation({
             text: `Xác nhận thao tác`,
@@ -839,6 +838,55 @@ function FormEdit() {
                                                         </TableRow>
                                                     ))
                                                 }
+                                                {
+                                                    (current && current.parentid === 0)
+                                                    &&
+                                                    <TableRow>
+                                                        <TableCell
+                                                            size='small'
+                                                            style={{
+                                                                width: 130,
+                                                                //background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
+                                                            }}>
+                                                            <img
+                                                                className='rounded-6 shadow-4'
+                                                                style={{ objectFit: 'contain', height: '110px', maxWidth: 150, margin: 'auto' }}
+                                                                src={`${process.env.REACT_APP_BASE_URL}api/product/img/${current?.productorders[0]?.image}`}
+                                                                alt={`imageforitemsheft`} />
+                                                        </TableCell>
+                                                        <TableCell
+                                                            style={{
+                                                                //background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
+                                                            }}
+                                                            size='small'>
+                                                            <div>
+                                                                <b>
+                                                                    - {current?.productorders[0]?.name}
+                                                                </b>
+                                                            </div>
+                                                            <div>
+                                                                -  {current?.productorders[0]?.sku}
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell
+                                                            style={{
+                                                                //background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
+                                                            }}
+                                                            size='small'
+                                                            className='text-right'>
+                                                            1
+                                                        </TableCell>
+                                                        <TableCell
+                                                            style={{
+                                                                //background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
+                                                            }}
+                                                            size='small'
+                                                            className='text-right'>
+                                                            0
+                                                        </TableCell>
+                                                    </TableRow>
+                                                }
+
                                             </TableBody>
                                             <TableBody>
                                                 <TableRow>
