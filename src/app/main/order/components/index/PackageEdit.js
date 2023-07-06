@@ -23,6 +23,7 @@ import { useParams } from 'react-router';
 import ListProductDialog from './ListProductDialog';
 import noImage from '@widgets/images/noImage.jpg';
 import clsx from 'clsx';
+import QRCode from 'qrcode';
 
 const BoxCustom = styled(Box)({
     border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -139,6 +140,18 @@ const SelectDetail = ({ prefix, detail }) => {
     </>
 }
 
+const generateQRCodeBase64 = async (data) => {
+    try {
+        const canvas = await QRCode.toCanvas(data);
+        const dataURL = canvas.toDataURL();
+        const base64 = dataURL.replace(/^data:image\/(png|jpg);base64,/, '');
+        return base64;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};
+
 function FormEdit() {
     const location = useLocation();
     const dispatch = useDispatch();
@@ -225,10 +238,12 @@ function FormEdit() {
         return current ? {
             [current.productorders[0].uniqueid]: {
                 item: {
-                    "id": current.productorders[0].id,
-                    "img": current.productorders[0].image,
-                    "sku": current.productorders[0].uniqueid,
-                    "name": current.productorders[0].name,
+                    id: current.productorders[0].id,
+                    img: current.productorders[0].image,
+                    sku: current.productorders[0].uniqueid,
+                    name: current.productorders[0].name,
+                    qrcode: current.qrcode,
+                    qrcodenonhash: current.productorders[0].uniqueid,
                     wine: 0
                 },
                 number: 1,
@@ -237,7 +252,7 @@ function FormEdit() {
             ...uniqueItems
         } : uniqueItems
     }, [listWine, numberReceive, current])
-    console.log(uniqueList);
+
     const handleSave = (values) => {
         alertInformation({
             text: `Xác nhận thao tác`,
@@ -380,12 +395,16 @@ function FormEdit() {
                 status: 2,
                 pageNumber: 1,
                 rowsPage: 10,
-                cms: 1
+                cms: 1,
+                getQrCode: 1
             })).then((res) => {
                 setLoading(false);
                 if (res?.payload?.result && res?.payload?.data?.length && current?.id !== res.payload.data[0]?.id) {
-                    setCurrent(res.payload.data[0])
-                    getWines(res.payload.data[0])
+                    const value = res.payload.data[0];
+                    generateQRCodeBase64(value?.productorders[0].uniqueid).then(qrcode => {
+                        setCurrent({ ...value, qrcode })
+                        getWines({ ...value, qrcode })
+                    })
                 }
             })
         }
@@ -453,6 +472,8 @@ function FormEdit() {
                         "img": current.productorders[0].image,
                         "sku": current.productorders[0].uniqueid,
                         "name": current.productorders[0].name,
+                        qrcode: current.qrcode,
+                        qrcodenonhash: current.productorders[0].uniqueid,
                         wine: 0
                     }, ...listWine]}
                     open={true}
@@ -477,6 +498,8 @@ function FormEdit() {
                         "img": current.productorders[0].image,
                         "sku": current.productorders[0].uniqueid,
                         "name": current.productorders[0].name,
+                        qrcode: current.qrcode,
+                        qrcodenonhash: current.productorders[0].uniqueid,
                         wine: 0
                     }, ...listWine]}
                     open={true}
@@ -593,7 +616,8 @@ function FormEdit() {
                                                     status: 2,
                                                     pageNumber: 1,
                                                     rowsPage: 10,
-                                                    cms: 1
+                                                    cms: 1,
+                                                    getQrCode: 1
                                                 }))
                                             setLoading(false);
                                         }}
@@ -601,8 +625,9 @@ function FormEdit() {
                                             value.parentid === 1
                                                 ? await dispatch(getShelf({ cusID: value.cusId, type: 'wine', orderID: value.id }))
                                                 : await dispatch(getWine({ cusId: value.cusId, parentId: value.hhid, cms: 1 }))
+                                            const qrcode = await generateQRCodeBase64(value?.productorders[0].uniqueid);
                                             setCheckFirst(false)
-                                            setCurrent(value)
+                                            setCurrent({ ...value, qrcode })
                                             setPrefix(null)
                                             History.push({
                                                 pathname: `/package/${id}`,
@@ -820,7 +845,10 @@ function FormEdit() {
                                             </TableHead>
                                             <TableBody>
                                                 {
-                                                    Object.values(uniqueList).map((val, i) => (
+                                                    Object.values(uniqueList).sort((a, b) => {
+                                                        if (a?.item?.wine < b?.item?.wine) return 1;
+                                                        return 0;
+                                                    }).map((val, i) => (
                                                         <TableRow key={val?.item?.sku}>
                                                             <TableCell
                                                                 size='small'
