@@ -30,7 +30,7 @@ const useStyles = makeStyles({
  * @param onRequestSort func
  */
 function TableHeaderBasic(props) {
-	const { columns, order, onRequestSort, onOffHover, numSelected, rowCount, onSelectAllClick, isMultiSelect, isCollapsible, upperHead, showBorder } = props;
+	const { columns, order, onRequestSort, onOffHover, numSelected, rowCount, onSelectAllClick, isMultiSelect, isCollapsible, upperHead } = props;
 	const { t } = useTranslation('UserMngPage');
 	const classes = useStyles();
 
@@ -65,7 +65,7 @@ function TableHeaderBasic(props) {
 						padding={item.disablePaddingHeader ? 'none' : 'default'}
 						sortDirection={order.field === item.field ? order.direction : false}
 						className={clsx('p-8', item.classHeader,
-							showBorder && classes.border)}
+							classes.border)}
 						style={item.style}
 					>
 						{item.onSelectAllClick && (

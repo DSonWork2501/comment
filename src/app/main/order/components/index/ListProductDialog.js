@@ -104,6 +104,7 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
     }
 
     const handleDownloadAll = (data, selects) => {
+        console.log(data, selects, '123');
         let listQR = "";
         for (let index = 0; index < data?.length; index++) {
             const item = data[index];
