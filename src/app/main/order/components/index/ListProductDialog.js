@@ -85,10 +85,10 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
                 </head>
                 <body style="display:flex;align-items:center;justify-content:center">
                     <div style="width:100%">
-                        <H2 style="text-align:center">${name}</H2>
-                        <H2 style="text-align:center">${sku}</H2>
+                        <H3 style="text-align:center">${name}</H3>
+                        <H3 style="text-align:center">${sku}</H3>
                         <img style="width:100%;margin:auto" src="${qrImage.src}" alt="QR Code">
-                        <H2 style="text-align:center">${qrcodenonhash}</H2>
+                        <H3 style="text-align:center">${qrcodenonhash}</H3>
                     </div>
                 </body>
             </html>`);
@@ -110,10 +110,10 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
             const item = data[index];
             if (item.qrcode && selects.find(val => val === item.currentIndex)) {
                 listQR = listQR + `<div style="width:100%;height:100%">
-                        <H2 style="text-align:center">${item.name}</H2>
-                        <H2 style="text-align:center">${item.sku}</H2>
+                        <H3 style="text-align:center">${item.name}</H3>
+                        <H3 style="text-align:center">${item.sku}</H3>
                         <img style="width:100%;margin:auto" src="data:image/png;base64,${item.qrcode}" alt="QR Code">
-                        <H2 style="text-align:center">${item.qrcodenonhash}</H2>
+                        <H3 style="text-align:center">${item.qrcodenonhash}</H3>
                     </div>`;
             }
         }
