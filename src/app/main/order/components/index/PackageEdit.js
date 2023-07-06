@@ -244,6 +244,7 @@ function FormEdit() {
                     name: current.productorders[0].name,
                     qrcode: current.qrcode,
                     qrcodenonhash: current.productorders[0].uniqueid,
+                    currentIndex:'cabin',
                     wine: 0
                 },
                 number: 1,
@@ -474,6 +475,7 @@ function FormEdit() {
                         "name": current.productorders[0].name,
                         qrcode: current.qrcode,
                         qrcodenonhash: current.productorders[0].uniqueid,
+                        currentIndex:'cabin',
                         wine: 0
                     }, ...listWine]}
                     open={true}
@@ -500,6 +502,7 @@ function FormEdit() {
                         "name": current.productorders[0].name,
                         qrcode: current.qrcode,
                         qrcodenonhash: current.productorders[0].uniqueid,
+                        currentIndex:'cabin',
                         wine: 0
                     }, ...listWine]}
                     open={true}
