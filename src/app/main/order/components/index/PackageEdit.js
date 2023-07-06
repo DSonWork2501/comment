@@ -369,6 +369,7 @@ function FormEdit() {
 
     useEffect(() => {
         if (ID !== '0' && current?.id !== parseInt(ID) && checkFirst) {
+            console.log(ID);
             setCheckFirst(false);
             setTimeout(() => {
                 setFieldValue('orderID', parseInt(ID))
@@ -600,6 +601,7 @@ function FormEdit() {
                                             value.parentid === 1
                                                 ? await dispatch(getShelf({ cusID: value.cusId, type: 'wine', orderID: value.id }))
                                                 : await dispatch(getWine({ cusId: value.cusId, parentId: value.hhid, cms: 1 }))
+                                            setCheckFirst(false)
                                             setCurrent(value)
                                             setPrefix(null)
                                             History.push({

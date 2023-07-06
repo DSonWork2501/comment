@@ -12,7 +12,7 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
         new initColumn({ field: "img", label: "Hình", sortable: false, alignHeader: "center", alignValue: "center" }),
-        new initColumn({ field: "sku", label: "Sku", sortable: false, alignHeader: "center", alignValue: "center" }),
+        new initColumn({ field: "sku", label: "Wine sku/UniqueId", sortable: false, alignHeader: "center", alignValue: "center" }),
         new initColumn({ field: "name", label: "Tên", sortable: false, alignHeader: "center", alignValue: "center" }),
         new initColumn({ field: "option", label: "QrCode", sortable: false, alignHeader: "center", alignValue: "center" }),
         new initColumn({
