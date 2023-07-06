@@ -244,7 +244,7 @@ function FormEdit() {
                     name: current.productorders[0].name,
                     qrcode: current.qrcode,
                     qrcodenonhash: current.productorders[0].uniqueid,
-                    currentIndex:'cabin',
+                    currentIndex: 'cabin',
                     wine: 0
                 },
                 number: 1,
@@ -429,7 +429,7 @@ function FormEdit() {
 
     }, [step, openDialog])
 
-    const updateNumber = (num, key) => {
+    const updateNumber = (num, key, name) => {
         setNumberReceive(prev => {
             if (!Boolean(uniqueList[key])) {
                 CmsAlert.fire({ heightAuto: false, text: 'Sản phẩm không tồn tại trong giỏ hàng !', icon: 'warning' })
@@ -444,6 +444,10 @@ function FormEdit() {
                     return prev
                 }
                 playMusic()
+                setTimeout(() => {
+                    setFieldValue('barCodeSearch', '')
+                    setFieldValue('numberProduct', 0)
+                }, 0);
                 return {
                     ...prev,
                     [key]: num
@@ -455,6 +459,10 @@ function FormEdit() {
                     return prev
                 }
                 playMusic()
+                setTimeout(() => {
+                    setFieldValue('barCodeSearch', '')
+                    setFieldValue('numberProduct', 0)
+                }, 0);
                 return {
                     ...prev,
                     [key]: prev[key] + num
@@ -475,7 +483,7 @@ function FormEdit() {
                         "name": current.productorders[0].name,
                         qrcode: current.qrcode,
                         qrcodenonhash: current.productorders[0].uniqueid,
-                        currentIndex:'cabin',
+                        currentIndex: 'cabin',
                         wine: 0
                     }, ...listWine]}
                     open={true}
@@ -502,7 +510,7 @@ function FormEdit() {
                         "name": current.productorders[0].name,
                         qrcode: current.qrcode,
                         qrcodenonhash: current.productorders[0].uniqueid,
-                        currentIndex:'cabin',
+                        currentIndex: 'cabin',
                         wine: 0
                     }, ...listWine]}
                     open={true}
@@ -652,6 +660,7 @@ function FormEdit() {
                                                     name="barCodeSearch"
                                                     className="my-8"
                                                     size="small"
+                                                    clearBlur
                                                     onKeyPress={(e) => {
                                                         if (e.key === 'Enter') {
                                                             // setNumberReceive(prev => {
@@ -676,7 +685,7 @@ function FormEdit() {
                                                             //         }
                                                             //     }
                                                             // })
-                                                            updateNumber(1, e.target.value);
+                                                            updateNumber(1, e.target.value, 'barCodeSearch');
                                                         }
                                                     }}
                                                     formik={formik} />
@@ -687,11 +696,12 @@ function FormEdit() {
                                                     name="numberProduct"
                                                     className="my-8"
                                                     size="small"
+                                                    clearBlur
                                                     disabled={!Boolean(barCodeSearch)}
                                                     isNumber
                                                     onKeyPress={(e) => {
                                                         if (e.key === 'Enter') {
-                                                            updateNumber(parseInt(e.target.value), barCodeSearch)
+                                                            updateNumber(parseInt(e.target.value), barCodeSearch, 'numberProduct')
                                                         }
                                                     }}
                                                     formik={formik} />
@@ -703,7 +713,7 @@ function FormEdit() {
                                                     className="my-8 bg-green-500"
                                                     disabled={!Boolean(barCodeSearch) || !Boolean(numberProduct)}
                                                     onClick={() => {
-                                                        updateNumber(parseInt(numberProduct), barCodeSearch)
+                                                        updateNumber(parseInt(numberProduct), barCodeSearch, null)
                                                     }}
                                                     size="small" />
                                             </div>
@@ -721,6 +731,7 @@ function FormEdit() {
                                                     name="qrCode"
                                                     className="my-8"
                                                     size="small"
+                                                    clearBlur
                                                     onKeyPress={(e) => {
                                                         if (e.key === 'Enter') {
                                                             setFieldValue('qrCode', e.target.value)
@@ -768,6 +779,7 @@ function FormEdit() {
                                                     label={`BarCode`}
                                                     name="barcode"
                                                     className="my-8"
+                                                    clearBlur
                                                     //disabled={!qrCode}
                                                     size="small"
                                                     onKeyPress={(e) => {
@@ -781,6 +793,10 @@ function FormEdit() {
                                                                 playMusicW()
                                                             } else {
                                                                 setPrefix(crIndex);
+                                                                setTimeout(() => {
+                                                                    setFieldValue('barcode', '')
+                                                                    setFieldValue('qrCode', '')
+                                                                }, 0);
                                                             }
                                                         }
                                                     }}
