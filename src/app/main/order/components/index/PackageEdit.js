@@ -22,6 +22,8 @@ import History from '@history/@history';
 import { useParams } from 'react-router';
 import ListProductDialog from './ListProductDialog';
 import noImage from '@widgets/images/noImage.jpg';
+import clsx from 'clsx';
+import QRCode from 'qrcode';
 
 const BoxCustom = styled(Box)({
     border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -138,6 +140,18 @@ const SelectDetail = ({ prefix, detail }) => {
     </>
 }
 
+const generateQRCodeBase64 = async (data) => {
+    try {
+        const canvas = await QRCode.toCanvas(data);
+        const dataURL = canvas.toDataURL();
+        const base64 = dataURL.replace(/^data:image\/(png|jpg);base64,/, '');
+        return base64;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+};
+
 function FormEdit() {
     const location = useLocation();
     const dispatch = useDispatch();
@@ -221,9 +235,25 @@ function FormEdit() {
             }
         }
 
-        return uniqueItems
-    }, [listWine, numberReceive])
-    console.log(uniqueList, numberReceive);
+        return current ? {
+            [current.productorders[0].uniqueid]: {
+                item: {
+                    id: current.productorders[0].id,
+                    img: current.productorders[0].image,
+                    sku: current.productorders[0].uniqueid,
+                    name: current.productorders[0].name,
+                    qrcode: current.qrcode,
+                    qrcodenonhash: current.productorders[0].uniqueid,
+                    currentIndex:'cabin',
+                    wine: 0
+                },
+                number: 1,
+                numberReceive: numberReceive && numberReceive[current.productorders[0].uniqueid] ? numberReceive[current.productorders[0].uniqueid] : 0
+            },
+            ...uniqueItems
+        } : uniqueItems
+    }, [listWine, numberReceive, current])
+
     const handleSave = (values) => {
         alertInformation({
             text: `Xác nhận thao tác`,
@@ -355,6 +385,7 @@ function FormEdit() {
 
     useEffect(() => {
         if (ID !== '0' && current?.id !== parseInt(ID) && checkFirst) {
+            console.log(ID);
             setCheckFirst(false);
             setTimeout(() => {
                 setFieldValue('orderID', parseInt(ID))
@@ -365,12 +396,16 @@ function FormEdit() {
                 status: 2,
                 pageNumber: 1,
                 rowsPage: 10,
-                cms: 1
+                cms: 1,
+                getQrCode: 1
             })).then((res) => {
                 setLoading(false);
                 if (res?.payload?.result && res?.payload?.data?.length && current?.id !== res.payload.data[0]?.id) {
-                    setCurrent(res.payload.data[0])
-                    getWines(res.payload.data[0])
+                    const value = res.payload.data[0];
+                    generateQRCodeBase64(value?.productorders[0].uniqueid).then(qrcode => {
+                        setCurrent({ ...value, qrcode })
+                        getWines({ ...value, qrcode })
+                    })
                 }
             })
         }
@@ -433,7 +468,16 @@ function FormEdit() {
             {openDialog === 'productList' &&
                 <ListProductDialog
                     handleClose={() => handleCloseDialog()}
-                    data={listWine}
+                    data={[{
+                        "id": current.productorders[0].id,
+                        "img": current.productorders[0].image,
+                        "sku": current.productorders[0].uniqueid,
+                        "name": current.productorders[0].name,
+                        qrcode: current.qrcode,
+                        qrcodenonhash: current.productorders[0].uniqueid,
+                        currentIndex:'cabin',
+                        wine: 0
+                    }, ...listWine]}
                     open={true}
                     loading={popupLoading}
                     handleSave={() => {
@@ -451,7 +495,16 @@ function FormEdit() {
             {openDialog === 'printQr' &&
                 <ListProductDialog
                     handleClose={() => setOpenDialog('')}
-                    data={listWine}
+                    data={[{
+                        "id": current.productorders[0].id,
+                        "img": current.productorders[0].image,
+                        "sku": current.productorders[0].uniqueid,
+                        "name": current.productorders[0].name,
+                        qrcode: current.qrcode,
+                        qrcodenonhash: current.productorders[0].uniqueid,
+                        currentIndex:'cabin',
+                        wine: 0
+                    }, ...listWine]}
                     open={true}
                     loading={popupLoading}
                 />}
@@ -493,7 +546,7 @@ function FormEdit() {
                                             }
                                         })
                                     }}
-                                    disabled={Boolean(step || ID === '0' || listWine?.length !== receive || !receive)}
+                                    disabled={Boolean(step || ID === '0' || (listWine?.length + 1) !== receive || !receive)}
                                     size="small" />
                                 <CmsButtonProgress
                                     loading={formik.isSubmitting}
@@ -566,7 +619,8 @@ function FormEdit() {
                                                     status: 2,
                                                     pageNumber: 1,
                                                     rowsPage: 10,
-                                                    cms: 1
+                                                    cms: 1,
+                                                    getQrCode: 1
                                                 }))
                                             setLoading(false);
                                         }}
@@ -574,7 +628,9 @@ function FormEdit() {
                                             value.parentid === 1
                                                 ? await dispatch(getShelf({ cusID: value.cusId, type: 'wine', orderID: value.id }))
                                                 : await dispatch(getWine({ cusId: value.cusId, parentId: value.hhid, cms: 1 }))
-                                            setCurrent(value)
+                                            const qrcode = await generateQRCodeBase64(value?.productorders[0].uniqueid);
+                                            setCheckFirst(false)
+                                            setCurrent({ ...value, qrcode })
                                             setPrefix(null)
                                             History.push({
                                                 pathname: `/package/${id}`,
@@ -592,7 +648,7 @@ function FormEdit() {
                                         <div className='flex justify-between items-center w-full'>
                                             <div style={{ width: '49%' }} className='pb-8'>
                                                 <CmsFormikTextField
-                                                    label={`BarCode`}
+                                                    label={`Wine barCode/Uniqueid`}
                                                     name="barCodeSearch"
                                                     className="my-8"
                                                     size="small"
@@ -772,7 +828,7 @@ function FormEdit() {
                                                         size='small'
                                                         component="th"
                                                         className='text-left'>
-                                                        Tên rượu
+                                                        Tên sản phẩm
                                                     </TableCell>
                                                     <TableCell
                                                         style={{ background: 'aliceblue' }}
@@ -792,7 +848,10 @@ function FormEdit() {
                                             </TableHead>
                                             <TableBody>
                                                 {
-                                                    Object.values(uniqueList).map((val, i) => (
+                                                    Object.values(uniqueList).sort((a, b) => {
+                                                        if (a?.item?.wine < b?.item?.wine) return 1;
+                                                        return 0;
+                                                    }).map((val, i) => (
                                                         <TableRow key={val?.item?.sku}>
                                                             <TableCell
                                                                 size='small'
@@ -812,7 +871,7 @@ function FormEdit() {
                                                                 }}
                                                                 size='small'>
                                                                 <div>
-                                                                    <b>
+                                                                    <b className={clsx(val?.item?.wine === 0 ? 'text-blue-500' : '')}>
                                                                         - {val?.item?.name}
                                                                     </b>
                                                                 </div>
@@ -855,7 +914,7 @@ function FormEdit() {
                                                         size='small'
                                                         style={{ background: 'aliceblue' }}
                                                         className='text-right'>
-                                                        {listWine?.length}
+                                                        {listWine?.length + 1}
                                                     </TableCell>
                                                     <TableCell
                                                         size='small'

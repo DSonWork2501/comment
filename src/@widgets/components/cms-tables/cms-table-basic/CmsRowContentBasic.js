@@ -31,7 +31,7 @@ const useStyles = makeStyles({
 });
 
 function RowContentBasic(props) {
-    const { index, isMultiSelect, item, handleSelectRow, isSelected, cols, isCollapsible, name, isSelectOnClickRow, handleSetColorRow, isClearHoverBg, showBorder } = props
+    const { index, isMultiSelect, item, handleSelectRow, isSelected, cols, isCollapsible, name, isSelectOnClickRow, handleSetColorRow, isClearHoverBg } = props
     const [openCollapse, setOpenCollapse] = useState(false)
     const classes = useStyles();
 
@@ -85,7 +85,7 @@ function RowContentBasic(props) {
                             scope="row"
                             align={col.alignValue}
                             className={clsx("relative p-8", col.classValue, returnRow() === 0 ? 'hidden' : '',
-                                showBorder && classes.border,
+                                classes.border,
                                 item.keyRow > 1 ? 'pointer-events-none' : '')}>
                             {
                                 col.isDate

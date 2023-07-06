@@ -54,8 +54,8 @@ const columns = [
     new initColumn({ field: "cusname", label: "Khách hàng", alignHeader: "center", alignValue: "left", sortable: false }),
 
     new initColumn({ field: "product", style: { width: 250 }, label: "Sản phẩm", alignHeader: "center", alignValue: "left", sortable: false }),
-    new initColumn({ field: "unitPR", label: "Đơn vị", alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "right", label: "Giá SP", alignHeader: "right", alignValue: "right", sortable: false }),
+    new initColumn({ field: "unitPR", label: "Đơn vị", style: { width: 85 }, alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "right", label: "Giá", alignHeader: "right", alignValue: "right", sortable: false }),
     new initColumn({ field: "numberPr", label: "SL", style: { width: 50 }, alignHeader: "center", alignValue: "center", sortable: false }),
 
     new initColumn({
