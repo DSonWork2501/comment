@@ -433,6 +433,7 @@ const Delivery = () => {
                                 fileProperties={
                                     { accept: ".doc, .docx, .xls, .xlsx" }
                                 }
+                                label='Chọn hình'
                                 setValue={upLoadFile}
                                 formik={formik}
                                 showFileName={false} />
