@@ -4,7 +4,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import { makeStyles, withStyles } from '@material-ui/core';
+import { FormHelperText, makeStyles, withStyles } from '@material-ui/core';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -16,6 +16,12 @@ import StepConnector from '@material-ui/core/StepConnector';
 import Typography from '@material-ui/core/Typography';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
+import { faBox, faCheck, faCircleCheck, faHandHoldingDollar, faHandHoldingHand, faTruck, faTruckFast } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useFormik } from 'formik';
+import CmsFormikUploadFile from '@widgets/components/cms-formik/CmsFormikUploadFile';
+import * as Yup from 'yup'
+import { get } from 'lodash';
 
 const QontoConnector = withStyles({
     alternativeLabel: {
@@ -127,8 +133,8 @@ const useColorlibStepIconStyles = makeStyles({
     },
     active: {
         backgroundImage:
-            'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
-        boxShadow: '0 4px 10px 0 rgba(0,0,0,.25)',
+            'linear-gradient( 136deg, rgb(203 239 231) 0%, rgb(54 171 139) 50%, rgb(5 52 46) 100%)',
+        boxShadow: '2px 4px 15px 4px #14201185',
     },
     completed: {
         backgroundImage:
@@ -140,10 +146,23 @@ function ColorlibStepIcon(props) {
     const classes = useColorlibStepIconStyles();
     const { active, completed } = props;
 
+    console.log(props);
     const icons = {
-        1: <SettingsIcon />,
-        2: <GroupAddIcon />,
-        3: <VideoLabelIcon />,
+        1: <FontAwesomeIcon
+            icon={faHandHoldingHand}
+            style={{ color: "white", fontSize: 19 }} />,
+        2: <FontAwesomeIcon
+            icon={faTruckFast}
+            style={{ color: "white", fontSize: 19 }} />,
+        3: <FontAwesomeIcon
+            icon={faBox}
+            style={{ color: "white", fontSize: 19 }} />,
+        4: <FontAwesomeIcon
+            icon={faHandHoldingDollar}
+            style={{ color: "white", fontSize: 19 }} />,
+        5: <FontAwesomeIcon
+            icon={faCircleCheck}
+            style={{ color: "white", fontSize: 19 }} />,
     };
 
     return (
@@ -197,6 +216,19 @@ const useStyles = makeStyles((theme) => ({
         },
         '& .MuiDialogTitle-root': {
             borderBottom: '1px solid gray'
+        },
+        '& .MuiStepper-root': {
+            padding: 0
+        },
+        '& .MuiDialogTitle-root': {
+            paddingLeft: 0,
+            paddingRight: 0,
+            paddingTop: 8,
+            paddingBottom: 0
+        },
+        '& .MuiDialogContent-root': {
+            paddingLeft: 0,
+            paddingRight: 0
         }
     }
 }));
@@ -239,6 +271,22 @@ const Delivery = () => {
         setActiveStep(0);
     };
 
+    const handleSave = (values) => {
+
+    }
+
+    const formik = useFormik({
+        initialValues: {},
+        keepDirtyOnReinitialize: true,
+        enableReinitialize: true,
+        onSubmit: handleSave,
+        validationSchema: Yup.object({
+        })
+    })
+
+    async function upLoadFile(file, { setLoading, resetFile, form }) {
+    }
+
     return (
         <div>
             <Dialog className={classes.modal} open={true} fullWidth maxWidth="md">
@@ -253,9 +301,163 @@ const Delivery = () => {
                         </Stepper>
                     </div>
                 </DialogTitle>
-                <DialogContent>
-                    <p>Dialog content goes here.</p>
+                <DialogContent className='text-11'>
+                    <div className='flex flex-wrap w-full p-8'>
+                        <div>
+                            <div>
+                                <b className='mr-4'>
+                                    Mã đơn hàng:
+                                </b>
+                                006-DK123
+                            </div>
+                            <div>
+                                <b className='mr-4'>
+                                    Tên khách hàng:
+                                </b>
+                                Trường Công Mạnh
+                            </div>
+                            <div>
+                                <b className='mr-4'>
+                                    Số điện thoại:
+                                </b>
+                                0363341099
+                            </div>
+                            <div>
+                                <b className='mr-4'>
+                                    Địa chỉ:
+                                </b>
+                                47/44 Nguyễn thị tần, p.8, q.8, Tp. Hồ Chí Minh
+                            </div>
+                        </div>
+                    </div>
+                    <hr style={{ borderColor: 'aliceblue' }}></hr>
+                    <div className='p-8'>
+                        <div>
+                            <b>
+                                Đơn hàng
+                            </b>
+                        </div>
+                        <div className='flex '>
+                            <table className='w-full'>
+                                <tbody>
+                                    <tr style={{ verticalAlign: 'baseline' }}>
+                                        <td>
+                                            <b>
+                                                1x
+                                            </b>
+                                        </td>
+                                        <td>
+                                            Tủ bảo quản rượu 121 chai WINE CHILLER KA110WR
+                                        </td>
+                                        <td className='text-right'>
+                                            100,000,000đ
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td colSpan={3} className='p-4'>
+                                            <hr style={{ borderColor: 'aliceblue' }}></hr>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr style={{ verticalAlign: 'baseline' }}>
+                                        <td colSpan={2}>
+                                            Tạm tính
+                                        </td>
+                                        <td className='text-right'>
+                                            100,000,000đ
+                                        </td>
+                                    </tr>
+                                    <tr style={{ verticalAlign: 'baseline' }}>
+                                        <td colSpan={2}>
+                                            Phí áp dụng: <b className='ml-4'>1.4km</b>
+                                        </td>
+                                        <td className='text-right'>
+                                            20,000đ
+                                        </td>
+                                    </tr>
+                                    <tr style={{ verticalAlign: 'baseline' }}>
+                                        <td colSpan={2}>
+                                            Discount
+                                        </td>
+                                        <td className='text-right'>
+                                            20,000đ
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr>
+                                        <td colSpan={3} className='p-4'>
+                                            <hr style={{ borderColor: 'aliceblue', borderStyle: 'dashed' }}></hr>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr style={{ verticalAlign: 'baseline' }}>
+                                        <td colSpan={2}>
+                                            <b>
+                                                Tổng Cộng
+                                            </b>
+                                        </td>
+                                        <td className='text-right'>
+                                            <b>
+                                                100,000,000đ
+                                            </b>
+                                        </td>
+                                    </tr>
+                                    <tr style={{ verticalAlign: 'baseline' }}>
+                                        <td colSpan={2}>
+                                            <b>
+                                                Thanh toán bằng
+                                            </b>
+                                        </td>
+                                        <td className='text-right'>
+                                            <b>
+                                                Ví momo
+                                            </b>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </DialogContent>
+                <DialogActions>
+                    <div className='flex justify-between w-full items-center'>
+                        <div className='w-1/2 text-left'>
+                            <CmsFormikUploadFile
+                                id="uploadfile"
+                                name="fileInput"
+                                fileProperties={
+                                    { accept: ".doc, .docx, .xls, .xlsx" }
+                                }
+                                setValue={upLoadFile}
+                                formik={formik}
+                                showFileName={false} />
+                            {/* {
+                                formik && get(formik?.touched, 'file') && Boolean(get(formik?.errors, 'file'))
+                                &&
+                                <FormHelperText
+                                    style={{
+                                        color: '#f44336'
+                                    }}
+                                    className='mx-16'
+                                >
+                                    {get(formik.errors, 'file')}
+                                </FormHelperText>
+                            } */}
+                        </div>
+                        <div className='w-1/2 text-right'>
+                            <Button
+                                variant='outlined'
+                                color="primary">
+                                Vận chuyển
+                            </Button>
+                        </div>
+                    </div>
+                </DialogActions>
             </Dialog>
         </div>
     );
