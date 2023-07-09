@@ -14,7 +14,7 @@ import { getList as getProduct, resetSearch, setSearch } from "../../store/produ
 import { getList as getCategory } from "../../store/categorySlice";
 import History from "@history";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArchive, faBox, faHome, faTruck } from "@fortawesome/free-solid-svg-icons";
+import { faArchive,  faHome, faTruck } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "@material-ui/core";
 
 const columns = [
