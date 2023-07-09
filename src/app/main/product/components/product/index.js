@@ -13,14 +13,33 @@ import reducer from "../../store";
 import { getList as getProduct, resetSearch, setSearch } from "../../store/productSlice";
 import { getList as getCategory } from "../../store/categorySlice";
 import History from "@history";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArchive,  faHome, faTruck } from "@fortawesome/free-solid-svg-icons";
+import { Tooltip } from "@material-ui/core";
 
 const columns = [
-    new initColumn({ field: "sku", label: "SKU", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "catename", label: "Danh Mục", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "name", label: "Tên S/P", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "sku", label: "SKU", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "catename", label: "Danh Mục", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "name", label: "Tên S/P", alignHeader: "center", alignValue: "left", sortable: false }),
     new initColumn({ field: "shortname", label: "Tên Ngắn", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "image", label: "Hình Ảnh", alignHeader: "center", alignValue: "center", sortable: false }),
     new initColumn({ field: "price", label: "Giá", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "hold", label: "Tồn", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({
+        field: "run", label: <Tooltip title="Đang giao hàng">
+            <FontAwesomeIcon icon={faTruck} style={{ color: '#03a9f4', fontSize: 17 }} />
+        </Tooltip>, alignHeader: "center", alignValue: "center", sortable: false
+    }),
+    new initColumn({
+        field: "home", label: <Tooltip title="Tồn trong kho">
+            <FontAwesomeIcon icon={faHome} style={{ color: 'gray', fontSize: 17 }} />
+        </Tooltip>, alignHeader: "center", alignValue: "center", sortable: false
+    }),
+    new initColumn({
+        field: "box", label: <Tooltip title="Tồn trong kho">
+            <FontAwesomeIcon icon={faArchive} style={{ color: 'orange', fontSize: 17 }} />
+        </Tooltip>, alignHeader: "center", alignValue: "center", sortable: false
+    }),
 ]
 
 function ProductView() {
