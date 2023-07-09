@@ -1,50 +1,22 @@
-import React from 'react'
+import React from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import { FormHelperText, makeStyles, withStyles } from '@material-ui/core';
+import { makeStyles, withStyles } from '@material-ui/core';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Check from '@material-ui/icons/Check';
-import SettingsIcon from '@material-ui/icons/Settings';
-import GroupAddIcon from '@material-ui/icons/GroupAdd';
-import VideoLabelIcon from '@material-ui/icons/VideoLabel';
 import StepConnector from '@material-ui/core/StepConnector';
-import Typography from '@material-ui/core/Typography';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { faBox, faCheck, faCircleCheck, faHandHoldingDollar, faHandHoldingHand, faTruck, faTruckFast } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faCircleCheck, faHandHoldingDollar, faHandHoldingHand, faTruckFast } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import CmsFormikUploadFile from '@widgets/components/cms-formik/CmsFormikUploadFile';
-import * as Yup from 'yup'
-import { get } from 'lodash';
-
-const QontoConnector = withStyles({
-    alternativeLabel: {
-        top: 10,
-        left: 'calc(-50% + 16px)',
-        right: 'calc(50% + 16px)',
-    },
-    active: {
-        '& $line': {
-            borderColor: '#784af4',
-        },
-    },
-    completed: {
-        '& $line': {
-            borderColor: '#784af4',
-        },
-    },
-    line: {
-        borderColor: '#eaeaf0',
-        borderTopWidth: 3,
-        borderRadius: 1,
-    },
-})(StepConnector);
+import * as Yup from 'yup';
 
 const useQontoStepIconStyles = makeStyles({
     root: {
@@ -214,21 +186,19 @@ const useStyles = makeStyles((theme) => ({
         '& .MuiBackdrop-root': {
             backgroundColor: 'rgb(159 155 155 / 50%)'
         },
-        '& .MuiDialogTitle-root': {
-            borderBottom: '1px solid gray'
-        },
         '& .MuiStepper-root': {
             padding: 0
         },
         '& .MuiDialogTitle-root': {
+            borderBottom: '1px solid gray',
             paddingLeft: 0,
             paddingRight: 0,
             paddingTop: 8,
             paddingBottom: 0
         },
         '& .MuiDialogContent-root': {
-            paddingLeft: 0,
-            paddingRight: 0
+            paddingLeft: 8,
+            paddingRight: 8
         }
     }
 }));
@@ -237,39 +207,22 @@ function getSteps() {
     return ['Nhận hàng', 'Đang vận chuyển', 'Đã giao hàng', 'Đã Thanh toán', 'Hoàn thành'];
 }
 
-function getStepContent(step) {
-    switch (step) {
-        case 0:
-            return 'Nhận hàng';
-        case 1:
-            return 'Đang vận chuyển';
-        case 2:
-            return 'Đã giao hàng';
-        case 3:
-            return 'Đã Thanh toán';
-        case 4:
-            return 'Hoàn thành';
-        default:
-            return 'Unknown step';
-    }
-}
-
 const Delivery = () => {
     const classes = useStyles();
-    const [activeStep, setActiveStep] = React.useState(1);
+    const [activeStep, setActiveStep] = React.useState(0);
     const steps = getSteps();
 
-    const handleNext = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    };
+    // const handleNext = () => {
+    //     setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    // };
 
-    const handleBack = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    };
+    // const handleBack = () => {
+    //     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    // };
 
-    const handleReset = () => {
-        setActiveStep(0);
-    };
+    // const handleReset = () => {
+    //     setActiveStep(0);
+    // };
 
     const handleSave = (values) => {
 
@@ -302,7 +255,7 @@ const Delivery = () => {
                     </div>
                 </DialogTitle>
                 <DialogContent className='text-11'>
-                    <div className='flex flex-wrap w-full p-8'>
+                    <div className='flex flex-wrap w-full p-8 rounded-4 shadow-4'>
                         <div>
                             <div>
                                 <b className='mr-4'>
@@ -330,8 +283,8 @@ const Delivery = () => {
                             </div>
                         </div>
                     </div>
-                    <hr style={{ borderColor: 'aliceblue' }}></hr>
-                    <div className='p-8'>
+                    <hr className='my-8' style={{ borderColor: 'aliceblue' }}></hr>
+                    <div className='p-8 rounded-4 shadow-4'>
                         <div>
                             <b>
                                 Đơn hàng
@@ -407,13 +360,14 @@ const Delivery = () => {
                                             </b>
                                         </td>
                                     </tr>
-                                    <tr style={{ verticalAlign: 'baseline' }}>
+                                    <tr >
                                         <td colSpan={2}>
                                             <b>
                                                 Thanh toán bằng
                                             </b>
                                         </td>
-                                        <td className='text-right'>
+                                        <td className='text-right flex items-center justify-end truncate'>
+                                            <img alt='photoMomo' src='https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png?20201011055544' width={25} className='mr-4' />
                                             <b>
                                                 Ví momo
                                             </b>
@@ -452,6 +406,7 @@ const Delivery = () => {
                         </div>
                         <div className='w-1/2 text-right'>
                             <Button
+                                onClick={() => setActiveStep(prev => { if (prev === 4) return 0; return prev + 1 })}
                                 variant='outlined'
                                 color="primary">
                                 Vận chuyển
