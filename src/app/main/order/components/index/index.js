@@ -16,7 +16,7 @@ import OrderDetailContent from "./orderDetail";
 import ChangeOderStatusContent from "./changeOrderStatus";
 import History from "@history";
 import { useParams } from "react-router";
-import { Box, Button, Menu, MenuItem, makeStyles, styled } from "@material-ui/core";
+import { Box, Button, Menu, MenuItem, Tooltip, makeStyles, styled } from "@material-ui/core";
 import PackageDialog from "./PackageDialog";
 import { getShelf, getWine } from "app/main/customer-shelf/store/customerShelfSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
@@ -59,12 +59,14 @@ const columns = [
     new initColumn({ field: "numberPr", label: "SL", style: { width: 50 }, alignHeader: "center", alignValue: "center", sortable: false }),
 
     new initColumn({
-        field: "moneydiscount", label: <FontAwesomeIcon icon={faTruck} />
+        field: "moneydiscount", label: <Tooltip title="Đang vận chuyển">
+            <FontAwesomeIcon icon={faTruck} style={{ color: '#03a9f4', fontSize: 17 }} />
+        </Tooltip>
         , alignHeader: "center", alignValue: "center", sortable: false
     }),
-    new initColumn({ field: "moneytotal", style: { width: 140 }, label: <FontAwesomeIcon icon={faMoneyBill} />, alignHeader: "center", alignValue: "right", sortable: false }),
-    new initColumn({ field: "staffdescription", style: { width: 250 }, label: <FontAwesomeIcon icon={faFilePen} />, alignHeader: "center", alignValue: "left", sortable: false }),
-    new initColumn({ field: "status", style: { width: 150 }, label: <FontAwesomeIcon icon={faFilter} />, alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "moneytotal", style: { width: 140 }, label: <Tooltip title="Tổng tiền"><FontAwesomeIcon icon={faMoneyBill} style={{ color: 'green', fontSize: 17 }} /></Tooltip>, alignHeader: "center", alignValue: "right", sortable: false }),
+    new initColumn({ field: "staffdescription", style: { width: 250 }, label: <FontAwesomeIcon icon={faFilePen} style={{ color: 'pink', fontSize: 17 }} />, alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "status", style: { width: 150 }, label: <FontAwesomeIcon icon={faFilter} style={{ color: 'orange', fontSize: 17 }} />, alignHeader: "center", alignValue: "center", sortable: false }),
 ]
 
 const DropMenu = ({ crName, data, handleClose, className }) => {
