@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import { makeStyles, withStyles } from '@material-ui/core';
+import { Menu, MenuItem, makeStyles, withStyles } from '@material-ui/core';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import CmsFormikUploadFile from '@widgets/components/cms-formik/CmsFormikUploadFile';
 import * as Yup from 'yup';
+import { ArrowDropDown } from '@material-ui/icons';
 
 const useQontoStepIconStyles = makeStyles({
     root: {
@@ -193,18 +194,67 @@ const useStyles = makeStyles((theme) => ({
             borderBottom: '1px solid gray',
             paddingLeft: 0,
             paddingRight: 0,
-            paddingTop: 8,
-            paddingBottom: 0
+            paddingTop: 0,
+            paddingBottom: 8
         },
         '& .MuiDialogContent-root': {
             paddingLeft: 8,
             paddingRight: 8
+        }
+    },
+    menu:{
+        '& ul':{
+            padding:'0 !important'
         }
     }
 }));
 
 function getSteps() {
     return ['Nhận hàng', 'Đang vận chuyển', 'Đã giao hàng', 'Đã Thanh toán', 'Hoàn thành'];
+}
+
+const DropMenu = ({ crName, className }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const classes = useStyles();
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    return (
+        <div>
+            <Button aria-controls="dropdown-menu" className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="outlined" aria-haspopup="true" onClick={handleClick}>
+                {crName}
+                <ArrowDropDown />
+            </Button>
+            <Menu
+                id="dropdown-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                className={classes.menu}
+            >
+                <MenuItem style={{ minHeight: 'initial' }} onClick={handleClose}>
+                    Tên NV : Trương Công Mạnh
+                </MenuItem>
+                <MenuItem style={{ minHeight: 'initial' }} onClick={handleClose}>
+                    SĐT : 0363341099
+                </MenuItem>
+                <MenuItem style={{ minHeight: 'initial' }} onClick={handleClose}>
+                    Chức vụ : Nhân viên giao hàng
+                </MenuItem>
+            </Menu>
+        </div>
+    );
 }
 
 const Delivery = () => {
@@ -245,6 +295,20 @@ const Delivery = () => {
             <Dialog className={classes.modal} open={true} fullWidth maxWidth="md">
                 <DialogTitle>
                     <div className={classes.root}>
+                        <div style={{
+                            background: '#fafafa!important',
+                            borderBottom: '1px solid rgb(128 128 128 / 21%)'
+                        }} className='mb-8'>
+                            <div className='p-8 text-right flex justify-between items-center '>
+                                <div className='text-center'>
+                                    WINE LOGO
+                                </div>
+                                <div style={{ width: 110 }}>
+                                    <DropMenu crName={`0363341099`} />
+                                </div>
+                            </div>
+                        </div>
+
                         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
                             {steps.map((label) => (
                                 <Step key={label}>
@@ -409,7 +473,23 @@ const Delivery = () => {
                                 onClick={() => setActiveStep(prev => { if (prev === 4) return 0; return prev + 1 })}
                                 variant='outlined'
                                 color="primary">
-                                Vận chuyển
+                                {
+                                    activeStep === 0
+                                        ? 'Vận chuyển' :
+                                        (
+                                            activeStep === 1
+                                                ? 'Giao hàng'
+                                                : (
+                                                    activeStep === 2
+                                                        ? 'Thanh toán'
+                                                        : (
+                                                            activeStep === 3
+                                                                ? 'Hoàn thành'
+                                                                : 'Hoàn thành'
+                                                        )
+                                                )
+                                        )
+                                }
                             </Button>
                         </div>
                     </div>
