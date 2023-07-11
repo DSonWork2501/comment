@@ -111,6 +111,9 @@ export default {
                 update: (entity, type) => axios.put(`${baseurl}/product/update-unity?type=${type}`, entity),
                 delete: (entity, type) => axios.put(`${baseurl}/product/delete-unity?type=${type}`, entity),
             }
+        },
+        uploadFile:{
+            insert: entity => axios.post(`${baseurl}/common/upload-file`, entity),
         }
     },
 }
