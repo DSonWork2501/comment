@@ -1,6 +1,6 @@
 import { CmsDialog, CmsFormikAutocomplete, CmsFormikSelect, CmsFormikTextField, CmsIconButton, CmsTinyMceEditor } from "@widgets/components"
 import { FieldArray, FormikProvider, useFormik } from "formik"
-import React from "react"
+import React, { useEffect } from "react"
 import { ContractType } from 'app/main/contract/model/type'
 import * as Yup from 'yup'
 import { useDispatch } from "react-redux"
@@ -43,6 +43,9 @@ const BoxCustom = styled(Box)({
     },
     "& .hide-label>label": {
         display: "none"
+    },
+    "& .Embed.WACFrameWord": {
+        border: '1px solid transparent'
     }
 });
 
@@ -68,16 +71,27 @@ function getFileExtension(filename) {
     return parts[parts.length - 1];
 }
 
-function EditDialogComponent({ open, handleClose, item = null }) {
+const Frame = React.memo(({ iframeKey }) => {
+    // Render component based on prop1 and prop2
+    return <iframe
+        key={iframeKey}
+        width={'100%'}
+        height={1000}
+        src={`https://view.officeapps.live.com/op/embed.aspx?src=` + baseurl + `/common/files/fileTemp.docx?version=${Date.now()}`}
+    />;
+});
+
+function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
     const dispatch = useDispatch()
     const [iframeKey, setIframeKey] = useState(0);
     const [fileSelect, setFileSelect] = useState(null);
     const [linkHd, setLinkHd] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleSaveData = async (value) => {
-        const data = [{ ...value, type: parseInt(value.type), status: parseInt(value.status) }]
-        dispatch(editContract(data))
-        handleClose && handleClose()
+        const data = [{ ...value, content: JSON.stringify(value.arrayForm) }]
+        handleSave(data, formik);
+        //dispatch(editContract(data))
     }
 
     const formik = useFormik({
@@ -87,36 +101,57 @@ function EditDialogComponent({ open, handleClose, item = null }) {
         onSubmit: handleSaveData,
         validationSchema: Yup.object({
             title: Yup.string().typeError("Tiêu đề không được bỏ trống !").required("Tiêu đề không được bỏ trống !"),
-            file:Yup.string().required("Vui lòng nhập file !")
+            file: Yup.string().required("Vui lòng nhập file !")
         })
     })
 
     const { setErrors, errors, touched, setFieldTouched, setFieldValue, values } = formik, { arrayForm } = values;
 
+    const handleFileRefresh = (fileL) => {
+        const data = new FormData();
+
+        data.append('enpoint', 'tempfile');
+        handleReadFile(fileL, async (file) => {
+            try {
+                const fileName = 'fileTemp.docx';
+                const fileWithMetadata = new Blob([file], { type: file.type });
+                fileWithMetadata.name = fileName;
+                data.append('files', fileWithMetadata, fileName);
+                await Connect.live.uploadFile.insert(data);
+                setIframeKey(prevKey => prevKey + 1)
+                setLinkHd('open')
+                setLoading(false)
+            } catch (error) { console.log(error); }
+            finally {
+            }
+        }, arrayForm);
+    }
+
+    useEffect(() => {
+        if (item?.file) {
+            const link = baseurl + `/common/files/${item?.file}?subfolder=contract`;
+
+            fetch(link).then(response => response.blob())
+                .then(async fileL => {
+                    setFileSelect(fileL)
+                    handleFileRefresh(fileL)
+                    setLoading(true)
+                })
+        }
+    }, [item])
+
     const handleRefresh = () => {
         const file = fileSelect;
-        if (file?.length) {
-            const data = new FormData();
-
-            data.append('enpoint', 'tempfile');
-            handleReadFile(file[0], async (file) => {
-                try {
-                    const fileName = 'fileTemp.docx';
-                    const fileWithMetadata = new Blob([file], { type: file.type });
-                    fileWithMetadata.name = fileName;
-                    data.append('files', fileWithMetadata, fileName);
-                    const result = await Connect.live.uploadFile.insert(data);
-                    setIframeKey(prevKey => prevKey + 1)
-                } catch (error) { console.log(error); }
-                finally {
-                }
-            }, arrayForm);
+        if (file) {
+            setLoading(true)
+            handleFileRefresh(file)
         }
     }
 
     async function upLoadFile(file, { setLoading, resetFile, form }) {
-        setFileSelect(file)
         if (file?.length) {
+            setFileSelect(file[0])
+
             const data = new FormData();
             const filename = file[0].name;
             const extension = getFileExtension(filename);
@@ -126,7 +161,7 @@ function EditDialogComponent({ open, handleClose, item = null }) {
                     { ...errors, file: "Vui lòng chọn file .docx" }
                 )
                 if (!touched?.file)
-                    setFieldTouched('files', true);
+                    setFieldTouched('file', true);
                 return;
             }
 
@@ -154,7 +189,7 @@ function EditDialogComponent({ open, handleClose, item = null }) {
                     console.log(fileWithMetadata2);
                     data2.append('files', fileWithMetadata2, name2);
                     await Connect.live.uploadFile.insert(data2);
-                    formik.setFieldValue('files', name2);
+                    formik.setFieldValue('file', name2);
                 } catch (error) { console.log(error); }
                 finally {
                     setLoading(false);
@@ -209,8 +244,6 @@ function EditDialogComponent({ open, handleClose, item = null }) {
 
             handleFile(new Blob([updatedContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }))
 
-            console.log(URL.createObjectURL(new Blob([updatedContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })));
-
             setFieldValue('arrayForm', dataKey)
         } catch (error) {
 
@@ -220,12 +253,13 @@ function EditDialogComponent({ open, handleClose, item = null }) {
     const selectedFile = async (filePath) => {
         // const file = await Connect.live.upload.getFileS3({ documentName: filePath });
         // const url = window.URL.createObjectURL(new Blob([file.data]));
-        // const link = document.createElement('a');
-        // link.href = url;
-        // link.setAttribute('download', file.config.params.documentName.split('/').pop()); //or any other extension
-        // document.body.appendChild(link);
-        // link.click();
-        // link.remove();
+        const url = baseurl + `/common/files/${filePath}?subfolder=contract`;
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filePath); //or any other extension
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
     }
 
     return (
@@ -235,6 +269,8 @@ function EditDialogComponent({ open, handleClose, item = null }) {
             handleClose={handleClose}
             handleSave={formik.handleSubmit}
             isCloseDialogSubmit={false}
+            disabledSave={formik.isSubmitting || loading}
+            loading={formik.isSubmitting || loading}
             size="xl"
 
         >
@@ -248,8 +284,8 @@ function EditDialogComponent({ open, handleClose, item = null }) {
 
                     </div>
                 </div> */}
-                <div className="flex justify-between">
-                    <div style={{ width: '49%' }}>
+                <div className="flex justify-between space-x-4">
+                    <div className="w-1/3 lg:w-1/2">
                         <BoxCustom
                             className="p-16 py-20 mt-25 border-1 rounded-4 black-label">
                             <InputLabel
@@ -303,7 +339,7 @@ function EditDialogComponent({ open, handleClose, item = null }) {
                                 name="type"
                             />
                         </div> */}
-                            <div>
+                            <div className="flex items-center">
                                 <CmsFormikUploadFile
                                     className="my-8"
                                     id="uploadfile"
@@ -315,7 +351,7 @@ function EditDialogComponent({ open, handleClose, item = null }) {
                                     formik={formik}
                                     showFileName={false} />
                                 {
-                                    formik && get(formik?.touched, 'files') && Boolean(get(formik?.errors, 'files'))
+                                    formik && get(formik?.touched, 'file') && Boolean(get(formik?.errors, 'file'))
                                     &&
                                     <FormHelperText
                                         style={{
@@ -323,26 +359,26 @@ function EditDialogComponent({ open, handleClose, item = null }) {
                                         }}
                                         className='mx-16'
                                     >
-                                        {get(formik.errors, 'files')}
+                                        {get(formik.errors, 'file')}
                                     </FormHelperText>
 
                                 }
                                 {
-                                    formik.values['files']
+                                    formik.values['file']
                                     &&
                                     <Button
                                         startIcon={<GetApp color='primary' />}
                                         style={{
                                             textTransform: 'none'
                                         }}
-                                        onClick={() => selectedFile(formik.values['files'])}
+                                        onClick={() => selectedFile(formik.values['file'])}
                                     >
-                                        {formik.values['files'].split('/').pop()}
+                                        {formik.values['file'].split('/').pop()}
                                     </Button>
                                 }
                                 <div>
                                     {
-                                        formik && get(formik?.touched, 'files') && Boolean(get(formik?.errors, 'files'))
+                                        formik && get(formik?.touched, 'file') && Boolean(get(formik?.errors, 'file'))
                                         &&
                                         <FormHelperText
                                             style={{
@@ -350,7 +386,7 @@ function EditDialogComponent({ open, handleClose, item = null }) {
                                             }}
                                             className='opacity-0'
                                         >
-                                            {get(formik.errors, 'files')}
+                                            {get(formik.errors, 'file')}
                                         </FormHelperText>
                                     }
                                 </div>
@@ -420,7 +456,7 @@ function EditDialogComponent({ open, handleClose, item = null }) {
                             </div>
                         }
                     </div>
-                    <div style={{ width: '49%' }}>
+                    <div className="w-2/3 lg:w-1/2">
 
                         <BoxCustom
                             className="p-16 py-20 mt-25 border-1 rounded-4 black-label">
@@ -442,12 +478,7 @@ function EditDialogComponent({ open, handleClose, item = null }) {
                                                     onClick={handleRefresh} />
                                             </div>
 
-                                            <iframe
-                                                key={iframeKey}
-                                                width={'100%'}
-                                                height={1000}
-                                                src={`https://view.officeapps.live.com/op/embed.aspx?src=` + baseurl + `/common/files/fileTemp.docx?version=${Date.now()}`}
-                                            />
+                                            <Frame iframeKey={iframeKey} />
                                         </div>
                                     </div>
                                     : <div className="pt-8 text-red-500">Vui lòng upload file để xem!</div>
