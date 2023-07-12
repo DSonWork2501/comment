@@ -71,17 +71,91 @@ function getFileExtension(filename) {
     return parts[parts.length - 1];
 }
 
-const Frame = React.memo(({ iframeKey }) => {
-    // Render component based on prop1 and prop2
-    return <iframe
+export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
+    const [showFile, setShowFile] = useState(false);
+
+    useEffect(() => {
+        if (!fileName)
+            setShowFile(true)
+        if (fileName) {
+            const link = baseurl + `/common/files/${fileName}?subfolder=contract`;
+
+            fetch(link).then(response => response.blob())
+                .then(async fileL => {
+                    handleFileRefresh(fileL)
+                })
+        }
+    }, [fileName])
+
+    const handleFileRefresh = (fileL) => {
+        const data = new FormData();
+
+        data.append('enpoint', 'tempfile');
+        handleReadFile(fileL, async (file) => {
+            try {
+                const fileName = 'fileTemp.docx';
+                const fileWithMetadata = new Blob([file], { type: file.type });
+                fileWithMetadata.name = fileName;
+                data.append('files', fileWithMetadata, fileName);
+                await Connect.live.uploadFile.insert(data);
+                setShowFile(true);
+            } catch (error) { console.log(error); }
+            finally {
+            }
+        }, arrayForm);
+    }
+
+    const handleReadFile = async (file, handleFile, mapFile) => {
+        try {
+            const content = await file.arrayBuffer();
+
+            const zip = await JSZip.loadAsync(content);
+
+            const documentXml = await zip.file('word/document.xml').async('string');
+
+            const regex = /\[(?:(?!\[).)*?{(.*?)\}.*?]/g;
+            const matches = documentXml.match(regex);
+
+
+            let updatedXml = documentXml;
+            matches.forEach(element => {
+                updatedXml = updatedXml.replaceAll(element, element.replace(/<\/?[^>]+>/g, ''));
+            });
+
+            mapFile?.length && mapFile.forEach(element => {
+                console.log(element);
+                if (element.content)
+                    updatedXml = updatedXml.replaceAll(element.keyWord, element.content);
+            });
+
+
+            const reMatch = updatedXml.match(regex);
+            const dataKey = mapFile || uniqBy(reMatch.map((val, index) => ({
+                keyWord: val,
+                content: "",
+            })), 'keyWord')
+
+            zip.file('word/document.xml', updatedXml);
+
+
+            const updatedContent = await zip.generateAsync({ type: 'arraybuffer' });
+
+            handleFile(new Blob([updatedContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }))
+
+        } catch (error) {
+
+        }
+    }
+
+    return showFile ? <iframe
         key={iframeKey}
         width={'100%'}
         height={1000}
         src={`https://view.officeapps.live.com/op/embed.aspx?src=` + baseurl + `/common/files/fileTemp.docx?version=${Date.now()}`}
-    />;
+    /> : null;
 });
 
-function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
+function EditDialogComponent({ open, handleClose, handleSave, item = null, isShip, signature }) {
     const dispatch = useDispatch()
     const [iframeKey, setIframeKey] = useState(0);
     const [fileSelect, setFileSelect] = useState(null);
@@ -95,7 +169,7 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
     }
 
     const formik = useFormik({
-        initialValues: initData(item),
+        initialValues: initData({ ...item, arrayForm: item?.content ? JSON.parse(item?.content) : [] }),
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
         onSubmit: handleSaveData,
@@ -112,6 +186,7 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
 
         data.append('enpoint', 'tempfile');
         handleReadFile(fileL, async (file) => {
+            console.log(12312312, URL.createObjectURL(file));
             try {
                 const fileName = 'fileTemp.docx';
                 const fileWithMetadata = new Blob([file], { type: file.type });
@@ -171,7 +246,6 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
             handleReadFile(file[0], async (file) => {
                 setLoading(true);
                 formik.setSubmitting(true);
-
                 try {
                     const name = 'fileTemp.docx';
                     const fileWithMetadata = new Blob([file], { type: file.type });
@@ -202,20 +276,14 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
     const handleReadFile = async (file, handleFile, mapFile) => {
         try {
             const content = await file.arrayBuffer();
+            let imageUrl = "";
+
 
             const zip = await JSZip.loadAsync(content);
 
-            //const checkHead = await checkHeadQrCode(zip);
-            // if (!checkHead) {
-            //     formik.setFieldValue('isHaveQr', null);
-            // } else {
-            //     formik.setFieldValue('isHaveQr', 1);
-            // }
-
-            // Lấy tệp word/document.xml
             const documentXml = await zip.file('word/document.xml').async('string');
 
-            const regex = /\[.*?{(.*?)\}.*?\]/g;
+            const regex = /\[(?:(?!\[).)*?{(.*?)\}.*?]/g;
             const matches = documentXml.match(regex);
 
 
@@ -237,6 +305,44 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                 content: "",
             })), 'keyWord')
 
+            /////
+            if (signature) {
+                imageUrl = `data:image/png;base64, ${signature}`;
+                const relationshipId = `rId${Math.floor(Math.random() * 100000)}`;
+
+                const imageFileData = await fetch(imageUrl);
+                const imageBinaryData = await imageFileData.arrayBuffer();
+                const imageReference = `word/media/image${relationshipId}.jpg`;
+                const imageReference2 = `media/image${relationshipId}.jpg`;
+
+                zip.file(imageReference, imageBinaryData);
+
+                const getKeySig = updatedXml.match(/<w:t[^>]*>\s*\[{userNameApprove}]\s*<\/w:t>/);
+                console.log(getKeySig[0]);
+                updatedXml = updatedXml.replace(getKeySig[0], `<w:drawing><wp:inlinedistB="114300"distT="114300"distL="114300"distR="114300"><wp:extentcx="608456"cy="608456"/><wp:effectExtentb="0"l="0"r="0"t="0"/><wp:docPrid="2"name="image1.png"/><a:graphic><a:graphicDatauri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPrid="0"name="image1.png"/><pic:cNvPicPrpreferRelativeResize="0"/></pic:nvPicPr><pic:blipFill><a:blipr:embed="${relationshipId}"/><a:srcRectb="0"l="0"r="0"t="0"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:offx="0"y="0"/><a:extcx="608456"cy="608456"/></a:xfrm><a:prstGeomprst="rect"/><a:ln/></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>
+            `);
+
+
+                const relationshipsFilePath = 'word/_rels/document.xml.rels';
+                const relationshipsXml = zip.file(relationshipsFilePath)
+                    ? await zip.file(relationshipsFilePath).async('string')
+                    : `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`;
+
+                const relationships = new DOMParser().parseFromString(relationshipsXml, 'application/xml');
+                const relationshipElement = relationships.createElementNS(
+                    'http://schemas.openxmlformats.org/package/2006/relationships',
+                    'Relationship'
+                );
+                relationshipElement.setAttribute('Id', relationshipId);
+                relationshipElement.setAttribute('Type', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image');
+                relationshipElement.setAttribute('Target', imageReference2);
+                relationships.documentElement.appendChild(relationshipElement);
+
+                const updatedRelationshipsXml = new XMLSerializer().serializeToString(relationships);
+                zip.file(relationshipsFilePath, updatedRelationshipsXml);
+            }
+            /////
+
             zip.file('word/document.xml', updatedXml);
 
 
@@ -246,7 +352,7 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
 
             setFieldValue('arrayForm', dataKey)
         } catch (error) {
-
+            console.log(error);
         }
     }
 
@@ -282,21 +388,24 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                 </div> */}
                 <div className="flex justify-between space-x-4">
                     <div className="w-1/3 lg:w-1/2">
-                        <BoxCustom
-                            className="p-16 py-20 mt-25 border-1 rounded-4 black-label">
-                            <InputLabel
-                                className='custom-label'>
-                                Thông tin hợp đồng
-                            </InputLabel>
-                            <div className="py-8">
-                                <CmsFormikTextField
-                                    formik={formik}
-                                    label="Tiêu đề"
-                                    size="small"
-                                    name="title" />
-                            </div>
+                        {
+                            !isShip
+                            &&
+                            <BoxCustom
+                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label">
+                                <InputLabel
+                                    className='custom-label'>
+                                    Thông tin hợp đồng
+                                </InputLabel>
+                                <div className="py-8">
+                                    <CmsFormikTextField
+                                        formik={formik}
+                                        label="Tiêu đề"
+                                        size="small"
+                                        name="title" />
+                                </div>
 
-                            {/* <div className="py-4">
+                                {/* <div className="py-4">
                             <CmsFormikTextField
                                 formik={formik}
                                 size="small"
@@ -327,53 +436,26 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                                 size="small" />
                         </div>
                         */}
-                            <div className="py-8">
-                                <CmsFormikSelect
-                                    data={Object.values(ContractType)}
-                                    formik={formik}
-                                    size="small"
-                                    label="Loại"
-                                    name="type"
-                                />
-                            </div>
-                            <div className="flex items-center">
-                                <CmsFormikUploadFile
-                                    className="my-8"
-                                    id="uploadfile"
-                                    name="fileInput"
-                                    fileProperties={
-                                        { accept: ".doc, .docx, .xls, .xlsx" }
-                                    }
-                                    setValue={upLoadFile}
-                                    formik={formik}
-                                    showFileName={false} />
-                                {
-                                    formik && get(formik?.touched, 'file') && Boolean(get(formik?.errors, 'file'))
-                                    &&
-                                    <FormHelperText
-                                        style={{
-                                            color: '#f44336'
-                                        }}
-                                        className='mx-16'
-                                    >
-                                        {get(formik.errors, 'file')}
-                                    </FormHelperText>
-
-                                }
-                                {
-                                    formik.values['file']
-                                    &&
-                                    <Button
-                                        startIcon={<GetApp color='primary' />}
-                                        style={{
-                                            textTransform: 'none'
-                                        }}
-                                        onClick={() => selectedFile(formik.values['file'])}
-                                    >
-                                        {formik.values['file'].split('/').pop()}
-                                    </Button>
-                                }
-                                <div>
+                                <div className="py-8">
+                                    <CmsFormikSelect
+                                        data={Object.values(ContractType)}
+                                        formik={formik}
+                                        size="small"
+                                        label="Loại"
+                                        name="type"
+                                    />
+                                </div>
+                                <div className="flex items-center">
+                                    <CmsFormikUploadFile
+                                        className="my-8"
+                                        id="uploadfile"
+                                        name="fileInput"
+                                        fileProperties={
+                                            { accept: ".doc, .docx, .xls, .xlsx" }
+                                        }
+                                        setValue={upLoadFile}
+                                        formik={formik}
+                                        showFileName={false} />
                                     {
                                         formik && get(formik?.touched, 'file') && Boolean(get(formik?.errors, 'file'))
                                         &&
@@ -381,17 +463,46 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                                             style={{
                                                 color: '#f44336'
                                             }}
-                                            className='opacity-0'
+                                            className='mx-16'
                                         >
                                             {get(formik.errors, 'file')}
                                         </FormHelperText>
+
                                     }
+                                    {
+                                        formik.values['file']
+                                        &&
+                                        <Button
+                                            startIcon={<GetApp color='primary' />}
+                                            style={{
+                                                textTransform: 'none'
+                                            }}
+                                            onClick={() => selectedFile(formik.values['file'])}
+                                        >
+                                            {formik.values['file'].split('/').pop()}
+                                        </Button>
+                                    }
+                                    <div>
+                                        {
+                                            formik && get(formik?.touched, 'file') && Boolean(get(formik?.errors, 'file'))
+                                            &&
+                                            <FormHelperText
+                                                style={{
+                                                    color: '#f44336'
+                                                }}
+                                                className='opacity-0'
+                                            >
+                                                {get(formik.errors, 'file')}
+                                            </FormHelperText>
+                                        }
+                                    </div>
                                 </div>
-                            </div>
-                        </BoxCustom>
+                            </BoxCustom>
+                        }
+
 
                         {
-                            false
+                            isShip
                             &&
                             <div >
                                 <BoxCustom
@@ -471,7 +582,7 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                                                     className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
                                                     onClick={handleRefresh} />
                                             </div>
-                                            <Frame iframeKey={iframeKey} />
+                                            <Frame iframeKey={iframeKey} fileName={false} />
                                         </div>
                                     </div>
                                     : <div className="pt-8 text-red-500">Vui lòng upload file để xem!</div>

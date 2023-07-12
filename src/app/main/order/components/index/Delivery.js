@@ -24,6 +24,7 @@ import ListProductDialog from './ListProductDialog';
 import noImage from '@widgets/images/noImage.jpg';
 import clsx from 'clsx';
 import QRCode from 'qrcode';
+import EditDialog, { Frame } from 'app/main/contract/components/edit/EditDialog';
 
 const BoxCustom = styled(Box)({
     border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -158,6 +159,7 @@ function FormEdit() {
     const [current, setCurrent] = useState(null);
     const [openDialog, setOpenDialog] = useState('');
     const orders = useSelector(store => store[keyStore].order.entities?.data) || [];
+    const orderDetail = useSelector(store => store[keyStore].order.entity);
     const popupLoading = useSelector(store => store[keyStore].order.popupLoading) || false;
     const detailEntities = useSelector(store => store[keyStore]?.order?.detailEntities?.data
         ? store[keyStore].order.detailEntities.data
@@ -372,7 +374,10 @@ function FormEdit() {
         const rest = currentT?.parentid === 1
             ? await dispatch(getShelf({ cusID: currentT?.cusId, type: 'wine', orderID: currentT?.id }))
             : await dispatch(getWine({ cusId: currentT?.cusId, parentId: currentT?.hhid, cms: 1 }))
-
+        await dispatch(getDetail({
+            cusId: currentT.cusId,
+            orderId: currentT.id
+        }))
         updateItems(rest)
     }, [updateItems, dispatch])
 
@@ -411,12 +416,6 @@ function FormEdit() {
     }, [ID, setFieldValue, dispatch, current, getWines, checkFirst])
 
     const handleCloseDialog = () => {
-        History.push({
-            state: {
-                prevPath: window.location.pathname + window.location.search
-            },
-            pathname: `/order-delivery/${ID}`
-        })
         setOpenDialog('');
     }
 
@@ -472,9 +471,19 @@ function FormEdit() {
 
     return (
         <React.Fragment>
+            {openDialog === 'edit' && orderDetail?.contract &&
+                <EditDialog
+                    open={openDialog === 'edit'}
+                    item={orderDetail.contract}
+                    handleSave={() => { }}
+                    handleClose={handleCloseDialog}
+                    signature={orderDetail.contract?.signature}
+                    isShip
+                />}
+
             <CmsCardedPage
                 classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
-                title={"Gói sản phẩm"}
+                title={"Vận chuyển"}
                 icon="whatshot"
                 rightHeaderButton={
                     <div className="flex items-center space-x-4">
@@ -830,21 +839,40 @@ function FormEdit() {
                                                         formik={formik} />
                                                     <CmsFormikTextField
                                                         size="small"
-                                                        label="Bằng lái"
+                                                        label="Biển số"
                                                         name="licenseplate"
                                                         className="my-8"
                                                         formik={formik} />
                                                 </div>
                                             </div>
                                         </BoxCustom>
-
-                                        <BoxCustom
-                                            className="p-16 py-20 mt-25 border-1 rounded-4 black-label h-full">
-                                            <InputLabel
-                                                className='custom-label'>
-                                                Thông tin hợp đồng
-                                            </InputLabel>
-                                        </BoxCustom>
+                                        {
+                                            orderDetail
+                                            &&
+                                            <BoxCustom
+                                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label h-full">
+                                                <InputLabel
+                                                    className='custom-label'>
+                                                    Thông tin hợp đồng
+                                                </InputLabel>
+                                                <div className='flex justify-between space-x-8 mb-8 items-center'>
+                                                    <div className='w-1/2'>
+                                                        <b>Tên:</b> {orderDetail?.contract?.title}
+                                                    </div>
+                                                    <div className='w-1/2 text-right'>
+                                                        <CmsButtonProgress
+                                                            label={"Chỉnh sửa"}
+                                                            startIcon="edit"
+                                                            color='primary'
+                                                            onClick={() => {
+                                                                setOpenDialog('edit')
+                                                            }}
+                                                            size="small" />
+                                                    </div>
+                                                </div>
+                                                <Frame iframeKey={1} fileName={orderDetail?.contract?.file} />
+                                            </BoxCustom>
+                                        }
                                     </>
                                 }
                             </BoxCustom>

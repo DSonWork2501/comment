@@ -68,7 +68,7 @@ function ContractComponent() {
                     const resultAction = await dispatch(editContract(value));
                     unwrapResult(resultAction);
                     handleCloseDialog();
-                    dispatch(getList({ ...search, status: parseInt(search.status) }))
+                    dispatch(getList({ ...search}))
                 } catch (error) { }
                 finally {
                     formik.setSubmitting(false);
@@ -136,7 +136,7 @@ function ContractComponent() {
                                     ]));
                                     unwrapResult(resultAction);
                                     handleCloseDialog();
-                                    dispatch(getList({ ...search, status: parseInt(search.status) }))
+                                    dispatch(getList({ ...search }))
                                 } catch (error) { }
                                 finally {
                                 }
