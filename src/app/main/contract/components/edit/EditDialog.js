@@ -272,16 +272,12 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
             disabledSave={formik.isSubmitting || loading}
             loading={formik.isSubmitting || loading}
             size="xl"
-
         >
             <div className="w-full ">
                 {/* <div className="flex justify-between">
                     <div style={{ width: '49%' }}>
-
                     </div>
                     <div style={{ width: '49%' }}>
-
-
                     </div>
                 </div> */}
                 <div className="flex justify-between space-x-4">
@@ -292,7 +288,7 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                                 className='custom-label'>
                                 Thông tin hợp đồng
                             </InputLabel>
-                            <div className="py-4">
+                            <div className="py-8">
                                 <CmsFormikTextField
                                     formik={formik}
                                     label="Tiêu đề"
@@ -330,15 +326,16 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                                 multiple
                                 size="small" />
                         </div>
-                        <div className="py-4">
-                            <CmsFormikSelect
-                                data={Object.values(ContractType)}
-                                formik={formik}
-                                size="small"
-                                label="Loại"
-                                name="type"
-                            />
-                        </div> */}
+                        */}
+                            <div className="py-8">
+                                <CmsFormikSelect
+                                    data={Object.values(ContractType)}
+                                    formik={formik}
+                                    size="small"
+                                    label="Loại"
+                                    name="type"
+                                />
+                            </div>
                             <div className="flex items-center">
                                 <CmsFormikUploadFile
                                     className="my-8"
@@ -450,14 +447,11 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                                             )}
                                         />
                                     </FormikProvider>
-
-
                                 </BoxCustom>
                             </div>
                         }
                     </div>
                     <div className="w-2/3 lg:w-1/2">
-
                         <BoxCustom
                             className="p-16 py-20 mt-25 border-1 rounded-4 black-label">
                             <InputLabel
@@ -477,7 +471,6 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                                                     className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
                                                     onClick={handleRefresh} />
                                             </div>
-
                                             <Frame iframeKey={iframeKey} />
                                         </div>
                                     </div>
@@ -494,8 +487,6 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null }) {
                 </div> */}
 
                 {/* <CmsFormikTextField multiline rows={5} formik={formik} label="Nội dung" name="content" /> */}
-
-
 
                 {/* {item && <CmsFormikSelect
                     data={Object.values(ContractStatus).map(x=>({...x, id: parseInt(x.id)}))}

@@ -118,6 +118,14 @@ const navigationConfig = [
 				icon: 'call_to_action',
 				url: '/package',
 			},
+			{
+				id: 'nvi-manager-delivery',
+				title: 'Vận chuyển',
+				translate: 'CUSTOM_DELIVERY',
+				type: 'item',
+				icon: 'call_to_action',
+				url: '/order-delivery',
+			},
 		],
 	},
 	{

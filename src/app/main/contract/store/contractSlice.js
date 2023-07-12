@@ -63,8 +63,6 @@ export const statusContract = createAsyncThunk(`${appName}/${moduleName}/statusC
 
 const initSearchState = {
     contractId: '',
-    status: 1,
-    type: 1
 }
 
 const contractSlice = createSlice({

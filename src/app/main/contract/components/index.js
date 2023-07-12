@@ -32,7 +32,7 @@ function ContractComponent() {
     const [item, setItem] = useState(null)
 
     useEffect(() => {
-        dispatch(getList({ ...search, status: parseInt(search.status) }))
+        dispatch(getList({ ...search }))
     }, [dispatch, search])
 
     const handleRefresh = () => {

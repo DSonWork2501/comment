@@ -3,6 +3,7 @@ import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 import { InitOrderModal } from '../model/modal';
 import { getWine, getShelf } from 'app/main/customer-shelf/store/customerShelfSlice';
+import { getErrorMessage } from '@widgets/functions';
 // import { getErrorMessage } from '@widgets/functions';
 
 
@@ -35,8 +36,8 @@ export const getDetail = createAsyncThunk(`${appName}/${moduleName}/getDetail`, 
             return InitOrderModal({ customerid: cusId })
         }
     } catch (error) {
-        // thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
-        return error
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return (thunkAPI.rejectWithValue(error))
     }
 });
 
@@ -179,8 +180,8 @@ const orderSlice = createSlice({
         [getList.pending]: state => ({
             ...state,
             loading: true,
-            entities:{
-                data:[]
+            entities: {
+                data: []
             },
             error: null
         }),
@@ -195,8 +196,8 @@ const orderSlice = createSlice({
         [getList.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
-            entities:{
-                data:[]
+            entities: {
+                data: []
             },
             error: error
         }),
