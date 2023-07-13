@@ -318,9 +318,38 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
                 zip.file(imageReference, imageBinaryData);
 
                 const getKeySig = updatedXml.match(/<w:t[^>]*>\s*\[{userNameApprove}]\s*<\/w:t>/);
-                console.log(getKeySig[0]);
-                updatedXml = updatedXml.replace(getKeySig[0], `<w:drawing><wp:inlinedistB="114300"distT="114300"distL="114300"distR="114300"><wp:extentcx="608456"cy="608456"/><wp:effectExtentb="0"l="0"r="0"t="0"/><wp:docPrid="2"name="image1.png"/><a:graphic><a:graphicDatauri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPrid="0"name="image1.png"/><pic:cNvPicPrpreferRelativeResize="0"/></pic:nvPicPr><pic:blipFill><a:blipr:embed="${relationshipId}"/><a:srcRectb="0"l="0"r="0"t="0"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:offx="0"y="0"/><a:extcx="608456"cy="608456"/></a:xfrm><a:prstGeomprst="rect"/><a:ln/></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>
-            `);
+                updatedXml = updatedXml.replace(getKeySig[0], `<w:drawing>` +
+                    `<wp:inline distB="114300" distT="114300" distL="114300" distR="114300">` +
+                    `<wp:extent cx="1243013" cy="1243013"/>` +
+                    `<wp:effectExtent b="0" l="0" r="0" t="0" />` +
+                    `<wp:docPr id="2" name="image1.jpg" />` +
+                    `<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">` +
+                    `<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
+                    `<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
+                    `<pic:nvPicPr>` +
+                    `<pic:cNvPr id="0" name="image1.jpg" />` +
+                    `<pic:cNvPicPr preferRelativeResize="0" />` +
+                    `</pic:nvPicPr>` +
+                    `<pic:blipFill>` +
+                    `<a:blip r:embed="${relationshipId}" />` +
+                    `<a:srcRect b="0" l="0" r="0" t="0" />` +
+                    `<a:stretch>` +
+                    `<a:fillRect />` +
+                    `</a:stretch>` +
+                    `</pic:blipFill>` +
+                    `<pic:spPr>` +
+                    `<a:xfrm>` +
+                    `<a:off x="0" y="0" />` +
+                    `<a:ext cx="1243013" cy="1243013" />` +
+                    `</a:xfrm>` +
+                    `<a:prstGeom prst="rect" />` +
+                    `<a:ln />` +
+                    `</pic:spPr>` +
+                    `</pic:pic>` +
+                    `</a:graphicData>` +
+                    `</a:graphic>` +
+                    `</wp:inline>` +
+                    `</w:drawing>`);
 
 
                 const relationshipsFilePath = 'word/_rels/document.xml.rels';
@@ -560,6 +589,19 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
                                     </FormikProvider>
                                 </BoxCustom>
                             </div>
+                        }
+
+                        {
+                            signature
+                            &&
+                            <BoxCustom
+                                className="p-16 py-20 mt-25 border-1 rounded-4 black-label text-center">
+                                <InputLabel
+                                    className='custom-label'>
+                                    Chữ ký khác hàng
+                                </InputLabel>
+                                <img width={150} className="m-auto rounded-2 shadow-4" src={`data:image/png;base64, ${signature}`} alt="imageForSignature" />
+                            </BoxCustom>
                         }
                     </div>
                     <div className="w-2/3 lg:w-1/2">
