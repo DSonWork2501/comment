@@ -4,12 +4,11 @@ import reducer from "../store";
 import { keyStore } from "../common";
 import { CmsButton, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
 import { useDispatch, useSelector } from "react-redux";
-import GenFilterOption from "./index/GenFilterOption";
 import { alertInformation, initColumn } from "@widgets/functions";
 import { useEffect } from "react";
-import { editContract, getList, setSearch, statusContract } from 'app/main/contract/store/contractSlice'
+import { editContract, getList, statusContract } from 'app/main/contract/store/contractSlice';
 import { useState } from "react";
-import EditDialog from "./edit/EditDialog"
+import EditDialog from "./edit/EditDialog";
 import { DisplayDateTime } from "@widgets/functions/ConvertDateTime";
 import StatusDialog from "./edit/StatusDialog";
 import { unwrapResult } from "@reduxjs/toolkit";
@@ -78,7 +77,7 @@ function ContractComponent() {
         })
     }
 
-    const data = React.useMemo(() => entities?.map(x => ({
+    const data =  entities?.map(x => ({
         ...x,
         datecreate: DisplayDateTime(x.datecreate),
         status: (
@@ -116,7 +115,7 @@ function ContractComponent() {
                 onClick={() => handleStatusDialog(x)}
             />
             {
-                x.status !== 0
+                false
                 &&
                 <CmsIconButton
                     icon="delete"
@@ -146,7 +145,7 @@ function ContractComponent() {
                 />
             }
         </div>
-    })) || [], [entities])
+    })) || []
 
     return (
         <CmsCardedPage

@@ -53,11 +53,11 @@ export const statusContract = createAsyncThunk(`${appName}/${moduleName}/statusC
     try {
         const response = await connect.live.contract.changeStatus(entity)
         const data = await response.data;
-        thunkAPI.dispatch(showMessage({ variant: "success", message: 'thao tác thành công !' }))
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
         return data
     } catch (error) {
         thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
-        return error
+        return (thunkAPI.rejectWithValue(error))
     }
 });
 

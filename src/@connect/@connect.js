@@ -88,6 +88,9 @@ export default {
             other: {
                 getSummary: params => axios.get(`${baseurl}/order/summary-order`, { params }),
                 updateNote: entity => axios.put(`${baseurl}/order/update-order-des`, entity),
+            },
+            shipper: {
+                insert: entity => axios.post(`${baseurl}/order/shipping-insert`, entity),
             }
         },
         location: {
@@ -112,7 +115,7 @@ export default {
                 delete: (entity, type) => axios.put(`${baseurl}/product/delete-unity?type=${type}`, entity),
             }
         },
-        uploadFile:{
+        uploadFile: {
             insert: entity => axios.post(`${baseurl}/common/upload-file`, entity),
         }
     },

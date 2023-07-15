@@ -1,17 +1,16 @@
-import { CmsDialog, CmsFormikAutocomplete, CmsFormikSelect, CmsFormikTextField, CmsIconButton, CmsTinyMceEditor } from "@widgets/components"
+import { CmsDialog, CmsFormikSelect, CmsFormikTextField, CmsIconButton } from "@widgets/components"
 import { FieldArray, FormikProvider, useFormik } from "formik"
 import React, { useEffect } from "react"
 import { ContractType } from 'app/main/contract/model/type'
 import * as Yup from 'yup'
-import { useDispatch } from "react-redux"
-import { editContract } from "app/main/contract/store/contractSlice"
 import CmsFormikUploadFile from "@widgets/components/cms-formik/CmsFormikUploadFile"
-import JSZip from 'jszip';
-import { get, uniqBy } from 'lodash';
+import JSZip from 'jszip'
+import { get, uniqBy } from 'lodash'
 import { Box, Button, FormHelperText, InputLabel, styled } from "@material-ui/core"
 import { GetApp } from "@material-ui/icons"
 import Connect, { baseurl } from "@connect/@connect"
 import { useState } from "react"
+import { useCallback } from "react"
 
 const BoxCustom = styled(Box)({
     border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -72,40 +71,9 @@ function getFileExtension(filename) {
 }
 
 export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
-    const [showFile, setShowFile] = useState(false);
+    const [showFile, setShowFile] = useState(0);
 
-    useEffect(() => {
-        if (!fileName)
-            setShowFile(true)
-        if (fileName) {
-            const link = baseurl + `/common/files/${fileName}?subfolder=contract`;
-
-            fetch(link).then(response => response.blob())
-                .then(async fileL => {
-                    handleFileRefresh(fileL)
-                })
-        }
-    }, [fileName])
-
-    const handleFileRefresh = (fileL) => {
-        const data = new FormData();
-
-        data.append('enpoint', 'tempfile');
-        handleReadFile(fileL, async (file) => {
-            try {
-                const fileName = 'fileTemp.docx';
-                const fileWithMetadata = new Blob([file], { type: file.type });
-                fileWithMetadata.name = fileName;
-                data.append('files', fileWithMetadata, fileName);
-                await Connect.live.uploadFile.insert(data);
-                setShowFile(true);
-            } catch (error) { console.log(error); }
-            finally {
-            }
-        }, arrayForm);
-    }
-
-    const handleReadFile = async (file, handleFile, mapFile) => {
+    const handleReadFile = useCallback(async (file, handleFile, mapFile) => {
         try {
             const content = await file.arrayBuffer();
 
@@ -128,15 +96,7 @@ export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
                     updatedXml = updatedXml.replaceAll(element.keyWord, element.content);
             });
 
-
-            const reMatch = updatedXml.match(regex);
-            const dataKey = mapFile || uniqBy(reMatch.map((val, index) => ({
-                keyWord: val,
-                content: "",
-            })), 'keyWord')
-
             zip.file('word/document.xml', updatedXml);
-
 
             const updatedContent = await zip.generateAsync({ type: 'arraybuffer' });
 
@@ -145,9 +105,42 @@ export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
         } catch (error) {
 
         }
-    }
+    }, [])
+
+    const handleFileRefresh = useCallback((fileL) => {
+        const data = new FormData();
+
+        data.append('enpoint', 'tempfile');
+        handleReadFile(fileL, async (file) => {
+            try {
+                const fileName = 'fileTemp.docx';
+                const fileWithMetadata = new Blob([file], { type: file.type });
+                fileWithMetadata.name = fileName;
+                data.append('files', fileWithMetadata, fileName);
+                await Connect.live.uploadFile.insert(data);
+                setShowFile(prev => prev + 1);
+            } catch (error) { console.log(error); }
+            finally {
+            }
+        }, arrayForm);
+    }, [arrayForm, handleReadFile])
+
+    useEffect(() => {
+        if (!fileName)
+            setShowFile(1)
+        if (fileName) {
+
+            const link = baseurl + `/common/files/${fileName}?subfolder=contract`;
+
+            fetch(link).then(response => response.blob())
+                .then(async fileL => {
+                    handleFileRefresh(fileL)
+                })
+        }
+    }, [fileName, arrayForm, handleFileRefresh])
 
     return showFile ? <iframe
+        title="IFrame"
         key={iframeKey}
         width={'100%'}
         height={1000}
@@ -156,7 +149,6 @@ export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
 });
 
 function EditDialogComponent({ open, handleClose, handleSave, item = null, isShip, signature }) {
-    const dispatch = useDispatch()
     const [iframeKey, setIframeKey] = useState(0);
     const [fileSelect, setFileSelect] = useState(null);
     const [linkHd, setLinkHd] = useState(null);
@@ -169,7 +161,7 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
     }
 
     const formik = useFormik({
-        initialValues: initData({ ...item, arrayForm: item?.content ? JSON.parse(item?.content) : [] }),
+        initialValues: initData({ ...item, arrayForm: item?.content ? (() => { try { return JSON.parse(item?.content) } catch { return [] } })() : [] }),
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
         onSubmit: handleSaveData,
@@ -181,99 +173,9 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
 
     const { setErrors, errors, touched, setFieldTouched, setFieldValue, values } = formik, { arrayForm } = values;
 
-    const handleFileRefresh = (fileL) => {
-        const data = new FormData();
-
-        data.append('enpoint', 'tempfile');
-        handleReadFile(fileL, async (file) => {
-            console.log(12312312, URL.createObjectURL(file));
-            try {
-                const fileName = 'fileTemp.docx';
-                const fileWithMetadata = new Blob([file], { type: file.type });
-                fileWithMetadata.name = fileName;
-                data.append('files', fileWithMetadata, fileName);
-                await Connect.live.uploadFile.insert(data);
-                setIframeKey(prevKey => prevKey + 1)
-                setLinkHd('open')
-                setLoading(false)
-            } catch (error) { console.log(error); }
-            finally {
-            }
-        }, arrayForm);
-    }
-
-    useEffect(() => {
-        if (item?.file) {
-            const link = baseurl + `/common/files/${item?.file}?subfolder=contract`;
-
-            fetch(link).then(response => response.blob())
-                .then(async fileL => {
-                    setFileSelect(fileL)
-                    handleFileRefresh(fileL)
-                    setLoading(true)
-                })
-        }
-    }, [item])
-
-    const handleRefresh = () => {
-        const file = fileSelect;
-        if (file) {
-            setLoading(true)
-            handleFileRefresh(file)
-        }
-    }
-
-    async function upLoadFile(file, { setLoading, resetFile, form }) {
-        if (file?.length) {
-            setFileSelect(file[0])
-
-            const data = new FormData();
-            const filename = file[0].name;
-            const extension = getFileExtension(filename);
-
-            if (extension !== "docx") {
-                setErrors(
-                    { ...errors, file: "Vui lòng chọn file .docx" }
-                )
-                if (!touched?.file)
-                    setFieldTouched('file', true);
-                return;
-            }
 
 
-            data.append('enpoint', 'tempfile');
-            setFieldValue('arrayForm', []);
-            handleReadFile(file[0], async (file) => {
-                setLoading(true);
-                formik.setSubmitting(true);
-                try {
-                    const name = 'fileTemp.docx';
-                    const fileWithMetadata = new Blob([file], { type: file.type });
-                    fileWithMetadata.name = name;
-                    data.append('files', fileWithMetadata, name);
-                    await Connect.live.uploadFile.insert(data);
-                    setLinkHd('open')
-                    setIframeKey(prevKey => prevKey + 1)
-                    ////
-                    const data2 = new FormData();
-                    data2.append('enpoint', 'contract');
-                    const name2 = Date.now() + '.docx';
-                    const fileWithMetadata2 = new Blob([file], { type: file.type });
-                    fileWithMetadata2.name = name2;
-                    console.log(fileWithMetadata2);
-                    data2.append('files', fileWithMetadata2, name2);
-                    await Connect.live.uploadFile.insert(data2);
-                    formik.setFieldValue('file', name2);
-                } catch (error) { console.log(error); }
-                finally {
-                    setLoading(false);
-                    formik.setSubmitting(false);
-                }
-            });
-        }
-    }
-
-    const handleReadFile = async (file, handleFile, mapFile) => {
+    const handleReadFile = useCallback(async (file, handleFile, mapFile) => {
         try {
             const content = await file.arrayBuffer();
             let imageUrl = "";
@@ -383,7 +285,98 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
         } catch (error) {
             console.log(error);
         }
+    }, [signature, setFieldValue])
+
+    const handleRefresh = () => {
+        const file = fileSelect;
+        if (file) {
+            setLoading(true)
+            handleFileRefresh(file)
+        }
     }
+
+    const handleFileRefresh = useCallback((fileL) => {
+        const data = new FormData();
+
+        data.append('enpoint', 'tempfile');
+        handleReadFile(fileL, async (file) => {
+            try {
+                const fileName = 'fileTemp.docx';
+                const fileWithMetadata = new Blob([file], { type: file.type });
+                fileWithMetadata.name = fileName;
+                data.append('files', fileWithMetadata, fileName);
+                await Connect.live.uploadFile.insert(data);
+                setIframeKey(prevKey => prevKey + 1)
+                setLinkHd('open')
+                setLoading(false)
+            } catch (error) { console.log(error); }
+            finally {
+            }
+        }, arrayForm);
+    }, [handleReadFile, arrayForm])
+
+    async function upLoadFile(file, { setLoading, resetFile, form }) {
+        if (file?.length) {
+            setFileSelect(file[0])
+
+            const data = new FormData();
+            const filename = file[0].name;
+            const extension = getFileExtension(filename);
+
+            if (extension !== "docx") {
+                setErrors(
+                    { ...errors, file: "Vui lòng chọn file .docx" }
+                )
+                if (!touched?.file)
+                    setFieldTouched('file', true);
+                return;
+            }
+
+
+            data.append('enpoint', 'tempfile');
+            setFieldValue('arrayForm', []);
+            handleReadFile(file[0], async (file) => {
+                setLoading(true);
+                formik.setSubmitting(true);
+                try {
+                    const name = 'fileTemp.docx';
+                    const fileWithMetadata = new Blob([file], { type: file.type });
+                    fileWithMetadata.name = name;
+                    data.append('files', fileWithMetadata, name);
+                    await Connect.live.uploadFile.insert(data);
+                    setLinkHd('open')
+                    setIframeKey(prevKey => prevKey + 1)
+                    ////
+                    const data2 = new FormData();
+                    data2.append('enpoint', 'contract');
+                    const name2 = Date.now() + '.docx';
+                    const fileWithMetadata2 = new Blob([file], { type: file.type });
+                    fileWithMetadata2.name = name2;
+                    console.log(fileWithMetadata2);
+                    data2.append('files', fileWithMetadata2, name2);
+                    await Connect.live.uploadFile.insert(data2);
+                    formik.setFieldValue('file', name2);
+                } catch (error) { console.log(error); }
+                finally {
+                    setLoading(false);
+                    formik.setSubmitting(false);
+                }
+            });
+        }
+    }
+
+    useEffect(() => {
+        if (item?.file) {
+            const link = baseurl + `/common/files/${item?.file}?subfolder=contract`;
+
+            fetch(link).then(response => response.blob())
+                .then(async fileL => {
+                    setFileSelect(fileL)
+                    handleFileRefresh(fileL)
+                    setLoading(true)
+                })
+        }
+    }, [item, handleFileRefresh])
 
     const selectedFile = async (filePath) => {
         // const file = await Connect.live.upload.getFileS3({ documentName: filePath });

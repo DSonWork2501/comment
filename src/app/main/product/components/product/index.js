@@ -14,7 +14,7 @@ import { getList as getProduct, resetSearch, setSearch } from "../../store/produ
 import { getList as getCategory } from "../../store/categorySlice";
 import History from "@history";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArchive,  faHome, faTruck } from "@fortawesome/free-solid-svg-icons";
+import { faArchive, faHome, faTruck } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "@material-ui/core";
 
 const columns = [
@@ -72,7 +72,7 @@ function ProductView() {
         shortname: item.shortname,
         image: (<img style={{ height: 100, margin: '0 auto' }} src={`${item.image ? `${process.env.REACT_APP_BASE_URL}api/product/img/${item?.image}` : 'assets/images/etc/no-image-icon.png'}`} alt={item?.img} />),
         sku: item.sku,
-        price: item.price,
+        price: item.price ? parseInt(item.price).toLocaleString() : 0,
         action: (
             <div className="flex flex-row">
                 <CmsIconButton

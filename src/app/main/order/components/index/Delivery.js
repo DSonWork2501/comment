@@ -1,27 +1,23 @@
 import React, { useMemo, useState } from 'react';
-import { CmsAlert, CmsButton, CmsButtonProgress, CmsCardedPage, CmsFormikTextField, CmsTextField } from '@widgets/components';
+import { CmsButton, CmsButtonProgress, CmsCardedPage, CmsFormikCheckbox, CmsFormikTextField } from '@widgets/components';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Box, InputLabel, Table, TableBody, TableCell, TableHead, TableRow, styled } from '@material-ui/core';
+import { Box, FormHelperText, InputLabel, Table, TableBody, TableCell, TableHead, TableRow, styled } from '@material-ui/core';
 import { Link, useLocation } from 'react-router-dom';
 import withReducer from 'app/store/withReducer';
-import { keyStore, playMusic, playMusicW } from '../../common';
+import { keyStore } from '../../common';
 import reducer from '../../store';
 import CmcFormikLazySelect from '@widgets/components/cms-formik/CmcFormikLazySelect';
 import { getDetail, getList, updateOrderStatus } from '../../store/orderSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getShelf, getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
-import LeftSideContent from 'app/main/product/components/product/edit/classify/LeftSideContent';
 import { useEffect } from 'react';
-import { product } from 'app/main/product/store/productSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { alertInformation } from '@widgets/functions';
 import { useCallback } from 'react';
 import { get } from 'lodash';
 import History from '@history/@history';
 import { useParams } from 'react-router';
-import ListProductDialog from './ListProductDialog';
-import noImage from '@widgets/images/noImage.jpg';
 import clsx from 'clsx';
 import QRCode from 'qrcode';
 import EditDialog, { Frame } from 'app/main/contract/components/edit/EditDialog';
@@ -61,84 +57,19 @@ const BoxCustom = styled(Box)({
 
 const initialValues = {
     id: 0,
-    orderID: null
-}
-
-const SelectDetail = ({ prefix, detail }) => {
-    const product = get(detail, `[${prefix}].item`);
-    return <>
-        <BoxCustom
-            className="p-16 py-20 mt-25 border-1 rounded-4 black-label h-full" >
-            <InputLabel
-                className='custom-label'>
-                Rượu đã chọn
-            </InputLabel>
-            {
-                product
-                    ? <>
-                        <div className='flex flex-wrap mb-8 justify-between'>
-                            {
-                                get(detail, `${prefix.split('.')[0]}`)?.name !== "Rượu Lẻ"
-                                &&
-                                <>
-                                    <div style={{ width: '49%' }}>
-                                        <CmsTextField
-                                            label='Ngăn'
-                                            value={get(detail, `${prefix.split('.')[0]}`)?.name}
-                                            disabled
-                                            size="small"
-                                            className='bg-blue-100 rounded-4'
-                                        />
-                                    </div>
-                                    <div style={{ width: '49%' }}>
-                                        <CmsTextField
-                                            label='Vị trí'
-                                            value={get(detail, `${prefix}`)?.slot_name}
-                                            disabled
-                                            size="small"
-                                            className='bg-blue-100 rounded-4'
-                                        />
-                                    </div>
-                                </>
-                            }
-
-                            <div className='w-full pt-8'>
-                                <div>
-                                    <b className='mr-8'>
-                                        Sku (Barcode):
-                                    </b>
-                                    {product?.sku}
-                                </div>
-                                <div>
-                                    <b className='mr-8'>
-                                        Tên rượu:
-                                    </b>
-                                    {product?.name}
-                                </div>
-                            </div>
-                            <div style={{ width: '69%' }} className='mt-8'>
-                                <div className='rounded-4 shadow-4'>
-                                    <img
-                                        style={{ objectFit: 'contain', width: '100%', height: 'auto', margin: 'auto' }}
-                                        src={`${process.env.REACT_APP_BASE_URL}api/product/img/${product?.img}`}
-                                        alt={`imageforitem`} />
-                                </div>
-                            </div>
-                            <div style={{ width: '29%' }} className='mt-8 flex items-center'>
-                                <img
-                                    alt={`qrcord_`}
-                                    style={{ objectFit: 'contain', width: '100%', height: 'auto', margin: 'auto' }}
-                                    src={product.qrcode ? `data:image/png;base64, ${product.qrcode}` : noImage} className="m-auto" />
-                            </div>
-
-                        </div>
-                    </>
-                    : <div className='text-red'>
-                        Lỗi không tồn tại sản phẩm trên
-                    </div>
-            }
-        </BoxCustom>
-    </>
+    orderID: null,
+    "shipperid": 0,
+    "shipname": "",
+    "phone": "",
+    "code": "",
+    "type": 0,
+    "session": "",
+    "vehicle": "",
+    "licenseplate": "",
+    "receiveimg": "",
+    "completeimg": "",
+    "contractfile": "",
+    contractValid: 0
 }
 
 const generateQRCodeBase64 = async (data) => {
@@ -158,40 +89,20 @@ function FormEdit() {
     const dispatch = useDispatch();
     const [current, setCurrent] = useState(null);
     const [openDialog, setOpenDialog] = useState('');
+    const [iframeKey, setIframeKey] = useState(0);
     const orders = useSelector(store => store[keyStore].order.entities?.data) || [];
     const orderDetail = useSelector(store => store[keyStore].order.entity);
-    const popupLoading = useSelector(store => store[keyStore].order.popupLoading) || false;
     const detailEntities = useSelector(store => store[keyStore]?.order?.detailEntities?.data
         ? store[keyStore].order.detailEntities.data
         : []);
     const params = useParams(), ID = params.id;
+    const [arrayForm, setArrayForm] = useState(null);
     if (!ID) {
         History.push('order-delivery/0')
     }
     const paramsURL = new URLSearchParams(location.search), step = paramsURL.get('step');
-    const detailCheck = useMemo(() => {
-        let totalWine = 0, totalCheck = 0;
-        current?.parentid !== 1
-            ? detailEntities?.length && detailEntities.forEach(element => {
-                element.slots?.length && element.slots.forEach(val => {
-                    if (val?.item?.id) {
-                        totalWine = totalWine + 1;
-                        if (val?.item?.ispacked === 1)
-                            totalCheck = totalCheck + 1;
-                    }
-                })
-            })
-            : detailEntities?.length && detailEntities.forEach(element => {
-                totalWine = totalWine + 1;
-                if (element?.ispacked === 1)
-                    totalCheck = totalCheck + 1;
-            })
-
-        return { totalWine, totalCheck };
-    }, [detailEntities, current])
     const [reList, setReList] = useState([]);
     const [loading, setLoading] = useState();
-    const [prefix, setPrefix] = useState(null);
     const [checkFirst, setCheckFirst] = useState(true);
     const listWine = useMemo(() => {
         let data = [], parent = 0, child = 0;
@@ -213,15 +124,6 @@ function FormEdit() {
         });
         return data
     }, [reList])
-    const [numberReceive, setNumberReceive] = useState(null);
-    const receive = useMemo(() => {
-        let total = 0;
-        if (numberReceive)
-            Object.values(numberReceive).forEach(val => {
-                total = total + val;
-            })
-        return total
-    }, [numberReceive])
     const uniqueList = useMemo(() => {
         const uniqueItems = {};
         for (let item of listWine) {
@@ -232,7 +134,6 @@ function FormEdit() {
                 uniqueItems[sku] = {
                     item,
                     number: 1,
-                    numberReceive: numberReceive && numberReceive[sku] ? numberReceive[sku] : 0
                 };
             }
         }
@@ -250,11 +151,10 @@ function FormEdit() {
                     wine: 0
                 },
                 number: 1,
-                numberReceive: numberReceive && numberReceive[current.productorders[0].uniqueid] ? numberReceive[current.productorders[0].uniqueid] : 0
             },
             ...uniqueItems
         } : uniqueItems
-    }, [listWine, numberReceive, current])
+    }, [listWine, current])
 
     const handleSave = (values) => {
         alertInformation({
@@ -286,17 +186,40 @@ function FormEdit() {
         })
     }
 
+    const handleSaveShip = (values) => {
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: values,
+            confirm: async (values) => {
+                formik.setSubmitting(true);
+                try {
+                    const value = { ...values, orderid: values.orderID }
+                    console.log(value);
+                    //const resultAction = await dispatch(order.shipper.insert(value))
+                    //unwrapResult(resultAction);
+
+                } catch (error) { }
+                finally {
+                    formik.setSubmitting(false);
+                }
+            },
+            close: () => formik.setSubmitting(false)
+        })
+    }
+
     const formik = useFormik({
         initialValues,
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
-        onSubmit: handleSave,
+        onSubmit: handleSaveShip,
         validationSchema: Yup.object({
+            "shipname": Yup.string().nullable().required("Nhập tên"),
+            "phone": Yup.string().nullable().required("Nhập số điện thoại"),
+            contractValid: Yup.number().min(1, 'Vui lòng xác nhận')
         })
     })
 
-    const { values, setFieldValue } = formik, { orderID, productID, qrCode, barCodeSearch, numberProduct } = values;
-
+    const { values, setFieldValue } = formik, { orderID } = values;
     const formik_shelf = useFormik({
         initialValues: detailEntities,
         keepDirtyOnReinitialize: true,
@@ -311,24 +234,6 @@ function FormEdit() {
     useEffect(() => {
         setVl(reList);
     }, [reList, setVl])
-
-    const HandleClickDetail = (event, stack_index, slot_index) => {
-        var data = !isNaN(parseInt(slot_index)) ? `[${stack_index}].slots[${slot_index}]` : `[${stack_index}]`
-        setPrefix(data)
-        if (!isNaN(parseInt(slot_index)) && get(reList, data))
-            setFieldValue('productID', get(reList, data)?.item.id)
-    }
-
-    const handleCheck = async (check, item, trigger) => {
-        const resultAction = await dispatch(product.other.wineArrange([{
-            id: item.id,
-            ispacked: check ? 1 : 0
-        }]))
-        unwrapResult(resultAction);
-        getWines(current)
-
-        trigger && trigger();
-    }
 
     const crString = JSON.stringify(current)
     const updateItems = useCallback(
@@ -427,46 +332,10 @@ function FormEdit() {
 
     }, [step, openDialog])
 
-    const updateNumber = (num, key, name) => {
-        setNumberReceive(prev => {
-            if (!Boolean(uniqueList[key])) {
-                CmsAlert.fire({ heightAuto: false, text: 'Sản phẩm không tồn tại trong giỏ hàng !', icon: 'warning' })
-                playMusicW();
-                return prev
-            }
-
-            if (!Boolean(prev) || !prev[key]) {
-                if (uniqueList[key].number < (num)) {
-                    CmsAlert.fire({ heightAuto: false, text: 'Vượt quá số lượng !', icon: 'warning' })
-                    playMusicW();
-                    return prev
-                }
-                playMusic()
-                setTimeout(() => {
-                    setFieldValue('barCodeSearch', '')
-                    setFieldValue('numberProduct', 0)
-                }, 0);
-                return {
-                    ...prev,
-                    [key]: num
-                }
-            } else {
-                if (uniqueList[key].number < (numberReceive[key] + num)) {
-                    CmsAlert.fire({ heightAuto: false, text: 'Vượt quá số lượng !', icon: 'warning' })
-                    playMusicW();
-                    return prev
-                }
-                playMusic()
-                setTimeout(() => {
-                    setFieldValue('barCodeSearch', '')
-                    setFieldValue('numberProduct', 0)
-                }, 0);
-                return {
-                    ...prev,
-                    [key]: prev[key] + num
-                }
-            }
-        })
+    const handleSaveContrac = (value, form) => {
+        setArrayForm(value[0]?.arrayForm);
+        handleCloseDialog();
+        setIframeKey(prev => prev + 1)
     }
 
     return (
@@ -475,7 +344,7 @@ function FormEdit() {
                 <EditDialog
                     open={openDialog === 'edit'}
                     item={orderDetail.contract}
-                    handleSave={() => { }}
+                    handleSave={handleSaveContrac}
                     handleClose={handleCloseDialog}
                     signature={orderDetail.contract?.signature}
                     isShip
@@ -506,37 +375,10 @@ function FormEdit() {
                             <div className="flex items-center space-x-4">
                                 <CmsButtonProgress
                                     loading={formik.isSubmitting}
-                                    label={"Đã nhặt hàng"}
-                                    startIcon="vertical_align_bottom"
-                                    className="mx-2"
-                                    onClick={() => {
-                                        History.push({
-                                            pathname: `/order-delivery/${ID}`,
-                                            search: `?step=2`,
-                                            state: {
-                                                prevPath: window.location.pathname + window.location.search
-                                            }
-                                        })
-                                    }}
-                                    disabled={Boolean(step || ID === '0' || (listWine?.length + 1) !== receive || !receive)}
-                                    size="small" />
-                                <CmsButtonProgress
-                                    loading={formik.isSubmitting}
                                     type="submit"
-                                    label={"In QrCode"}
+                                    label={"Lưu"}
                                     startIcon="vertical_align_bottom"
                                     className="mx-2"
-                                    onClick={() => {
-                                        setOpenDialog('printQr')
-                                    }}
-                                    size="small" />
-                                <CmsButtonProgress
-                                    loading={formik.isSubmitting}
-                                    type="submit"
-                                    label={"Đóng gói"}
-                                    startIcon="vertical_align_bottom"
-                                    className="mx-2"
-                                    disabled={Boolean(detailCheck?.totalWine !== detailCheck?.totalCheck || step !== '3')}
                                     onClick={formik.handleSubmit}
                                     size="small" />
                             </div>
@@ -607,7 +449,6 @@ function FormEdit() {
                                             const qrcode = await generateQRCodeBase64(value?.productorders[0].uniqueid);
                                             setCheckFirst(false)
                                             setCurrent({ ...value, qrcode })
-                                            setPrefix(null)
                                             History.push({
                                                 pathname: `/order-delivery/${id}`,
                                                 state: {
@@ -715,27 +556,6 @@ function FormEdit() {
                                             </TableBody>
                                         </Table>
                                     }
-                                    {
-                                        Boolean(orderID && step === '3')
-                                        &&
-                                        <div className='pt-8'>
-                                            <LeftSideContent
-                                                data={reList}
-                                                isCanFix
-                                                productID={productID}
-                                                handleCheckBox={handleCheck}
-                                                detailCheck={detailCheck}
-                                                // HandleAddStack={HandleAddStack}
-                                                // HandleAddSlot={HandleAddSlot}
-                                                HandleClickDetail={HandleClickDetail}
-                                                label={current?.parentid === 1 ? 'Thông tin rượu' : 'Thông tin tủ'}
-                                            // HandleDeleteSlot={HandleDeleteSlot}
-                                            // HandleDeleteStack={HandleDeleteStack}
-                                            // stackIndex={stackIndex}
-                                            // slotIndex={slotIndex}
-                                            />
-                                        </div>
-                                    }
                                 </div>
                             </BoxCustom>
                         </div>
@@ -818,9 +638,9 @@ function FormEdit() {
                                                         className="my-8"
                                                         formik={formik} />
                                                     <CmsFormikTextField
-                                                        label="Số điện thoại"
                                                         size="small"
-                                                        name="phone"
+                                                        label="Phương tiện"
+                                                        name="vehicle"
                                                         className="my-8"
                                                         formik={formik} />
                                                     <CmsFormikTextField
@@ -832,9 +652,9 @@ function FormEdit() {
                                                 </div>
                                                 <div className='w-1/2'>
                                                     <CmsFormikTextField
+                                                        label="Số điện thoại"
                                                         size="small"
-                                                        label="Phương tiện"
-                                                        name="vehicle"
+                                                        name="phone"
                                                         className="my-8"
                                                         formik={formik} />
                                                     <CmsFormikTextField
@@ -843,6 +663,26 @@ function FormEdit() {
                                                         name="licenseplate"
                                                         className="my-8"
                                                         formik={formik} />
+                                                    <div className="my-8">
+                                                        <CmsFormikCheckbox
+                                                            formik={formik}
+                                                            name="contractValid"
+                                                            label='Hợp đồng chính xác'
+                                                        />
+                                                        {
+                                                            formik && get(formik?.touched, 'contractValid') && Boolean(get(formik?.errors, 'contractValid'))
+                                                            &&
+                                                            <FormHelperText
+                                                                style={{
+                                                                    color: '#f44336'
+                                                                }}
+                                                                className='mx-16'
+                                                            >
+                                                                {get(formik.errors, 'contractValid')}
+                                                            </FormHelperText>
+
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
                                         </BoxCustom>
@@ -870,7 +710,7 @@ function FormEdit() {
                                                             size="small" />
                                                     </div>
                                                 </div>
-                                                <Frame iframeKey={1} fileName={orderDetail?.contract?.file} />
+                                                <Frame iframeKey={iframeKey} fileName={orderDetail?.contract?.file} arrayForm={arrayForm} />
                                             </BoxCustom>
                                         }
                                     </>
