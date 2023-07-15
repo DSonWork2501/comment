@@ -114,7 +114,7 @@ function EditOrderContent() {
                     </div>
                     <div className="flex items-center justify-end space-x-8">
                         {
-                            (!Boolean(cusId && orderId))
+                            (Boolean(cusId))
                             &&
                             <CmsButtonProgress label="Lưu" onClick={formik.handleSubmit} loading={loading} />
                         }

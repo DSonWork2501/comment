@@ -37,13 +37,13 @@ export const getById = createAsyncThunk(`${appName}/${moduleName}/getById`, asyn
  */
 export const editContract = createAsyncThunk(`${appName}/${moduleName}/editContract`, async (entity, thunkAPI) => {
     try {
-        const response = entity[0].id === 0 ? await connect.live.contract.insert(entity) : connect.live.contract.update(entity);
-        const data = await response.data;
-        thunkAPI.dispatch(showMessage({ variant: "success", message: 'thao tác thành công !' }))
+        const response = entity[0].id === 0 ? await connect.live.contract.insert(entity) : await connect.live.contract.update(entity);
+        const data =  response.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
         return data
     } catch (error) {
         thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
-        return error
+        return (thunkAPI.rejectWithValue(error))
     }
 });
 /**
@@ -53,18 +53,16 @@ export const statusContract = createAsyncThunk(`${appName}/${moduleName}/statusC
     try {
         const response = await connect.live.contract.changeStatus(entity)
         const data = await response.data;
-        thunkAPI.dispatch(showMessage({ variant: "success", message: 'thao tác thành công !' }))
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
         return data
     } catch (error) {
         thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
-        return error
+        return (thunkAPI.rejectWithValue(error))
     }
 });
 
 const initSearchState = {
     contractId: '',
-    status: 1,
-    type: 1
 }
 
 const contractSlice = createSlice({

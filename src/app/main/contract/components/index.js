@@ -4,20 +4,22 @@ import reducer from "../store";
 import { keyStore } from "../common";
 import { CmsButton, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
 import { useDispatch, useSelector } from "react-redux";
-import GenFilterOption from "./index/GenFilterOption";
-import { initColumn } from "@widgets/functions";
+import { alertInformation, initColumn } from "@widgets/functions";
 import { useEffect } from "react";
-import { getList, setSearch } from 'app/main/contract/store/contractSlice'
+import { editContract, getList, statusContract } from 'app/main/contract/store/contractSlice';
 import { useState } from "react";
-import EditDialog from "./edit/EditDialog"
+import EditDialog from "./edit/EditDialog";
 import { DisplayDateTime } from "@widgets/functions/ConvertDateTime";
 import StatusDialog from "./edit/StatusDialog";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { Chip } from "@material-ui/core";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "title", label: "Tiêu đề", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "datecreate", label: "Ngày tạo", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "approve", label: "Thông tin duyệt", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "title", label: "Tiêu đề", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "datecreate", label: "Ngày tạo", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "status", label: "Trạng thái", alignHeader: "center", alignValue: "center", sortable: false }),
+    //new initColumn({ field: "approve", label: "Thông tin duyệt", alignHeader: "left", alignValue: "left", sortable: false }),
 ]
 
 function ContractComponent() {
@@ -29,7 +31,7 @@ function ContractComponent() {
     const [item, setItem] = useState(null)
 
     useEffect(() => {
-        dispatch(getList({ ...search, status: parseInt(search.status) }))
+        dispatch(getList({ ...search }))
     }, [dispatch, search])
 
     const handleRefresh = () => {
@@ -39,33 +41,111 @@ function ContractComponent() {
         setOpen('edit')
         setItem(null)
     }
+
     const handleUpdateDialog = (value) => {
         setOpen('edit')
         setItem(value)
     }
+
     const handleStatusDialog = (value) => {
         setOpen('status')
         setItem(value)
     }
 
-    const data = React.useMemo(() => entities?.map(x => ({
+    const handleCloseDialog = () => {
+        setOpen('')
+        setItem(null)
+    }
+
+    const handleSave = (value, formik) => {
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: value,
+            confirm: async (value) => {
+                formik.setSubmitting(true);
+                try {
+                    const resultAction = await dispatch(editContract(value));
+                    unwrapResult(resultAction);
+                    handleCloseDialog();
+                    dispatch(getList({ ...search}))
+                } catch (error) { }
+                finally {
+                    formik.setSubmitting(false);
+                }
+            },
+            close: () => formik.setSubmitting(false)
+        })
+    }
+
+    const data =  entities?.map(x => ({
         ...x,
         datecreate: DisplayDateTime(x.datecreate),
+        status: (
+            <React.Fragment>
+                {
+                    x.status === 0
+                    &&
+                    <Chip label="Đã xóa" className="bg-red-500 text-white" />
+                }
+
+                {
+                    x.status === 1
+                    &&
+                    <Chip label="Đã tạo" className="bg-blue-500 text-white" />
+                }
+
+                {
+                    x.status === 2
+                    &&
+                    <Chip label="Đang sử dụng" className="bg-green-500 text-white" />
+                }
+            </React.Fragment>
+        ),
         action: <div className="w-full flex flex-row space-x-8">
             <CmsIconButton
                 icon="edit"
-                tooltip={'cập nhật'}
+                tooltip={'Cập nhật'}
                 className="text-white bg-green-500 hover:bg-green-700"
                 onClick={() => handleUpdateDialog(x)}
             />
             <CmsIconButton
                 icon="sync"
-                tooltip={'chuyển trạng thái'}
+                tooltip={'Chuyển trạng thái'}
                 className="text-white bg-blue-500 hover:bg-blue-700"
                 onClick={() => handleStatusDialog(x)}
             />
+            {
+                false
+                &&
+                <CmsIconButton
+                    icon="delete"
+                    tooltip={'Xóa'}
+                    className="text-white bg-red-500 hover:bg-red-700"
+                    onClick={() => {
+                        alertInformation({
+                            text: `Xác nhận thao tác`,
+                            data: {},
+                            confirm: async () => {
+                                try {
+                                    const resultAction = await dispatch(statusContract([
+                                        {
+                                            id: x.id,
+                                            status: 0
+                                        }
+                                    ]));
+                                    unwrapResult(resultAction);
+                                    handleCloseDialog();
+                                    dispatch(getList({ ...search }))
+                                } catch (error) { }
+                                finally {
+                                }
+                            },
+                        })
+                    }}
+                />
+            }
         </div>
-    })) || [], [entities])
+    })) || []
 
     return (
         <CmsCardedPage
@@ -92,7 +172,8 @@ function ContractComponent() {
                         <EditDialog
                             open={open === 'edit'}
                             item={item}
-                            handleClose={() => setOpen('')}
+                            handleSave={handleSave}
+                            handleClose={handleCloseDialog}
                         />}
                     {open === 'status' &&
                         <StatusDialog
@@ -105,10 +186,10 @@ function ContractComponent() {
             toolbar={
                 <div className="w-full flex items-center justify-between px-12">
                     <div className="flex items-center justify-items-start">
-                        <GenFilterOption
+                        {/* <GenFilterOption
                             search={search}
                             setSearch={(value) => dispatch(setSearch(value))}
-                        />
+                        /> */}
                     </div>
                     <div className="flex items-center justify-end space-x-8">
                         <CmsButton size="small" label="Tạo mới" startIcon="add" onClick={() => handleCreateDialog()} className="bg-orange-500 hover:bg-orange-700" />
