@@ -136,7 +136,8 @@ const orderSlice = createSlice({
         selected: null,
         response: null,
         search: initSearchState,
-        popupLoading: false
+        popupLoading: false,
+        storeOrders: []
     },
     reducers: {
         /**
@@ -184,6 +185,15 @@ const orderSlice = createSlice({
                     isEdit: payload
                 }
             }
+        },
+
+        setStateRedux: {
+            reducer: (state, { payload }) => {
+                return {
+                    ...state,
+                    ...payload
+                }
+            },
         },
     },
     extraReducers: {
@@ -364,6 +374,6 @@ const orderSlice = createSlice({
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setIsEdit } = orderSlice.actions;
+export const { setSelected, setSearch, resetSearch, setIsEdit, setStateRedux } = orderSlice.actions;
 
 export default orderSlice.reducer;
