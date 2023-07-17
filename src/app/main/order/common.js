@@ -44,8 +44,8 @@ export const links = (valueOb) => orderStatusArray.map(val => (
 ));
 
 export const deliveryLink = [
-    { id: 1, name: "Sản phẩm", link: "/digital/partner", icon: "star_rate" },
-    { id: 3, name: "Đơn hàng", link: "/digital/contract", icon: "star_rate" },
+    { id: 1, name: "Sản phẩm", link: "/order/delivery/1", icon: "" },
+    { id: 2, name: "Đơn hàng", link: "/order/delivery/2", icon: "" },
 ];
 
 export function playMusic() {

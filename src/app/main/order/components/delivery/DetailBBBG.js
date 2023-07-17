@@ -11,13 +11,18 @@ import History from '@history';
 import { GetApp } from '@material-ui/icons';
 import Connect from '@connect';
 import { deliveryLink, keyStore } from '../../common';
-import { order } from '../../store/orderSlice';
+import { getDetail, order } from '../../store/orderSlice';
 import reducer from '../../store';
+import { getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
     "& .inner-scroll>div": {
-        minHeight: '70px'
+        minHeight: 'initial'
+    },
+    '& [class^="makeStyles-header-"]': {
+        minHeight: '7.8rem !important',
+        height: '7.8rem !important'
     },
 });
 
@@ -102,7 +107,7 @@ function DetailBBBG() {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].contractLoading);
     const partners = useSelector(store => store[keyStore].partners?.data);
-    const entities = useSelector(store => store[keyStore].contracts);
+    const entities = useSelector(store => store[keyStore].order.detailEntities);
     const typeInv = useSelector(store => store[keyStore].typeInv);
     const units = useSelector(store => store[keyStore].units);
     const platforms = useSelector(store => store[keyStore].platforms);
@@ -131,10 +136,11 @@ function DetailBBBG() {
         // dispatch(order.other.getUnit());
         // dispatch(order.other.getTypeInv());
         // dispatch(order.other.platform());
+        dispatch(getWine({ cusId: 20, parentId: 58, cms: 1 }))
     }, [dispatch])
 
     const getListTable = useCallback((search) => {
-        dispatch(order.contract.getList(search));
+        dispatch(order.other.getSummary(search));
     }, [dispatch])
 
     const searchString = JSON.stringify(search);
@@ -180,85 +186,16 @@ function DetailBBBG() {
     const data = entities && entities.data && entities.data.map((item, index) => ({
         ...item,
         original: item,
-        duration: (
-            <React.Fragment>
-                <CmsLabel content={`${item.duration ? (item.duration + ' năm') : ''} ${item.monthDuration ? (item.monthDuration + ' tháng') : ''}`} />
-            </React.Fragment>
-        ),
-        file: (
-            <>
-                {
-                    Boolean(item.file)
-                    &&
-                    <Button
-                        startIcon={<GetApp color='primary' />}
-                        style={{
-                            textTransform: 'none'
-                        }}
-                        onClick={() => selectedFile(item.file)}
-                    >
-                        Download
-                    </Button>
-                }
-            </>
-        ),
         STT: (
             <React.Fragment>
                 <CmsLabel content={`${(index + 1)}`} />
             </React.Fragment>
         ),
-        date: (
-            <React.Fragment>
-                <CmsLabel content={`${format(new Date(item.date), 'dd-MM-yyyy')}`} />
-            </React.Fragment>
-        ),
-        dateCreated: (
-            <React.Fragment>
-                <CmsLabel content={`${format(new Date(item.dateCreated), 'dd-MM-yyyy')}`} />
-            </React.Fragment>
-        ),
-        cycle: (
-            <React.Fragment>
-                {
-                    item.cycle === 1
-                    &&
-                    <CmsLabel content={`Tháng`} />
-                }
-                {
-                    item.cycle === 2
-                    &&
-                    <CmsLabel content={`Quý`} />
-                }
-                {
-                    item.cycle === 3
-                    &&
-                    <CmsLabel content={`Năm`} />
-                }
-            </React.Fragment>
-        ),
-        status: (
-            <React.Fragment>
-                {
-                    item.status === 1
-                    &&
-                    <Chip label="Bình thường" color="primary" />
-                }
-
-                {
-                    item.status === 2
-                    &&
-                    <Chip label="Hết hạn" color='error' />
-                }
-            </React.Fragment>
-        ),
         action: (
             <div className="flex space-x-3 ">
-              
+
             </div>
         ),
-        style: (item.warning === 1 && item.status === 1) ? {
-            background: 'rgb(157 4 4 / 35%)'
-        } : {}
     }))
 
     const handleCloseDialog = () => {
@@ -321,25 +258,36 @@ function DetailBBBG() {
     //     return { ...search, ...values, page: 1 };
     // })
 
-    if (!data) {
-        return <FuseLoading />
-    }
+    // if (!data) {
+    //     return <FuseLoading />
+    // }
 
     return (
         <LayoutCustom>
-            <CmsCardedPage
-                classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
-                icon="whatshot"
-                title={"Quản lý hợp đồng"}
-                toolbar={
-                    <>
+
+            <div className='w-full  h-full'>
+                <div className='p-8 bg-white'>
+                    <div className='p-8 rounded-4 shadow-4 flex'>
+                        <div className='w-1/2'>
+                            <b className='mr-4'>
+                                Tên người vận chuyển:
+                            </b>
+                            Trương Công Mạnh
+                        </div>
+                        <div className='w-1/2'>
+                            <b className='mr-4'>
+                                Số đơn:
+                            </b>
+                            1
+                        </div>
+                    </div>
+                </div>
+
+                <div className='p-8 h-full bg-white'>
+                    <div className='p-8 rounded-4 shadow-4 '>
                         <CmsTab data={deliveryLink} value={0} isLink={true} onChange={(e, value) => {
                             History.push(deliveryLink.find(e => e.id === value)?.link)
                         }} />
-                    </>
-                }
-                content={
-                    <>
                         <CmsTableBasic
                             className="w-full h-full"
                             isServerSide={true}
@@ -351,9 +299,22 @@ function DetailBBBG() {
                             columns={columns}
                             loading={loading}
                         />
+                    </div>
+                </div>
+            </div>
+            {/* <CmsCardedPage
+                classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
+                icon="whatshot"
+                title={"Quản lý hợp đồng"}
+                toolbar={
+
+                }
+                content={
+                    <>
+                      
                     </>
                 }
-            />
+            /> */}
         </LayoutCustom>
     );
 }
