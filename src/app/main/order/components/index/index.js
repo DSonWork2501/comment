@@ -1,4 +1,4 @@
-import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTab, CmsTableBasic } from "@widgets/components";
+import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsCheckbox, CmsIconButton, CmsTab, CmsTableBasic } from "@widgets/components";
 import { alertInformation, initColumn } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
@@ -28,12 +28,18 @@ import { format } from "date-fns";
 import { ArrowDropDown } from "@material-ui/icons";
 import ConfirmationDialog from "./ConfirmationDialog";
 import FuseLoading from "@fuse/core/FuseLoading/FuseLoading";
+import AddShipperDialog from "./AddShipperDialog";
 
 const useStyles = makeStyles({
     hoverOpenBtn: {
         '&:hover .btn-fix': {
             opacity: 1
         },
+    },
+    menu: {
+        '& ul': {
+            padding: '0 !important'
+        }
     }
 });
 
@@ -48,30 +54,9 @@ const LayoutCustom = styled(Box)({
     }
 });
 
-const columns = [
-    new initColumn({ field: "id", label: "ID", classHeader: "w-128", alignValue: "left", sortable: false }),
-    //new initColumn({ field: "createdate", label: "Ngày tạo", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "cusname", label: "Khách hàng", alignHeader: "center", alignValue: "left", sortable: false }),
-
-    new initColumn({ field: "product", style: { width: 250 }, label: "Sản phẩm", alignHeader: "center", alignValue: "left", sortable: false }),
-    new initColumn({ field: "unitPR", label: "Đơn vị", style: { width: 85 }, alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "right", label: "Giá", alignHeader: "right", alignValue: "right", sortable: false }),
-    new initColumn({ field: "numberPr", label: "SL", style: { width: 50 }, alignHeader: "center", alignValue: "center", sortable: false }),
-
-    new initColumn({
-        field: "moneydiscount", label: <Tooltip title="Đang vận chuyển">
-            <FontAwesomeIcon icon={faTruck} style={{ color: '#03a9f4', fontSize: 17 }} />
-        </Tooltip>
-        , alignHeader: "center", alignValue: "center", sortable: false
-    }),
-    new initColumn({ field: "moneytotal", style: { width: 140 }, label: <Tooltip title="Tổng tiền"><FontAwesomeIcon icon={faMoneyBill} style={{ color: 'green', fontSize: 17 }} /></Tooltip>, alignHeader: "center", alignValue: "right", sortable: false }),
-    new initColumn({ field: "staffdescription", style: { width: 250 }, label: <FontAwesomeIcon icon={faFilePen} style={{ color: 'pink', fontSize: 17 }} />, alignHeader: "center", alignValue: "left", sortable: false }),
-    new initColumn({ field: "status", style: { width: 150 }, label: <FontAwesomeIcon icon={faFilter} style={{ color: 'orange', fontSize: 17 }} />, alignHeader: "center", alignValue: "center", sortable: false }),
-]
-
 const DropMenu = ({ crName, data, handleClose, className }) => {
     const [anchorEl, setAnchorEl] = useState(null);
-
+    const classes = useStyles();
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -98,6 +83,7 @@ const DropMenu = ({ crName, data, handleClose, className }) => {
                     vertical: 'top',
                     horizontal: 'right',
                 }}
+                className={classes.menu}
             >
                 {
                     data.map((val, index) => {
@@ -143,12 +129,51 @@ function OrderView() {
         100: (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)
             ? (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)?.toLocaleString('en-US')
             : 0,
-        5: summary?.cho_thanh_toan ? summary?.cho_thanh_toan?.toLocaleString('en-US') : 0,
-        4: summary?.hoan_tat ? summary?.hoan_tat?.toLocaleString('en-US') : 0,
-        3: summary?.da_thanh_toan ? summary?.da_thanh_toan?.toLocaleString('en-US') : 0,
+        //5: summary?.cho_thanh_toan ? summary?.cho_thanh_toan?.toLocaleString('en-US') : 0,
+        // 4: summary?.hoan_tat ? summary?.hoan_tat?.toLocaleString('en-US') : 0,
+        // 3: summary?.da_thanh_toan ? summary?.da_thanh_toan?.toLocaleString('en-US') : 0,
         2: summary?.da_xac_nhan ? summary?.da_xac_nhan?.toLocaleString('en-US') : 0,
         1: summary?.da_tao ? summary?.da_tao?.toLocaleString('en-US') : 0
     }
+    const [selects, setSelects] = useState([]);
+
+    const columns = [
+        new initColumn({
+            field: 'select',
+            label: '',
+            onSelectAllClick: () => {
+                if (selects?.length) {
+                    setSelects([]);
+                    return;
+                }
+
+                let values = entities?.data.map(value => value.id);
+                setSelects(values);
+            },
+            classCheckAll: 'w-full',
+            classHeader: 'w-5',
+            sortable: false,
+            isSelectAllDisabled: false
+        }),
+        new initColumn({ field: "id", label: "ID", classHeader: "w-128", alignValue: "left", sortable: false }),
+        //new initColumn({ field: "createdate", label: "Ngày tạo", alignHeader: "left", alignValue: "left", sortable: false }),
+        new initColumn({ field: "cusname", label: "Khách hàng", alignHeader: "center", alignValue: "left", sortable: false }),
+
+        new initColumn({ field: "product", style: { width: 250 }, label: "Sản phẩm", alignHeader: "center", alignValue: "left", sortable: false }),
+        new initColumn({ field: "unitPR", label: "Đơn vị", style: { width: 85 }, alignHeader: "center", alignValue: "center", sortable: false }),
+        new initColumn({ field: "right", label: "Giá", alignHeader: "right", alignValue: "right", sortable: false }),
+        new initColumn({ field: "numberPr", label: "SL", style: { width: 50 }, alignHeader: "center", alignValue: "center", sortable: false }),
+
+        new initColumn({
+            field: "moneydiscount", label: <Tooltip title="Đang vận chuyển">
+                <FontAwesomeIcon icon={faTruck} style={{ color: '#03a9f4', fontSize: 17 }} />
+            </Tooltip>
+            , alignHeader: "center", alignValue: "center", sortable: false
+        }),
+        new initColumn({ field: "moneytotal", style: { width: 140 }, label: <Tooltip title="Tổng tiền"><FontAwesomeIcon icon={faMoneyBill} style={{ color: 'green', fontSize: 17 }} /></Tooltip>, alignHeader: "center", alignValue: "right", sortable: false }),
+        new initColumn({ field: "staffdescription", style: { width: 250 }, label: <FontAwesomeIcon icon={faFilePen} style={{ color: 'pink', fontSize: 17 }} />, alignHeader: "center", alignValue: "left", sortable: false }),
+        new initColumn({ field: "status", style: { width: 150 }, label: <FontAwesomeIcon icon={faFilter} style={{ color: 'orange', fontSize: 17 }} />, alignHeader: "center", alignValue: "center", sortable: false }),
+    ]
 
     const getListTable = useCallback((search, status) => {
         if (typeof status === 'number' && !isNaN(status)) {
@@ -220,7 +245,7 @@ function OrderView() {
     //     setInfo(item)
     // }
 
-    const data = reEntities?.data?.map(item => ({
+    const data = reEntities?.data?.map((item, index) => ({
         id: <div className="text-12">
             <div className="text-blue-500">
                 {item.id}
@@ -229,6 +254,21 @@ function OrderView() {
                 {item.createdate ? format(new Date(item.createdate), 'HH:mm dd/MM/yyyy') : ''}
             </div>
         </div>,
+        select: (
+            <CmsCheckbox
+                key={`${index}_select`}
+                checked={selects?.length ? selects.includes(item.id) : false}
+                value={item.id}
+                onChange={e => {
+                    let check = selects.includes(item.id);
+                    check
+                        ? setSelects(value => value.filter(e => e !== item.id))
+                        : setSelects(value => [...value, item.id])
+                }}
+                name="select"
+                disabled={item.typeBox === "Box OTT"}
+            />
+        ),
         staffdescription: (
             <div className={clsx("text-12  h-full w-full absolute top-8 right-8 bottom-8 left-8", classes.hoverOpenBtn)}>
                 <div
@@ -460,6 +500,10 @@ function OrderView() {
         return <FuseLoading />
     }
 
+    const handleSaveShipper = (value, formik) => {
+        console.log(value, formik);
+    }
+
     return (
         <LayoutCustom>
             {openDialog === 'package' &&
@@ -483,6 +527,13 @@ function OrderView() {
                     open={true}
                     handleClose={handleCloseDialog} />
             }
+
+            {openDialog === 'shipper' && <AddShipperDialog
+                title='Thêm biên bản bàn giao'
+                detail={{ orders: selects }}
+                open={openDialog === 'shipper'}
+                onSave={handleSaveShipper}
+                handleClose={handleCloseDialog} />}
 
             <CmsCardedPage
                 title={'Danh sách đơn hàng'}
@@ -518,6 +569,7 @@ function OrderView() {
                             openFilterOptions={Boolean(filterOptions)}
                             pagination={reEntities?.pagination}
                             isClearHoverBg
+                            selectedList={selects}
                         />
                         <OrderDetailContent
                             open={open === 'detail'}
@@ -536,11 +588,30 @@ function OrderView() {
                     <div className="w-full flex items-center justify-between px-12">
                         <div className="flex items-center justify-items-start">
                             <CmsTab data={links(totalValues)} value={0} isLink={true} onChange={(e, value) => {
-                                History.push(links(totalValues).find(e => e.id === value)?.link)
+                                History.push(links(totalValues).find(e => e.id === value)?.link);
+                                setSelects([]);
                             }} />
                             {/* <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType).filter(x => x.id === FilterOptions.FilterType.basic.id)} /> */}
                         </div>
                         <div className="flex items-center justify-end space-x-8">
+                            {
+                                Boolean(selects?.length)
+                                &&
+                                <DropMenu
+                                    crName={`Lựa chọn`}
+                                    handleClose={(value, setAnchorEl) => {
+                                        if (value?.id === 1)
+                                            setOpenDialog('shipper')
+                                        setAnchorEl(null)
+                                    }}
+                                    className={`min-w-128`}
+                                    data={
+                                        [
+                                            { id: 1, name: 'Thêm vào biên bản bàn giao', hide: status === 6 }
+                                        ].filter(val => val.hide)
+                                    } />
+                            }
+
                             <CmsButtonGroup
                                 size="small"
                                 value={filterOptions}
