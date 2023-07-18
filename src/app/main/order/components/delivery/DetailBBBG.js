@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { CmsCardedPage, CmsTableBasic, CmsLabel, CmsTab } from '@widgets/components';
-import { Box, Button, Chip, styled } from '@material-ui/core';
+import { CmsCardedPage, CmsTableBasic, CmsLabel, CmsTab, CmsFormikTextField, CmsFormikAutocomplete } from '@widgets/components';
+import { Box, Button, Chip, Icon, TableCell, TableRow, Typography, styled } from '@material-ui/core';
 import { alertInformation, initColumn } from '@widgets/functions'
 import withReducer from 'app/store/withReducer'
 import { useDispatch, useSelector } from 'react-redux'
@@ -15,6 +15,8 @@ import { getDetail, order } from '../../store/orderSlice';
 import reducer from '../../store';
 import { getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
 import { useParams } from 'react-router';
+import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
+import { useFormik } from 'formik';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -32,93 +34,108 @@ const initialValues = {
     limit: 10
 };
 
-// const Filter = ({ onSearch, search, namePage }) => {
+const Filter = ({ onSearch, search, namePage }) => {
 
-//     const formik = useFormik({
-//         initialValues,
-//         onSubmit: handleSubmit
-//     })
-//     const { setFieldValue } = formik;
+    const formik = useFormik({
+        initialValues,
+        onSubmit: handleSubmit
+    })
+    const { setFieldValue } = formik;
 
-//     useEffect(() => {
-//         if (search) {
-//             for (const key in initialValues) {
-//                 if (search[key] !== initialValues[key]) {
-//                     let value = search[key];
-//                     if (key === 'status') {
-//                         value = JSON.stringify(search[key])
-//                     }
-//                     setFieldValue(key, value);
-//                 }
-//             }
-//         }
-//     }, [search, setFieldValue])
+    useEffect(() => {
+        if (search) {
+            for (const key in initialValues) {
+                if (search[key] !== initialValues[key]) {
+                    let value = search[key];
+                    if (key === 'status') {
+                        value = JSON.stringify(search[key])
+                    }
+                    setFieldValue(key, value);
+                }
+            }
+        }
+    }, [search, setFieldValue])
 
-//     function handleSubmit(value) {
-//         let values = { ...value };
-//         if (values.status)
-//             values.status = parseInt(values.status);
-//         onSearch(values);
-//     }
+    function handleSubmit(value) {
+        let values = { ...value };
+        if (values.status)
+            values.status = parseInt(values.status);
+        onSearch(values);
+    }
 
-//     return <form onSubmit={formik.handleSubmit} className="flex items-center justify-items-start w-1/4 space-x-8 px-8" >
-//         <CmsFormikTextField
-//             label={`Tên đối tác`}
-//             name="name"
-//             className="my-8"
-//             size="small"
-//             clearBlur
-//             formik={formik} />
-//         <Button
-//             style={{
-//                 background: '#FF6231',
-//                 color: 'white',
-//                 height: 36,
-//                 position: 'relative',
-//                 top: -1
-//             }}
-//             size='small'
-//             variant="contained"
-//             type='submit'
-//         >
-//             <Icon>
-//                 search
-//             </Icon>
-//         </Button>
-//         <Button
-//             style={{
-//                 color: 'black',
-//                 height: 36,
-//                 position: 'relative',
-//                 top: -1
-//             }}
-//             size='small'
-//             variant="contained"
-//             type='submit'
-//             onClick={() => formik.handleReset()}
-//         >
-//             <Icon>
-//                 refresh
-//             </Icon>
-//         </Button>
-//     </form>
-// }
+    return <form onSubmit={formik.handleSubmit} className="flex items-center justify-items-start  space-x-8 px-8" >
+        <CmsFormikTextField
+            label={`ID đơn hàng`}
+            name="name"
+            className="my-8"
+            size="small"
+            clearBlur
+            formik={formik} />
+        <CmsFormikTextField
+            label={`Sản phẩm`}
+            name="name"
+            className="my-8"
+            size="small"
+            clearBlur
+            formik={formik} />
+        <CmsFormikAutocomplete
+            className="my-8 inline-flex"
+            name="partnerID"
+            formik={formik}
+            label="Trạng thái"
+            data={[]}
+            size="small"
+            autocompleteProps={{
+                getOptionLabel: (option) => option?.partnerShortName || '',
+                ChipProps: {
+                    size: 'small'
+                },
+                size: 'small',
+            }}
+            setOption={(option) => option?.partnerShortName || ''}
+            valueIsId />
+        <Button
+            style={{
+                background: '#FF6231',
+                color: 'white',
+                height: 36,
+                position: 'relative',
+                top: -1
+            }}
+            size='small'
+            variant="contained"
+            type='submit'
+        >
+            <Icon>
+                search
+            </Icon>
+        </Button>
+        <Button
+            style={{
+                color: 'black',
+                height: 36,
+                position: 'relative',
+                top: -1
+            }}
+            size='small'
+            variant="contained"
+            type='submit'
+            onClick={() => formik.handleReset()}
+        >
+            <Icon>
+                refresh
+            </Icon>
+        </Button>
+    </form>
+}
 
 const ProductTable = ({ entities, loading, setSearch }) => {
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        //new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-        new initColumn({ field: "contract", label: `Số hợp đồng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "version", label: `Version`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "date", label: `Ngày ký hợp đồng`, style: { width: 250 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "dateCreated", label: `Ngày tạo`, style: { width: 250 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "partnerShortName", label: `Đối tác MCN`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "shortName", label: `Đơn ví ký`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "rate", label: `Tỷ lệ hưởng doanh thu(%)`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "cycle", label: `Chu kỳ đối soát`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "duration", label: `Thời hạn hợp đồng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "file", label: `Hợp đồng`, style: { width: 130 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "status", label: `Tình trạng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
+        new initColumn({ field: "contract", label: `Sản phẩm`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "version", label: `Giá`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "date", label: `Tổng số lượng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
     const data = entities && entities.data && entities.data.map((item, index) => ({
@@ -142,15 +159,101 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         apiServerSide={params => setSearch(prev => {
             return { ...prev, ...params }
         })}
-        pagination={entities && entities.pagination}
+        isPagination={false}
         data={data}
         columns={columns}
         loading={loading}
+        moreFooter={
+            <TableRow>
+                <TableCell
+                    colSpan={3}
+                    className="text-center"
+                    style={{ borderRight: '1px solid #ddd' }}
+                >
+                    <b>
+                        TỔNG:
+                    </b>
+                </TableCell>
+                <TableCell
+                    className="text-right"
+                    style={{ borderRight: '1px solid #ddd' }}
+                >
+                </TableCell>
+                <TableCell
+                    style={{ borderRight: '1px solid #ddd' }}
+                >
+
+                </TableCell>
+            </TableRow>
+        }
     />
 }
 
-const OrderTable = () => {
+const OrderTable = ({ entities, loading, setSearch }) => {
+    const columns = [
+        new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
+        new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
+        new initColumn({ field: "contract", label: `Sản phẩm`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "version", label: `SL`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "date", label: `Giá`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+    ]
 
+    const data = entities && entities.data && entities.data.map((item, index) => ({
+        ...item,
+        original: item,
+        STT: (
+            <React.Fragment>
+                <CmsLabel content={`${(index + 1)}`} />
+            </React.Fragment>
+        ),
+        action: (
+            <div className="flex space-x-3 ">
+
+            </div>
+        ),
+    }))
+
+    return <CmsTableBasic
+        className="w-full h-full"
+        isServerSide={true}
+        apiServerSide={params => setSearch(prev => {
+            return { ...prev, ...params }
+        })}
+        isPagination={false}
+        data={data}
+        columns={columns}
+        loading={loading}
+        moreFooter={
+            <TableRow>
+                <TableCell
+                    colSpan={3}
+                    className="text-center"
+                    style={{ borderRight: '1px solid #ddd' }}
+                >
+                    <b>
+                        TỔNG:
+                    </b>
+                </TableCell>
+                <TableCell
+                    className="text-right"
+                    style={{ borderRight: '1px solid #ddd' }}
+                >
+                </TableCell>
+                <TableCell
+                    style={{ borderRight: '1px solid #ddd' }}
+                >
+
+                </TableCell>
+
+                <TableCell
+                    style={{ borderRight: '1px solid #ddd' }}
+                >
+
+                </TableCell>
+            </TableRow>
+        }
+    />
 }
 
 function DetailBBBG() {
@@ -165,7 +268,7 @@ function DetailBBBG() {
     const [search, setSearch] = useState(initialValues);
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
-    const params = useParams(), id = params.id;
+    const params = useParams(), id = params.id, type = params.type;
 
 
     useEffect(() => {
@@ -288,33 +391,69 @@ function DetailBBBG() {
 
     return (
         <LayoutCustom>
-            <div className='w-full  h-full'>
-                <div className='p-8 bg-white'>
-                    <div className='p-8 rounded-4 shadow-4 flex'>
+            <div className='w-full  h-full' style={{ padding: '0 3.2rem' }}>
+                <div className="w-full flex items-start py-8">
+                    <FuseAnimate animation="transition.expandIn" delay={300}>
+                        <Icon className="text-32">whatshot</Icon>
+                    </FuseAnimate>
+                    <div className="flex flex-col w-full">
+                        <FuseAnimate animation="transition.slideLeftIn" delay={300}>
+                            <React.Fragment>
+                                <Typography className="hidden sm:flex mx-0 sm:mx-12" variant="h6">
+                                    Chi tiết biên bản bàn giao
+                                </Typography>
+                            </React.Fragment>
+                        </FuseAnimate>
+                    </div>
+                </div>
+                <div className='p-8 '>
+                    <div className='p-8 rounded-4 shadow-4 flex bg-white'>
                         <div className='w-1/2'>
-                            <b className='mr-4'>
-                                Tên người vận chuyển:
-                            </b>
-                            Trương Công Mạnh
+                            <div>
+                                <b className='mr-4'>
+                                    Mã biên bản:
+                                </b>
+                                {id}
+                            </div>
+                            <div>
+                                <b className='mr-4'>
+                                    Tên người vận chuyển:
+                                </b>
+                                Trương Công Mạnh
+                            </div>
+
                         </div>
                         <div className='w-1/2'>
-                            <b className='mr-4'>
-                                Số đơn:
-                            </b>
-                            1
+                            <div>
+                                <b className='mr-4'>
+                                    Số đơn:
+                                </b>
+                                1
+                            </div>
+                            <div>
+                                <b className='mr-4'>
+                                    Ghi chú:
+                                </b>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className='p-8 h-full bg-white'>
-                    <div className='p-8 rounded-4 shadow-4 '>
-                        <CmsTab data={deliveryLink} value={0} isLink={true} onChange={(e, value) => {
-                            History.push(deliveryLink.find(e => e.id === value)?.link)
+                <div className='p-8 '>
+                    <div className='p-8 rounded-4 shadow-4 bg-white'>
+                        <CmsTab data={deliveryLink(id)} value={0} isLink={true} onChange={(e, value) => {
+                            History.push(deliveryLink(id).find(e => e.id === value)?.link)
                         }} />
+                        <div className='w-4/6 py-8'>
+                            <Filter
+                                onSearch={setSearch}
+                                search={search}
+                            />
+                        </div>
                         {
-                            id === '1'
+                            type === '1'
                                 ? <ProductTable entities={entities} loading={loading} setSearch={setSearch} />
-                                : <OrderTable />
+                                : <OrderTable entities={entities} loading={loading} setSearch={setSearch} />
                         }
 
                     </div>

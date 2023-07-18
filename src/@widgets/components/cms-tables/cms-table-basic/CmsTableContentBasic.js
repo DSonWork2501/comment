@@ -66,7 +66,8 @@ function TableContentBasic(props) {
 		isSelectOnClickRow,
 		upperHead,
 		isClearHoverBg,
-		showBorder
+		showBorder,
+		moreFooter
 	} = props;
 	const [hover, setHover] = useState(null)
 	const [page, setPage] = useState(panigationDefault?.page || 0);
@@ -285,6 +286,7 @@ function TableContentBasic(props) {
 				/>
 				{data.length > 0 && <TableBody>{genTableCell()}</TableBody>}
 				{footerData && <TableFooter>{genTableFooterCell()}</TableFooter>}
+				{moreFooter && moreFooter}
 			</Table>
 			{data.length === 0 && isShowDataNullAlert && <div className="w-full grid justify-items-center mt-10"><Typography className="text-18" color="secondary">Không tìm thấy dữ liệu</Typography></div>}
 		</>
