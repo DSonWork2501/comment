@@ -14,6 +14,7 @@ import { deliveryLink, keyStore } from '../../common';
 import { getDetail, order } from '../../store/orderSlice';
 import reducer from '../../store';
 import { getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
+import { useParams } from 'react-router';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -103,6 +104,14 @@ const initialValues = {
 //     </form>
 // }
 
+const ProductTable = () => {
+
+}
+
+const OrderTable = () => {
+
+}
+
 function DetailBBBG() {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].contractLoading);
@@ -115,6 +124,7 @@ function DetailBBBG() {
     const [search, setSearch] = useState(initialValues);
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
+    const params = useParams(), id = params.id;
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
         //new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -264,7 +274,6 @@ function DetailBBBG() {
 
     return (
         <LayoutCustom>
-
             <div className='w-full  h-full'>
                 <div className='p-8 bg-white'>
                     <div className='p-8 rounded-4 shadow-4 flex'>
@@ -288,6 +297,11 @@ function DetailBBBG() {
                         <CmsTab data={deliveryLink} value={0} isLink={true} onChange={(e, value) => {
                             History.push(deliveryLink.find(e => e.id === value)?.link)
                         }} />
+                        {
+                            id === '1'
+                                ? <ProductTable />
+                                : <OrderTable />
+                        }
                         <CmsTableBasic
                             className="w-full h-full"
                             isServerSide={true}
