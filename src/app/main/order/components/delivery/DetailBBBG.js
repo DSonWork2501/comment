@@ -104,8 +104,49 @@ const initialValues = {
 //     </form>
 // }
 
-const ProductTable = () => {
+const ProductTable = ({ entities, loading, setSearch }) => {
+    const columns = [
+        new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
+        //new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
+        new initColumn({ field: "contract", label: `Số hợp đồng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "version", label: `Version`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "date", label: `Ngày ký hợp đồng`, style: { width: 250 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "dateCreated", label: `Ngày tạo`, style: { width: 250 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "partnerShortName", label: `Đối tác MCN`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "shortName", label: `Đơn ví ký`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "rate", label: `Tỷ lệ hưởng doanh thu(%)`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "cycle", label: `Chu kỳ đối soát`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "duration", label: `Thời hạn hợp đồng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "file", label: `Hợp đồng`, style: { width: 130 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Tình trạng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+    ]
 
+    const data = entities && entities.data && entities.data.map((item, index) => ({
+        ...item,
+        original: item,
+        STT: (
+            <React.Fragment>
+                <CmsLabel content={`${(index + 1)}`} />
+            </React.Fragment>
+        ),
+        action: (
+            <div className="flex space-x-3 ">
+
+            </div>
+        ),
+    }))
+
+    return <CmsTableBasic
+        className="w-full h-full"
+        isServerSide={true}
+        apiServerSide={params => setSearch(prev => {
+            return { ...prev, ...params }
+        })}
+        pagination={entities && entities.pagination}
+        data={data}
+        columns={columns}
+        loading={loading}
+    />
 }
 
 const OrderTable = () => {
@@ -125,21 +166,7 @@ function DetailBBBG() {
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
     const params = useParams(), id = params.id;
-    const columns = [
-        new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        //new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-        new initColumn({ field: "contract", label: `Số hợp đồng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "version", label: `Version`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "date", label: `Ngày ký hợp đồng`, style: { width: 250 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "dateCreated", label: `Ngày tạo`, style: { width: 250 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "partnerShortName", label: `Đối tác MCN`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "shortName", label: `Đơn ví ký`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "rate", label: `Tỷ lệ hưởng doanh thu(%)`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "cycle", label: `Chu kỳ đối soát`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "duration", label: `Thời hạn hợp đồng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "file", label: `Hợp đồng`, style: { width: 130 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "status", label: `Tình trạng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-    ]
+
 
     useEffect(() => {
         // dispatch(order.partner.getList());
@@ -193,20 +220,7 @@ function DetailBBBG() {
         link.remove();
     }
 
-    const data = entities && entities.data && entities.data.map((item, index) => ({
-        ...item,
-        original: item,
-        STT: (
-            <React.Fragment>
-                <CmsLabel content={`${(index + 1)}`} />
-            </React.Fragment>
-        ),
-        action: (
-            <div className="flex space-x-3 ">
 
-            </div>
-        ),
-    }))
 
     const handleCloseDialog = () => {
         setOpenDialog('');
@@ -299,20 +313,10 @@ function DetailBBBG() {
                         }} />
                         {
                             id === '1'
-                                ? <ProductTable />
+                                ? <ProductTable entities={entities} loading={loading} setSearch={setSearch} />
                                 : <OrderTable />
                         }
-                        <CmsTableBasic
-                            className="w-full h-full"
-                            isServerSide={true}
-                            apiServerSide={params => setSearch(prev => {
-                                return { ...prev, ...params }
-                            })}
-                            pagination={entities && entities.pagination}
-                            data={data}
-                            columns={columns}
-                            loading={loading}
-                        />
+
                     </div>
                 </div>
             </div>
