@@ -126,7 +126,7 @@ function DetailBBBG() {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].contractLoading);
     const partners = useSelector(store => store[keyStore].partners?.data);
-    const entities = useSelector(store => store[keyStore].order.detailEntities);
+    const entities = useSelector(store => store[keyStore].order.deliveryList);
     const typeInv = useSelector(store => store[keyStore].typeInv);
     const units = useSelector(store => store[keyStore].units);
     const platforms = useSelector(store => store[keyStore].platforms);
@@ -138,19 +138,35 @@ function DetailBBBG() {
 
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-        new initColumn({ field: "contract2", label: `Người giao hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "contract", label: `Tổng đơn`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "version", label: `Ghi chú`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "deliveryid", label: "ID", classHeader: "w-128", sortable: false }),
+        new initColumn({ field: "customer", label: `Người giao hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "numberOrder", label: `Tổng đơn`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "note", label: `Ghi chú`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "date", label: `Người tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
     const data = entities && entities.data && entities.data.map((item, index) => ({
         ...item,
         original: item,
+        deliveryid: (
+            <a href={`/order/delivery/1/${item.deliveryid}`}>
+                {item.deliveryid}
+            </a>
+        ),
         STT: (
             <React.Fragment>
                 <CmsLabel content={`${(index + 1)}`} />
+            </React.Fragment>
+        ),
+        customer: (
+            <React.Fragment>
+                <CmsLabel content={`${(item.shipname)}`} />
+                <CmsLabel content={`${(item.phone)}`} />
+            </React.Fragment>
+        ),
+        numberOrder: (
+            <React.Fragment>
+                <CmsLabel content={`${(item.cho_lay_hang + item.da_lay_hang + item.dang_giao_hang)}`} />
             </React.Fragment>
         ),
         action: (
@@ -168,7 +184,7 @@ function DetailBBBG() {
     }, [dispatch])
 
     const getListTable = useCallback((search) => {
-        dispatch(order.other.getSummary(search));
+        dispatch(order.other.getDeliveryList(search));
     }, [dispatch])
 
     const searchString = JSON.stringify(search);

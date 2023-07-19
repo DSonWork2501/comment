@@ -137,9 +137,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         new initColumn({ field: "version", label: `Giá`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "date", label: `Tổng số lượng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
-
     const data = entities && entities.data && entities.data.map((item, index) => ({
-        ...item,
         original: item,
         STT: (
             <React.Fragment>
@@ -163,29 +161,29 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         data={data}
         columns={columns}
         loading={loading}
-        moreFooter={
-            <TableRow>
-                <TableCell
-                    colSpan={3}
-                    className="text-center"
-                    style={{ borderRight: '1px solid #ddd' }}
-                >
-                    <b>
-                        TỔNG:
-                    </b>
-                </TableCell>
-                <TableCell
-                    className="text-right"
-                    style={{ borderRight: '1px solid #ddd' }}
-                >
-                </TableCell>
-                <TableCell
-                    style={{ borderRight: '1px solid #ddd' }}
-                >
+        // moreFooter={
+        //     <TableRow>
+        //         <TableCell
+        //             colSpan={3}
+        //             className="text-center"
+        //             style={{ borderRight: '1px solid #ddd' }}
+        //         >
+        //             <b>
+        //                 TỔNG:
+        //             </b>
+        //         </TableCell>
+        //         <TableCell
+        //             className="text-right"
+        //             style={{ borderRight: '1px solid #ddd' }}
+        //         >
+        //         </TableCell>
+        //         <TableCell
+        //             style={{ borderRight: '1px solid #ddd' }}
+        //         >
 
-                </TableCell>
-            </TableRow>
-        }
+        //         </TableCell>
+        //     </TableRow>
+        // }
     />
 }
 
@@ -200,7 +198,6 @@ const OrderTable = ({ entities, loading, setSearch }) => {
     ]
 
     const data = entities && entities.data && entities.data.map((item, index) => ({
-        ...item,
         original: item,
         STT: (
             <React.Fragment>
@@ -260,7 +257,7 @@ function DetailBBBG() {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].contractLoading);
     const partners = useSelector(store => store[keyStore].partners?.data);
-    const entities = useSelector(store => store[keyStore].order.detailEntities);
+    const entities = useSelector(store => store[keyStore].order.detailDelivery);
     const typeInv = useSelector(store => store[keyStore].typeInv);
     const units = useSelector(store => store[keyStore].units);
     const platforms = useSelector(store => store[keyStore].platforms);
@@ -269,7 +266,6 @@ function DetailBBBG() {
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
     const params = useParams(), id = params.id, type = params.type;
-
 
     useEffect(() => {
         // dispatch(order.partner.getList());
@@ -280,8 +276,8 @@ function DetailBBBG() {
     }, [dispatch])
 
     const getListTable = useCallback((search) => {
-        dispatch(order.other.getSummary(search));
-    }, [dispatch])
+        dispatch(order.other.getDetailDelivery({ ...search, id }));
+    }, [dispatch, id])
 
     const searchString = JSON.stringify(search);
     useEffect(() => {
