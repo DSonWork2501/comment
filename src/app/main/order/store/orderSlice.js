@@ -90,7 +90,7 @@ export const order = {
         }),
     },
     other: {
-        getSummary: createAsyncThunk(`${appName} /${moduleName}/order / other / getSummary`, async (params, thunkAPI) => {
+        getSummary: createAsyncThunk(`${appName} /${moduleName}/order/other/getSummary`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.order.other.getSummary(params);
                 const data = await response.data;
@@ -100,10 +100,20 @@ export const order = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
-        updateNote: createAsyncThunk(`${appName} /${moduleName}/order / other / updateNote`, async (params, thunkAPI) => {
+        updateNote: createAsyncThunk(`${appName} /${moduleName}/order/other/updateNote`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.order.other.updateNote(params);
                 thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getDelivery: createAsyncThunk(`${appName} /${moduleName}/order/other/getDelivery`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.other.getDelivery(params);
                 const data = await response.data;
                 return data
             } catch (error) {
@@ -244,6 +254,14 @@ const orderSlice = createSlice({
             ...state,
             loading: false,
             error: error
+        }),
+        /**
+       * @description getEditors
+       */
+        [order.other.getDelivery.fulfilled]: (state, { payload }) => ({
+            ...state,
+            deliveries: payload?.data,
+            loading: false,
         }),
         /**
          * @description getDetail

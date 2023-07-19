@@ -190,7 +190,6 @@ function OrderView() {
         getListTable(search, status);
     }, [dispatch, search, status, getListTable])
 
-
     const HandleClickDetail = (item) => {
         setInfo(item)
         setOpen('detail')
@@ -501,7 +500,28 @@ function OrderView() {
     }
 
     const handleSaveShipper = (value, formik) => {
-        console.log(value, formik);
+        const values = value.orders.map(val => ({
+            ...value, orderid: val
+        }))
+
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: { values, formik },
+            confirm: async () => {
+                try {
+                    const resultAction = await dispatch(order.shipper.insert(values));
+                    unwrapResult(resultAction);
+                    formik.resetForm();
+                    setOpenDialog('');
+                    getListTable(search, status);
+                    setSelects([]);
+                } catch (error) {
+                } finally {
+                    formik.setSubmitting(false)
+                }
+            },
+            close: () => formik.setSubmitting(false)
+        });
     }
 
     return (

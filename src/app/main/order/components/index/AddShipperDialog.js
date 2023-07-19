@@ -2,7 +2,11 @@ import React, { useEffect } from 'react';
 import { CmsDialog, CmsFormikAutocomplete, CmsFormikTextField } from '@widgets/components';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Box, InputLabel, makeStyles, styled } from '@material-ui/core';
+import { Box, FormControlLabel, InputLabel, Radio, RadioGroup, makeStyles, styled } from '@material-ui/core';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { order } from '../../store/orderSlice';
+import { keyStore } from '../../common';
 
 const BoxCustom = styled(Box)({
     border: '1px solid rgba(0, 0, 0, 0.12)',
@@ -52,6 +56,9 @@ const initialValues = {
     completeimg: "",
     contractfile: "",
     contractValid: 0,
+    deliveryid: null,
+    deliverysession: null,
+    note: '',
     orders: []
 }
 
@@ -71,6 +78,10 @@ const fillDefaultForm = (def, detail, setId = true) => {
 }
 
 function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc tính', status }) {
+    const dispatch = useDispatch();
+    const [type, setType] = useState('1');
+    const deliveries = useSelector(store => store[keyStore].order.deliveries) || [];
+
     const handleSave = (values) => {
         if (formik)
             onSave(values, formik);
@@ -87,7 +98,11 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
         })
     })
 
-    const { setValues, values } = formik, { orders } = values;
+    useEffect(() => {
+        dispatch(order.other.getDelivery());
+    }, [])
+
+    const { setValues, values } = formik, { orders, shipperid } = values;
 
     useEffect(() => {
         setValues(detail ? fillDefaultForm(initialValues, detail) : initialValues);
@@ -112,58 +127,116 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                         Thông tin người giao hàng
                     </InputLabel> */}
                 <>
-                    <b className='mr-8'>
-                        Số đơn cần giao:
-                    </b>
-                    {orders?.length}
-                    <div className='flex justify-between space-x-16'>
+                    <div className='flex justify-between items-center space-x-16'>
                         <div className='w-1/2'>
-                            <CmsFormikAutocomplete
-                                className="my-8"
-                                name="shipperid"
-                                formik={formik}
-                                label={`Chọn người nội bộ`}
-                                data={[]}
-                                size="small"
-                                autocompleteProps={{
-                                    getOptionLabel: (option) => option?.name,
-                                    ChipProps: {
-                                        size: 'small'
-                                    },
-                                    size: 'small',
+                            <b className='mr-8'>
+                                Số đơn cần giao:
+                            </b>
+                            {orders?.length}
+                        </div>
+                        <div className='w-1/2'>
+                            <RadioGroup
+                                aria-label="Layout Style"
+                                name="type"
+                                className="mt-8 px-8"
+                                value={type}
+                                onChange={(val) => {
+                                    setType(val.target.value);
+                                    formik.setFieldValue('shipperid', null);
+                                    formik.setFieldValue('deliveryid', null);
                                 }}
-                                setOption={(option) => option?.name}
-                                valueIsId />
+                                row
+                            >
+                                <FormControlLabel
+                                    key="rtl"
+                                    value="1"
+                                    control={<Radio />}
+                                    label="Biên bản mới" />
+                                <FormControlLabel
+                                    key="ltr"
+                                    value="2"
+                                    control={<Radio />}
+                                    label="Biên bản có sẵn" />
+                            </RadioGroup>
+                        </div>
+                    </div>
+
+                    <div className='flex flex-wrap justify-between'>
+                        <div className='w-1/2 pr-8'>
+                            {
+                                type === '1'
+                                    ?
+                                    <CmsFormikAutocomplete
+                                        className="my-8"
+                                        name="shipperid"
+                                        formik={formik}
+                                        label={`Chọn người nội bộ`}
+                                        data={[]}
+                                        size="small"
+                                        autocompleteProps={{
+                                            getOptionLabel: (option) => option?.name,
+                                            ChipProps: {
+                                                size: 'small'
+                                            },
+                                            size: 'small',
+                                        }}
+                                        setOption={(option) => option?.name}
+                                        valueIsId />
+                                    : <CmsFormikAutocomplete
+                                        className="my-8"
+                                        name="deliveryid"
+                                        formik={formik}
+                                        label={`Chọn biên bản`}
+                                        data={deliveries.map(val => ({ ...val, id: val.deliveryid }))}
+                                        size="small"
+                                        autocompleteProps={{
+                                            getOptionLabel: (option) => option?.deliveryid + ' - ' + option?.shipname,
+                                            ChipProps: {
+                                                size: 'small'
+                                            },
+                                            size: 'small',
+                                        }}
+                                        onChangeValue={(value) => {
+                                            formik.setValues(prev => ({ ...prev, deliveryid: value.deliveryid, shipname: value.shipname, phone: value.phone }))
+                                        }}
+                                        setOption={(option) => option?.deliveryid + ' - ' + option?.shipname}
+                                        valueIsId='deliveryid' />
+                            }
                             <CmsFormikTextField
                                 label="Tên"
                                 name="shipname"
                                 size="small"
                                 className="my-8"
+                                disabled={type === '2' || shipperid}
                                 formik={formik} />
                             <CmsFormikTextField
                                 size="small"
                                 label="Phương tiện"
                                 name="vehicle"
                                 className="my-8"
+                                disabled={type === '2' || shipperid}
                                 formik={formik} />
                         </div>
-                        <div className='w-1/2'>
+                        <div className='w-1/2 pl-8'>
                             <CmsFormikTextField
                                 label="Số điện thoại"
                                 size="small"
                                 name="phone"
+                                disabled={type === '2' || shipperid}
                                 className="my-8"
                                 formik={formik} />
                             <CmsFormikTextField
                                 size="small"
                                 label="Biển số"
                                 name="licenseplate"
+                                disabled={type === '2' || shipperid}
                                 className="my-8"
                                 formik={formik} />
                             <CmsFormikTextField
                                 size="small"
                                 label="Mã"
                                 name="code"
+                                disabled={type === '2' || shipperid}
                                 className="my-8"
                                 formik={formik} />
                             {/* <div className="my-8">
@@ -187,6 +260,13 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                                 }
                             </div> */}
                         </div>
+                        <CmsFormikTextField
+                            label="Ghi chú"
+                            name="note"
+                            className="my-8"
+                            multiline={true}
+                            rows={4}
+                            formik={formik} />
                     </div>
                 </>
                 {/* </BoxCustom> */}
