@@ -54,7 +54,7 @@ const LayoutCustom = styled(Box)({
     }
 });
 
-const DropMenu = ({ crName, data, handleClose, className }) => {
+export const DropMenu = ({ crName, data, handleClose, className }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const classes = useStyles();
     const handleClick = (event) => {
@@ -69,30 +69,38 @@ const DropMenu = ({ crName, data, handleClose, className }) => {
         <div>
             <Button aria-controls="dropdown-menu" className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="contained" aria-haspopup="true" onClick={handleClick}>
                 {crName}
-                <ArrowDropDown />
-            </Button>
-            <Menu
-                id="dropdown-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={() => {
-                    handleClose(null, setAnchorEl)
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                className={classes.menu}
-            >
                 {
-                    data.map((val, index) => {
-                        return <MenuItem key={index} onClick={() => {
-                            handleClose(val, setAnchorEl, 0)
-                        }}>{val.name}</MenuItem>
-                    })
+                    Boolean(data?.length)
+                    &&
+                    <ArrowDropDown />
                 }
-            </Menu>
+            </Button>
+            {
+                Boolean(data?.length)
+                &&
+                <Menu
+                    id="dropdown-menu"
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={() => {
+                        handleClose(null, setAnchorEl)
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    className={classes.menu}
+                >
+                    {
+                        data.map((val, index) => {
+                            return <MenuItem key={index} onClick={() => {
+                                handleClose(val, setAnchorEl, 0)
+                            }}>{val.name}</MenuItem>
+                        })
+                    }
+                </Menu>
+            }
         </div>
     );
 }

@@ -1,22 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { CmsCardedPage, CmsTableBasic, CmsLabel, CmsTab, CmsFormikTextField, CmsFormikAutocomplete } from '@widgets/components';
-import { Box, Button, Chip, Icon, TableCell, TableRow, Typography, styled } from '@material-ui/core';
-import { alertInformation, initColumn } from '@widgets/functions'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { CmsTableBasic, CmsLabel, CmsTab, CmsFormikTextField, CmsFormikAutocomplete } from '@widgets/components';
+import { Box, Button, Icon, TableCell, TableRow, Typography, styled } from '@material-ui/core';
+import { initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer'
 import { useDispatch, useSelector } from 'react-redux'
-import FuseLoading from '@fuse/core/FuseLoading'
-import { unwrapResult } from '@reduxjs/toolkit';
-import { format } from 'date-fns';
 import History from '@history';
-import { GetApp } from '@material-ui/icons';
-import Connect from '@connect';
-import { deliveryLink, keyStore } from '../../common';
-import { getDetail, order } from '../../store/orderSlice';
+import { deliveryLink, keyStore, shipStatus } from '../../common';
+import { order } from '../../store/orderSlice';
 import reducer from '../../store';
 import { getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
 import { useParams } from 'react-router';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { useFormik } from 'formik';
+import { groupBy, map } from 'lodash';
+import clsx from 'clsx';
+import { DropMenu } from '../index';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -130,19 +128,90 @@ const Filter = ({ onSearch, search, namePage }) => {
 }
 
 const ProductTable = ({ entities, loading, setSearch }) => {
+    const listProduct = useMemo(() => {
+        let data = [], table = [];
+        if (entities?.data?.length) {
+            entities.data.forEach(element => {
+                 element.productorder.forEach(e => {
+                    JSON.parse(e.model).forEach(el => {
+                        el?.slots?.length && el.slots.forEach(elm => {
+                            data.push(elm.item);
+                        })
+                    })
+                    table.push({
+                        sku: e.sku,
+                        img: e.image,
+                        name: e.name,
+                        price: 0,
+                        type: 'table'
+                    })
+                })
+            });
+            const groupedData = groupBy(data, 'sku');
+            const groupedTable = groupBy(table, 'sku');
+
+            return [
+                ...map(groupedTable, (products, sku) => ({
+                    ...products[0],
+                    numberPR: products.length,
+                })),
+                ...map(groupedData, (products, sku) => ({
+                    ...products[0],
+                    numberPR: products.length,
+                }))
+            ];
+        }
+
+        return []
+    }, [entities])
+    const totalPr = useMemo(() => {
+        let total = 0, money = 0;
+        if (listProduct?.length)
+            listProduct.forEach(element => {
+                total = total + element.numberPR;
+            });
+        return { total, money }
+    }, [listProduct])
+
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-        new initColumn({ field: "contract", label: `Sản phẩm`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "version", label: `Giá`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "date", label: `Tổng số lượng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "sku", label: "ID", classHeader: "w-128", sortable: false }),
+        new initColumn({ field: "image", label: `Hình ảnh`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "name", label: `Sản phẩm`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "type", label: `Loại`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "price", label: `Giá`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "numberPR", label: `Tổng số lượng`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
     ]
-    const data = entities && entities.data && entities.data.map((item, index) => ({
+    const data = listProduct?.length && listProduct.map((item, index) => ({
+        ...item,
         original: item,
+        image: (<img style={{ height: 100, margin: '0 auto' }} src={`${item.img ? `${process.env.REACT_APP_BASE_URL}api/product/img/${item?.img}` : 'assets/images/etc/no-image-icon.png'}`} alt={item?.img} />),
         STT: (
             <React.Fragment>
                 <CmsLabel content={`${(index + 1)}`} />
             </React.Fragment>
+        ),
+
+        name: (
+            <>
+                <div className={clsx(item.type === 'table' ? 'text-blue-500' : '')}>
+                    {item.name}
+                </div>
+            </>
+        ),
+        type: (
+            <>
+                {
+                    item.type === 'table' ? 'Tủ' : 'Chai'
+                }
+            </>
+        ),
+        price: (
+            <div>
+                {
+                    typeof item?.price === 'number' ? (item.price || 0) : '-'
+                }
+            </div>
         ),
         action: (
             <div className="flex space-x-3 ">
@@ -150,67 +219,6 @@ const ProductTable = ({ entities, loading, setSearch }) => {
             </div>
         ),
     }))
-
-    return <CmsTableBasic
-        className="w-full h-full"
-        isServerSide={true}
-        apiServerSide={params => setSearch(prev => {
-            return { ...prev, ...params }
-        })}
-        isPagination={false}
-        data={data}
-        columns={columns}
-        loading={loading}
-        // moreFooter={
-        //     <TableRow>
-        //         <TableCell
-        //             colSpan={3}
-        //             className="text-center"
-        //             style={{ borderRight: '1px solid #ddd' }}
-        //         >
-        //             <b>
-        //                 TỔNG:
-        //             </b>
-        //         </TableCell>
-        //         <TableCell
-        //             className="text-right"
-        //             style={{ borderRight: '1px solid #ddd' }}
-        //         >
-        //         </TableCell>
-        //         <TableCell
-        //             style={{ borderRight: '1px solid #ddd' }}
-        //         >
-
-        //         </TableCell>
-        //     </TableRow>
-        // }
-    />
-}
-
-const OrderTable = ({ entities, loading, setSearch }) => {
-    const columns = [
-        new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-        new initColumn({ field: "contract", label: `Sản phẩm`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "version", label: `SL`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "date", label: `Giá`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-    ]
-
-    const data = entities && entities.data && entities.data.map((item, index) => ({
-        original: item,
-        STT: (
-            <React.Fragment>
-                <CmsLabel content={`${(index + 1)}`} />
-            </React.Fragment>
-        ),
-        action: (
-            <div className="flex space-x-3 ">
-
-            </div>
-        ),
-    }))
-
     return <CmsTableBasic
         className="w-full h-full"
         isServerSide={true}
@@ -224,27 +232,233 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         moreFooter={
             <TableRow>
                 <TableCell
-                    colSpan={3}
-                    className="text-center"
-                    style={{ borderRight: '1px solid #ddd' }}
+                    colSpan={5}
+                    className="text-center p-8"
+                    style={{
+                        borderRight: '1px solid #ddd',
+                        backgroundColor: '#F2F8F1'
+                    }}
                 >
                     <b>
                         TỔNG:
                     </b>
                 </TableCell>
                 <TableCell
-                    className="text-right"
-                    style={{ borderRight: '1px solid #ddd' }}
+                    className="text-right p-8"
+                    style={{
+                        borderRight: '1px solid #ddd',
+                        backgroundColor: '#F2F8F1'
+                    }}
                 >
+                    {totalPr.money}
                 </TableCell>
                 <TableCell
-                    style={{ borderRight: '1px solid #ddd' }}
+                    className="text-right p-8"
+                    style={{
+                        borderRight: '1px solid #ddd',
+                        backgroundColor: '#F2F8F1'
+                    }}
                 >
+                    {totalPr.total}
+                </TableCell>
+            </TableRow>
+        }
+    />
+}
 
+const OrderTable = ({ entities, loading, setSearch }) => {
+    const listProduct = useMemo(() => {
+        let data = [];
+        if (entities?.data?.length) {
+            entities.data.forEach(element => {
+                element?.productorder?.length && element.productorder.forEach(e => {
+                    data.push({
+                        ...element, dataOfItem: {
+                            sku: e.sku,
+                            img: e.image,
+                            name: e.name,
+                            price: 0,
+                            type: 'table',
+
+                        },
+                        keyRow: 1
+                    });
+
+                    JSON.parse(e?.model).forEach(el => {
+                        el?.slots?.length && el.slots.forEach(elm => {
+                            data.push({ ...element, dataOfItem: elm.item, keyRow: 2 });
+                        })
+                    })
+                })
+            });
+            const groupedData = groupBy(data, 'id');
+            return data.forEach(val => {
+                return { ...val, numberPR: groupedData[val.id]?.length }
+            })
+        }
+
+        return []
+    }, [entities])
+
+    const listProductTemp = useMemo(() => {
+        let data = [], table = [];
+        if (entities?.data?.length) {
+            entities.data.forEach(element => {
+                element?.productorder?.length && element.productorder.forEach(e => {
+                    JSON.parse(e?.model).forEach(el => {
+                        el?.slots?.length && el.slots.forEach(elm => {
+                            data.push(elm.item);
+                        })
+                    })
+                    table.push({
+                        sku: e.sku,
+                        img: e.image,
+                        name: e.name,
+                        price: 0,
+                        type: 'table'
+                    })
+                })
+            });
+            const groupedData = groupBy(data, 'sku');
+            const groupedTable = groupBy(table, 'sku');
+
+            return [
+                ...map(groupedTable, (products, sku) => ({
+                    ...products[0],
+                    numberPR: products.length,
+                })),
+                ...map(groupedData, (products, sku) => ({
+                    ...products[0],
+                    numberPR: products.length,
+                }))
+            ];
+        }
+
+        return []
+    }, [entities])
+    const totalPr = useMemo(() => {
+        let total = 0, money = 0;
+        if (listProductTemp?.length)
+            listProductTemp.forEach(element => {
+                total = total + element.numberPR;
+            });
+        return { total, money }
+    }, [listProductTemp])
+
+    const columns = [
+        // new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
+        new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
+        new initColumn({ field: "image", label: `Hình ảnh`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "name", label: `Sản phẩm`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "type", label: `Loại`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "sl", label: `SL`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "price", label: `Giá`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+    ]
+    console.log(listProduct);
+    const data = listProduct.length && listProduct.map((item, index) => ({
+        original: item,
+        id: item.id,
+        rowSpan: {
+            id: item?.numberPR || 1,
+            status: item?.numberPR || 1,
+            STT: item?.numberPR || 1,
+        },
+        keyRow: item.keyRow,
+        image: (<img style={{ height: 100, margin: '0 auto' }} src={`${item.dataOfItem.img ? `${process.env.REACT_APP_BASE_URL}api/product/img/${item.dataOfItem?.img}` : 'assets/images/etc/no-image-icon.png'}`} alt={item.dataOfItem?.img} />),
+        name: (<>
+            {
+                item.dataOfItem.type === 'table'
+                    ? <b className='text-blue-500'>{item.dataOfItem.name}</b>
+                    : <CmsLabel content={`--- ${(item.dataOfItem.name)}`} />
+            }
+        </>),
+        sl: (1),
+        type: (<>
+            {
+                item.dataOfItem.type === 'table'
+                    ? 'Tủ'
+                    : 'Chai'
+            }
+        </>),
+        STT: (
+            <React.Fragment>
+                <CmsLabel content={`${(index + 1)}`} />
+            </React.Fragment>
+        ),
+
+        status: <div>
+            <DropMenu
+                crName={shipStatus[item.shipping.status].name}
+                className={clsx('text-white px-4 py-2  text-12'
+                    , `hover:${shipStatus[item.shipping.status].className}`
+                    , shipStatus[item.shipping.status].className
+                )}
+                data={[]}
+
+                handleClose={(value, setAnchorEl) => {
+                    setAnchorEl(null)
+                }} />
+            {/* <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} /> */}
+        </div>,
+        action: (
+            <div className="flex space-x-3 ">
+
+            </div>
+        ),
+    }))
+
+    return <CmsTableBasic
+        className="w-full h-full"
+        isServerSide={true}
+        apiServerSide={params => setSearch(prev => {
+            return { ...prev, ...params }
+        })}
+        isPagination={false}
+        data={data}
+        columns={columns}
+        loading={loading}
+        isClearHoverBg
+        removeSelect
+        moreFooter={
+            <TableRow>
+                <TableCell
+                    colSpan={4}
+                    className="text-center p-8"
+                    style={{
+                        borderRight: '1px solid #ddd',
+                        backgroundColor: '#F2F8F1'
+                    }}
+                >
+                    <b>
+                        TỔNG:
+                    </b>
+                </TableCell>
+                <TableCell
+                    className="text-right p-8"
+                    style={{
+                        borderRight: '1px solid #ddd',
+                        backgroundColor: '#F2F8F1'
+                    }}
+                >
+                    {totalPr.total}
+                </TableCell>
+                <TableCell
+                    style={{
+                        borderRight: '1px solid #ddd',
+                        backgroundColor: '#F2F8F1'
+                    }}
+                    className='p-8 text-right'
+                >
+                    {totalPr.money}
                 </TableCell>
 
                 <TableCell
-                    style={{ borderRight: '1px solid #ddd' }}
+                    style={{
+                        borderRight: '1px solid #ddd',
+                        backgroundColor: '#F2F8F1'
+                    }}
+                    className='p-8'
                 >
 
                 </TableCell>
@@ -256,15 +470,8 @@ const OrderTable = ({ entities, loading, setSearch }) => {
 function DetailBBBG() {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].contractLoading);
-    const partners = useSelector(store => store[keyStore].partners?.data);
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
-    const typeInv = useSelector(store => store[keyStore].typeInv);
-    const units = useSelector(store => store[keyStore].units);
-    const platforms = useSelector(store => store[keyStore].platforms);
-    const selected = useSelector(store => store[keyStore].selected);
     const [search, setSearch] = useState(initialValues);
-    const [openDialog, setOpenDialog] = useState('');
-    const [detail, setDetail] = useState(null);
     const params = useParams(), id = params.id, type = params.type;
 
     useEffect(() => {
@@ -284,106 +491,6 @@ function DetailBBBG() {
         let search = JSON.parse(searchString);
         getListTable(search);
     }, [searchString, getListTable, dispatch])
-
-    useEffect(() => {
-        if (openDialog === '')
-            setDetail(null);
-    }, [openDialog])
-
-    const handleUpdate = (item) => {
-        let value = { ...item };
-        setDetail(value);
-        setOpenDialog('partner');
-    }
-
-    const handleUpdateV = (item) => {
-        let value = { ...item };
-        setDetail({ ...value, version: "" });
-        setOpenDialog('newVersion');
-    }
-
-    const handleUpdateA = (item) => {
-        let value = { ...item };
-        setDetail(value);
-        setOpenDialog('addendum');
-    }
-
-    const selectedFile = async (filePath) => {
-        const file = await Connect.live.upload.getFileS3({ documentName: filePath });
-        const url = window.URL.createObjectURL(new Blob([file.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', file.config.params.documentName.split('/').pop()); //or any other extension
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    }
-
-
-
-    const handleCloseDialog = () => {
-        setOpenDialog('');
-    }
-
-    const handleSubmit = async (values, form) => {
-        alertInformation({
-            text: `Xác nhận thao tác`,
-            data: { values, form },
-            confirm: async () => {
-                try {
-                    const resultAction = values?.id
-                        ? await dispatch(order.contract.update([values]))
-                        : await dispatch(order.contract.create([values]));
-                    unwrapResult(resultAction);
-                    if (!values?.id) {
-                        form.resetForm();
-                    }
-                    setOpenDialog('');
-                    getListTable(search);
-                } catch (error) {
-                } finally {
-                    form.setSubmitting(false)
-                }
-            },
-            close: () => form.setSubmitting(false)
-        });
-    }
-
-    const handleSubmitAddendum = async (values, form) => {
-        alertInformation({
-            text: `Xác nhận thao tác`,
-            data: { values, form },
-            confirm: async () => {
-                try {
-                    const resultAction = await dispatch(order.subContract.create(values))
-                    unwrapResult(resultAction);
-                    if (!values?.id) {
-                        form.resetForm();
-                    }
-                    setOpenDialog('');
-                } catch (error) {
-                } finally {
-                    form.setSubmitting(false)
-                }
-            },
-            close: () => form.setSubmitting(false)
-        });
-    }
-    // const clearSearchValue = (value) => setSearch(prev => {
-    //     const values = { ...value };
-    //     const search = { ...prev };
-    //     for (const key in values) {
-    //         if (!values[key] && typeof values[key] !== 'number') {
-    //             delete search[key];
-    //             delete values[key];
-    //         }
-    //     }
-    //     return { ...search, ...values, page: 1 };
-    // })
-
-    // if (!data) {
-    //     return <FuseLoading />
-    // }
 
     return (
         <LayoutCustom>
@@ -415,7 +522,7 @@ function DetailBBBG() {
                                 <b className='mr-4'>
                                     Tên người vận chuyển:
                                 </b>
-                                Trương Công Mạnh
+                                {entities?.data?.length && entities.data[0]?.shipping?.shipname}
                             </div>
 
                         </div>
@@ -424,7 +531,7 @@ function DetailBBBG() {
                                 <b className='mr-4'>
                                     Số đơn:
                                 </b>
-                                1
+                                {entities?.data?.length}
                             </div>
                             <div>
                                 <b className='mr-4'>

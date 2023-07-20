@@ -2,44 +2,11 @@ import React, { useEffect } from 'react';
 import { CmsDialog, CmsFormikAutocomplete, CmsFormikTextField } from '@widgets/components';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Box, FormControlLabel, InputLabel, Radio, RadioGroup, makeStyles, styled } from '@material-ui/core';
+import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { order } from '../../store/orderSlice';
 import { keyStore } from '../../common';
-
-const BoxCustom = styled(Box)({
-    border: '1px solid rgba(0, 0, 0, 0.12)',
-    margin: '24px 0 16px 0',
-    padding: '0 12px 0 12px',
-    position: 'relative',
-    borderRadius: '2px',
-    transition: 'none',
-    "& .custom-label": {
-        top: '-13px',
-        left: '8px',
-        padding: '0 4px',
-        position: 'absolute',
-        backgroundColor: 'white',
-        color: '#1B9E85',
-        fontSize: '1.4rem',
-        fontFamily: 'Roboto',
-        fontWeight: 400,
-        lineHeight: 1.5,
-        margin: 0
-    },
-    "&.black-label>.custom-label": {
-        color: 'black',
-        fontSize: '1.5rem',
-    },
-    "& .hide-border": {
-        border: 'none',
-        marginTop: 0
-    },
-    "& .hide-label>label": {
-        display: "none"
-    }
-});
 
 const initialValues = {
     id: 0,
@@ -100,7 +67,7 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
 
     useEffect(() => {
         dispatch(order.other.getDelivery());
-    }, [])
+    }, [dispatch])
 
     const { setValues, values } = formik, { orders, shipperid } = values;
 

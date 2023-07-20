@@ -31,7 +31,7 @@ const useStyles = makeStyles({
 });
 
 function RowContentBasic(props) {
-    const { index, isMultiSelect, item, handleSelectRow, isSelected, cols, isCollapsible, name, isSelectOnClickRow, handleSetColorRow, isClearHoverBg } = props
+    const { index, isMultiSelect, item, handleSelectRow, isSelected, cols, isCollapsible, name, isSelectOnClickRow, handleSetColorRow, isClearHoverBg, removeSelect } = props
     const [openCollapse, setOpenCollapse] = useState(false)
     const classes = useStyles();
 
@@ -45,10 +45,8 @@ function RowContentBasic(props) {
                 hover
                 role="checkbox"
                 tabIndex={-1}
-                // selected={isMultiSelect ? (selectedList && item.original && selectedList.map(ob => ob.id).includes(item.id)) : (selected && item.original && selected.id === item.original.id)}
                 selected={isSelected(item)}
-                onClick={(!isSelectOnClickRow && isMultiSelect) ? handleSetColorRow(item, `${index}_row_table${name}`, index) : handleSelectRow(item, `${index}_row_table${name}`, index)}
-                // onMouseOver={() => setHover(item.id)}
+                onClick={!removeSelect ? (!isSelectOnClickRow && isMultiSelect) ? handleSetColorRow(item, `${index}_row_table${name}`, index) : handleSelectRow(item, `${index}_row_table${name}`, index) : null}
                 onMouseEnter={(e) => handleRowHover(e, item, index, name)}
                 onMouseLeave={(e) => handleRowHoverLeave(e, item, index, name)}
             >

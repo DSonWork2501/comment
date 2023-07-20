@@ -367,7 +367,6 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
         const data = new FormData();
         data.append('enpoint', 'tempfile');
         const dataValueF = JSON.parse(dataValueString)
-        console.log(dataValue);
         handleReadFile(fileL, async (file) => {
             try {
                 const fileName = 'fileTemp.docx';

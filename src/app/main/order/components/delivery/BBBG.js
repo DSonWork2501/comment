@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { CmsCardedPage, CmsTableBasic, CmsLabel, CmsTab, CmsFormikTextField, CmsFormikDateTimePicker } from '@widgets/components';
-import { Box, Button, Chip, Icon, TableCell, TableRow, Typography, styled } from '@material-ui/core';
-import { alertInformation, initColumn } from '@widgets/functions'
+import {
+    CmsCardedPage,
+    CmsTableBasic,
+    CmsLabel,
+    CmsFormikTextField,
+    CmsFormikDateTimePicker,
+} from '@widgets/components';
+import { Box, Button, Icon, styled } from '@material-ui/core';
+import { initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer'
 import { useDispatch, useSelector } from 'react-redux'
-import FuseLoading from '@fuse/core/FuseLoading'
-import { unwrapResult } from '@reduxjs/toolkit';
-import { format } from 'date-fns';
-import History from '@history';
-import { GetApp } from '@material-ui/icons';
-import Connect from '@connect';
-import { deliveryLink, keyStore } from '../../common';
-import { getDetail, order } from '../../store/orderSlice';
+import { keyStore } from '../../common';
+import { order } from '../../store/orderSlice';
 import reducer from '../../store';
 import { getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
-import { useParams } from 'react-router';
-import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { useFormik } from 'formik';
 
 const LayoutCustom = styled(Box)({
@@ -125,29 +123,45 @@ const Filter = ({ onSearch, search, namePage }) => {
 function DetailBBBG() {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].contractLoading);
-    const partners = useSelector(store => store[keyStore].partners?.data);
     const entities = useSelector(store => store[keyStore].order.deliveryList);
-    const typeInv = useSelector(store => store[keyStore].typeInv);
-    const units = useSelector(store => store[keyStore].units);
-    const platforms = useSelector(store => store[keyStore].platforms);
-    const selected = useSelector(store => store[keyStore].selected);
     const [search, setSearch] = useState(initialValues);
-    const [openDialog, setOpenDialog] = useState('');
-    const [detail, setDetail] = useState(null);
-    const params = useParams(), id = params.id, type = params.type;
 
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
         new initColumn({ field: "deliveryid", label: "ID", classHeader: "w-128", sortable: false }),
         new initColumn({ field: "customer", label: `Người giao hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "numberOrder", label: `Tổng đơn`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "numberOrder", label: `Tổng đơn`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "cho_lay_hang", label: `Chờ lấy`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "da_lay_hang", label: `Đã lấy`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "dang_giao_hang", label: `Đang giao`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "hoan_tat", label: `Hoàn thành`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "note", label: `Ghi chú`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "date", label: `Người tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        //new initColumn({ field: "date", label: `Người tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
     const data = entities && entities.data && entities.data.map((item, index) => ({
         ...item,
         original: item,
+        cho_lay_hang: (
+            <div>
+                {item.cho_lay_hang || 0}
+            </div>
+        ),
+        da_lay_hang: (
+            <div>
+                {item.da_lay_hang || 0}
+            </div>
+        ),
+        dang_giao_hang: (
+            <div>
+                {item.dang_giao_hang || 0}
+            </div>
+        ),
+        hoan_tat: (
+            <div>
+                {item.hoan_tat || 0}
+            </div>
+        ),
         deliveryid: (
             <a href={`/order/delivery/1/${item.deliveryid}`}>
                 {item.deliveryid}
@@ -192,106 +206,6 @@ function DetailBBBG() {
         let search = JSON.parse(searchString);
         getListTable(search);
     }, [searchString, getListTable, dispatch])
-
-    useEffect(() => {
-        if (openDialog === '')
-            setDetail(null);
-    }, [openDialog])
-
-    const handleUpdate = (item) => {
-        let value = { ...item };
-        setDetail(value);
-        setOpenDialog('partner');
-    }
-
-    const handleUpdateV = (item) => {
-        let value = { ...item };
-        setDetail({ ...value, version: "" });
-        setOpenDialog('newVersion');
-    }
-
-    const handleUpdateA = (item) => {
-        let value = { ...item };
-        setDetail(value);
-        setOpenDialog('addendum');
-    }
-
-    const selectedFile = async (filePath) => {
-        const file = await Connect.live.upload.getFileS3({ documentName: filePath });
-        const url = window.URL.createObjectURL(new Blob([file.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', file.config.params.documentName.split('/').pop()); //or any other extension
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    }
-
-
-
-    const handleCloseDialog = () => {
-        setOpenDialog('');
-    }
-
-    const handleSubmit = async (values, form) => {
-        alertInformation({
-            text: `Xác nhận thao tác`,
-            data: { values, form },
-            confirm: async () => {
-                try {
-                    const resultAction = values?.id
-                        ? await dispatch(order.contract.update([values]))
-                        : await dispatch(order.contract.create([values]));
-                    unwrapResult(resultAction);
-                    if (!values?.id) {
-                        form.resetForm();
-                    }
-                    setOpenDialog('');
-                    getListTable(search);
-                } catch (error) {
-                } finally {
-                    form.setSubmitting(false)
-                }
-            },
-            close: () => form.setSubmitting(false)
-        });
-    }
-
-    const handleSubmitAddendum = async (values, form) => {
-        alertInformation({
-            text: `Xác nhận thao tác`,
-            data: { values, form },
-            confirm: async () => {
-                try {
-                    const resultAction = await dispatch(order.subContract.create(values))
-                    unwrapResult(resultAction);
-                    if (!values?.id) {
-                        form.resetForm();
-                    }
-                    setOpenDialog('');
-                } catch (error) {
-                } finally {
-                    form.setSubmitting(false)
-                }
-            },
-            close: () => form.setSubmitting(false)
-        });
-    }
-    // const clearSearchValue = (value) => setSearch(prev => {
-    //     const values = { ...value };
-    //     const search = { ...prev };
-    //     for (const key in values) {
-    //         if (!values[key] && typeof values[key] !== 'number') {
-    //             delete search[key];
-    //             delete values[key];
-    //         }
-    //     }
-    //     return { ...search, ...values, page: 1 };
-    // })
-
-    // if (!data) {
-    //     return <FuseLoading />
-    // }
 
     return (
         <LayoutCustom>

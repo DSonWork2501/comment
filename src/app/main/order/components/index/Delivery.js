@@ -89,7 +89,6 @@ function FormEdit() {
     const dispatch = useDispatch();
     const [current, setCurrent] = useState(null);
     const [openDialog, setOpenDialog] = useState('');
-    const [iframeKey, setIframeKey] = useState(0);
     const orders = useSelector(store => store[keyStore].order.entities?.data) || [];
     const orderDetail = useSelector(store => store[keyStore].order.entity);
     const storeOrders = useSelector(store => store[keyStore].order.storeOrders);
@@ -770,7 +769,7 @@ function FormEdit() {
                                                             size="small" />
                                                     </div>
                                                 </div>
-                                                <Frame iframeKey={iframeKey} fileName={orderDetail?.contract?.file} arrayForm={arrayForm} signature={orderDetail?.contract?.signature} />
+                                                <Frame  fileName={orderDetail?.contract?.file} arrayForm={arrayForm} signature={orderDetail?.contract?.signature} />
                                             </BoxCustom>
                                         }
                                     </>

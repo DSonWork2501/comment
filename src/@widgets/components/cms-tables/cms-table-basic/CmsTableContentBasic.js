@@ -67,7 +67,8 @@ function TableContentBasic(props) {
 		upperHead,
 		isClearHoverBg,
 		showBorder,
-		moreFooter
+		moreFooter,
+		removeSelect
 	} = props;
 	const [hover, setHover] = useState(null)
 	const [page, setPage] = useState(panigationDefault?.page || 0);
@@ -103,7 +104,7 @@ function TableContentBasic(props) {
 			}
 		} else {
 			setTotalRecord(data.length)
-			if (data.length / limit  < page) {
+			if (data.length / limit < page) {
 				setPage(0)
 				setTotalPage(Math.ceil(data.length / limit))
 			}
@@ -254,6 +255,7 @@ function TableContentBasic(props) {
 					handleSetColorRow={handleSetColorRow}
 					isClearHoverBg={isClearHoverBg}
 					showBorder={showBorder}
+					removeSelect={removeSelect}
 				/>
 			)))
 	}
@@ -286,7 +288,7 @@ function TableContentBasic(props) {
 				/>
 				{data.length > 0 && <TableBody>{genTableCell()}</TableBody>}
 				{footerData && <TableFooter>{genTableFooterCell()}</TableFooter>}
-				{moreFooter && moreFooter}
+				{moreFooter && <TableBody>{moreFooter}</TableBody>}
 			</Table>
 			{data.length === 0 && isShowDataNullAlert && <div className="w-full grid justify-items-center mt-10"><Typography className="text-18" color="secondary">Không tìm thấy dữ liệu</Typography></div>}
 		</>
