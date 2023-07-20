@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { CmsTableBasic, CmsLabel, CmsTab, CmsFormikTextField, CmsFormikAutocomplete } from '@widgets/components';
+import { CmsTableBasic, CmsLabel, CmsTab, CmsFormikTextField, CmsFormikAutocomplete, CmsButton } from '@widgets/components';
 import { Box, Button, Icon, TableCell, TableRow, Typography, styled } from '@material-ui/core';
 import { initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer'
@@ -8,13 +8,14 @@ import History from '@history';
 import { deliveryLink, keyStore, shipStatus } from '../../common';
 import { order } from '../../store/orderSlice';
 import reducer from '../../store';
-import { getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
 import { useParams } from 'react-router';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { useFormik } from 'formik';
 import { groupBy, map } from 'lodash';
 import clsx from 'clsx';
 import { DropMenu } from '../index';
+import { Link } from 'react-router-dom'
+import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -29,7 +30,9 @@ const LayoutCustom = styled(Box)({
 
 const initialValues = {
     page: 1,
-    limit: 10
+    limit: 10,
+    orderID: '',
+    status: null
 };
 
 const Filter = ({ onSearch, search, namePage }) => {
@@ -45,9 +48,6 @@ const Filter = ({ onSearch, search, namePage }) => {
             for (const key in initialValues) {
                 if (search[key] !== initialValues[key]) {
                     let value = search[key];
-                    if (key === 'status') {
-                        value = JSON.stringify(search[key])
-                    }
                     setFieldValue(key, value);
                 }
             }
@@ -64,34 +64,34 @@ const Filter = ({ onSearch, search, namePage }) => {
     return <form onSubmit={formik.handleSubmit} className="flex items-center justify-items-start  space-x-8 px-8" >
         <CmsFormikTextField
             label={`ID đơn hàng`}
-            name="name"
+            name="orderID"
             className="my-8"
             size="small"
             clearBlur
             formik={formik} />
-        <CmsFormikTextField
+        {/* <CmsFormikTextField
             label={`Sản phẩm`}
             name="name"
             className="my-8"
             size="small"
             clearBlur
-            formik={formik} />
+            formik={formik} /> */}
         <CmsFormikAutocomplete
             className="my-8 inline-flex"
-            name="partnerID"
+            name="status"
             formik={formik}
             label="Trạng thái"
-            data={[]}
+            data={Object.values(shipStatus)}
             size="small"
             autocompleteProps={{
-                getOptionLabel: (option) => option?.partnerShortName || '',
+                getOptionLabel: (option) => option?.name || '',
                 ChipProps: {
                     size: 'small'
                 },
                 size: 'small',
             }}
-            setOption={(option) => option?.partnerShortName || ''}
-            valueIsId />
+            setOption={(option) => option?.name || ''}
+            valueIsId='status' />
         <Button
             style={{
                 background: '#FF6231',
@@ -132,7 +132,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         let data = [], table = [];
         if (entities?.data?.length) {
             entities.data.forEach(element => {
-                 element.productorder.forEach(e => {
+                element.productorder.forEach(e => {
                     JSON.parse(e.model).forEach(el => {
                         el?.slots?.length && el.slots.forEach(elm => {
                             data.push(elm.item);
@@ -355,7 +355,6 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         new initColumn({ field: "price", label: `Giá`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
-    console.log(listProduct);
     const data = listProduct.length && listProduct.map((item, index) => ({
         original: item,
         id: item.id,
@@ -469,45 +468,50 @@ const OrderTable = ({ entities, loading, setSearch }) => {
 
 function DetailBBBG() {
     const dispatch = useDispatch();
-    const loading = useSelector(store => store[keyStore].contractLoading);
+    const loading = useSelector(store => store[keyStore].order.loading);
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
     const [search, setSearch] = useState(initialValues);
     const params = useParams(), id = params.id, type = params.type;
-
-    useEffect(() => {
-        // dispatch(order.partner.getList());
-        // dispatch(order.other.getUnit());
-        // dispatch(order.other.getTypeInv());
-        // dispatch(order.other.platform());
-        dispatch(getWine({ cusId: 20, parentId: 58, cms: 1 }))
-    }, [dispatch])
 
     const getListTable = useCallback((search) => {
         dispatch(order.other.getDetailDelivery({ ...search, id }));
     }, [dispatch, id])
 
-    const searchString = JSON.stringify(search);
     useEffect(() => {
-        let search = JSON.parse(searchString);
         getListTable(search);
-    }, [searchString, getListTable, dispatch])
+    }, [search, getListTable, dispatch])
+
+    console.log(loading);
+
+    if (loading) {
+        return <FuseLoading />
+    }
 
     return (
         <LayoutCustom>
             <div className='w-full  h-full' style={{ padding: '0 3.2rem' }}>
-                <div className="w-full flex items-start py-8">
-                    <FuseAnimate animation="transition.expandIn" delay={300}>
-                        <Icon className="text-32">whatshot</Icon>
-                    </FuseAnimate>
-                    <div className="flex flex-col w-full">
-                        <FuseAnimate animation="transition.slideLeftIn" delay={300}>
-                            <React.Fragment>
-                                <Typography className="hidden sm:flex mx-0 sm:mx-12" variant="h6">
-                                    Chi tiết biên bản bàn giao
-                                </Typography>
-                            </React.Fragment>
+                <div className="w-full flex justify-between items-start py-8">
+                    <div className='flex'>
+                        <FuseAnimate animation="transition.expandIn" delay={300}>
+                            <Icon className="text-32">whatshot</Icon>
                         </FuseAnimate>
+                        <div className="flex flex-col w-full">
+                            <FuseAnimate animation="transition.slideLeftIn" delay={300}>
+                                <React.Fragment>
+                                    <Typography className="hidden sm:flex mx-0 sm:mx-12" variant="h6">
+                                        Chi tiết biên bản bàn giao
+                                    </Typography>
+                                </React.Fragment>
+                            </FuseAnimate>
+                        </div>
                     </div>
+                    <CmsButton label={`Trở về`}
+                        variant="text"
+                        color="default"
+                        component={Link}
+                        to={'/order/delivery'}
+                        className="mx-2"
+                        startIcon="arrow_back" />
                 </div>
                 <div className='p-8 '>
                     <div className='p-8 rounded-4 shadow-4 flex bg-white'>
@@ -547,7 +551,7 @@ function DetailBBBG() {
                         <CmsTab data={deliveryLink(id)} value={0} isLink={true} onChange={(e, value) => {
                             History.push(deliveryLink(id).find(e => e.id === value)?.link)
                         }} />
-                        <div className='w-4/6 py-8'>
+                        <div className='w-3/6 py-8'>
                             <Filter
                                 onSearch={setSearch}
                                 search={search}

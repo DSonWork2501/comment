@@ -33,21 +33,25 @@ export const btnStatus = [
 
 export const shipStatus = {
     1: {
+        id: 1,
         status: 1,
         name: 'Chờ lấy hàng',
         className: 'bg-orange-500'
     },
     2: {
+        id: 2,
         status: 2,
         name: 'Đã lấy hàng',
         className: 'bg-blue-500'
     },
     3: {
+        id: 3,
         status: 3,
         name: 'Đang giao',
         className: 'bg-green-500'
     },
     5: {
+        id: 5,
         status: 5,
         name: 'Hoàn thành',
         className: 'bg-green-900'
