@@ -292,7 +292,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                 })
             });
             const groupedData = groupBy(data, 'id');
-            return data.forEach(val => {
+            return data.map(val => {
                 return { ...val, numberPR: groupedData[val.id]?.length }
             })
         }

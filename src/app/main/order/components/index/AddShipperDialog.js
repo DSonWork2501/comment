@@ -227,13 +227,13 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                                 }
                             </div> */}
                         </div>
-                        <CmsFormikTextField
+                        {/* <CmsFormikTextField
                             label="Ghi chú"
                             name="note"
                             className="my-8"
                             multiline={true}
                             rows={4}
-                            formik={formik} />
+                            formik={formik} /> */}
                     </div>
                 </>
                 {/* </BoxCustom> */}

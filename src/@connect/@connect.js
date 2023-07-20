@@ -92,7 +92,7 @@ export default {
                 updateNote: entity => axios.put(`${baseurl}/order/update-order-des`, entity),
             },
             shipper: {
-                insert: entity => axios.post(`${baseurl}/order/shipping-insert`, entity),
+                insert: entity => axios.post(`${baseurl}/order/shipping-insert${entity[0]?.deliveryid ? '?exist=1' : ''}`, entity),
             }
         },
         location: {
