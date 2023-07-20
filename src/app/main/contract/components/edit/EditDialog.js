@@ -70,9 +70,8 @@ function getFileExtension(filename) {
     return parts[parts.length - 1];
 }
 
-export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
+export const Frame = React.memo(({ iframeKey, fileName, arrayForm, signature }) => {
     const [showFile, setShowFile] = useState(0);
-
     const handleReadFile = useCallback(async (file, handleFile, mapFile) => {
         try {
             const content = await file.arrayBuffer();
@@ -84,17 +83,83 @@ export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
             const regex = /\[(?:(?!\[).)*?{(.*?)\}.*?]/g;
             const matches = documentXml.match(regex);
 
+            let updatedXml = documentXml, imageUrl = '';
 
-            let updatedXml = documentXml;
             matches.forEach(element => {
                 updatedXml = updatedXml.replaceAll(element, element.replace(/<\/?[^>]+>/g, ''));
             });
 
             mapFile?.length && mapFile.forEach(element => {
-                console.log(element);
                 if (element.content)
                     updatedXml = updatedXml.replaceAll(element.keyWord, element.content);
             });
+
+            /////
+            if (signature) {
+                imageUrl = `data:image/png;base64, ${signature}`;
+                const relationshipId = `rId${Math.floor(Math.random() * 100000)}`;
+
+                const imageFileData = await fetch(imageUrl);
+                const imageBinaryData = await imageFileData.arrayBuffer();
+                const imageReference = `word/media/image${relationshipId}.jpg`;
+                const imageReference2 = `media/image${relationshipId}.jpg`;
+
+                zip.file(imageReference, imageBinaryData);
+
+                const getKeySig = updatedXml.match(/<w:t[^>]*>\s*\[{userNameApprove}]\s*<\/w:t>/);
+                updatedXml = updatedXml.replace(getKeySig[0], `<w:drawing>` +
+                    `<wp:inline distB="114300" distT="114300" distL="114300" distR="114300">` +
+                    `<wp:extent cx="1243013" cy="1243013"/>` +
+                    `<wp:effectExtent b="0" l="0" r="0" t="0" />` +
+                    `<wp:docPr id="2" name="image1.jpg" />` +
+                    `<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">` +
+                    `<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
+                    `<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
+                    `<pic:nvPicPr>` +
+                    `<pic:cNvPr id="0" name="image1.jpg" />` +
+                    `<pic:cNvPicPr preferRelativeResize="0" />` +
+                    `</pic:nvPicPr>` +
+                    `<pic:blipFill>` +
+                    `<a:blip r:embed="${relationshipId}" />` +
+                    `<a:srcRect b="0" l="0" r="0" t="0" />` +
+                    `<a:stretch>` +
+                    `<a:fillRect />` +
+                    `</a:stretch>` +
+                    `</pic:blipFill>` +
+                    `<pic:spPr>` +
+                    `<a:xfrm>` +
+                    `<a:off x="0" y="0" />` +
+                    `<a:ext cx="1243013" cy="1243013" />` +
+                    `</a:xfrm>` +
+                    `<a:prstGeom prst="rect" />` +
+                    `<a:ln />` +
+                    `</pic:spPr>` +
+                    `</pic:pic>` +
+                    `</a:graphicData>` +
+                    `</a:graphic>` +
+                    `</wp:inline>` +
+                    `</w:drawing>`);
+
+
+                const relationshipsFilePath = 'word/_rels/document.xml.rels';
+                const relationshipsXml = zip.file(relationshipsFilePath)
+                    ? await zip.file(relationshipsFilePath).async('string')
+                    : `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`;
+
+                const relationships = new DOMParser().parseFromString(relationshipsXml, 'application/xml');
+                const relationshipElement = relationships.createElementNS(
+                    'http://schemas.openxmlformats.org/package/2006/relationships',
+                    'Relationship'
+                );
+                relationshipElement.setAttribute('Id', relationshipId);
+                relationshipElement.setAttribute('Type', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image');
+                relationshipElement.setAttribute('Target', imageReference2);
+                relationships.documentElement.appendChild(relationshipElement);
+
+                const updatedRelationshipsXml = new XMLSerializer().serializeToString(relationships);
+                zip.file(relationshipsFilePath, updatedRelationshipsXml);
+            }
+            /////
 
             zip.file('word/document.xml', updatedXml);
 
@@ -105,14 +170,18 @@ export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
         } catch (error) {
 
         }
-    }, [])
+    }, [signature])
 
+    const arrayFormString = JSON.stringify(arrayForm);
     const handleFileRefresh = useCallback((fileL) => {
         const data = new FormData();
+        const arrayF = JSON.parse(arrayFormString);
 
         data.append('enpoint', 'tempfile');
         handleReadFile(fileL, async (file) => {
             try {
+                console.log(arrayFormString);
+
                 const fileName = 'fileTemp.docx';
                 const fileWithMetadata = new Blob([file], { type: file.type });
                 fileWithMetadata.name = fileName;
@@ -122,8 +191,8 @@ export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
             } catch (error) { console.log(error); }
             finally {
             }
-        }, arrayForm);
-    }, [arrayForm, handleReadFile])
+        }, arrayF);
+    }, [arrayFormString, handleReadFile])
 
     useEffect(() => {
         if (!fileName)
@@ -137,7 +206,7 @@ export const Frame = React.memo(({ iframeKey, fileName, arrayForm }) => {
                     handleFileRefresh(fileL)
                 })
         }
-    }, [fileName, arrayForm, handleFileRefresh])
+    }, [fileName, handleFileRefresh])
 
     return showFile ? <iframe
         title="IFrame"
@@ -153,13 +222,13 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
     const [fileSelect, setFileSelect] = useState(null);
     const [linkHd, setLinkHd] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [dataValue, setDataValue] = useState(item?.content ? (() => { try { return JSON.parse(item?.content) } catch { return [] } })() : []);
 
     const handleSaveData = async (value) => {
         const data = [{ ...value, content: JSON.stringify(value.arrayForm) }]
         handleSave(data, formik);
         //dispatch(editContract(data))
     }
-
     const formik = useFormik({
         initialValues: initData({ ...item, arrayForm: item?.content ? (() => { try { return JSON.parse(item?.content) } catch { return [] } })() : [] }),
         keepDirtyOnReinitialize: true,
@@ -173,15 +242,13 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
 
     const { setErrors, errors, touched, setFieldTouched, setFieldValue, values } = formik, { arrayForm } = values;
 
-
-
     const handleReadFile = useCallback(async (file, handleFile, mapFile) => {
         try {
             const content = await file.arrayBuffer();
             let imageUrl = "";
 
 
-            const zip = await JSZip.loadAsync(content);
+            let zip = await JSZip.loadAsync(content);
 
             const documentXml = await zip.file('word/document.xml').async('string');
 
@@ -195,7 +262,6 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
             });
 
             mapFile?.length && mapFile.forEach(element => {
-                console.log(element);
                 if (element.content)
                     updatedXml = updatedXml.replaceAll(element.keyWord, element.content);
             });
@@ -291,14 +357,16 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
         const file = fileSelect;
         if (file) {
             setLoading(true)
-            handleFileRefresh(file)
+            setDataValue(arrayForm)
+            //handleFileRefresh(file)
         }
     }
 
+    const dataValueString = JSON.stringify(dataValue);
     const handleFileRefresh = useCallback((fileL) => {
         const data = new FormData();
-
         data.append('enpoint', 'tempfile');
+        const dataValueF = JSON.parse(dataValueString)
         handleReadFile(fileL, async (file) => {
             try {
                 const fileName = 'fileTemp.docx';
@@ -312,8 +380,8 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
             } catch (error) { console.log(error); }
             finally {
             }
-        }, arrayForm);
-    }, [handleReadFile, arrayForm])
+        }, dataValueF);
+    }, [handleReadFile, dataValueString])
 
     async function upLoadFile(file, { setLoading, resetFile, form }) {
         if (file?.length) {
@@ -365,18 +433,20 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
         }
     }
 
+    const { file } = item;
     useEffect(() => {
-        if (item?.file) {
-            const link = baseurl + `/common/files/${item?.file}?subfolder=contract`;
+        if (file) {
+            const link = baseurl + `/common/files/${file}?subfolder=contract`;
 
             fetch(link).then(response => response.blob())
                 .then(async fileL => {
                     setFileSelect(fileL)
+                    //setDataValue(JSON.parse(item.content))
                     handleFileRefresh(fileL)
                     setLoading(true)
                 })
         }
-    }, [item, handleFileRefresh])
+    }, [file, handleFileRefresh])
 
     const selectedFile = async (filePath) => {
         // const file = await Connect.live.upload.getFileS3({ documentName: filePath });
@@ -617,7 +687,7 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
                                                     className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
                                                     onClick={handleRefresh} />
                                             </div>
-                                            <Frame iframeKey={iframeKey} fileName={false} />
+                                            <Frame iframeKey={iframeKey} fileName={false} arrayForm={false} />
                                         </div>
                                     </div>
                                     : <div className="pt-8 text-red-500">Vui lòng upload file để xem!</div>

@@ -77,7 +77,7 @@ export const updateOrderStatus = createAsyncThunk(`${appName}/${moduleName}/stat
 
 export const order = {
     shipper: {
-        insert: createAsyncThunk(`${appName} / ${moduleName}/order/shipper/insert`, async (params, thunkAPI) => {
+        insert: createAsyncThunk(`${appName}/${moduleName}/order/shipper/insert`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.order.shipper.insert(params);
                 thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
@@ -90,7 +90,7 @@ export const order = {
         }),
     },
     other: {
-        getSummary: createAsyncThunk(`${appName} /${moduleName}/order / other / getSummary`, async (params, thunkAPI) => {
+        getSummary: createAsyncThunk(`${appName}/${moduleName}/order/other/getSummary`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.order.other.getSummary(params);
                 const data = await response.data;
@@ -100,10 +100,40 @@ export const order = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
-        updateNote: createAsyncThunk(`${appName} /${moduleName}/order / other / updateNote`, async (params, thunkAPI) => {
+        updateNote: createAsyncThunk(`${appName}/${moduleName}/order/other/updateNote`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.order.other.updateNote(params);
                 thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getDelivery: createAsyncThunk(`${appName}/${moduleName}/order/other/getDelivery`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.other.getDelivery(params);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getDeliveryList: createAsyncThunk(`${appName}/${moduleName}/order/other/getDeliveryList`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.other.getDelivery(params);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getDetailDelivery: createAsyncThunk(`${appName}/${moduleName}/order/other/getDetailDelivery`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.other.getDetailDelivery(params);
                 const data = await response.data;
                 return data
             } catch (error) {
@@ -136,7 +166,8 @@ const orderSlice = createSlice({
         selected: null,
         response: null,
         search: initSearchState,
-        popupLoading: false
+        popupLoading: false,
+        storeOrders: []
     },
     reducers: {
         /**
@@ -184,6 +215,15 @@ const orderSlice = createSlice({
                     isEdit: payload
                 }
             }
+        },
+
+        setStateRedux: {
+            reducer: (state, { payload }) => {
+                return {
+                    ...state,
+                    ...payload
+                }
+            },
         },
     },
     extraReducers: {
@@ -234,6 +274,53 @@ const orderSlice = createSlice({
             ...state,
             loading: false,
             error: error
+        }),
+
+        [order.other.getDetailDelivery.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [order.other.getDetailDelivery.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                detailDelivery: payload,
+                error: null
+            }
+        },
+        [order.other.getDetailDelivery.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+
+        [order.other.getDeliveryList.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [order.other.getDeliveryList.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                deliveryList: payload,
+                error: null
+            }
+        },
+        [order.other.getDeliveryList.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+
+        /**
+       * @description getEditors
+       */
+        [order.other.getDelivery.fulfilled]: (state, { payload }) => ({
+            ...state,
+            deliveries: payload?.data,
+            loading: false,
         }),
         /**
          * @description getDetail
@@ -364,6 +451,6 @@ const orderSlice = createSlice({
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setIsEdit } = orderSlice.actions;
+export const { setSelected, setSearch, resetSearch, setIsEdit, setStateRedux } = orderSlice.actions;
 
 export default orderSlice.reducer;

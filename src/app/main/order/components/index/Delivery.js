@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { CmsButton, CmsButtonProgress, CmsCardedPage, CmsFormikCheckbox, CmsFormikTextField } from '@widgets/components';
+import { CmsButton, CmsButtonProgress, CmsCardedPage, CmsFormikCheckbox, CmsFormikTextField, CmsSelect } from '@widgets/components';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Box, FormHelperText, InputLabel, Table, TableBody, TableCell, TableHead, TableRow, styled } from '@material-ui/core';
@@ -8,7 +8,7 @@ import withReducer from 'app/store/withReducer';
 import { keyStore } from '../../common';
 import reducer from '../../store';
 import CmcFormikLazySelect from '@widgets/components/cms-formik/CmcFormikLazySelect';
-import { getDetail, getList, updateOrderStatus } from '../../store/orderSlice';
+import { getDetail, getList, setStateRedux, updateOrderStatus } from '../../store/orderSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getShelf, getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
 import { useEffect } from 'react';
@@ -89,13 +89,18 @@ function FormEdit() {
     const dispatch = useDispatch();
     const [current, setCurrent] = useState(null);
     const [openDialog, setOpenDialog] = useState('');
-    const [iframeKey, setIframeKey] = useState(0);
     const orders = useSelector(store => store[keyStore].order.entities?.data) || [];
     const orderDetail = useSelector(store => store[keyStore].order.entity);
+    const storeOrders = useSelector(store => store[keyStore].order.storeOrders);
     const detailEntities = useSelector(store => store[keyStore]?.order?.detailEntities?.data
         ? store[keyStore].order.detailEntities.data
         : []);
     const params = useParams(), ID = params.id;
+    const currentOrder = useMemo(() => {
+        if (ID === '0')
+            return null
+        return storeOrders.find(val => val.orderID === parseInt(ID)) || null
+    }, [storeOrders, ID])
     const [arrayForm, setArrayForm] = useState(null);
     if (!ID) {
         History.push('order-delivery/0')
@@ -157,6 +162,7 @@ function FormEdit() {
     }, [listWine, current])
 
     const handleSave = (values) => {
+
         alertInformation({
             text: `Xác nhận thao tác`,
             data: values,
@@ -187,24 +193,40 @@ function FormEdit() {
     }
 
     const handleSaveShip = (values) => {
-        alertInformation({
-            text: `Xác nhận thao tác`,
-            data: values,
-            confirm: async (values) => {
-                formik.setSubmitting(true);
-                try {
-                    const value = { ...values, orderid: values.orderID }
-                    console.log(value);
-                    //const resultAction = await dispatch(order.shipper.insert(value))
-                    //unwrapResult(resultAction);
+        if (!values.isNext) {
+            const value = {
+                ...values,
+                arrayForm: arrayForm,
+                cusId: current.cusId
+            }
+            formik.setSubmitting(false);
+            let listOrders = [...storeOrders];
+            listOrders.push(value);
+            dispatch(setStateRedux({
+                storeOrders: listOrders
+            }));
+            History.push('/order-delivery/0');
+            formik.resetForm(initialValues);
+        } else {
+            alertInformation({
+                text: `Xác nhận thao tác`,
+                data: values,
+                confirm: async (values) => {
+                    formik.setSubmitting(true);
+                    try {
+                        const value = { ...values, orderid: values.orderID }
+                        console.log(value);
+                        //const resultAction = await dispatch(order.shipper.insert(value))
+                        //unwrapResult(resultAction);
 
-                } catch (error) { }
-                finally {
-                    formik.setSubmitting(false);
-                }
-            },
-            close: () => formik.setSubmitting(false)
-        })
+                    } catch (error) { }
+                    finally {
+                        formik.setSubmitting(false);
+                    }
+                },
+                close: () => formik.setSubmitting(false)
+            })
+        }
     }
 
     const formik = useFormik({
@@ -213,9 +235,9 @@ function FormEdit() {
         enableReinitialize: true,
         onSubmit: handleSaveShip,
         validationSchema: Yup.object({
-            "shipname": Yup.string().nullable().required("Nhập tên"),
-            "phone": Yup.string().nullable().required("Nhập số điện thoại"),
-            contractValid: Yup.number().min(1, 'Vui lòng xác nhận')
+            // "shipname": Yup.string().nullable().required("Nhập tên"),
+            // "phone": Yup.string().nullable().required("Nhập số điện thoại"),
+            // contractValid: Yup.number().min(1, 'Vui lòng xác nhận')
         })
     })
 
@@ -332,10 +354,12 @@ function FormEdit() {
 
     }, [step, openDialog])
 
-    const handleSaveContrac = (value, form) => {
-        setArrayForm(value[0]?.arrayForm);
+    const handleSaveContract = (value, form) => {
         handleCloseDialog();
-        setIframeKey(prev => prev + 1)
+
+        setArrayForm(value[0]?.arrayForm);
+        formik.setFieldValue('arrayForm', value[0]?.arrayForm)
+        //setIframeKey(prev => prev + 1)
     }
 
     return (
@@ -343,8 +367,8 @@ function FormEdit() {
             {openDialog === 'edit' && orderDetail?.contract &&
                 <EditDialog
                     open={openDialog === 'edit'}
-                    item={orderDetail.contract}
-                    handleSave={handleSaveContrac}
+                    item={{ ...orderDetail.contract, content: arrayForm ? JSON.stringify(arrayForm) : orderDetail.contract.content }}
+                    handleSave={handleSaveContract}
                     handleClose={handleCloseDialog}
                     signature={orderDetail.contract?.signature}
                     isShip
@@ -370,16 +394,51 @@ function FormEdit() {
                 }
                 toolbar={
                     <div className="w-full h-68 flex justify-between items-center">
-                        <div></div>
-                        <div className="justify-end px-8 flex items-center space-x-8">
+                        <div className='w-2/3'>
+                            {
+                                Boolean(storeOrders?.length)
+                                &&
+                                <div className='px-8 w-1/5'>
+                                    <CmsSelect
+                                        label="Danh sách đơn hàng"
+                                        data={storeOrders.map(val => ({ ...val, name: `${val.orderID}` }))}
+                                        value={currentOrder?.orderID}
+                                        size='small'
+                                        keyValue='orderID'
+                                        onChange={(e) => {
+                                            const cr = storeOrders?.find(val => val.orderID === e.target.value)
+                                            History.push(`/order-delivery/${e.target.value}`);
+                                            formik.setValues(cr || initialValues);
+                                            if (cr) {
+                                                dispatch(getDetail({
+                                                    cusId: cr.cusId,
+                                                    orderId: cr.orderID
+                                                }))
+                                                setArrayForm(cr)
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            }
+                        </div>
+                        <div className="w-1/3 justify-end px-8 flex items-center space-x-8">
                             <div className="flex items-center space-x-4">
+                                <CmsButtonProgress
+                                    loading={formik.isSubmitting}
+                                    type="submit"
+                                    label={"Thêm đơn hàng khác"}
+                                    startIcon="vertical_align_bottom"
+                                    className="mx-2"
+                                    onClick={() => { formik.setFieldValue('isNext', 0); formik.handleSubmit() }}
+                                    color='primary'
+                                    size="small" />
                                 <CmsButtonProgress
                                     loading={formik.isSubmitting}
                                     type="submit"
                                     label={"Lưu"}
                                     startIcon="vertical_align_bottom"
                                     className="mx-2"
-                                    onClick={formik.handleSubmit}
+                                    onClick={() => { formik.setFieldValue('isNext', 1); formik.handleSubmit() }}
                                     size="small" />
                             </div>
                         </div>
@@ -697,7 +756,7 @@ function FormEdit() {
                                                 </InputLabel>
                                                 <div className='flex justify-between space-x-8 mb-8 items-center'>
                                                     <div className='w-1/2'>
-                                                        <b>Tên:</b> {orderDetail?.contract?.title}
+                                                        <b>Tên:</b> {orderDetail?.contract?.id}|{orderDetail?.contract?.title}
                                                     </div>
                                                     <div className='w-1/2 text-right'>
                                                         <CmsButtonProgress
@@ -710,7 +769,7 @@ function FormEdit() {
                                                             size="small" />
                                                     </div>
                                                 </div>
-                                                <Frame iframeKey={iframeKey} fileName={orderDetail?.contract?.file} arrayForm={arrayForm} />
+                                                <Frame  fileName={orderDetail?.contract?.file} arrayForm={arrayForm} signature={orderDetail?.contract?.signature} />
                                             </BoxCustom>
                                         }
                                     </>

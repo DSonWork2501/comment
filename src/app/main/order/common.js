@@ -31,6 +31,29 @@ export const btnStatus = [
     },
 ];
 
+export const shipStatus = {
+    1: {
+        status: 1,
+        name: 'Chờ lấy hàng',
+        className: 'bg-orange-500'
+    },
+    2: {
+        status: 2,
+        name: 'Đã lấy hàng',
+        className: 'bg-blue-500'
+    },
+    3: {
+        status: 3,
+        name: 'Đang giao',
+        className: 'bg-green-500'
+    },
+    5: {
+        status: 5,
+        name: 'Hoàn thành',
+        className: 'bg-green-900'
+    }
+}
+
 export const links = (valueOb) => orderStatusArray.map(val => (
     {
         id: val.id, name: val.name, link: "/order/" + val.id, otherComp: <div className={val.className} style={{
@@ -42,6 +65,11 @@ export const links = (valueOb) => orderStatusArray.map(val => (
         }}>{valueOb[val.id]}</div>
     }
 ));
+
+export const deliveryLink = (id) => [
+    { id: 1, name: "Sản phẩm", link: `/order/delivery/1/${id}`, icon: "" },
+    { id: 2, name: "Đơn hàng", link: `/order/delivery/2/${id}`, icon: "" },
+];
 
 export function playMusic() {
     var audio = new Audio('assets/upload/correct.mp3');
