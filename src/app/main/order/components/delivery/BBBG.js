@@ -13,8 +13,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { keyStore } from '../../common';
 import { order } from '../../store/orderSlice';
 import reducer from '../../store';
-import { getWine } from 'app/main/customer-shelf/store/customerShelfSlice';
 import { useFormik } from 'formik';
+import { format } from 'date-fns';
+import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -29,7 +30,10 @@ const LayoutCustom = styled(Box)({
 
 const initialValues = {
     page: 1,
-    limit: 10
+    limit: 10,
+    phone: '',
+    fromDate: null,
+    toDate: null
 };
 
 const Filter = ({ onSearch, search, namePage }) => {
@@ -45,9 +49,6 @@ const Filter = ({ onSearch, search, namePage }) => {
             for (const key in initialValues) {
                 if (search[key] !== initialValues[key]) {
                     let value = search[key];
-                    if (key === 'status') {
-                        value = JSON.stringify(search[key])
-                    }
                     setFieldValue(key, value);
                 }
             }
@@ -56,15 +57,17 @@ const Filter = ({ onSearch, search, namePage }) => {
 
     function handleSubmit(value) {
         let values = { ...value };
-        if (values.status)
-            values.status = parseInt(values.status);
+        if (values?.fromDate)
+            values.fromDate = format(new Date(values.fromDate), 'yyyy-MM-dd')
+        if (values?.toDate)
+            values.toDate = format(new Date(values.toDate), 'yyyy-MM-dd')
         onSearch(values);
     }
 
     return <form onSubmit={formik.handleSubmit} className="flex items-center justify-items-start space-x-8 px-8" >
         <CmsFormikTextField
-            label={`Người giao hàng`}
-            name="name"
+            label={`Số điện thoại`}
+            name="phone"
             className="my-8"
             size="small"
             clearBlur
@@ -72,7 +75,7 @@ const Filter = ({ onSearch, search, namePage }) => {
         <CmsFormikDateTimePicker
             format="dd/MM/yyyy"
             className="my-8"
-            name="monthly"
+            name="fromDate"
             formik={formik}
             size="small"
             isOpenKeyBoard={false}
@@ -80,7 +83,7 @@ const Filter = ({ onSearch, search, namePage }) => {
         <CmsFormikDateTimePicker
             format="dd/MM/yyyy"
             className="my-8"
-            name="monthly"
+            name="toDate"
             formik={formik}
             size="small"
             isOpenKeyBoard={false}
@@ -122,7 +125,7 @@ const Filter = ({ onSearch, search, namePage }) => {
 
 function DetailBBBG() {
     const dispatch = useDispatch();
-    const loading = useSelector(store => store[keyStore].contractLoading);
+    const loading = useSelector(store => store[keyStore].order.loading);
     const entities = useSelector(store => store[keyStore].order.deliveryList);
     const [search, setSearch] = useState(initialValues);
 
@@ -189,23 +192,19 @@ function DetailBBBG() {
             </div>
         ),
     }))
-    useEffect(() => {
-        // dispatch(order.partner.getList());
-        // dispatch(order.other.getUnit());
-        // dispatch(order.other.getTypeInv());
-        // dispatch(order.other.platform());
-        dispatch(getWine({ cusId: 20, parentId: 58, cms: 1 }))
-    }, [dispatch])
 
     const getListTable = useCallback((search) => {
         dispatch(order.other.getDeliveryList(search));
     }, [dispatch])
 
-    const searchString = JSON.stringify(search);
     useEffect(() => {
-        let search = JSON.parse(searchString);
         getListTable(search);
-    }, [searchString, getListTable, dispatch])
+    }, [search, getListTable, dispatch])
+
+
+    if (!data) {
+        return <FuseLoading />
+    }
 
     return (
         <LayoutCustom>

@@ -281,11 +281,15 @@ const orderSlice = createSlice({
             loading: true,
             error: null
         }),
-        [order.other.getDetailDelivery.fulfilled]: (state, { payload }) => {
+        [order.other.getDetailDelivery.fulfilled]: (state, { payload, meta }) => {
+            const { arg } = meta, { orderID, status } = arg;
+            let data = { ...payload };
+            data = { ...data, data: payload.data.filter(val => (orderID ? val.id === parseInt(orderID) : true) && (status ? val.shipping.status === status : true)) }
+
             return {
                 ...state,
                 loading: false,
-                detailDelivery: payload,
+                detailDelivery: data,
                 error: null
             }
         },
@@ -298,6 +302,7 @@ const orderSlice = createSlice({
         [order.other.getDeliveryList.pending]: state => ({
             ...state,
             loading: true,
+            deliveryList: null,
             error: null
         }),
         [order.other.getDeliveryList.fulfilled]: (state, { payload }) => {

@@ -155,7 +155,7 @@ function OrderView() {
                     return;
                 }
 
-                let values = entities?.data.map(value => value.id);
+                let values = entities?.data.filter(val => val.shipped !== 1).map(value => value.id);
                 setSelects(values);
             },
             classCheckAll: 'w-full',
@@ -272,8 +272,8 @@ function OrderView() {
                         ? setSelects(value => value.filter(e => e !== item.id))
                         : setSelects(value => [...value, item.id])
                 }}
+                disabled={Boolean(item?.shipped)}
                 name="select"
-                disabled={item.typeBox === "Box OTT"}
             />
         ),
         staffdescription: (
@@ -411,7 +411,9 @@ function OrderView() {
             cusname: item?.productorders?.length || 1,
             moneytotal: item?.productorders?.length || 1,
             detail: item?.productorders?.length || 1,
-            status: item?.productorders?.length || 1
+            status: item?.productorders?.length || 1,
+            select: item?.productorders?.length || 1,
+            staffdescription: item?.productorders?.length || 1,
         },
         // action: (
         //     <div className="w-full flex flex-row space-x-4">
@@ -597,6 +599,7 @@ function OrderView() {
                             openFilterOptions={Boolean(filterOptions)}
                             pagination={reEntities?.pagination}
                             isClearHoverBg
+                            removeSelect
                             selectedList={selects}
                         />
                         <OrderDetailContent
