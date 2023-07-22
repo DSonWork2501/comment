@@ -20,6 +20,8 @@ import { groupBy, map } from 'lodash';
 import { DropMenu } from '../order/components/index';
 import { Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
+import { useRef } from 'react';
+import './css/CameraComponent.css'; // Import the CSS file
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -444,29 +446,46 @@ const OrderTable = ({ entities, loading, setSearch }) => {
 }
 
 const TakePhotoDialog = ({ open, className }) => {
-    const webcamRef = React.useRef(null);
-    const [photoData, setPhotoData] = React.useState(null);
+    const webcamRef = useRef(null);
+    const [frontCamera, setFrontCamera] = useState(false);
+    const [photoData, setPhotoData] = useState(null);
 
-    const handleCapture = React.useCallback(() => {
+    const videoConstraints = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        facingMode: frontCamera ? 'user' : 'environment',
+    };
+
+    const handleCapture = () => {
         const imageSrc = webcamRef.current.getScreenshot();
         setPhotoData(imageSrc);
-    }, []);
+    };
+
+    const handleCameraSwitch = () => {
+        setFrontCamera(prevFrontCamera => !prevFrontCamera);
+    };
 
     return <Dialog className={className} open={open} fullWidth maxWidth="md">
         <DialogContent className='text-11'>
-            <Webcam
-                audio={false}
-                ref={webcamRef}
-                screenshotFormat="image/jpeg"
-                className='m-auto'
-            />
-            <button onClick={handleCapture}>Take Photo</button>
-            {photoData && (
-                <div>
-                    <h3>Photo Preview:</h3>
-                    <img src={photoData} alt="Captured" />
+            <div className="camera-container">
+                <div className="camera-view">
+                    <Webcam
+                        audio={false}
+                        ref={webcamRef}
+                        screenshotFormat="image/jpeg"
+                        videoConstraints={videoConstraints}
+                    />
+                    {photoData && (
+                        <div className="photo-preview">
+                            <img src={photoData} alt="Captured" />
+                        </div>
+                    )}
                 </div>
-            )}
+                <div className="camera-controls">
+                    <button onClick={handleCapture}>Take a Photo</button>
+                    <button onClick={handleCameraSwitch}>Switch Camera</button>
+                </div>
+            </div>
         </DialogContent>
     </Dialog>
 }
