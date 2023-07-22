@@ -133,18 +133,27 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         if (entities?.data?.length) {
             entities.data.forEach(element => {
                 element.productorder.forEach(e => {
-                    JSON.parse(e.model).forEach(el => {
-                        el?.slots?.length && el.slots.forEach(elm => {
-                            data.push(elm.item);
+                    if (element.parentid === 1) {
+                        data.push({
+                            sku: e.sku,
+                            img: e.image,
+                            name: e.name,
+                            price: e.price,
+                        });
+                    } else {
+                        JSON.parse(e.model).forEach(el => {
+                            el?.slots?.length && el.slots.forEach(elm => {
+                                data.push(elm.item);
+                            })
                         })
-                    })
-                    table.push({
-                        sku: e.sku,
-                        img: e.image,
-                        name: e.name,
-                        price: 0,
-                        type: 'table'
-                    })
+                        table.push({
+                            sku: e.sku,
+                            img: e.image,
+                            name: e.name,
+                            price: 0,
+                            type: 'table'
+                        })
+                    }
                 })
             });
             const groupedData = groupBy(data, 'sku');
@@ -169,6 +178,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         if (listProduct?.length)
             listProduct.forEach(element => {
                 total = total + element.numberPR;
+                money = money + ((element.price || 0) * element.numberPR);
             });
         return { total, money }
     }, [listProduct])
@@ -209,7 +219,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         price: (
             <div>
                 {
-                    typeof item?.price === 'number' ? (item.price || 0) : '-'
+                    typeof item?.price === 'number' ? (item.price || 0).toLocaleString('en-US') : '-'
                 }
             </div>
         ),
@@ -220,7 +230,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         ),
     }))
     return <CmsTableBasic
-        className="w-full h-full"
+        className="w-full h-full "
         isServerSide={true}
         apiServerSide={params => setSearch(prev => {
             return { ...prev, ...params }
@@ -250,7 +260,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
                         backgroundColor: '#F2F8F1'
                     }}
                 >
-                    {totalPr.money}
+                    {(totalPr.money || 0).toLocaleString('en-US')}
                 </TableCell>
                 <TableCell
                     className="text-right p-8"
@@ -272,23 +282,35 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         if (entities?.data?.length) {
             entities.data.forEach(element => {
                 element?.productorder?.length && element.productorder.forEach(e => {
-                    data.push({
-                        ...element, dataOfItem: {
-                            sku: e.sku,
-                            img: e.image,
-                            name: e.name,
-                            price: 0,
-                            type: 'table',
+                    if (element.parentid === 1) {
+                        data.push({
+                            ...element,
+                            dataOfItem: {
+                                sku: e.sku,
+                                img: e.image,
+                                name: e.name,
+                                price: e.price,
+                            },
+                            keyRow: 1
+                        });
+                    } else {
+                        data.push({
+                            ...element, dataOfItem: {
+                                sku: e.sku,
+                                img: e.image,
+                                name: e.name,
+                                price: 0,
+                                type: 'table',
+                            },
+                            keyRow: 1
+                        });
 
-                        },
-                        keyRow: 1
-                    });
-
-                    JSON.parse(e?.model).forEach(el => {
-                        el?.slots?.length && el.slots.forEach(elm => {
-                            data.push({ ...element, dataOfItem: elm.item, keyRow: 2 });
+                        JSON.parse(e?.model).forEach(el => {
+                            el?.slots?.length && el.slots.forEach(elm => {
+                                data.push({ ...element, dataOfItem: elm.item, keyRow: 2 });
+                            })
                         })
-                    })
+                    }
                 })
             });
             const groupedData = groupBy(data, 'id');
@@ -304,19 +326,28 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         let data = [], table = [];
         if (entities?.data?.length) {
             entities.data.forEach(element => {
-                element?.productorder?.length && element.productorder.forEach(e => {
-                    JSON.parse(e?.model).forEach(el => {
-                        el?.slots?.length && el.slots.forEach(elm => {
-                            data.push(elm.item);
+                element.productorder.forEach(e => {
+                    if (element.parentid === 1) {
+                        data.push({
+                            sku: e.sku,
+                            img: e.image,
+                            name: e.name,
+                            price: e.price,
+                        });
+                    } else {
+                        JSON.parse(e.model).forEach(el => {
+                            el?.slots?.length && el.slots.forEach(elm => {
+                                data.push(elm.item);
+                            })
                         })
-                    })
-                    table.push({
-                        sku: e.sku,
-                        img: e.image,
-                        name: e.name,
-                        price: 0,
-                        type: 'table'
-                    })
+                        table.push({
+                            sku: e.sku,
+                            img: e.image,
+                            name: e.name,
+                            price: 0,
+                            type: 'table'
+                        })
+                    }
                 })
             });
             const groupedData = groupBy(data, 'sku');
@@ -341,6 +372,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         if (listProductTemp?.length)
             listProductTemp.forEach(element => {
                 total = total + element.numberPR;
+                money = money + ((element.price || 0) * element.numberPR);
             });
         return { total, money }
     }, [listProductTemp])
@@ -380,6 +412,13 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                     : 'Chai'
             }
         </>),
+        price: (
+            <div>
+                {
+                    typeof item?.price === 'number' ? (item.price || 0).toLocaleString('en-US') : '-'
+                }
+            </div>
+        ),
         STT: (
             <React.Fragment>
                 <CmsLabel content={`${(index + 1)}`} />
@@ -547,7 +586,7 @@ function DetailBBBG() {
                 </div>
 
                 <div className='p-8 '>
-                    <div className='p-8 rounded-4 shadow-4 bg-white'>
+                    <div className='py-8 rounded-4 shadow-4 bg-white'>
                         <CmsTab data={deliveryLink(id)} value={0} isLink={true} onChange={(e, value) => {
                             History.push(deliveryLink(id).find(e => e.id === value)?.link)
                         }} />

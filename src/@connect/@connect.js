@@ -87,7 +87,15 @@ export default {
             update: entity => axios.put(`${baseurl}/order/update-order`, entity),
             other: {
                 getSummary: params => axios.get(`${baseurl}/order/summary-order`, { params }),
-                getDetailDelivery: params => axios.get(`${baseurl}/order/get-delivery-detail`, { params }),
+                getDetailDelivery: params => axios.get(`${baseurl}/order/get-delivery-detail`, {
+                    params,
+                    headers: {
+                        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InF1YW5ndmluaDI5MTExNzZAZ21haWwuY29tIiwibmJmIjoxNjg4NDc3ODg1LCJleHAiOjE2OTA1NzY2ODV9.MA8WEdt4Rc89Ea_e4VYF2iz9AnDFhwdENzwNkJxOVF4`,
+                    },
+                }),
+                getDetailDeliverySession: params => axios.get(`${baseurl}/order/get-ship-info/${params.session}`, {
+                    params,
+                }),
                 getDelivery: params => axios.get(`${baseurl}/order/get-delivery`, { params }),
                 updateNote: entity => axios.put(`${baseurl}/order/update-order-des`, entity),
             },

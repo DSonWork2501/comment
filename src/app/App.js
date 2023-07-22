@@ -18,6 +18,7 @@ import routes from './fuse-configs/routesConfig';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import store from './store';
 import Delivery from './main/delivery';
+import EmployDelivery from './main/delivery/EmployDelivery';
 
 const jss = create({
 	...jssPreset(),
@@ -30,19 +31,22 @@ const generateClassName = createGenerateClassName();
 const App = () => {
 	return (
 		<>
-			<Router history={history}>
-				<Switch>
-					<Route path="/delivery">
-						<Delivery />
-					</Route>
-					<Route path="/*">
-						<AppContext.Provider
-							value={{
-								routes
-							}}
-						>
-							<StylesProvider jss={jss} generateClassName={generateClassName}>
-								<Provider store={store}>
+			<AppContext.Provider
+				value={{
+					routes
+				}}
+			>
+				<StylesProvider jss={jss} generateClassName={generateClassName}>
+					<Provider store={store}>
+						<Router history={history}>
+							<Switch>
+								<Route path="/delivery">
+									<Delivery />
+								</Route>
+								<Route path="/employ-delivery/:type">
+									<EmployDelivery />
+								</Route>
+								<Route path="/*">
 									<MuiPickersUtilsProvider utils={MomentUtils}>
 										<Auth>
 											<FuseAuthorization>
@@ -52,12 +56,12 @@ const App = () => {
 											</FuseAuthorization>
 										</Auth>
 									</MuiPickersUtilsProvider>
-								</Provider>
-							</StylesProvider>
-						</AppContext.Provider>
-					</Route>
-				</Switch>
-			</Router>
+								</Route>
+							</Switch>
+						</Router>
+					</Provider>
+				</StylesProvider>
+			</AppContext.Provider >
 		</>
 
 	);
