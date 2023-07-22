@@ -39,6 +39,9 @@ const useStyles = makeStyles({
     menu: {
         '& ul': {
             padding: '0 !important'
+        },
+        '& ul li.MuiMenuItem-root': {
+            minHeight: '35px !important'
         }
     }
 });

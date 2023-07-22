@@ -372,6 +372,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         if (listProductTemp?.length)
             listProductTemp.forEach(element => {
                 total = total + element.numberPR;
+                money = money + ((element.price || 0) * element.numberPR);
             });
         return { total, money }
     }, [listProductTemp])

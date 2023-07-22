@@ -4,176 +4,22 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import { Menu, MenuItem, TableCell, TableRow, makeStyles, withStyles } from '@material-ui/core';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import Check from '@material-ui/icons/Check';
-import StepConnector from '@material-ui/core/StepConnector';
+import { Menu, MenuItem, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import PropTypes from 'prop-types';
-import { faBox, faCircleCheck, faHandHoldingDollar, faHandHoldingHand, faList, faLocationDot, faPhone, faTruckFast, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useFormik } from 'formik';
-import CmsFormikUploadFile from '@widgets/components/cms-formik/CmsFormikUploadFile';
-import * as Yup from 'yup';
 import { ArrowDropDown } from '@material-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { order } from '../order/store/orderSlice';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import reducer from './store';
 import withReducer from 'app/store/withReducer';
-import { CmsLabel, CmsTab } from '@widgets/components';
+import { CmsTab } from '@widgets/components';
 import History from '@history/@history';
 import { groupBy, map } from 'lodash';
-import { initColumn } from '@widgets/functions';
 import { DropMenu } from '../order/components/index';
-
-const useQontoStepIconStyles = makeStyles({
-    root: {
-        color: '#eaeaf0',
-        display: 'flex',
-        height: 22,
-        alignItems: 'center',
-    },
-    active: {
-        color: '#784af4',
-    },
-    circle: {
-        width: 8,
-        height: 8,
-        borderRadius: '50%',
-        backgroundColor: 'currentColor',
-    },
-    completed: {
-        color: '#784af4',
-        zIndex: 1,
-        fontSize: 18,
-    },
-});
-
-function QontoStepIcon(props) {
-    const classes = useQontoStepIconStyles();
-    const { active, completed } = props;
-
-    return (
-        <div
-            className={clsx(classes.root, {
-                [classes.active]: active,
-            })}
-        >
-            {completed ? <Check className={classes.completed} /> : <div className={classes.circle} />}
-        </div>
-    );
-}
-
-QontoStepIcon.propTypes = {
-    /**
-     * Whether this step is active.
-     */
-    active: PropTypes.bool,
-    /**
-     * Mark the step as completed. Is passed to child components.
-     */
-    completed: PropTypes.bool,
-};
-
-const ColorlibConnector = withStyles({
-    alternativeLabel: {
-        top: 22,
-    },
-    active: {
-        '& $line': {
-            backgroundImage:
-                'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
-        },
-    },
-    completed: {
-        '& $line': {
-            backgroundImage:
-                'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
-        },
-    },
-    line: {
-        height: 3,
-        border: 0,
-        backgroundColor: '#eaeaf0',
-        borderRadius: 1,
-    },
-})(StepConnector);
-
-const useColorlibStepIconStyles = makeStyles({
-    root: {
-        backgroundColor: '#ccc',
-        zIndex: 1,
-        color: '#fff',
-        width: 50,
-        height: 50,
-        display: 'flex',
-        borderRadius: '50%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    active: {
-        backgroundImage:
-            'linear-gradient( 136deg, rgb(203 239 231) 0%, rgb(54 171 139) 50%, rgb(5 52 46) 100%)',
-        boxShadow: '2px 4px 15px 4px #14201185',
-    },
-    completed: {
-        backgroundImage:
-            'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
-    },
-});
-
-function ColorlibStepIcon(props) {
-    const classes = useColorlibStepIconStyles();
-    const { active, completed } = props;
-
-    console.log(props);
-    const icons = {
-        1: <FontAwesomeIcon
-            icon={faHandHoldingHand}
-            style={{ color: "white", fontSize: 19 }} />,
-        2: <FontAwesomeIcon
-            icon={faTruckFast}
-            style={{ color: "white", fontSize: 19 }} />,
-        3: <FontAwesomeIcon
-            icon={faBox}
-            style={{ color: "white", fontSize: 19 }} />,
-        4: <FontAwesomeIcon
-            icon={faHandHoldingDollar}
-            style={{ color: "white", fontSize: 19 }} />,
-        5: <FontAwesomeIcon
-            icon={faCircleCheck}
-            style={{ color: "white", fontSize: 19 }} />,
-    };
-
-    return (
-        <div
-            className={clsx(classes.root, {
-                [classes.active]: active,
-                [classes.completed]: completed,
-            })}
-        >
-            {icons[String(props.icon)]}
-        </div>
-    );
-}
-
-ColorlibStepIcon.propTypes = {
-    /**
-     * Whether this step is active.
-     */
-    active: PropTypes.bool,
-    /**
-     * Mark the step as completed. Is passed to child components.
-     */
-    completed: PropTypes.bool,
-    /**
-     * The label displayed in the step icon.
-     */
-    icon: PropTypes.node,
-};
+import { Link } from 'react-router-dom';
+import Webcam from 'react-webcam';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -210,6 +56,9 @@ const useStyles = makeStyles((theme) => ({
         '& .MuiDialogContent-root': {
             paddingLeft: 8,
             paddingRight: 8
+        },
+        '& .MuiTab-root ,& .MuiTabs-root': {
+            minHeight: '35px !important'
         }
     },
     menu: {
@@ -219,11 +68,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function getSteps() {
-    return ['Nhận hàng', 'Đang vận chuyển', 'Đã giao hàng', 'Đã Thanh toán', 'Hoàn thành'];
-}
-
-const DropMenu_ = ({ crName, className }) => {
+const DropMenuMobile = ({ crName, className }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const classes = useStyles();
 
@@ -276,6 +121,67 @@ export const deliveryLink = (id) => [
     { id: 1, name: "Sản phẩm", link: `/employ-delivery/1`, icon: "" },
     { id: 2, name: "Đơn hàng", link: `/employ-delivery/2`, icon: "" },
 ];
+
+const List = ({ listProduct, totalPr }) => {
+    return <div className='flex '>
+        <table className='w-full'>
+            <tbody>
+                <tr>
+                    <td colSpan={3} className='p-4'>
+                        <hr style={{ borderColor: 'aliceblue' }}></hr>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody>
+                {
+                    listProduct.map(val => (
+                        <tr style={{ verticalAlign: 'baseline' }} key={val.sku}>
+                            <td>
+                                <b>
+                                    {val.numberPR}x
+                                </b>
+                            </td>
+                            <td>
+                                {val.name}
+                            </td>
+                            <td className='text-right'>
+                                {typeof val.price === 'number'
+                                    ? val.price.toLocaleString('en-US')
+                                    : '-'}đ
+                            </td>
+                        </tr>
+                    ))
+                }
+            </tbody>
+            <tbody>
+                <tr>
+                    <td colSpan={3} className='p-4'>
+                        <hr style={{ borderColor: 'aliceblue' }}></hr>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody>
+                <tr style={{ verticalAlign: 'baseline' }}>
+                    <td >
+                        <b>
+                            {totalPr.total}
+                        </b>
+                    </td>
+                    <td>
+                        <b>
+                            Tổng tiền:
+                        </b>
+                    </td>
+                    <td className='text-right'>
+                        <b>
+                            {totalPr.money.toLocaleString('en-US')} đ
+                        </b>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
 
 const ProductTable = ({ entities, loading, setSearch }) => {
     const listProduct = useMemo(() => {
@@ -338,140 +244,116 @@ const ProductTable = ({ entities, loading, setSearch }) => {
             <b>
                 Tổng sản phẩm
             </b>
-        </div>
-        <div className='flex '>
-            <table className='w-full'>
-                <tbody>
-                    <tr>
-                        <td colSpan={3} className='p-4'>
-                            <hr style={{ borderColor: 'aliceblue' }}></hr>
-                        </td>
-                    </tr>
-                </tbody>
-                <tbody>
-                    {
-                        listProduct.map(val => (
-                            <tr style={{ verticalAlign: 'baseline' }} key={val.sku}>
-                                <td>
-                                    <b>
-                                        {val.numberPR}x
-                                    </b>
-                                </td>
-                                <td>
-                                    {val.name}
-                                </td>
-                                <td className='text-right'>
-                                    {typeof val.price === 'number'
-                                        ? val.price.toLocaleString('en-US')
-                                        : '-'}đ
-                                </td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-                <tbody>
-                    <tr>
-                        <td colSpan={3} className='p-4'>
-                            <hr style={{ borderColor: 'aliceblue' }}></hr>
-                        </td>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr style={{ verticalAlign: 'baseline' }}>
-                        <td >
-                            <b>
-                                {totalPr.total}
-                            </b>
-                        </td>
-                        <td>
-                            <b>
-                                Tổng tiền:
-                            </b>
-                        </td>
-                        <td className='text-right'>
-                            <b>
-                                {totalPr.money.toLocaleString('en-US')} đ
-                            </b>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        </div> <List listProduct={listProduct} totalPr={totalPr} />
     </div>
 }
 
-const OrderTable = ({ entities, loading, setSearch }) => {
-    const listProduct = useMemo(() => {
-        let data = [];
-        if (entities?.data?.length) {
-            entities.data.forEach(element => {
-                element?.productorder?.length && element.productorder.forEach(e => {
-                    if (element.parentid === 1) {
-                        data.push({
-                            ...element,
-                            dataOfItem: {
-                                sku: e.sku,
-                                img: e.image,
-                                name: e.name,
-                                price: e.price,
-                            },
-                            keyRow: 1
-                        });
-                    } else {
-                        data.push({
-                            ...element, dataOfItem: {
-                                sku: e.sku,
-                                img: e.image,
-                                name: e.name,
-                                price: 0,
-                                type: 'table',
-                            },
-                            keyRow: 1
-                        });
+const TableWithCustomer = ({ val, index, noBorder }) => {
+    const className = useStyles();
+    const [openDialog, setOpenDialog] = useState('');
 
-                        JSON.parse(e?.model).forEach(el => {
-                            el?.slots?.length && el.slots.forEach(elm => {
-                                data.push({ ...element, dataOfItem: elm.item, keyRow: 2 });
-                            })
-                        })
-                    }
-                })
-            });
-            const groupedData = groupBy(data, 'id');
-            return data.map(val => {
-                return { ...val, numberPR: groupedData[val.id]?.length }
-            })
+    return <>
+        {
+            openDialog === 'photo'
+            &&
+            <TakePhotoDialog className={className.modal} open />
         }
 
-        return []
-    }, [entities])
+        <tbody key={val.id}>
+            <tr key={val.sku}>
+                <td style={{ width: 20 }}>
+                    <b>
+                        {index + 1}
+                    </b>
+                </td>
+                <td>
+                    <div className='flex items-center mb-2'>
+                        <b className='mr-2'>
+                            ID
+                        </b>
+                        <Link
+                            to={`${window.location.pathname}?orderID=${val.id}`}
+                        >
+                            <div style={{ color: 'aqua', textDecoration: 'underline', cursor: 'pointer' }}>
+                                {val.id}
+                            </div>
+                        </Link>
+                    </div>
+                    <div className='flex items-center mb-2'>
+                        <FontAwesomeIcon icon={faUser} className='mr-2 text-10' />
+                        {val.customername} - {val.customeremail}
+                    </div>
+                    <div className='flex items-center mb-2'>
+                        <FontAwesomeIcon icon={faPhone} className='mr-2 text-10' />
+                        {val.customermoblie}
+                    </div>
+                    <div className='flex items-center'>
+                        <FontAwesomeIcon icon={faLocationDot} className='mr-2 text-10' />
+                        {val.customeraddress}, {val.customerward}, {val.customerdistrict}, {val.customercity}
+                    </div>
+                </td>
+                <td className='text-right' style={{ width: 85 }}>
+                    <DropMenu
+                        crName={'Chờ lấy hàng'}
+                        className={clsx('text-white px-4 py-2  text-9 bg-orange-500'
+                        )}
+                        data={[
+                            {
+                                name: 'Chụp hình',
+                                id: 1
+                            }
+                        ]}
+                        handleClose={(value, setAnchorEl) => {
+                            if (value?.id === 1)
+                                setOpenDialog('photo')
+                            setAnchorEl(null)
+                        }} />
+                </td>
+            </tr>
+            {
+                !noBorder
+                &&
+                <tr>
+                    <td colSpan={3} className='p-4'>
+                        <hr style={{ borderColor: 'aliceblue' }}></hr>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </>
+}
+
+const OrderTable = ({ entities, loading, setSearch }) => {
+    const location = useLocation(), params2 = new URLSearchParams(location.search)
+        , orderID = parseInt(params2.get('orderID'));
 
     const listProductTemp = useMemo(() => {
         let data = [], table = [];
         if (entities?.data?.length) {
             entities.data.forEach(element => {
                 element.productorder.forEach(e => {
-                    if (element.parentid === 1) {
-                        data.push({
-                            sku: e.sku,
-                            img: e.image,
-                            name: e.name,
-                            price: e.price,
-                        });
-                    } else {
-                        JSON.parse(e.model).forEach(el => {
-                            el?.slots?.length && el.slots.forEach(elm => {
-                                data.push(elm.item);
+                    if (parseInt(orderID) === element.id)
+                        if (element.parentid === 1) {
+                            data.push({
+                                sku: e.sku,
+                                img: e.image,
+                                name: e.name,
+                                price: e.price,
+                            });
+                        } else {
+                            JSON.parse(e.model).forEach(el => {
+                                el?.slots?.length && el.slots.forEach(elm => {
+                                    data.push(elm.item);
+                                })
                             })
-                        })
-                        table.push({
-                            sku: e.sku,
-                            img: e.image,
-                            name: e.name,
-                            price: 0,
-                            type: 'table'
-                        })
-                    }
+                            table.push({
+                                sku: e.sku,
+                                img: e.image,
+                                name: e.name,
+                                price: 0,
+                                type: 'table'
+                            })
+                        }
                 })
             });
             const groupedData = groupBy(data, 'sku');
@@ -490,12 +372,13 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         }
 
         return []
-    }, [entities])
+    }, [entities, orderID])
     const totalPr = useMemo(() => {
         let total = 0, money = 0;
         if (listProductTemp?.length)
             listProductTemp.forEach(element => {
                 total = total + element.numberPR;
+                money = money + ((element.price || 0) * element.numberPR);
             });
         return { total, money }
     }, [listProductTemp])
@@ -503,77 +386,37 @@ const OrderTable = ({ entities, loading, setSearch }) => {
     return <div className='p-8 rounded-4 shadow-4'>
         <div>
             <b>
-                Tổng đơn hàng
+                Tổng đơn hàng {Boolean(orderID) ? orderID : ''}
             </b>
         </div>
-        <div className='flex '>
-            <table className='w-full'>
-                <tbody>
-                    <tr>
-                        <td colSpan={3} className='p-4'>
-                            <hr style={{ borderColor: 'aliceblue' }}></hr>
-                        </td>
-                    </tr>
-                </tbody>
-                {
-                    entities?.data?.length && entities.data.map((val, index) => (
-                        <>
-                            <tbody key={val.id}>
-                                <tr key={val.sku}>
-                                    <td style={{ width: 20 }}>
-                                        <b>
-                                            {index + 1}
-                                        </b>
-                                    </td>
-                                    <td>
-                                        <div className='flex items-center mb-2'>
-                                            <b className='mr-2'>
-                                                ID
-                                            </b>
-                                            <div style={{ color: 'aqua', textDecoration: 'underline', cursor: 'pointer' }}>
-                                                {val.id}
-                                            </div>
-                                        </div>
-                                        <div className='flex items-center mb-2'>
-                                            <FontAwesomeIcon icon={faUser} className='mr-2' />
-                                            {val.customername} - {val.customeremail}
-                                        </div>
-                                        <div className='flex items-center mb-2'>
-                                            <FontAwesomeIcon icon={faPhone} className='mr-2' />
-                                            {val.customermoblie}
-                                        </div>
-                                        <div className='flex items-center'>
-                                            <FontAwesomeIcon icon={faLocationDot} className='mr-2' />
-                                            {val.customeraddress}, {val.customerward}, {val.customerdistrict}, {val.customercity}
-                                        </div>
-                                    </td>
-                                    <td className='text-right' style={{ width: 85 }}>
-                                        <DropMenu
-                                            crName={'Chờ lấy hàng'}
-                                            className={clsx('text-white px-4 py-2  text-9 bg-orange-500'
-                                            )}
-                                            data={[
-                                                {
-                                                    name: 'Chụp hình',
-                                                    id: 1
-                                                }
-                                            ]}
-                                            handleClose={(value, setAnchorEl) => {
-                                                setAnchorEl(null)
-                                            }} />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colSpan={3} className='p-4'>
-                                        <hr style={{ borderColor: 'aliceblue' }}></hr>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </>
+        {
+            orderID
+                ? <>
+                    <table style={{ width: '100%' }}>
+                        {
+                            entities?.data?.length && entities.data.map((val, index) => {
+                                return val.id === parseInt(orderID) ? <TableWithCustomer val={val} key={val.id} index={0} noBorder /> : null
+                            })
+                        }
+                    </table>
 
-                    ))
-                }
-                {/* <tbody>
+                    <List listProduct={listProductTemp} totalPr={totalPr} />
+                </>
+                : <div className='flex '>
+                    <table className='w-full'>
+                        <tbody>
+                            <tr>
+                                <td colSpan={3} className='p-4'>
+                                    <hr style={{ borderColor: 'aliceblue' }}></hr>
+                                </td>
+                            </tr>
+                        </tbody>
+                        {
+                            entities?.data?.length && entities.data.map((val, index) => (
+                                <TableWithCustomer val={val} key={val.id} index={index} />
+                            ))
+                        }
+                        {/* <tbody>
                     {
                         listProduct.map(val => (
                             <tr style={{ verticalAlign: 'baseline' }} key={val.sku}>
@@ -594,35 +437,38 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                         ))
                     }
                 </tbody> */}
-                <tbody>
-                    <tr>
-                        <td colSpan={3} className='p-4'>
-                            <hr style={{ borderColor: 'aliceblue' }}></hr>
-                        </td>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr style={{ verticalAlign: 'baseline' }}>
-                        <td >
-                            <b>
-                                {totalPr.total}
-                            </b>
-                        </td>
-                        <td>
-                            <b>
-                                Tổng tiền:
-                            </b>
-                        </td>
-                        <td className='text-right'>
-                            <b>
-                                {totalPr.money.toLocaleString('en-US')} đ
-                            </b>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                    </table>
+                </div>
+        }
     </div>
+}
+
+const TakePhotoDialog = ({ open, className }) => {
+    const webcamRef = React.useRef(null);
+    const [photoData, setPhotoData] = React.useState(null);
+
+    const handleCapture = React.useCallback(() => {
+        const imageSrc = webcamRef.current.getScreenshot();
+        setPhotoData(imageSrc);
+    }, []);
+
+    return <Dialog className={className} open={open} fullWidth maxWidth="md">
+        <DialogContent className='text-11'>
+            <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                className='m-auto'
+            />
+            <button onClick={handleCapture}>Take Photo</button>
+            {photoData && (
+                <div>
+                    <h3>Photo Preview:</h3>
+                    <img src={photoData} alt="Captured" />
+                </div>
+            )}
+        </DialogContent>
+    </Dialog>
 }
 
 const EmployDelivery = () => {
@@ -634,7 +480,7 @@ const EmployDelivery = () => {
     const params = useParams(), id = params.id, type = params.type;
 
     const getListTable = useCallback((search) => {
-        dispatch(order.other.getDetailDelivery({ ...search, id: '1689803176', session: '' }));
+        dispatch(order.other.getDetailDelivery({ ...search, id: id || '1689803176', session: '' }));
     }, [dispatch, id])
 
     useEffect(() => {
@@ -654,9 +500,6 @@ const EmployDelivery = () => {
     //     })
     // })
 
-    async function upLoadFile(file, { setLoading, resetFile, form }) {
-    }
-
     return (
         <div>
             <Dialog className={classes.modal} open={true} fullWidth maxWidth="md">
@@ -670,7 +513,7 @@ const EmployDelivery = () => {
                                     WINE LOGO
                                 </div>
                                 <div style={{ width: 110 }}>
-                                    <DropMenu_ crName={`0363341099`} />
+                                    <DropMenuMobile crName={`0363341099`} />
                                 </div>
                             </div>
                         </div>
@@ -694,9 +537,21 @@ const EmployDelivery = () => {
                         </div>
                     </div>
                     <hr className='my-8' style={{ borderColor: 'aliceblue' }}></hr>
-                    <CmsTab data={deliveryLink(1)} value={0} isLink={true} onChange={(e, value) => {
-                        History.push(deliveryLink(1).find(e => e.id === value)?.link)
-                    }} />
+                    <div className='flex justify-between items-center'>
+                        <CmsTab data={deliveryLink(1)} value={0} isLink={true} onChange={(e, value) => {
+                            History.push(deliveryLink(1).find(e => e.id === value)?.link)
+                        }} />
+                        <Link
+                            to={`${window.location.pathname}`}
+                        >
+                            <div className='text-10' style={{ width: 54, color: '#e35c5c', textDecoration: 'underline', cursor: 'pointer' }}>
+                                <FontAwesomeIcon icon={faArrowLeft} className='mr-2' />
+                                Trở lại
+                            </div>
+                        </Link>
+                    </div>
+
+
                     {
                         type === '1'
                             ? <ProductTable entities={entities} loading={loading} setSearch={setSearch} />
