@@ -288,10 +288,13 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
     const [detail, setDetail] = useState(null);
     const dispatch = useDispatch();
     const className = useStyles();
+    const location = useLocation(), params2 = new URLSearchParams(location.search)
+        , shipID = parseInt(params2.get('shipID'));
 
     const handleSaveFile = async (file, name) => {
         //setOpen(false)
         //window.alert(JSON.stringify(file));
+        window.alert(detail)
         try {
             const data = new FormData();
             data.append('enpoint', 'tempfile');
@@ -301,7 +304,7 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                 typeItem: 2,
                 data: [
                     {
-                        id: detail.shipping.id,
+                        id: parseInt(shipID),
                         receiveimg: name
                     }
                 ]
@@ -351,33 +354,6 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                     </div>
                 </td>
                 <td className='text-right' style={{ width: 85 }}>
-                    {/* <DropMenu
-                        crName={'Chờ lấy hàng'}
-                        className={clsx('text-white px-4 py-2  text-9 bg-orange-500'
-                        )}
-                        data={[
-                            {
-                                name: 'Chụp hình',
-                                id: 1
-                            }
-                        ]}
-                        handleClose={(value, setAnchorEl) => {
-                            if (value?.id === 1) {
-                                setDetail(val);
-                                History.push(window.location.pathname + '?openCame=1')
-                                dispatch(order.shipper.update({
-                                    typeItem: 2,
-                                    data: [
-                                        {
-                                            id: val.shipping.id,
-                                            receiveimg: '123123'
-                                        }
-                                    ]
-                                }))
-                            }
-                            //setOpenDialog('photo')
-                            setAnchorEl(null)
-                        }} /> */}
                     <DropMenu
                         crName={shipStatus[val.shipping.status].name}
                         className={clsx('text-white px-4 py-2 text-9'
@@ -401,8 +377,7 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                         handleClose={(value, setAnchorEl) => {
                             if (value?.id === 1) {
                                 setDetail(val);
-                                History.push(window.location.pathname + '?openCame=1')
-
+                                History.push(window.location.pathname + `?openCame=1&&shipID=${val.shipping.id}`)
                             }
                             //setOpenDialog('photo')
                             setAnchorEl(null)
@@ -418,7 +393,7 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                     </td>
                 </tr>
             }
-        </tbody>
+        </tbody >
     </>
 }
 
@@ -542,7 +517,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
     </div>
 }
 
-const TakePhotoDialog = ({ open, className, saveFile }) => {
+const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     const webcamRef = useRef(null);
     const [frontCamera, setFrontCamera] = useState(false);
     const [photoData, setPhotoData] = useState(null);
