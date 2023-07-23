@@ -286,7 +286,7 @@ const TableWithCustomer = ({ val, index, noBorder }) => {
 
     const handleSaveFile = (file, setOpen) => {
         setOpen(false)
-        //window.alert(JSON.stringify(file));
+        window.alert(JSON.stringify(file));
         History.push(window.location.pathname)
     }
 
