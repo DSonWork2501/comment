@@ -104,7 +104,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const DropMenuMobile = ({ crName, className }) => {
+const DropMenuMobile = ({ phone, name, className }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const classes = useStyles();
 
@@ -119,7 +119,7 @@ const DropMenuMobile = ({ crName, className }) => {
     return (
         <div>
             <Button aria-controls="dropdown-menu" className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="outlined" aria-haspopup="true" onClick={handleClick}>
-                {crName}
+                {phone}
                 <ArrowDropDown />
             </Button>
             <Menu
@@ -135,13 +135,10 @@ const DropMenuMobile = ({ crName, className }) => {
                 className={classes.menu}
             >
                 <MenuItem style={{ minHeight: 'initial' }} onClick={handleClose}>
-                    Tên NV : Trương Công Mạnh
+                    Tên NV : {name}
                 </MenuItem>
                 <MenuItem style={{ minHeight: 'initial' }} onClick={handleClose}>
-                    SĐT : 0363341099
-                </MenuItem>
-                <MenuItem style={{ minHeight: 'initial' }} onClick={handleClose}>
-                    Chức vụ : Nhân viên giao hàng
+                    SĐT : {phone}
                 </MenuItem>
             </Menu>
         </div>
@@ -678,7 +675,7 @@ const EmployDelivery = () => {
                                     WINE LOGO
                                 </div>
                                 <div style={{ width: 110 }}>
-                                    <DropMenuMobile crName={`0363341099`} />
+                                    <DropMenuMobile phone={entities?.data[0]?.shipping?.phone} name={entities?.data[0]?.shipping?.shipname} />
                                 </div>
                             </div>
                         </div>
