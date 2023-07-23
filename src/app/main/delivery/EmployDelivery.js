@@ -287,6 +287,7 @@ const TableWithCustomer = ({ val, index, noBorder }) => {
     const handleSaveFile = (file, setOpen) => {
         setOpen(false)
         window.alert(JSON.stringify(file));
+        History.push(window.location.pathname)
     }
 
     return <>
@@ -508,6 +509,7 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
 
     const handleAddCapturedPhoto = () => {
         if (photoData) {
+            window.alert(photoData)
             const blob = dataURItoBlob(photoData);
             const file = new File([blob], 'captured_photo.jpeg', { type: 'image/jpeg' });
             // Update the input file element's value to include the captured photo
@@ -533,7 +535,7 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
         <DialogContent className='text-11' style={{ paddingTop: 8 }}>
             <div className="camera-container">
                 <div className="camera-view relative">
-                    <button onClick={() => setOpenCame(false)}
+                    <button onClick={() => History.push(window.location.pathname)}
                         style={{
                             position: 'absolute',
                             top: 8,
