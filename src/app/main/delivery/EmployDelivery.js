@@ -288,8 +288,8 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
     const [detail, setDetail] = useState(null);
     const dispatch = useDispatch();
     const className = useStyles();
-
-    console.log(detail);
+    const location = useLocation(), params2 = new URLSearchParams(location.search)
+        , shipID = parseInt(params2.get('shipID'));
 
     const handleSaveFile = async (file, name) => {
         //setOpen(false)
@@ -304,7 +304,7 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                 typeItem: 2,
                 data: [
                     {
-                        id: detail.shipping.id,
+                        id: parseInt(shipID),
                         receiveimg: name
                     }
                 ]
@@ -354,7 +354,6 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                     </div>
                 </td>
                 <td className='text-right' style={{ width: 85 }}>
-                    <div onClick={() => console.log(detail)}>check </div>
                     <DropMenu
                         crName={shipStatus[val.shipping.status].name}
                         className={clsx('text-white px-4 py-2 text-9'
@@ -378,8 +377,7 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                         handleClose={(value, setAnchorEl) => {
                             if (value?.id === 1) {
                                 setDetail(val);
-                                History.push(window.location.pathname + '?openCame=1')
-
+                                History.push(window.location.pathname + `?openCame=1&&shipID=${val.shipping.id}`)
                             }
                             //setOpenDialog('photo')
                             setAnchorEl(null)
@@ -395,7 +393,7 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                     </td>
                 </tr>
             }
-        </tbody>
+        </tbody >
     </>
 }
 
@@ -519,7 +517,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
     </div>
 }
 
-const TakePhotoDialog = ({ open, className, saveFile }) => {
+const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     const webcamRef = useRef(null);
     const [frontCamera, setFrontCamera] = useState(false);
     const [photoData, setPhotoData] = useState(null);
