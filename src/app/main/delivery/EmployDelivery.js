@@ -289,9 +289,12 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
     const dispatch = useDispatch();
     const className = useStyles();
 
+    console.log(detail);
+
     const handleSaveFile = async (file, name) => {
         //setOpen(false)
         //window.alert(JSON.stringify(file));
+        window.alert(detail)
         try {
             const data = new FormData();
             data.append('enpoint', 'tempfile');
@@ -351,33 +354,7 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                     </div>
                 </td>
                 <td className='text-right' style={{ width: 85 }}>
-                    {/* <DropMenu
-                        crName={'Chờ lấy hàng'}
-                        className={clsx('text-white px-4 py-2  text-9 bg-orange-500'
-                        )}
-                        data={[
-                            {
-                                name: 'Chụp hình',
-                                id: 1
-                            }
-                        ]}
-                        handleClose={(value, setAnchorEl) => {
-                            if (value?.id === 1) {
-                                setDetail(val);
-                                History.push(window.location.pathname + '?openCame=1')
-                                dispatch(order.shipper.update({
-                                    typeItem: 2,
-                                    data: [
-                                        {
-                                            id: val.shipping.id,
-                                            receiveimg: '123123'
-                                        }
-                                    ]
-                                }))
-                            }
-                            //setOpenDialog('photo')
-                            setAnchorEl(null)
-                        }} /> */}
+                    <div onClick={() => console.log(detail)}>check </div>
                     <DropMenu
                         crName={shipStatus[val.shipping.status].name}
                         className={clsx('text-white px-4 py-2 text-9'
