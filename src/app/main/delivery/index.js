@@ -18,6 +18,14 @@ import { useFormik } from 'formik';
 import CmsFormikUploadFile from '@widgets/components/cms-formik/CmsFormikUploadFile';
 import * as Yup from 'yup';
 import { ArrowDropDown } from '@material-ui/icons';
+import { useLocation, useParams } from 'react-router';
+import { keyStore } from '../order/common';
+import reducer from './store';
+import withReducer from 'app/store/withReducer';
+import { useDispatch, useSelector } from 'react-redux';
+import { useCallback } from 'react';
+import { useEffect } from 'react';
+import { order } from '../order/store/orderSlice';
 
 const useQontoStepIconStyles = makeStyles({
     root: {
@@ -202,9 +210,9 @@ const useStyles = makeStyles((theme) => ({
             paddingRight: 8
         }
     },
-    menu:{
-        '& ul':{
-            padding:'0 !important'
+    menu: {
+        '& ul': {
+            padding: '0 !important'
         }
     }
 }));
@@ -261,7 +269,13 @@ const Delivery = () => {
     const classes = useStyles();
     const [activeStep, setActiveStep] = React.useState(0);
     const steps = getSteps();
-
+    const dispatch = useDispatch();
+    const params = useParams()
+        , ship = (params.ship)
+        , delivery = (params.delivery)
+        , orderID = (params.order);
+    const loading = useSelector(store => store[keyStore].order.loading);
+    const entities = useSelector(store => store[keyStore].order.detailDelivery);
     // const handleNext = () => {
     //     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     // };
@@ -273,6 +287,14 @@ const Delivery = () => {
     // const handleReset = () => {
     //     setActiveStep(0);
     // };
+
+    const getListTable = useCallback((search) => {
+        dispatch(order.other.getDetailDelivery({ ...search, id: delivery }));
+    }, [dispatch, delivery])
+
+    useEffect(() => {
+        getListTable();
+    }, [getListTable, dispatch])
 
     const handleSave = (values) => {
 
@@ -499,5 +521,4 @@ const Delivery = () => {
     );
 }
 
-
-export default Delivery;
+export default withReducer(keyStore, reducer)(Delivery);

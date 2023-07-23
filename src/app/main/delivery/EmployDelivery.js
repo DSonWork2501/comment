@@ -393,11 +393,20 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                             if (value?.id === 1) {
                                 History.push(window.location.pathname + `?openCame=1&&shipID=${val.shipping.id}`)
                             }
+
+                            if (value?.id === 2) {
+                                History.push(`/delivery/${val.shipping.id}/${val.shipping.deliveryid}/${val.shipping.orderid}`)
+                            }
                             //setOpenDialog('photo')
                             setAnchorEl(null)
                         }} />
                 </td>
             </tr>
+            {/* <tr>
+                <td colSpan={3}>
+                    <img src='https://ibp.tastycounter.vn/api/common/files/1690110599015.jpeg'/>
+                </td>
+            </tr> */}
             {
                 !noBorder
                 &&
