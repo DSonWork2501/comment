@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Menu, MenuItem, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { faArrowLeft, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCameraRotate, faCircle, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ArrowDropDown } from '@material-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -252,14 +252,13 @@ const ProductTable = ({ entities, loading, setSearch }) => {
 
 const TableWithCustomer = ({ val, index, noBorder }) => {
     const className = useStyles();
-    const [openDialog, setOpenDialog] = useState('');
+
+    const handleSaveFile = (file, setOpen) => {
+        window.alert(file);
+    }
 
     return <>
-        {
-            openDialog === 'photo'
-            &&
-            <TakePhotoDialog className={className.modal} open />
-        }
+        <TakePhotoDialog className={className.modal} saveFile={handleSaveFile} />
 
         <tbody key={val.id}>
             <tr key={val.sku}>
@@ -307,7 +306,8 @@ const TableWithCustomer = ({ val, index, noBorder }) => {
                         ]}
                         handleClose={(value, setAnchorEl) => {
                             if (value?.id === 1)
-                                setOpenDialog('photo')
+                                History.push(window.location.pathname + '?openCame=1')
+                            //setOpenDialog('photo')
                             setAnchorEl(null)
                         }} />
                 </td>
@@ -445,16 +445,25 @@ const OrderTable = ({ entities, loading, setSearch }) => {
     </div>
 }
 
-const TakePhotoDialog = ({ open, className }) => {
+const TakePhotoDialog = ({ open, className, saveFile }) => {
     const webcamRef = useRef(null);
     const [frontCamera, setFrontCamera] = useState(false);
     const [photoData, setPhotoData] = useState(null);
+    const location = useLocation(), params2 = new URLSearchParams(location.search)
+        , openCameUrl = parseInt(params2.get('openCame'));
+
+    const [openCame, setOpenCame] = useState(false);
 
     const videoConstraints = {
         width: window.innerWidth,
         height: window.innerHeight,
         facingMode: frontCamera ? 'user' : 'environment',
     };
+
+    useEffect(() => {
+        if (parseInt(openCameUrl) === 1)
+            setOpenCame(true)
+    }, [openCameUrl])
 
     const handleCapture = () => {
         const imageSrc = webcamRef.current.getScreenshot();
@@ -465,8 +474,29 @@ const TakePhotoDialog = ({ open, className }) => {
         setFrontCamera(prevFrontCamera => !prevFrontCamera);
     };
 
-    return <Dialog className={className} open={open} fullWidth maxWidth="md">
-        <DialogContent className='text-11'>
+    const handleAddCapturedPhoto = () => {
+        if (photoData) {
+            const blob = dataURItoBlob(photoData);
+            const file = new File([blob], 'captured_photo.jpeg', { type: 'image/jpeg' });
+            // Update the input file element's value to include the captured photo
+            saveFile(file, setOpenCame)
+        }
+    };
+
+    // Helper function to convert base64 to Blob
+    const dataURItoBlob = (dataURI) => {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    };
+
+    return <Dialog className={className} open={openCame} fullWidth maxWidth="md">
+        <DialogContent className='text-11' style={{ paddingTop: 8 }}>
             <div className="camera-container">
                 <div className="camera-view">
                     <Webcam
@@ -475,17 +505,33 @@ const TakePhotoDialog = ({ open, className }) => {
                         screenshotFormat="image/jpeg"
                         videoConstraints={videoConstraints}
                     />
-                    {photoData && (
-                        <div className="photo-preview">
-                            <img src={photoData} alt="Captured" />
-                        </div>
-                    )}
                 </div>
-                <div className="camera-controls">
-                    <button onClick={handleCapture}>Take a Photo</button>
-                    <button onClick={handleCameraSwitch}>Switch Camera</button>
+                <div className="camera-controls flex justify-between w-full px-8 items-center ">
+                    <div style={{ width: 35, height: 35 }}>
+
+                    </div>
+                    <button onClick={handleCapture} style={{ width: 40, height: 40, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '30px', color: 'white' }}>
+                        <FontAwesomeIcon icon={faCircle} />
+                    </button>
+                    <button onClick={handleCameraSwitch} style={{ width: 35, height: 35, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '18px', color: 'white' }}>
+                        <FontAwesomeIcon icon={faCameraRotate} />
+                    </button>
                 </div>
+
             </div>
+            {photoData &&
+                <div className="photo-preview w-full mt-8">
+                    <img src={photoData} alt="Captured" className='w-full mb-8' />
+                    <Button
+                        size='small'
+                        variant='contained'
+                        color='primary'
+                        onClick={handleAddCapturedPhoto}
+                    >
+                        Lưu
+                    </Button>
+                </div>
+            }
         </DialogContent>
     </Dialog>
 }
