@@ -22,6 +22,7 @@ import { Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { useRef } from 'react';
 import './css/CameraComponent.css'; // Import the CSS file
+import Connect from '@connect/@connect';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -284,9 +285,15 @@ const ProductTable = ({ entities, loading, setSearch }) => {
 const TableWithCustomer = ({ val, index, noBorder }) => {
     const className = useStyles();
 
-    const handleSaveFile = (file, setOpen) => {
-        setOpen(false)
-        window.alert(JSON.stringify(file));
+    const handleSaveFile = async (file, setOpen) => {
+        //setOpen(false)
+        //window.alert(JSON.stringify(file));
+
+        const data = new FormData();
+        data.append('enpoint', 'tempfile');
+        data.append('files', file);
+        await Connect.live.uploadFile.insert(data);
+
         History.push(window.location.pathname)
     }
 
@@ -494,8 +501,7 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
     };
 
     useEffect(() => {
-        if (parseInt(openCameUrl) === 1)
-            setOpenCame(true)
+        setOpenCame(parseInt(openCameUrl) === 1)
     }, [openCameUrl])
 
     const handleCapture = () => {
@@ -509,7 +515,6 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
 
     const handleAddCapturedPhoto = () => {
         if (photoData) {
-            window.alert(photoData)
             const blob = dataURItoBlob(photoData);
             const file = new File([blob], 'captured_photo.jpeg', { type: 'image/jpeg' });
             // Update the input file element's value to include the captured photo
