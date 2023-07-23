@@ -1,11 +1,14 @@
 /* Camera container */
 .camera-container {
+  padding: 8px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  background-color: #f0f0f0;
+  background-color: black;
+}
+.camera-view{
+  margin-bottom: 8;
 }
 
 /* Webcam video element */
