@@ -25,6 +25,7 @@ import './css/CameraComponent.css'; // Import the CSS file
 import Connect from '@connect/@connect';
 import { shipStatus } from '../order/common';
 import { unwrapResult } from '@reduxjs/toolkit';
+import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -678,9 +679,13 @@ const EmployDelivery = () => {
     //     })
     // })
 
+    if (loading)
+        return <FuseLoading />
+
     return (
         <div>
             <Dialog className={classes.modal} open={true} fullWidth maxWidth="md">
+
                 <DialogTitle>
                     <div className={classes.root}>
                         <div style={{
