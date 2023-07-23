@@ -309,8 +309,8 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
             unwrapResult(resultAction);
             handleRefresh()
             History.push(window.location.pathname)
-        } catch {
-
+        } catch (error) {
+            window.alert(error)
         }
     }
 
@@ -601,7 +601,7 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
     return <Dialog className={className} open={openCame} fullWidth maxWidth="md">
         <DialogContent className='text-11' style={{ paddingTop: 8 }}>
             <div className="camera-container">
-                <div className="camera-view relative">
+                <div className="camera-view relative mb-8">
                     <button onClick={() => History.push(window.location.pathname)}
                         style={{
                             position: 'absolute',
@@ -673,7 +673,7 @@ const EmployDelivery = () => {
         getListTable(search);
     }, [search, getListTable, dispatch])
 
-    const handleRefresh=()=>{
+    const handleRefresh = () => {
         getListTable(search);
     }
 
