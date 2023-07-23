@@ -282,7 +282,6 @@ const ProductTable = ({ entities, loading, setSearch }) => {
 }
 
 const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
-    const [detail, setDetail] = useState(null);
     const dispatch = useDispatch();
     const className = useStyles();
     const location = useLocation(), params2 = new URLSearchParams(location.search)
@@ -291,7 +290,6 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
     const handleSaveFile = async (file, name) => {
         //setOpen(false)
         //window.alert(JSON.stringify(file));
-        window.alert(detail)
         try {
             const data = new FormData();
             data.append('enpoint', 'tempfile');
@@ -314,8 +312,27 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
         }
     }
 
+    const check = async () => {
+        try {
+            const resultAction = await dispatch(order.shipper.update({
+                typeItem: 2,
+                data: [
+                    {
+                        id: parseInt(shipID),
+                        receiveimg: '123'
+                    }
+                ]
+            }))
+            unwrapResult(resultAction);
+            handleRefresh()
+            History.push(window.location.pathname)
+        } catch (error) {
+            window.alert(error)
+        }
+    }
+
     return <>
-        <TakePhotoDialog className={className.modal2} saveFile={handleSaveFile} />
+        <TakePhotoDialog className={className.modal2} saveFile={handleSaveFile} check={check} />
 
         <tbody key={val.id}>
             <tr key={val.sku}>
@@ -373,7 +390,6 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                         }
                         handleClose={(value, setAnchorEl) => {
                             if (value?.id === 1) {
-                                setDetail(val);
                                 History.push(window.location.pathname + `?openCame=1&&shipID=${val.shipping.id}`)
                             }
                             //setOpenDialog('photo')
