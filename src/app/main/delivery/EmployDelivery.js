@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Menu, MenuItem, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { faArrowLeft, faCameraRotate, faCircle, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCameraRotate, faCircle, faCircleXmark, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ArrowDropDown } from '@material-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -512,6 +512,8 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
             const file = new File([blob], 'captured_photo.jpeg', { type: 'image/jpeg' });
             // Update the input file element's value to include the captured photo
             saveFile(file, setOpenCame)
+            // const inputFile = document.getElementById('photoInput');
+            // inputFile.files = [file];
         }
     };
 
@@ -530,7 +532,23 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
     return <Dialog className={className} open={openCame} fullWidth maxWidth="md">
         <DialogContent className='text-11' style={{ paddingTop: 8 }}>
             <div className="camera-container">
-                <div className="camera-view">
+                <div className="camera-view relative">
+                    <button onClick={() => setOpenCame(false)}
+                        style={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            opacity: .5,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            border: '1px solid white',
+                            borderRadius: '50%',
+                            fontSize: '25px',
+                            color: 'white'
+                        }}>
+                        <FontAwesomeIcon icon={faCircleXmark} />
+                    </button>
                     <Webcam
                         audio={false}
                         ref={webcamRef}
