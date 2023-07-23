@@ -285,7 +285,8 @@ const TableWithCustomer = ({ val, index, noBorder }) => {
     const className = useStyles();
 
     const handleSaveFile = (file, setOpen) => {
-        window.alert(file);
+        setOpen(false)
+        window.alert(JSON.stringify(file));
     }
 
     return <>
@@ -551,13 +552,14 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
 
             </div>
             {photoData &&
-                <div className="photo-preview w-full mt-8">
+                <div className="photo-preview w-full mt-8 relative">
                     <img src={photoData} alt="Captured" className='w-full mb-8' />
                     <Button
                         size='small'
                         variant='contained'
                         color='primary'
                         onClick={handleAddCapturedPhoto}
+                        className='absolute top-8 right-8'
                     >
                         Lưu
                     </Button>
