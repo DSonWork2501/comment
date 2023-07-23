@@ -63,6 +63,37 @@ const useStyles = makeStyles((theme) => ({
             minHeight: '35px !important'
         }
     },
+    modal2: {
+        '& .MuiDialog-paperFullWidth': {
+            width: `calc(100%)`, // Change this to the desired background color
+        },
+        '& .MuiDialog-paperScrollPaper': {
+            maxHeight: 'calc(100%)',
+        },
+        '& .MuiDialog-paper': {
+            margin: 0
+        },
+        '& .MuiBackdrop-root': {
+            backgroundColor: 'rgb(159 155 155 / 50%)'
+        },
+        '& .MuiStepper-root': {
+            padding: 0
+        },
+        '& .MuiDialogTitle-root': {
+            borderBottom: '1px solid gray',
+            paddingLeft: 0,
+            paddingRight: 0,
+            paddingTop: 0,
+            paddingBottom: 0
+        },
+        '& .MuiDialogContent-root': {
+            paddingLeft: 8,
+            paddingRight: 8
+        },
+        '& .MuiTab-root ,& .MuiTabs-root': {
+            minHeight: '35px !important'
+        }
+    },
     menu: {
         '& ul': {
             padding: '0 !important'
@@ -258,7 +289,7 @@ const TableWithCustomer = ({ val, index, noBorder }) => {
     }
 
     return <>
-        <TakePhotoDialog className={className.modal} saveFile={handleSaveFile} />
+        <TakePhotoDialog className={className.modal2} saveFile={handleSaveFile} />
 
         <tbody key={val.id}>
             <tr key={val.sku}>
