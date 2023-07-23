@@ -88,6 +88,17 @@ export const order = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        update: createAsyncThunk(`${appName}/${moduleName}/order/shipper/update`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.shipper.update(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     },
     other: {
         getSummary: createAsyncThunk(`${appName}/${moduleName}/order/other/getSummary`, async (params, thunkAPI) => {

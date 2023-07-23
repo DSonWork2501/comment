@@ -23,6 +23,8 @@ import Webcam from 'react-webcam';
 import { useRef } from 'react';
 import './css/CameraComponent.css'; // Import the CSS file
 import Connect from '@connect/@connect';
+import { shipStatus } from '../order/common';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -282,19 +284,34 @@ const ProductTable = ({ entities, loading, setSearch }) => {
     </div>
 }
 
-const TableWithCustomer = ({ val, index, noBorder }) => {
+const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
+    const [detail, setDetail] = useState(null);
+    const dispatch = useDispatch();
     const className = useStyles();
 
-    const handleSaveFile = async (file, setOpen) => {
+    const handleSaveFile = async (file, name) => {
         //setOpen(false)
         //window.alert(JSON.stringify(file));
+        try {
+            const data = new FormData();
+            data.append('enpoint', 'tempfile');
+            data.append('files', file);
+            await Connect.live.uploadFile.insert(data);
+            const resultAction = await dispatch(order.shipper.update({
+                typeItem: 2,
+                data: [
+                    {
+                        id: detail.shipping.id,
+                        receiveimg: name
+                    }
+                ]
+            }))
+            unwrapResult(resultAction);
+            handleRefresh()
+            History.push(window.location.pathname)
+        } catch {
 
-        const data = new FormData();
-        data.append('enpoint', 'tempfile');
-        data.append('files', file);
-        await Connect.live.uploadFile.insert(data);
-
-        History.push(window.location.pathname)
+        }
     }
 
     return <>
@@ -334,7 +351,7 @@ const TableWithCustomer = ({ val, index, noBorder }) => {
                     </div>
                 </td>
                 <td className='text-right' style={{ width: 85 }}>
-                    <DropMenu
+                    {/* <DropMenu
                         crName={'Chờ lấy hàng'}
                         className={clsx('text-white px-4 py-2  text-9 bg-orange-500'
                         )}
@@ -345,8 +362,48 @@ const TableWithCustomer = ({ val, index, noBorder }) => {
                             }
                         ]}
                         handleClose={(value, setAnchorEl) => {
-                            if (value?.id === 1)
+                            if (value?.id === 1) {
+                                setDetail(val);
                                 History.push(window.location.pathname + '?openCame=1')
+                                dispatch(order.shipper.update({
+                                    typeItem: 2,
+                                    data: [
+                                        {
+                                            id: val.shipping.id,
+                                            receiveimg: '123123'
+                                        }
+                                    ]
+                                }))
+                            }
+                            //setOpenDialog('photo')
+                            setAnchorEl(null)
+                        }} /> */}
+                    <DropMenu
+                        crName={shipStatus[val.shipping.status].name}
+                        className={clsx('text-white px-4 py-2 text-9'
+                            , `hover:${shipStatus[val.shipping.status].className}`
+                            , shipStatus[val.shipping.status].className
+                        )}
+                        data={[
+                            {
+                                name: 'Chụp hình',
+                                id: 1,
+                                show: val.shipping.status === 1
+                            },
+                            {
+                                name: 'Giao hàng',
+                                id: 2,
+                                show: val.shipping.status === 2
+                            }
+                        ]
+                            //  .filter(val => val.show)
+                        }
+                        handleClose={(value, setAnchorEl) => {
+                            if (value?.id === 1) {
+                                setDetail(val);
+                                History.push(window.location.pathname + '?openCame=1')
+
+                            }
                             //setOpenDialog('photo')
                             setAnchorEl(null)
                         }} />
@@ -365,7 +422,7 @@ const TableWithCustomer = ({ val, index, noBorder }) => {
     </>
 }
 
-const OrderTable = ({ entities, loading, setSearch }) => {
+const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , orderID = parseInt(params2.get('orderID'));
 
@@ -455,7 +512,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                         </tbody>
                         {
                             entities?.data?.length && entities.data.map((val, index) => (
-                                <TableWithCustomer val={val} key={val.id} index={index} />
+                                <TableWithCustomer val={val} key={val.id} index={index} handleRefresh={handleRefresh} />
                             ))
                         }
                         {/* <tbody>
@@ -505,7 +562,11 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
     }, [openCameUrl])
 
     const handleCapture = () => {
-        const imageSrc = webcamRef.current.getScreenshot();
+        const imageSrc = webcamRef.current.getScreenshot({
+            width: 1280, // Set the desired width for the screenshot (e.g., 1280)
+            height: 720, // Set the desired height for the screenshot (e.g., 720)
+            screenshotQuality: 1.0, // Set the screenshot quality to 1.0 for maximum quality (no compression)
+        });
         setPhotoData(imageSrc);
     };
 
@@ -516,9 +577,10 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
     const handleAddCapturedPhoto = () => {
         if (photoData) {
             const blob = dataURItoBlob(photoData);
-            const file = new File([blob], 'captured_photo.jpeg', { type: 'image/jpeg' });
+            const name = `${Date.now()}.jpeg`;
+            const file = new File([blob], name, { type: 'image/jpeg' });
             // Update the input file element's value to include the captured photo
-            saveFile(file, setOpenCame)
+            saveFile(file, name)
             // const inputFile = document.getElementById('photoInput');
             // inputFile.files = [file];
         }
@@ -552,7 +614,8 @@ const TakePhotoDialog = ({ open, className, saveFile }) => {
                             border: '1px solid white',
                             borderRadius: '50%',
                             fontSize: '25px',
-                            color: 'white'
+                            color: 'white',
+                            zIndex: 1
                         }}>
                         <FontAwesomeIcon icon={faCircleXmark} />
                     </button>
@@ -609,6 +672,10 @@ const EmployDelivery = () => {
     useEffect(() => {
         getListTable(search);
     }, [search, getListTable, dispatch])
+
+    const handleRefresh=()=>{
+        getListTable(search);
+    }
 
     // const handleSave = (values) => {
 
@@ -678,7 +745,7 @@ const EmployDelivery = () => {
                     {
                         type === '1'
                             ? <ProductTable entities={entities} loading={loading} setSearch={setSearch} />
-                            : <OrderTable entities={entities} loading={loading} setSearch={setSearch} />
+                            : <OrderTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
                     }
                 </DialogContent>
                 <DialogActions>
