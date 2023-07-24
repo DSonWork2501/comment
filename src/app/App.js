@@ -40,10 +40,10 @@ const App = () => {
 					<Provider store={store}>
 						<Router history={history}>
 							<Switch>
-								<Route path="/delivery/:ship/:delivery/:order">
+								<Route path="/delivery/:ship/:session/:order">
 									<Delivery />
 								</Route>
-								<Route path="/employ-delivery/:type">
+								<Route path="/employ-delivery/:type/:session">
 									<EmployDelivery />
 								</Route>
 								<Route path="/*">

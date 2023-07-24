@@ -127,7 +127,6 @@ function ColorlibStepIcon(props) {
     const classes = useColorlibStepIconStyles();
     const { active, completed } = props;
 
-    console.log(props);
     const icons = {
         1: <FontAwesomeIcon
             icon={faHandHoldingHand}
@@ -138,9 +137,9 @@ function ColorlibStepIcon(props) {
         3: <FontAwesomeIcon
             icon={faBox}
             style={{ color: "white", fontSize: 19 }} />,
-        4: <FontAwesomeIcon
-            icon={faHandHoldingDollar}
-            style={{ color: "white", fontSize: 19 }} />,
+        // 4: <FontAwesomeIcon
+        //     icon={faHandHoldingDollar}
+        //     style={{ color: "white", fontSize: 19 }} />,
         5: <FontAwesomeIcon
             icon={faCircleCheck}
             style={{ color: "white", fontSize: 19 }} />,
@@ -218,7 +217,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function getSteps() {
-    return ['Nhận hàng', 'Đang vận chuyển', 'Đã giao hàng', 'Đã Thanh toán', 'Hoàn thành'];
+    return ['Nhận hàng', 'Đang vận chuyển', 'Đã giao hàng', 'Hoàn thành'];
 }
 
 const DropMenu = ({ crName, className }) => {
@@ -272,7 +271,7 @@ const Delivery = () => {
     const dispatch = useDispatch();
     const params = useParams()
         , ship = (params.ship)
-        , delivery = (params.delivery)
+        , session = (params.session)
         , orderID = (params.order);
     const loading = useSelector(store => store[keyStore].order.loading);
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
@@ -289,8 +288,8 @@ const Delivery = () => {
     // };
 
     const getListTable = useCallback((search) => {
-        dispatch(order.other.getDetailDelivery({ ...search, id: delivery }));
-    }, [dispatch, delivery])
+        dispatch(order.shipper.getDetailShipDelivery({ ...search, session }));
+    }, [dispatch, session])
 
     useEffect(() => {
         getListTable();

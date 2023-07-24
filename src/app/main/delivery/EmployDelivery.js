@@ -151,9 +151,9 @@ const initialValues = {
 
 };
 
-export const deliveryLink = (id) => [
-    { id: 1, name: "Sản phẩm", link: `/employ-delivery/1`, icon: "" },
-    { id: 2, name: "Đơn hàng", link: `/employ-delivery/2`, icon: "" },
+export const deliveryLink = (session) => [
+    { id: 1, name: "Sản phẩm", link: `/employ-delivery/1/${session}`, icon: "" },
+    { id: 2, name: "Đơn hàng", link: `/employ-delivery/2/${session}`, icon: "" },
 ];
 
 const List = ({ listProduct, totalPr }) => {
@@ -395,7 +395,7 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
                             }
 
                             if (value?.id === 2) {
-                                History.push(`/delivery/${val.shipping.id}/${val.shipping.deliveryid}/${val.shipping.orderid}`)
+                                History.push(`/delivery/${val.shipping.id}/${encodeURIComponent(val.shipping.deliverysession)}/${val.shipping.orderid}`)
                             }
                             //setOpenDialog('photo')
                             setAnchorEl(null)
@@ -661,11 +661,13 @@ const EmployDelivery = () => {
     const loading = useSelector(store => store[keyStore].order.loading);
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
     const [search, setSearch] = useState(initialValues);
-    const params = useParams(), id = params.id, type = params.type;
+    const params = useParams(), id = params.id, type = params.type, session = params.session;
+    const location = useLocation(), params2 = new URLSearchParams(location.search)
+        , orderID = (params2.get('orderID'));
 
     const getListTable = useCallback((search) => {
-        dispatch(order.other.getDetailDelivery({ ...search, id: id || '1689803176', session: '' }));
-    }, [dispatch, id])
+        dispatch(order.shipper.getDetailShipDelivery({ ...search, session }));
+    }, [dispatch, session])
 
     useEffect(() => {
         getListTable(search);
@@ -730,17 +732,22 @@ const EmployDelivery = () => {
                     </div>
                     <hr className='my-8' style={{ borderColor: 'aliceblue' }}></hr>
                     <div className='flex justify-between items-center'>
-                        <CmsTab data={deliveryLink(1)} value={0} isLink={true} onChange={(e, value) => {
-                            History.push(deliveryLink(1).find(e => e.id === value)?.link)
+                        <CmsTab data={deliveryLink(session)} value={0} isLink={true} onChange={(e, value) => {
+                            History.push(deliveryLink(session).find(e => e.id === value)?.link)
                         }} />
-                        <Link
-                            to={`${window.location.pathname}`}
-                        >
-                            <div className='text-10' style={{ width: 54, color: '#e35c5c', textDecoration: 'underline', cursor: 'pointer' }}>
-                                <FontAwesomeIcon icon={faArrowLeft} className='mr-2' />
-                                Trở lại
-                            </div>
-                        </Link>
+
+                        {
+                            orderID
+                            &&
+                            <Link
+                                to={`${window.location.pathname}`}
+                            >
+                                <div className='text-10' style={{ width: 54, color: '#e35c5c', textDecoration: 'underline', cursor: 'pointer' }}>
+                                    <FontAwesomeIcon icon={faArrowLeft} className='mr-2' />
+                                    Trở lại
+                                </div>
+                            </Link>
+                        }
                     </div>
 
 

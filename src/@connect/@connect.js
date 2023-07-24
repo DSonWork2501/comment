@@ -107,6 +107,7 @@ export default {
                             Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InF1YW5ndmluaDI5MTExNzZAZ21haWwuY29tIiwibmJmIjoxNjg4NDc3ODg1LCJleHAiOjE2OTA1NzY2ODV9.MA8WEdt4Rc89Ea_e4VYF2iz9AnDFhwdENzwNkJxOVF4`,
                         },
                     }),
+                getDetailShipDelivery: params => axios.get(`${baseurl}/order/get-delivery-shipping/${params.session}`, { params })
             }
         },
         location: {

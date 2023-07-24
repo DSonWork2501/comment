@@ -99,6 +99,16 @@ export const order = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        getDetailShipDelivery: createAsyncThunk(`${appName}/${moduleName}/order/other/getDetailShipDelivery`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.shipper.getDetailShipDelivery(params);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     },
     other: {
         getSummary: createAsyncThunk(`${appName}/${moduleName}/order/other/getSummary`, async (params, thunkAPI) => {
@@ -309,6 +319,30 @@ const orderSlice = createSlice({
             loading: false,
             error: error
         }),
+
+        [order.shipper.getDetailShipDelivery.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [order.shipper.getDetailShipDelivery.fulfilled]: (state, { payload, meta }) => {
+            const { arg } = meta, { orderID, status } = arg;
+            let data = { ...payload };
+            data = { ...data, data: payload.data.filter(val => (orderID ? val.id === parseInt(orderID) : true) && (status ? val.shipping.status === status : true)) }
+
+            return {
+                ...state,
+                loading: false,
+                detailDelivery: data,
+                error: null
+            }
+        },
+        [order.shipper.getDetailShipDelivery.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+        
 
         [order.other.getDeliveryList.pending]: state => ({
             ...state,
