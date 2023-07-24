@@ -126,15 +126,14 @@ const useColorlibStepIconStyles = makeStyles({
 function ColorlibStepIcon(props) {
     const classes = useColorlibStepIconStyles();
     const { active, completed } = props;
-
     const icons = {
-        1: <FontAwesomeIcon
+        2: <FontAwesomeIcon
             icon={faHandHoldingHand}
             style={{ color: "white", fontSize: 19 }} />,
-        2: <FontAwesomeIcon
+        3: <FontAwesomeIcon
             icon={faTruckFast}
             style={{ color: "white", fontSize: 19 }} />,
-        3: <FontAwesomeIcon
+        4: <FontAwesomeIcon
             icon={faBox}
             style={{ color: "white", fontSize: 19 }} />,
         // 4: <FontAwesomeIcon
@@ -152,7 +151,7 @@ function ColorlibStepIcon(props) {
                 [classes.completed]: completed,
             })}
         >
-            {icons[String(props.icon)]}
+            {icons[String(props.item.id)]}
         </div>
     );
 }
@@ -217,7 +216,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function getSteps() {
-    return ['Nhận hàng', 'Đang vận chuyển', 'Đã giao hàng', 'Hoàn thành'];
+    return [{
+        id: 2,
+        name: 'Nhận hàng'
+    },
+    {
+        id: 3,
+        name: 'Đang vận chuyển'
+    },
+    {
+        id: 5,
+        name: 'Hoàn thành'
+    }];
 }
 
 const DropMenu = ({ crName, className }) => {
@@ -331,9 +341,9 @@ const Delivery = () => {
                         </div>
 
                         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
-                            {steps.map((label) => (
-                                <Step key={label}>
-                                    <StepLabel StepIconComponent={ColorlibStepIcon}>{label}</StepLabel>
+                            {steps.map((val) => (
+                                <Step key={val.name}>
+                                    <StepLabel StepIconComponent={(e) => ColorlibStepIcon({ ...e, item: val })}>{val.name}</StepLabel>
                                 </Step>
                             ))}
                         </Stepper>
