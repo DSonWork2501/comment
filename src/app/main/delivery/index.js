@@ -26,6 +26,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
 import { order } from '../order/store/orderSlice';
+import HeadDelivery from './components/Header';
+import { useMemo } from 'react';
 
 const useQontoStepIconStyles = makeStyles({
     root: {
@@ -285,6 +287,11 @@ const Delivery = () => {
         , orderID = (params.order);
     const loading = useSelector(store => store[keyStore].order.loading);
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
+    const currentOrder = useMemo(() => {
+        if (entities?.data?.length)
+            return entities.data.find(val => val.id === parseInt(orderID))
+        return null
+    }, [entities, orderID])
     // const handleNext = () => {
     //     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     // };
@@ -296,7 +303,7 @@ const Delivery = () => {
     // const handleReset = () => {
     //     setActiveStep(0);
     // };
-
+    console.log(currentOrder);
     const getListTable = useCallback((search) => {
         dispatch(order.shipper.getDetailShipDelivery({ ...search, session }));
     }, [dispatch, session])
@@ -330,14 +337,7 @@ const Delivery = () => {
                             background: '#fafafa!important',
                             borderBottom: '1px solid rgb(128 128 128 / 21%)'
                         }} className='mb-8'>
-                            <div className='p-8 text-right flex justify-between items-center '>
-                                <div className='text-center'>
-                                    WINE LOGO
-                                </div>
-                                <div style={{ width: 110 }}>
-                                    <DropMenu crName={`0363341099`} />
-                                </div>
-                            </div>
+                            <HeadDelivery entities={entities} />
                         </div>
 
                         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
@@ -356,25 +356,25 @@ const Delivery = () => {
                                 <b className='mr-4'>
                                     Mã đơn hàng:
                                 </b>
-                                006-DK123
+                                {orderID}
                             </div>
                             <div>
                                 <b className='mr-4'>
                                     Tên khách hàng:
                                 </b>
-                                Trường Công Mạnh
+                                {currentOrder?.customername}
                             </div>
                             <div>
                                 <b className='mr-4'>
                                     Số điện thoại:
                                 </b>
-                                0363341099
+                                {currentOrder?.customermoblie}
                             </div>
                             <div>
                                 <b className='mr-4'>
                                     Địa chỉ:
                                 </b>
-                                47/44 Nguyễn thị tần, p.8, q.8, Tp. Hồ Chí Minh
+                                {currentOrder?.customeraddress}, {currentOrder?.customerward}, {currentOrder?.customerdistrict}, {currentOrder?.customercity}
                             </div>
                         </div>
                     </div>

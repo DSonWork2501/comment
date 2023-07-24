@@ -26,6 +26,7 @@ import Connect from '@connect/@connect';
 import { shipStatus } from '../order/common';
 import { unwrapResult } from '@reduxjs/toolkit';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
+import HeadDelivery from './components/Header';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -105,7 +106,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const DropMenuMobile = ({ phone, name, className }) => {
+export const DropMenuMobile = ({ phone, name, className }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const classes = useStyles();
 
@@ -702,14 +703,7 @@ const EmployDelivery = () => {
                         <div style={{
                             background: '#fafafa!important',
                         }} >
-                            <div className='p-8 text-right flex justify-between items-center '>
-                                <div className='text-center'>
-                                    WINE LOGO
-                                </div>
-                                <div style={{ width: 110 }}>
-                                    <DropMenuMobile phone={entities?.data[0]?.shipping?.phone} name={entities?.data[0]?.shipping?.shipname} />
-                                </div>
-                            </div>
+                            <HeadDelivery entities={entities} />
                         </div>
                     </div>
                 </DialogTitle>
