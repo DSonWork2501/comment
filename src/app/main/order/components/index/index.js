@@ -43,6 +43,11 @@ const useStyles = makeStyles({
         '& ul li.MuiMenuItem-root': {
             minHeight: '35px !important'
         }
+    },
+    menuSmall: {
+        '& ul li.MuiMenuItem-root': {
+            minHeight: '25px !important'
+        }
     }
 });
 
@@ -57,7 +62,7 @@ const LayoutCustom = styled(Box)({
     }
 });
 
-export const DropMenu = ({ crName, data, handleClose, className }) => {
+export const DropMenu = ({ crName, data, handleClose, className, small }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const classes = useStyles();
     const handleClick = (event) => {
@@ -93,7 +98,7 @@ export const DropMenu = ({ crName, data, handleClose, className }) => {
                         vertical: 'top',
                         horizontal: 'right',
                     }}
-                    className={classes.menu}
+                    className={clsx(classes.menu, small && classes.menuSmall)}
                 >
                     {
                         data.map((val, index) => {

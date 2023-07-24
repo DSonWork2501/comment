@@ -14,7 +14,7 @@ import { order } from '../order/store/orderSlice';
 import { useLocation, useParams } from 'react-router';
 import reducer from './store';
 import withReducer from 'app/store/withReducer';
-import { CmsTab } from '@widgets/components';
+import { CmsCheckbox, CmsTab } from '@widgets/components';
 import History from '@history/@history';
 import { groupBy, map } from 'lodash';
 import { DropMenu } from '../order/components/index';
@@ -27,6 +27,7 @@ import { shipStatus } from '../order/common';
 import { unwrapResult } from '@reduxjs/toolkit';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 import HeadDelivery from './components/Header';
+import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -283,7 +284,23 @@ const ProductTable = ({ entities, loading, setSearch }) => {
     </div>
 }
 
-const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
+const handleSaveFileOut = async (value, handleRefresh, dispatch, file, successFc) => {
+    try {
+        const data = new FormData();
+        data.append('enpoint', 'tempfile');
+        data.append('files', file);
+        await Connect.live.uploadFile.insert(data);
+        const resultAction = await dispatch(order.shipper.update(value))
+        unwrapResult(resultAction);
+        handleRefresh()
+        successFc()
+        History.push(window.location.pathname)
+    } catch (error) {
+        window.alert(error)
+    }
+}
+
+const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) => {
     const dispatch = useDispatch();
     const className = useStyles();
     const location = useLocation(), params2 = new URLSearchParams(location.search)
@@ -292,26 +309,27 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
     const handleSaveFile = async (file, name) => {
         //setOpen(false)
         //window.alert(JSON.stringify(file));
-        try {
-            const data = new FormData();
-            data.append('enpoint', 'tempfile');
-            data.append('files', file);
-            await Connect.live.uploadFile.insert(data);
-            const resultAction = await dispatch(order.shipper.update({
-                typeItem: 2,
-                data: [
-                    {
-                        id: parseInt(shipID),
-                        receiveimg: name
-                    }
-                ]
-            }))
-            unwrapResult(resultAction);
-            handleRefresh()
-            History.push(window.location.pathname)
-        } catch (error) {
-            window.alert(error)
-        }
+        handleSaveFileOut({
+            typeItem: 2,
+            data: [
+                {
+                    id: parseInt(shipID),
+                    receiveimg: name
+                }
+            ]
+        }, handleRefresh, dispatch, file, () => { })
+        // try {
+        //     const data = new FormData();
+        //     data.append('enpoint', 'tempfile');
+        //     data.append('files', file);
+        //     await Connect.live.uploadFile.insert(data);
+        //     const resultAction = await dispatch(order.shipper.update())
+        //     unwrapResult(resultAction);
+        //     handleRefresh()
+        //     History.push(window.location.pathname)
+        // } catch (error) {
+        //     window.alert(error)
+        // }
     }
 
     const check = async () => {
@@ -338,10 +356,18 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
 
         <tbody key={val.id}>
             <tr key={val.sku}>
-                <td style={{ width: 20 }}>
+                <td style={{ width: 20, borderRight: '1px dashed #bbbbbb' }} className='text-center'>
                     <b>
                         {index + 1}
                     </b>
+                    <CmsCheckbox
+                        checked={val.checked}
+                        onChange={event => {
+                            setCheck(e => {
+                                return e.includes(val.id) ? e.filter(el => el !== val.id) : [...e, val.id];
+                            })
+                        }}
+                    />
                 </td>
                 <td>
                     <div className='flex items-center mb-2'>
@@ -422,99 +448,104 @@ const TableWithCustomer = ({ val, index, noBorder, handleRefresh }) => {
 }
 
 const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
+    const classes = useStyles();
     const location = useLocation(), params2 = new URLSearchParams(location.search)
-        , orderID = parseInt(params2.get('orderID'));
+        , orderID = parseInt(params2.get('orderID')), openCame = parseInt(params2.get('openCame'));
+    const [check, setCheck] = useState([]);
+    const dispatch = useDispatch();
 
     const listProductTemp = useMemo(() => {
-        let data = [], table = [];
-        if (entities?.data?.length) {
-            entities.data.forEach(element => {
-                element.productorder.forEach(e => {
-                    if (parseInt(orderID) === element.id)
-                        if (element.parentid === 1) {
-                            data.push({
-                                sku: e.sku,
-                                img: e.image,
-                                name: e.name,
-                                price: e.price,
-                            });
-                        } else {
-                            JSON.parse(e.model).forEach(el => {
-                                el?.slots?.length && el.slots.forEach(elm => {
-                                    data.push(elm.item);
-                                })
-                            })
-                            table.push({
-                                sku: e.sku,
-                                img: e.image,
-                                name: e.name,
-                                price: 0,
-                                type: 'table'
-                            })
-                        }
-                })
-            });
-            const groupedData = groupBy(data, 'sku');
-            const groupedTable = groupBy(table, 'sku');
-
-            return [
-                ...map(groupedTable, (products, sku) => ({
-                    ...products[0],
-                    numberPR: products.length,
-                })),
-                ...map(groupedData, (products, sku) => ({
-                    ...products[0],
-                    numberPR: products.length,
-                }))
-            ];
-        }
-
-        return []
+        return returnListProductByOrderID(entities, orderID)
     }, [entities, orderID])
     const totalPr = useMemo(() => {
-        let total = 0, money = 0;
-        if (listProductTemp?.length)
-            listProductTemp.forEach(element => {
-                total = total + element.numberPR;
-                money = money + ((element.price || 0) * element.numberPR);
-            });
-        return { total, money }
+        return returnTotalAllProduct(listProductTemp)
     }, [listProductTemp])
 
-    return <div className='p-8 rounded-4 shadow-4'>
-        <div>
-            <b>
-                Tổng đơn hàng {Boolean(orderID) ? orderID : ''}
-            </b>
-        </div>
-        {
-            orderID
-                ? <>
-                    <table style={{ width: '100%' }}>
-                        {
-                            entities?.data?.length && entities.data.map((val, index) => {
-                                return val.id === parseInt(orderID) ? <TableWithCustomer val={val} key={val.id} index={0} noBorder /> : null
-                            })
-                        }
-                    </table>
+    const handleSaveFile = async (file, name) => {
+        //setOpen(false)
+        //window.alert(JSON.stringify(file));
+        handleSaveFileOut({
+            typeItem: 2,
+            data: check.map(val => ({ id: val, receiveimg: name }))
+        }, handleRefresh, dispatch, file, () => {
+            setCheck([]);
+        })
+        // try {
+        //     const data = new FormData();
+        //     data.append('enpoint', 'tempfile');
+        //     data.append('files', file);
+        //     await Connect.live.uploadFile.insert(data);
+        //     const resultAction = await dispatch(order.shipper.update())
+        //     unwrapResult(resultAction);
+        //     handleRefresh()
+        //     History.push(window.location.pathname)
+        // } catch (error) {
+        //     window.alert(error)
+        // }
+    }
 
-                    <List listProduct={listProductTemp} totalPr={totalPr} />
-                </>
-                : <div className='flex '>
-                    <table className='w-full'>
-                        <tbody>
-                            <tr>
-                                <td colSpan={3} className='p-4'>
-                                    <hr style={{ borderColor: 'aliceblue' }}></hr>
-                                </td>
-                            </tr>
-                        </tbody>
-                        {
-                            entities?.data?.length && entities.data.map((val, index) => (
-                                <TableWithCustomer val={val} key={val.id} index={index} handleRefresh={handleRefresh} />
-                            ))
+    return <>
+        {
+            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} saveFile={handleSaveFile} />
+        }
+
+        <div className='p-8 rounded-4 shadow-4'>
+            <div className='flex justify-between' style={{ height: 25 }}>
+                <b>
+                    Tổng đơn hàng {Boolean(orderID) ? orderID : ''}
+                </b>
+                {
+                    Boolean(check?.length)
+                    &&
+                    <DropMenu
+                        crName={'Lựa chọn'}
+                        className={clsx('text-white px-4 py-2 text-9 bg-blue-500'
+                            , `hover:bg-blue-500`
+                        )}
+                        data={[
+                            {
+                                name: 'Chụp hình đơn đã chọn',
+                                id: 1,
+                            },
+                        ]
                         }
-                        {/* <tbody>
+                        small
+                        handleClose={(value, setAnchorEl) => {
+                            if (value?.id === 1) {
+                                History.push(window.location.pathname + `?openCame=1`)
+                            }
+                            setAnchorEl(null)
+                        }} />
+                }
+            </div>
+            {
+                orderID
+                    ? <>
+                        <table style={{ width: '100%' }}>
+                            {
+                                entities?.data?.length && entities.data.map((val, index) => {
+                                    return val.id === parseInt(orderID) ? <TableWithCustomer val={val} key={val.id} index={0} noBorder /> : null
+                                })
+                            }
+                        </table>
+
+                        <List listProduct={listProductTemp} totalPr={totalPr} />
+                    </>
+                    : <div className='flex '>
+                        <table className='w-full'>
+                            <tbody>
+                                <tr>
+                                    <td colSpan={3} className='p-4'>
+                                        <hr style={{ borderColor: 'aliceblue' }}></hr>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            {
+                                entities?.data?.length && entities.data.map((val, index) => (
+                                    <TableWithCustomer setCheck={setCheck} val={{ ...val, checked: check.includes(val.id) }} key={val.id} index={index} handleRefresh={handleRefresh} />
+                                ))
+                            }
+                            {/* <tbody>
                     {
                         listProduct.map(val => (
                             <tr style={{ verticalAlign: 'baseline' }} key={val.sku}>
@@ -535,10 +566,12 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                         ))
                     }
                 </tbody> */}
-                    </table>
-                </div>
-        }
-    </div>
+                        </table>
+                    </div>
+            }
+        </div>
+    </>
+
 }
 
 const TakePhotoDialog = ({ open, className, saveFile, check }) => {
@@ -662,7 +695,7 @@ const EmployDelivery = () => {
     const loading = useSelector(store => store[keyStore].order.loading);
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
     const [search, setSearch] = useState(initialValues);
-    const params = useParams(), id = params.id, type = params.type, session = params.session;
+    const params = useParams(), type = params.type, session = params.session;
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , orderID = (params2.get('orderID'));
 

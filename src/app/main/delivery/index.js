@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import { Menu, MenuItem, makeStyles, withStyles } from '@material-ui/core';
+import { makeStyles, withStyles } from '@material-ui/core';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -12,13 +12,12 @@ import Check from '@material-ui/icons/Check';
 import StepConnector from '@material-ui/core/StepConnector';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { faBox, faCircleCheck, faHandHoldingDollar, faHandHoldingHand, faTruckFast } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faCircleCheck, faHandHoldingHand, faTruckFast } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import CmsFormikUploadFile from '@widgets/components/cms-formik/CmsFormikUploadFile';
 import * as Yup from 'yup';
-import { ArrowDropDown } from '@material-ui/icons';
-import { useLocation, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { keyStore } from '../order/common';
 import reducer from './store';
 import withReducer from 'app/store/withReducer';
@@ -28,6 +27,7 @@ import { useEffect } from 'react';
 import { order } from '../order/store/orderSlice';
 import HeadDelivery from './components/Header';
 import { useMemo } from 'react';
+import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 
 const useQontoStepIconStyles = makeStyles({
     root: {
@@ -232,66 +232,28 @@ function getSteps() {
     }];
 }
 
-const DropMenu = ({ crName, className }) => {
-    const [anchorEl, setAnchorEl] = useState(null);
-    const classes = useStyles();
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    return (
-        <div>
-            <Button aria-controls="dropdown-menu" className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="outlined" aria-haspopup="true" onClick={handleClick}>
-                {crName}
-                <ArrowDropDown />
-            </Button>
-            <Menu
-                id="dropdown-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                className={classes.menu}
-            >
-                <MenuItem style={{ minHeight: 'initial' }} onClick={handleClose}>
-                    Tên NV : Trương Công Mạnh
-                </MenuItem>
-                <MenuItem style={{ minHeight: 'initial' }} onClick={handleClose}>
-                    SĐT : 0363341099
-                </MenuItem>
-                <MenuItem style={{ minHeight: 'initial' }} onClick={handleClose}>
-                    Chức vụ : Nhân viên giao hàng
-                </MenuItem>
-            </Menu>
-        </div>
-    );
-}
-
 const Delivery = () => {
     const classes = useStyles();
     const [activeStep, setActiveStep] = React.useState(0);
     const steps = getSteps();
     const dispatch = useDispatch();
     const params = useParams()
-        , ship = (params.ship)
         , session = (params.session)
         , orderID = (params.order);
-    const loading = useSelector(store => store[keyStore].order.loading);
+    //const loading = useSelector(store => store[keyStore].order.loading);
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
     const currentOrder = useMemo(() => {
         if (entities?.data?.length)
             return entities.data.find(val => val.id === parseInt(orderID))
         return null
     }, [entities, orderID])
+    const listProductTemp = useMemo(() => {
+        return returnListProductByOrderID(entities, orderID)
+    }, [entities, orderID])
+    const totalPr = useMemo(() => {
+        return returnTotalAllProduct(listProductTemp)
+    }, [listProductTemp])
+
     // const handleNext = () => {
     //     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     // };
@@ -303,7 +265,6 @@ const Delivery = () => {
     // const handleReset = () => {
     //     setActiveStep(0);
     // };
-    console.log(currentOrder);
     const getListTable = useCallback((search) => {
         dispatch(order.shipper.getDetailShipDelivery({ ...search, session }));
     }, [dispatch, session])
@@ -387,7 +348,7 @@ const Delivery = () => {
                         </div>
                         <div className='flex '>
                             <table className='w-full'>
-                                <tbody>
+                                {/* <tbody>
                                     <tr style={{ verticalAlign: 'baseline' }}>
                                         <td>
                                             <b>
@@ -401,7 +362,29 @@ const Delivery = () => {
                                             100,000,000đ
                                         </td>
                                     </tr>
+                                </tbody> */}
+                                <tbody>
+                                    {
+                                        listProductTemp.map(val => (
+                                            <tr style={{ verticalAlign: 'baseline' }} key={val.sku}>
+                                                <td>
+                                                    <b>
+                                                        {val.numberPR}x
+                                                    </b>
+                                                </td>
+                                                <td>
+                                                    {val.name}
+                                                </td>
+                                                <td className='text-right'>
+                                                    {typeof val.price === 'number'
+                                                        ? val.price.toLocaleString('en-US')
+                                                        : '-'}đ
+                                                </td>
+                                            </tr>
+                                        ))
+                                    }
                                 </tbody>
+
                                 <tbody>
                                     <tr>
                                         <td colSpan={3} className='p-4'>
@@ -415,23 +398,23 @@ const Delivery = () => {
                                             Tạm tính
                                         </td>
                                         <td className='text-right'>
-                                            100,000,000đ
+                                            {totalPr?.money}đ
                                         </td>
                                     </tr>
-                                    <tr style={{ verticalAlign: 'baseline' }}>
+                                    {/* <tr style={{ verticalAlign: 'baseline' }}>
                                         <td colSpan={2}>
                                             Phí áp dụng: <b className='ml-4'>1.4km</b>
                                         </td>
                                         <td className='text-right'>
                                             20,000đ
                                         </td>
-                                    </tr>
+                                    </tr> */}
                                     <tr style={{ verticalAlign: 'baseline' }}>
                                         <td colSpan={2}>
                                             Discount
                                         </td>
                                         <td className='text-right'>
-                                            20,000đ
+                                            0đ
                                         </td>
                                     </tr>
                                 </tbody>
@@ -451,11 +434,11 @@ const Delivery = () => {
                                         </td>
                                         <td className='text-right'>
                                             <b>
-                                                100,000,000đ
+                                                {totalPr?.money}đ
                                             </b>
                                         </td>
                                     </tr>
-                                    <tr >
+                                    {/* <tr >
                                         <td colSpan={2}>
                                             <b>
                                                 Thanh toán bằng
@@ -467,7 +450,7 @@ const Delivery = () => {
                                                 Ví momo
                                             </b>
                                         </td>
-                                    </tr>
+                                    </tr> */}
                                 </tbody>
                             </table>
                         </div>
