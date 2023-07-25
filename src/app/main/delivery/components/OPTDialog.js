@@ -5,6 +5,7 @@ const OPTDialog = ({ open, className, saveFile, check }) => {
 
     return <Dialog className={className} open={open} fullWidth maxWidth="md">
         <DialogContent className='text-11' style={{ paddingTop: 8 }}>
+            1234
         </DialogContent>
     </Dialog>
 }

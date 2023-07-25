@@ -41,7 +41,34 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1),
     },
-
+    modalSmall: {
+        '& .MuiDialog-paperFullWidth': {
+            width: `calc(100% - 30px)`, // Change this to the desired background color
+        },
+        '& .MuiDialog-paper': {
+            margin: '15px 22px'
+        },
+        '& .MuiBackdrop-root': {
+            backgroundColor: 'rgb(159 155 155 / 50%)'
+        },
+        '& .MuiStepper-root': {
+            padding: 0
+        },
+        '& .MuiDialogTitle-root': {
+            borderBottom: '1px solid gray',
+            paddingLeft: 0,
+            paddingRight: 0,
+            paddingTop: 0,
+            paddingBottom: 0
+        },
+        '& .MuiDialogContent-root': {
+            paddingLeft: 8,
+            paddingRight: 8
+        },
+        '& .MuiTab-root ,& .MuiTabs-root': {
+            minHeight: '35px !important'
+        }
+    },
     modal: {
         '& .MuiDialog-paperFullWidth': {
             width: `calc(100% - 30px)`, // Change this to the desired background color
@@ -875,7 +902,7 @@ const EmployDelivery = () => {
                 <DialogActions>
                 </DialogActions>
             </Dialog>
-            <OPTDialog className={classes.modal} open={true} />
+            <OPTDialog className={classes.modalSmall} open={true} />
         </div>
     );
 }
