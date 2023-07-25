@@ -301,59 +301,37 @@ const handleSaveFileOut = async (value, handleRefresh, dispatch, file, successFc
 }
 
 const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) => {
-    const dispatch = useDispatch();
-    const className = useStyles();
-    const location = useLocation(), params2 = new URLSearchParams(location.search)
-        , shipID = parseInt(params2.get('shipID'));
+    // const dispatch = useDispatch();
+    // const location = useLocation(), params2 = new URLSearchParams(location.search)
+    //     , shipID = parseInt(params2.get('shipID'));
 
-    const handleSaveFile = async (file, name) => {
-        //setOpen(false)
-        //window.alert(JSON.stringify(file));
-        handleSaveFileOut({
-            typeItem: 2,
-            data: [
-                {
-                    id: parseInt(shipID),
-                    receiveimg: name
-                }
-            ]
-        }, handleRefresh, dispatch, file, () => { })
-        // try {
-        //     const data = new FormData();
-        //     data.append('enpoint', 'tempfile');
-        //     data.append('files', file);
-        //     await Connect.live.uploadFile.insert(data);
-        //     const resultAction = await dispatch(order.shipper.update())
-        //     unwrapResult(resultAction);
-        //     handleRefresh()
-        //     History.push(window.location.pathname)
-        // } catch (error) {
-        //     window.alert(error)
-        // }
-    }
-
-    const check = async () => {
-        try {
-            const resultAction = await dispatch(order.shipper.update({
-                typeItem: 2,
-                data: [
-                    {
-                        id: parseInt(shipID),
-                        receiveimg: '123'
-                    }
-                ]
-            }))
-            unwrapResult(resultAction);
-            handleRefresh()
-            History.push(window.location.pathname)
-        } catch (error) {
-            window.alert(error)
-        }
-    }
+    // const handleSaveFile = async (file, name) => {
+    //     //setOpen(false)
+    //     //window.alert(JSON.stringify(file));
+    //     handleSaveFileOut({
+    //         typeItem: 2,
+    //         data: [
+    //             {
+    //                 id: parseInt(shipID),
+    //                 receiveimg: name,
+    //             }
+    //         ]
+    //     }, handleRefresh, dispatch, file, () => { })
+    //     // try {
+    //     //     const data = new FormData();
+    //     //     data.append('enpoint', 'tempfile');
+    //     //     data.append('files', file);
+    //     //     await Connect.live.uploadFile.insert(data);
+    //     //     const resultAction = await dispatch(order.shipper.update())
+    //     //     unwrapResult(resultAction);
+    //     //     handleRefresh()
+    //     //     History.push(window.location.pathname)
+    //     // } catch (error) {
+    //     //     window.alert(error)
+    //     // }
+    // }
 
     return <>
-        <TakePhotoDialog className={className.modal2} saveFile={handleSaveFile} check={check} />
-
         <tbody key={val.id}>
             <tr key={val.sku}>
                 <td style={{ width: 20, borderRight: '1px dashed #bbbbbb' }} className='text-center'>
@@ -367,10 +345,11 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                                 return e.includes(val.id) ? e.filter(el => el !== val.id) : [...e, val.id];
                             })
                         }}
+                        disabled={val.shipping.status !== 1 && val.shipping.status !== 2}
                     />
                 </td>
-                <td>
-                    <div className='flex items-center mb-2'>
+                <td className='pl-2'>
+                    <div className='flex items-baseline mb-2'>
                         <b className='mr-2'>
                             ID
                         </b>
@@ -382,15 +361,15 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                             </div>
                         </Link>
                     </div>
-                    <div className='flex items-center mb-2'>
+                    <div className='flex items-baseline mb-2'>
                         <FontAwesomeIcon icon={faUser} className='mr-2 text-10' />
                         {val.customername} - {val.customeremail}
                     </div>
-                    <div className='flex items-center mb-2'>
+                    <div className='flex items-baseline mb-2'>
                         <FontAwesomeIcon icon={faPhone} className='mr-2 text-10' />
                         {val.customermoblie}
                     </div>
-                    <div className='flex items-center'>
+                    <div className='flex items-baseline'>
                         <FontAwesomeIcon icon={faLocationDot} className='mr-2 text-10' />
                         {val.customeraddress}, {val.customerward}, {val.customerdistrict}, {val.customercity}
                     </div>
@@ -450,7 +429,8 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
 const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
     const classes = useStyles();
     const location = useLocation(), params2 = new URLSearchParams(location.search)
-        , orderID = parseInt(params2.get('orderID')), openCame = parseInt(params2.get('openCame'));
+        , orderID = parseInt(params2.get('orderID')), openCame = parseInt(params2.get('openCame'))
+        , shipID = parseInt(params2.get('shipID'));
     const [check, setCheck] = useState([]);
     const dispatch = useDispatch();
 
@@ -464,12 +444,50 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
     const handleSaveFile = async (file, name) => {
         //setOpen(false)
         //window.alert(JSON.stringify(file));
-        handleSaveFileOut({
-            typeItem: 2,
-            data: check.map(val => ({ id: val, receiveimg: name }))
-        }, handleRefresh, dispatch, file, () => {
-            setCheck([]);
-        })
+        if (shipID) {
+            const current = entities.data.find(element => {
+                return element.shipping.id === parseInt(shipID)
+            });
+
+            handleSaveFileOut({
+                typeItem: 2,
+                data: [
+                    {
+                        id: current.shipping.id,
+                        receiveimg: name,
+                        session: current.shipping.session
+                    }
+                ]
+            }, handleRefresh, dispatch, file, () => {
+            })
+        } else {
+            const data = check.map(val => {
+                const current = entities.data.find(element => {
+                    return element.id === parseInt(val)
+                });
+
+                return {
+                    id: current.shipping.id,
+                    receiveimg: name,
+                    session: current.shipping.session
+                }
+            })
+
+            handleSaveFileOut({
+                typeItem: 2,
+                data
+            }, handleRefresh, dispatch, file, () => {
+                setCheck([]);
+            })
+        }
+
+
+        // handleSaveFileOut({
+        //     typeItem: 2,
+        //     data: check.map(val => ({ id: val, receiveimg: name }))
+        // }, handleRefresh, dispatch, file, () => {
+        //     setCheck([]);
+        // })
         // try {
         //     const data = new FormData();
         //     data.append('enpoint', 'tempfile');
@@ -486,7 +504,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
     return <>
         {
-            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} saveFile={handleSaveFile} />
+            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} check={handleSaveFile} />
         }
 
         <div className='p-8 rounded-4 shadow-4'>
@@ -590,7 +608,8 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     };
 
     useEffect(() => {
-        setOpenCame(parseInt(openCameUrl) === 1)
+        setOpenCame(parseInt(openCameUrl) === 1);
+        setPhotoData(null);
     }, [openCameUrl])
 
     const handleCapture = () => {
@@ -670,6 +689,9 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                     </button>
                 </div>
 
+            </div>
+            <div onClick={() => check()}>
+                check
             </div>
             {photoData &&
                 <div className="photo-preview w-full mt-8 relative">
