@@ -188,7 +188,8 @@ const orderSlice = createSlice({
         response: null,
         search: initSearchState,
         popupLoading: false,
-        storeOrders: []
+        storeOrders: [],
+        btnLoading: false
     },
     reducers: {
         /**
@@ -342,7 +343,7 @@ const orderSlice = createSlice({
             loading: false,
             error: error
         }),
-        
+
 
         [order.other.getDeliveryList.pending]: state => ({
             ...state,
@@ -495,6 +496,25 @@ const orderSlice = createSlice({
                     data: []
                 },
                 error: null
+            }
+        },
+
+        [order.shipper.update.pending]: (state, { payload }) => {
+            return {
+                ...state,
+                btnLoading: true,
+            }
+        },
+        [order.shipper.update.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                btnLoading: false,
+            }
+        },
+        [order.shipper.update.rejected]: (state, { payload }) => {
+            return {
+                ...state,
+                btnLoading: false,
             }
         },
 

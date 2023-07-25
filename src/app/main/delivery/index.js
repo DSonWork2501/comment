@@ -28,6 +28,9 @@ import { order } from '../order/store/orderSlice';
 import HeadDelivery from './components/Header';
 import { useMemo } from 'react';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
+import { alertInformation } from '@widgets/functions';
+import { unwrapResult } from '@reduxjs/toolkit';
+import './css/CameraComponent.css'; // Import the CSS file
 
 const useQontoStepIconStyles = makeStyles({
     root: {
@@ -274,7 +277,21 @@ const Delivery = () => {
     }, [getListTable, dispatch])
 
     const handleSave = (values) => {
-
+        alertInformation({
+            text: `Xác nhận vận chuyển`,
+            data: values,
+            confirm: async (values) => {
+                formik.setSubmitting(true);
+                try {
+                    const resultAction = await dispatch(order.shipper.update(values));
+                    unwrapResult(resultAction);
+                } catch (error) { }
+                finally {
+                    formik.setSubmitting(false);
+                }
+            },
+            close: () => formik.setSubmitting(false)
+        })
     }
 
     const formik = useFormik({
@@ -459,16 +476,21 @@ const Delivery = () => {
                 <DialogActions>
                     <div className='flex justify-between w-full items-center'>
                         <div className='w-1/2 text-left'>
-                            <CmsFormikUploadFile
-                                id="uploadfile"
-                                name="fileInput"
-                                fileProperties={
-                                    { accept: ".doc, .docx, .xls, .xlsx" }
-                                }
-                                label='Chọn hình'
-                                setValue={upLoadFile}
-                                formik={formik}
-                                showFileName={false} />
+                            {
+                                currentOrder?.shipping?.status !== 2
+                                &&
+                                <CmsFormikUploadFile
+                                    id="uploadfile"
+                                    name="fileInput"
+                                    fileProperties={
+                                        { accept: ".doc, .docx, .xls, .xlsx" }
+                                    }
+                                    label='Chọn hình'
+                                    setValue={upLoadFile}
+                                    formik={formik}
+                                    showFileName={false} />
+                            }
+
                             {/* {
                                 formik && get(formik?.touched, 'file') && Boolean(get(formik?.errors, 'file'))
                                 &&
@@ -484,7 +506,7 @@ const Delivery = () => {
                         </div>
                         <div className='w-1/2 text-right'>
                             <Button
-                                onClick={() => setActiveStep(prev => { if (prev === 4) return 0; return prev + 1 })}
+                                onClick={formik.handleSubmit}
                                 variant='outlined'
                                 color="primary">
                                 {
