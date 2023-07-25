@@ -14,7 +14,7 @@ import { order } from '../order/store/orderSlice';
 import { useLocation, useParams } from 'react-router';
 import reducer from './store';
 import withReducer from 'app/store/withReducer';
-import { CmsCheckbox, CmsTab } from '@widgets/components';
+import { CmsCheckbox, CmsTab, CmsUploadFile } from '@widgets/components';
 import History from '@history/@history';
 import { groupBy, map } from 'lodash';
 import { DropMenu } from '../order/components/index';
@@ -504,7 +504,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
     return <>
         {
-            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} check={handleSaveFile} />
+            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} saveFile={handleSaveFile} />
         }
 
         <div className='p-8 rounded-4 shadow-4'>
@@ -598,6 +598,7 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     const [photoData, setPhotoData] = useState(null);
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , openCameUrl = parseInt(params2.get('openCame'));
+    const [file, setFile] = useState(null);
 
     const [openCame, setOpenCame] = useState(false);
 
@@ -610,6 +611,7 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     useEffect(() => {
         setOpenCame(parseInt(openCameUrl) === 1);
         setPhotoData(null);
+        setFile(null);
     }, [openCameUrl])
 
     const handleCapture = () => {
@@ -636,6 +638,12 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
             // inputFile.files = [file];
         }
     };
+
+    const handleSaveFile = () => {
+        if (file?.length) {
+            saveFile(file[0], file[0].name)
+        }
+    }
 
     // Helper function to convert base64 to Blob
     const dataURItoBlob = (dataURI) => {
@@ -690,9 +698,7 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                 </div>
 
             </div>
-            <div onClick={() => check()}>
-                check
-            </div>
+
             {photoData &&
                 <div className="photo-preview w-full mt-8 relative">
                     <img src={photoData} alt="Captured" className='w-full mb-8' />
@@ -707,6 +713,41 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                     </Button>
                 </div>
             }
+
+            <div className='flex justify-between items-center mt-8'>
+                <div className='flex items-center'>
+                    <CmsUploadFile
+                        size="small"
+                        label="Chọn file hình"
+                        id="uploadfile"
+                        fileProperties={
+                            {
+                                accept: '.png, .jpeg, .jpg, .gif'
+                            }
+                        }
+                        className='mr-8'
+                        setValue={(value, setLoading, resetFileInput) => {
+                            console.log(value);
+                            setFile(value)
+                            resetFileInput();
+                        }} />
+                    {
+                        file && 'Đã chọn 1 hình'
+                    }
+                </div>
+                {
+                    file &&
+                    <Button
+                        size='small'
+                        variant='contained'
+                        color='primary'
+                        onClick={handleSaveFile}
+                    >
+                        Lưu
+                    </Button>
+                }
+            </div>
+
         </DialogContent>
     </Dialog>
 }

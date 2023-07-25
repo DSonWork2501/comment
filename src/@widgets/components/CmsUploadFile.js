@@ -6,6 +6,7 @@ import {
 } from '@material-ui/core'
 import * as PropTypes from 'prop-types';
 import FileProperties from '@widgets/metadatas/FileProperties';
+import { useRef } from 'react';
 
 /**
  * 
@@ -26,15 +27,20 @@ function CmsUploadFile(props) {
     const handleChange = e => {
         const files = e.target.files
         setFile(Object.values(files))
-        setValue(Object.values(files), setLoading)
+        setValue(Object.values(files), setLoading, resetFileInput)
     }
     const [loading, setLoading] = useState(false)
+    const inputRef = useRef(null);
+
+    const resetFileInput = () => {
+        inputRef.current.value = null;
+    };
 
     return (
         <div className={className}>
             {isMultiple ? (
-                <input multiple accept={fileProperties.accept} id={`widgets-upload-file-${id}`} type="file" style={{ display: "none" }} disabled={loading} onChange={handleChange} />
-            ) : (<input accept={fileProperties.accept} id={`widgets-upload-file-${id}`} type="file" style={{ display: "none" }} disabled={loading} onChange={handleChange} />
+                <input ref={inputRef} multiple accept={fileProperties.accept} id={`widgets-upload-file-${id}`} type="file" style={{ display: "none" }} disabled={loading} onChange={handleChange} />
+            ) : (<input ref={inputRef} accept={fileProperties.accept} id={`widgets-upload-file-${id}`} type="file" style={{ display: "none" }} disabled={loading} onChange={handleChange} />
             )}
             <label className="flex flex-row items-center space-x-3" htmlFor={`widgets-upload-file-${id}`}>
                 <Button
