@@ -28,6 +28,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 import HeadDelivery from './components/Header';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
+import OPTDialog from './components/OPTDialog';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -338,15 +339,19 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                     <b>
                         {index + 1}
                     </b>
-                    <CmsCheckbox
-                        checked={val.checked}
-                        onChange={event => {
-                            setCheck(e => {
-                                return e.includes(val.id) ? e.filter(el => el !== val.id) : [...e, val.id];
-                            })
-                        }}
-                        disabled={val.shipping.status !== 1 && val.shipping.status !== 2}
-                    />
+                    {
+                        !noBorder
+                        &&
+                        <CmsCheckbox
+                            checked={val.checked}
+                            onChange={event => {
+                                setCheck(e => {
+                                    return e.includes(val.id) ? e.filter(el => el !== val.id) : [...e, val.id];
+                                })
+                            }}
+                            disabled={val.shipping.status !== 1 && val.shipping.status !== 2}
+                        />
+                    }
                 </td>
                 <td className='pl-2'>
                     <div className='flex items-baseline mb-2'>
@@ -510,6 +515,25 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
         <div className='p-8 rounded-4 shadow-4'>
             <div className='flex justify-between' style={{ height: 25 }}>
                 <b>
+                    {
+                        !Boolean(orderID)
+                        &&
+                        <CmsCheckbox
+                            //checked={false}
+                            onChange={event => {
+                                if (check?.length) {
+                                    setCheck([]);
+                                    return;
+                                }
+
+                                let values = entities?.data.map(value => value.id);
+                                setCheck(values);
+                            }}
+                            checked={(check?.length > 0 && check?.length === entities?.data?.length)}
+                            indeterminate={check?.length > 0 && check?.length < entities?.data?.length}
+                        />
+                    }
+
                     Tổng đơn hàng {Boolean(orderID) ? orderID : ''}
                 </b>
                 {
@@ -517,8 +541,8 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                     &&
                     <DropMenu
                         crName={'Lựa chọn'}
-                        className={clsx('text-white px-4 py-2 text-9 bg-blue-500'
-                            , `hover:bg-blue-500`
+                        className={clsx('text-white px-4 py-2 text-9 bg-green-500'
+                            , `hover:bg-green-500`
                         )}
                         data={[
                             {
@@ -558,6 +582,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                     </td>
                                 </tr>
                             </tbody>
+
                             {
                                 entities?.data?.length && entities.data.map((val, index) => (
                                     <TableWithCustomer setCheck={setCheck} val={{ ...val, checked: check.includes(val.id) }} key={val.id} index={index} handleRefresh={handleRefresh} />
@@ -850,6 +875,7 @@ const EmployDelivery = () => {
                 <DialogActions>
                 </DialogActions>
             </Dialog>
+            <OPTDialog className={classes.modal} open={true} />
         </div>
     );
 }
