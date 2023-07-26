@@ -613,7 +613,7 @@ const Delivery = () => {
             </Dialog>
 
             {
-                openDialog === 'OPT' && <OPTDialog isOPT className={classes.modalSmall} open={true} handleSave={handleSave2FA} />
+                openDialog === 'OPT' && <OPTDialog isOPT className={classes.modalSmall} open={true} handleSave={handleSave2FA} handleClose={() => setOpenDialog('')}/>
             }
         </div>
     );

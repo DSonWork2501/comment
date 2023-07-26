@@ -961,7 +961,7 @@ const EmployDelivery = () => {
                 </DialogActions>
             </Dialog>
             {
-                openDialog === '2FA' && <OPTDialog className={classes.modalSmall} open={true} handleSave={handleSave2FA} />
+                openDialog === '2FA' && <OPTDialog className={classes.modalSmall} open={true} handleSave={handleSave2FA} handleClose={() => setOpenDialog('')} />
             }
         </div>
     );
