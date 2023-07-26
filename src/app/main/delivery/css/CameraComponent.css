@@ -57,7 +57,7 @@
 }
 
 .swal2-popup{
-  width: 250px;
+  width: 200px !important;
   font-size:12px !important;
   padding: 8px 0px !important;
 }
