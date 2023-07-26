@@ -28,7 +28,6 @@ import { useMemo } from 'react';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import { alertInformation } from '@widgets/functions';
 import { unwrapResult } from '@reduxjs/toolkit';
-import './css/CameraComponent.css'; // Import the CSS file
 import { CmsButtonProgress } from '@widgets/components';
 import { TakePhotoDialog, fileEndpoint, modalSmall } from './EmployDelivery';
 import History from '@history/@history';
@@ -379,6 +378,7 @@ const Delivery = () => {
 
     return (
         <div>
+             <link rel="stylesheet" href="assets/css/CameraComponent.css" />
             {
                 parseInt(openCame) === 1 && <TakePhotoDialog saveFile={handleSaveFile} />
             }
@@ -613,7 +613,7 @@ const Delivery = () => {
             </Dialog>
 
             {
-                openDialog === 'OPT' && <OPTDialog isOPT className={classes.modalSmall} open={true} handleSave={handleSave2FA} handleClose={() => setOpenDialog('')}/>
+                openDialog === 'OPT' && <OPTDialog isOPT className={classes.modalSmall} open={true} handleSave={handleSave2FA} handleClose={() => setOpenDialog('')} />
             }
         </div>
     );
