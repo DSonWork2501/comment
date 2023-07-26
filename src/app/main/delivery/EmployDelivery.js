@@ -762,7 +762,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
             {photoData &&
                 <div className="photo-preview w-full mt-8 relative">
                     <img src={photoData} alt="Captured" className='w-full mb-8' />
-                    {/* <Button
+                    <Button
                         size='small'
                         variant='contained'
                         color='primary'
@@ -770,14 +770,14 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                         className='absolute top-8 right-8'
                     >
                         Lưu
-                    </Button> */}
-                    <CmsButtonProgress
+                    </Button>
+                    {/* <CmsButtonProgress
                         loading={loading}
                         type="submit"
                         label={"Lưu"}
                         onClick={handleAddCapturedPhoto}
                         className='absolute top-8 right-8'
-                        size="small" />
+                        size="small" /> */}
                 </div>
             }
 
