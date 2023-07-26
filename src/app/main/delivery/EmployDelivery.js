@@ -14,7 +14,7 @@ import { order } from '../order/store/orderSlice';
 import { useLocation, useParams } from 'react-router';
 import reducer from './store';
 import withReducer from 'app/store/withReducer';
-import { CmsCheckbox, CmsTab, CmsUploadFile } from '@widgets/components';
+import { CmsButtonProgress, CmsCheckbox, CmsTab, CmsUploadFile } from '@widgets/components';
 import History from '@history/@history';
 import { groupBy, map } from 'lodash';
 import { DropMenu } from '../order/components/index';
@@ -28,8 +28,39 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 import HeadDelivery from './components/Header';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
+import OPTDialog from './components/OPTDialog';
+import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 
-const useStyles = makeStyles((theme) => ({
+export const modalSmall = {
+    '& .MuiDialog-paperFullWidth': {
+        width: `calc(100% - 30px)`, // Change this to the desired background color
+    },
+    '& .MuiDialog-paper': {
+        margin: '15px 22px'
+    },
+    '& .MuiBackdrop-root': {
+        backgroundColor: 'rgb(159 155 155 / 50%)'
+    },
+    '& .MuiStepper-root': {
+        padding: 0
+    },
+    '& .MuiDialogTitle-root': {
+        borderBottom: '1px solid gray',
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
+        paddingBottom: 0
+    },
+    '& .MuiDialogContent-root': {
+        paddingLeft: 8,
+        paddingRight: 8
+    },
+    '& .MuiTab-root ,& .MuiTabs-root': {
+        minHeight: '35px !important'
+    }
+};
+
+export const useStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
     },
@@ -40,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1),
     },
-
+    modalSmall,
     modal: {
         '& .MuiDialog-paperFullWidth': {
             width: `calc(100% - 30px)`, // Change this to the desired background color
@@ -148,6 +179,7 @@ export const DropMenuMobile = ({ phone, name, className }) => {
     );
 }
 
+export const fileEndpoint = 'tempfile';
 const keyStore = 'stores';
 const initialValues = {
 
@@ -287,7 +319,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
 const handleSaveFileOut = async (value, handleRefresh, dispatch, file, successFc) => {
     try {
         const data = new FormData();
-        data.append('enpoint', 'tempfile');
+        data.append('enpoint', fileEndpoint);
         data.append('files', file);
         await Connect.live.uploadFile.insert(data);
         const resultAction = await dispatch(order.shipper.update(value))
@@ -335,18 +367,25 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
         <tbody key={val.id}>
             <tr key={val.sku}>
                 <td style={{ width: 20, borderRight: '1px dashed #bbbbbb' }} className='text-center'>
-                    <b>
-                        {index + 1}
-                    </b>
-                    <CmsCheckbox
-                        checked={val.checked}
-                        onChange={event => {
-                            setCheck(e => {
-                                return e.includes(val.id) ? e.filter(el => el !== val.id) : [...e, val.id];
-                            })
-                        }}
-                        disabled={val.shipping.status !== 1 && val.shipping.status !== 2}
-                    />
+                    <div>
+                        <b>
+                            {index + 1}
+                        </b>
+                    </div>
+
+                    {
+                        !noBorder
+                        &&
+                        <CmsCheckbox
+                            checked={val.checked}
+                            onChange={event => {
+                                setCheck(e => {
+                                    return e.includes(val.id) ? e.filter(el => el !== val.id) : [...e, val.id];
+                                })
+                            }}
+                            disabled={val.shipping.status !== 1 && val.shipping.status !== 2}
+                        />
+                    }
                 </td>
                 <td className='pl-2'>
                     <div className='flex items-baseline mb-2'>
@@ -510,6 +549,25 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
         <div className='p-8 rounded-4 shadow-4'>
             <div className='flex justify-between' style={{ height: 25 }}>
                 <b>
+                    {
+                        !Boolean(orderID)
+                        &&
+                        <CmsCheckbox
+                            //checked={false}
+                            onChange={event => {
+                                if (check?.length) {
+                                    setCheck([]);
+                                    return;
+                                }
+
+                                let values = entities?.data.map(value => value.id);
+                                setCheck(values);
+                            }}
+                            checked={(check?.length > 0 && check?.length === entities?.data?.length)}
+                            indeterminate={check?.length > 0 && check?.length < entities?.data?.length}
+                        />
+                    }
+
                     Tổng đơn hàng {Boolean(orderID) ? orderID : ''}
                 </b>
                 {
@@ -517,8 +575,8 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                     &&
                     <DropMenu
                         crName={'Lựa chọn'}
-                        className={clsx('text-white px-4 py-2 text-9 bg-blue-500'
-                            , `hover:bg-blue-500`
+                        className={clsx('text-white px-4 py-2 text-9 bg-green-500'
+                            , `hover:bg-green-500`
                         )}
                         data={[
                             {
@@ -558,6 +616,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                     </td>
                                 </tr>
                             </tbody>
+
                             {
                                 entities?.data?.length && entities.data.map((val, index) => (
                                     <TableWithCustomer setCheck={setCheck} val={{ ...val, checked: check.includes(val.id) }} key={val.id} index={index} handleRefresh={handleRefresh} />
@@ -592,14 +651,15 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
 }
 
-const TakePhotoDialog = ({ open, className, saveFile, check }) => {
+export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
+    const classes = useStyles();
     const webcamRef = useRef(null);
     const [frontCamera, setFrontCamera] = useState(false);
     const [photoData, setPhotoData] = useState(null);
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , openCameUrl = parseInt(params2.get('openCame'));
+    const loading = useSelector(store => store[keyStore].order.btnLoading)
     const [file, setFile] = useState(null);
-
     const [openCame, setOpenCame] = useState(false);
 
     const videoConstraints = {
@@ -657,7 +717,7 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
         return new Blob([ab], { type: mimeString });
     };
 
-    return <Dialog className={className} open={openCame} fullWidth maxWidth="md">
+    return <Dialog className={classes.modal2} open={openCame} fullWidth maxWidth="md">
         <DialogContent className='text-11' style={{ paddingTop: 8 }}>
             <div className="camera-container">
                 <div className="camera-view relative mb-8">
@@ -702,7 +762,7 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
             {photoData &&
                 <div className="photo-preview w-full mt-8 relative">
                     <img src={photoData} alt="Captured" className='w-full mb-8' />
-                    <Button
+                    {/* <Button
                         size='small'
                         variant='contained'
                         color='primary'
@@ -710,7 +770,14 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                         className='absolute top-8 right-8'
                     >
                         Lưu
-                    </Button>
+                    </Button> */}
+                    <CmsButtonProgress
+                        loading={loading}
+                        type="submit"
+                        label={"Lưu"}
+                        onClick={handleAddCapturedPhoto}
+                        className='absolute top-8 right-8'
+                        size="small" />
                 </div>
             }
 
@@ -737,14 +804,20 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                 </div>
                 {
                     file &&
-                    <Button
-                        size='small'
-                        variant='contained'
-                        color='primary'
+                    // <Button
+                    //     size='small'
+                    //     variant='contained'
+                    //     color='primary'
+                    //     onClick={handleSaveFile}
+                    // >
+                    //     Lưu
+                    // </Button>
+                    <CmsButtonProgress
+                        loading={loading}
+                        type="submit"
+                        label={"Lưu"}
                         onClick={handleSaveFile}
-                    >
-                        Lưu
-                    </Button>
+                        size="small" />
                 }
             </div>
 
@@ -761,6 +834,18 @@ const EmployDelivery = () => {
     const params = useParams(), type = params.type, session = params.session;
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , orderID = (params2.get('orderID'));
+    const [openDialog, setOpenDialog] = useState('');
+    const checkAllReceive = useMemo(() => {
+        if (entities?.data?.length) {
+            const pass = entities.data.filter(val => {
+                return val.shipping.status === 2
+            })
+
+            return pass.length === entities.data.length
+        }
+
+        return false
+    }, [entities])
 
     const getListTable = useCallback((search) => {
         dispatch(order.shipper.getDetailShipDelivery({ ...search, session }));
@@ -787,11 +872,16 @@ const EmployDelivery = () => {
     //     })
     // })
 
+    const handleSave2FA = (value) => {
+        setOpenDialog('')
+    }
+
     if (loading)
         return <FuseLoading />
 
     return (
         <div>
+            <FuseMessage />
             <Dialog className={classes.modal} open={true} fullWidth maxWidth="md">
 
                 <DialogTitle>
@@ -828,15 +918,30 @@ const EmployDelivery = () => {
 
                         {
                             orderID
-                            &&
-                            <Link
-                                to={`${window.location.pathname}`}
-                            >
-                                <div className='text-10' style={{ width: 54, color: '#e35c5c', textDecoration: 'underline', cursor: 'pointer' }}>
-                                    <FontAwesomeIcon icon={faArrowLeft} className='mr-2' />
-                                    Trở lại
-                                </div>
-                            </Link>
+                                ?
+                                <Link
+                                    to={`${window.location.pathname}`}
+                                >
+                                    <div className='text-10' style={{ width: 54, color: '#e35c5c', textDecoration: 'underline', cursor: 'pointer' }}>
+                                        <FontAwesomeIcon icon={faArrowLeft} className='mr-2' />
+                                        Trở lại
+                                    </div>
+                                </Link>
+                                : <>
+                                    {
+                                        (checkAllReceive && type === '2')
+                                        &&
+                                        <Button
+                                            size='small'
+                                            variant='contained'
+                                            color='primary'
+                                            onClick={() => { setOpenDialog('2FA') }}
+                                            style={{ textTransform: 'initial' }}
+                                        >
+                                            Nhận đủ
+                                        </Button>
+                                    }
+                                </>
                         }
                     </div>
 
@@ -850,6 +955,9 @@ const EmployDelivery = () => {
                 <DialogActions>
                 </DialogActions>
             </Dialog>
+            {
+                openDialog === '2FA' && <OPTDialog className={classes.modalSmall} open={true} handleSave={handleSave2FA} />
+            }
         </div>
     );
 }

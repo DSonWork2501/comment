@@ -55,3 +55,28 @@
 .MuiIconButton-root{
   padding: 0;
 }
+
+.swal2-popup{
+  width: 250px;
+  font-size:12px !important;
+  padding: 8px 0px !important;
+}
+
+.swal2-icon{
+  margin: 8px;
+  width: 50px;
+  height: 50px;
+}
+
+.swal2-icon .swal2-icon-content {
+  font-size: 1.75em;
+}
+
+.MuiSnackbar-anchorOriginTopCenter {
+  top: 41px;
+}
+
+.MuiSnackbar-root {
+  left: 24px;
+  right: 24px;
+}

@@ -43,7 +43,6 @@ function FuseMessage(props) {
 	const options = useSelector(({ fuse }) => fuse.message.options);
 
 	const classes = useStyles();
-
 	return (
 		<Snackbar
 			{...options}
@@ -59,6 +58,7 @@ function FuseMessage(props) {
 					body2: 'div'
 				}
 			}}
+			{...props}
 		>
 			<SnackbarContent
 				className={clsx(classes[options.variant])}
