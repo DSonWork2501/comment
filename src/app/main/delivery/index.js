@@ -1,5 +1,4 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -12,12 +11,11 @@ import Check from '@material-ui/icons/Check';
 import StepConnector from '@material-ui/core/StepConnector';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { faBox, faCircleCheck, faHandHoldingHand, faTruckFast } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faBox, faCircleCheck, faHandHoldingHand, faTruckFast } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
-import CmsFormikUploadFile from '@widgets/components/cms-formik/CmsFormikUploadFile';
 import * as Yup from 'yup';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import { keyStore } from '../order/common';
 import reducer from './store';
 import withReducer from 'app/store/withReducer';
@@ -31,6 +29,15 @@ import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import { alertInformation } from '@widgets/functions';
 import { unwrapResult } from '@reduxjs/toolkit';
 import './css/CameraComponent.css'; // Import the CSS file
+import { CmsButtonProgress } from '@widgets/components';
+import { TakePhotoDialog, fileEndpoint, modalSmall } from './EmployDelivery';
+import History from '@history/@history';
+import { useState } from 'react';
+import Connect from '@connect/@connect';
+import { Link } from 'react-router-dom';
+import OPTDialog from './components/OPTDialog';
+import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
+import { showMessage } from 'app/store/fuse/messageSlice';
 
 const useQontoStepIconStyles = makeStyles({
     root: {
@@ -217,7 +224,8 @@ const useStyles = makeStyles((theme) => ({
         '& ul': {
             padding: '0 !important'
         }
-    }
+    },
+    modalSmall
 }));
 
 function getSteps() {
@@ -237,14 +245,19 @@ function getSteps() {
 
 const Delivery = () => {
     const classes = useStyles();
-    const [activeStep, setActiveStep] = React.useState(0);
+    const [activeStep, setActiveStep] = React.useState(3);
     const steps = getSteps();
     const dispatch = useDispatch();
+    const location = useLocation(), params2 = new URLSearchParams(location.search)
+        , openCame = parseInt(params2.get('openCame'));
     const params = useParams()
         , session = (params.session)
         , orderID = (params.order);
-    //const loading = useSelector(store => store[keyStore].order.loading);
+    const loading = useSelector(store => store[keyStore].order.btnLoading);
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
+    const [file, setFile] = useState(null);
+    const [openDialog, setOpenDialog] = useState('');
+
     const currentOrder = useMemo(() => {
         if (entities?.data?.length)
             return entities.data.find(val => val.id === parseInt(orderID))
@@ -256,6 +269,7 @@ const Delivery = () => {
     const totalPr = useMemo(() => {
         return returnTotalAllProduct(listProductTemp)
     }, [listProductTemp])
+
 
     // const handleNext = () => {
     //     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -273,18 +287,59 @@ const Delivery = () => {
     }, [dispatch, session])
 
     useEffect(() => {
+        let step = 0;
+        if (currentOrder)
+            switch (currentOrder.shipping.status) {
+                case 2:
+                    step = 0;
+                    break;
+                case 3:
+                    step = 1;
+                    break;
+                case 5:
+                    step = 2;
+                    break;
+                default:
+                    break;
+            }
+        setActiveStep(step)
+    }, [currentOrder])
+
+    useEffect(() => {
         getListTable();
     }, [getListTable, dispatch])
 
-    const handleSave = (values) => {
+    const handleSave = (values, setLoading) => {
         alertInformation({
-            text: `Xác nhận vận chuyển`,
+            text: `Xác nhận thao tác`,
             data: values,
             confirm: async (values) => {
                 formik.setSubmitting(true);
                 try {
-                    const resultAction = await dispatch(order.shipper.update(values));
+                    const dataVL = {
+                        typeItem: currentOrder.shipping.status === 2 ? 3 : 5,
+                        data: [
+                            {
+                                id: currentOrder.shipping.id,
+                                session: currentOrder.shipping.session
+                            }
+                        ]
+                    }
+
+                    if (file) {
+                        const data = new FormData();
+                        data.append('enpoint', fileEndpoint);
+                        data.append('files', file);
+                        await Connect.live.uploadFile.insert(data);
+                        dataVL.data[0].completeimg = file.name;
+                    }
+
+                    const resultAction = await dispatch(order.shipper.update(dataVL));
                     unwrapResult(resultAction);
+                    getListTable();
+                    setFile(null)
+                    setOpenDialog('');
+                    setLoading && setLoading(false)
                 } catch (error) { }
                 finally {
                     formik.setSubmitting(false);
@@ -303,11 +358,37 @@ const Delivery = () => {
         })
     })
 
-    async function upLoadFile(file, { setLoading, resetFile, form }) {
+    // async function upLoadFile(file, { setLoading, resetFile, form }) {
+    // }
+
+    const handleSaveFile = (file, name) => {
+        setFile(file);
+        History.push(window.location.pathname);
+    }
+
+    const handleSave2FA = (value, setLoading) => {
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: {},
+            confirm: async (values) => {
+                if (currentOrder?.shipping?.code === value) {
+                    setLoading(true);
+                    handleSave(value, setLoading)
+                } else {
+                    setTimeout(() => {
+                        dispatch(showMessage({ variant: "error", message: 'Sai mã OPT' }))
+                    }, 0);
+                }
+            },
+        })
     }
 
     return (
         <div>
+            {
+                parseInt(openCame) === 1 && <TakePhotoDialog saveFile={handleSaveFile} />
+            }
+            <FuseMessage autoHideDuration={750} />
             <Dialog className={classes.modal} open={true} fullWidth maxWidth="md">
                 <DialogTitle>
                     <div className={classes.root}>
@@ -330,11 +411,21 @@ const Delivery = () => {
                 <DialogContent className='text-11'>
                     <div className='flex flex-wrap w-full p-8 rounded-4 shadow-4'>
                         <div>
-                            <div>
-                                <b className='mr-4'>
-                                    Mã đơn hàng:
-                                </b>
-                                {orderID}
+                            <div className='flex justify-between'>
+                                <div>
+                                    <b className='mr-4'>
+                                        Mã đơn hàng:
+                                    </b>
+                                    {orderID}
+                                </div>
+                                <Link
+                                    to={`/employ-delivery/2/${session}`}
+                                >
+                                    <div className='text-10' style={{ width: 85, color: '#e35c5c', textDecoration: 'underline', cursor: 'pointer' }}>
+                                        <FontAwesomeIcon icon={faArrowLeft} className='mr-2' />
+                                        Về danh sách
+                                    </div>
+                                </Link>
                             </div>
                             <div>
                                 <b className='mr-4'>
@@ -365,21 +456,6 @@ const Delivery = () => {
                         </div>
                         <div className='flex '>
                             <table className='w-full'>
-                                {/* <tbody>
-                                    <tr style={{ verticalAlign: 'baseline' }}>
-                                        <td>
-                                            <b>
-                                                1x
-                                            </b>
-                                        </td>
-                                        <td>
-                                            Tủ bảo quản rượu 121 chai WINE CHILLER KA110WR
-                                        </td>
-                                        <td className='text-right'>
-                                            100,000,000đ
-                                        </td>
-                                    </tr>
-                                </tbody> */}
                                 <tbody>
                                     {
                                         listProductTemp.map(val => (
@@ -473,25 +549,28 @@ const Delivery = () => {
                         </div>
                     </div>
                 </DialogContent>
-                <DialogActions>
-                    <div className='flex justify-between w-full items-center'>
-                        <div className='w-1/2 text-left'>
-                            {
-                                currentOrder?.shipping?.status !== 2
-                                &&
-                                <CmsFormikUploadFile
-                                    id="uploadfile"
-                                    name="fileInput"
-                                    fileProperties={
-                                        { accept: ".doc, .docx, .xls, .xlsx" }
-                                    }
-                                    label='Chọn hình'
-                                    setValue={upLoadFile}
-                                    formik={formik}
-                                    showFileName={false} />
-                            }
-
-                            {/* {
+                {
+                    currentOrder?.shipping?.status !== 5
+                    &&
+                    <DialogActions>
+                        <div className='flex justify-between w-full items-center'>
+                            <div className='w-1/2 text-left flex'>
+                                {
+                                    currentOrder?.shipping?.status !== 2
+                                    &&
+                                    <CmsButtonProgress
+                                        loading={loading}
+                                        type="submit"
+                                        label={'Đính kèm hình'}
+                                        onClick={() => {
+                                            History.push(window.location.pathname + '?openCame=1')
+                                        }}
+                                        //startIcon='save_alt'
+                                        endIcon={file ? 'check' : false}
+                                        className={clsx(file ? 'bg-green-500' : '')}
+                                        size="small" />
+                                }
+                                {/* {
                                 formik && get(formik?.touched, 'file') && Boolean(get(formik?.errors, 'file'))
                                 &&
                                 <FormHelperText
@@ -503,34 +582,45 @@ const Delivery = () => {
                                     {get(formik.errors, 'file')}
                                 </FormHelperText>
                             } */}
+                            </div>
+                            <div className='w-1/2 text-right'>
+                                <CmsButtonProgress
+                                    loading={loading}
+                                    type="submit"
+                                    color="primary"
+                                    label={
+                                        currentOrder?.shipping?.status === 2
+                                            ? 'Vận chuyển' :
+                                            (
+                                                currentOrder?.shipping?.status === 3
+                                                    ? 'Hoàn thành'
+                                                    : 'Hoàn thành'
+                                            )
+                                    }
+                                    onClick={() => {
+                                        if (currentOrder?.shipping?.status === 2)
+                                            formik.handleSubmit()
+                                        if (currentOrder?.shipping?.status === 3) {
+                                            if (!Boolean(file)) {
+                                                setTimeout(() => {
+                                                    dispatch(showMessage({ variant: "error", message: 'Vui lòng đính kèm hình' }))
+                                                }, 0);
+                                                return
+                                            }
+
+                                            setOpenDialog('OPT')
+                                        }
+                                    }}
+                                    size="small" />
+                            </div>
                         </div>
-                        <div className='w-1/2 text-right'>
-                            <Button
-                                onClick={formik.handleSubmit}
-                                variant='outlined'
-                                color="primary">
-                                {
-                                    activeStep === 0
-                                        ? 'Vận chuyển' :
-                                        (
-                                            activeStep === 1
-                                                ? 'Giao hàng'
-                                                : (
-                                                    activeStep === 2
-                                                        ? 'Thanh toán'
-                                                        : (
-                                                            activeStep === 3
-                                                                ? 'Hoàn thành'
-                                                                : 'Hoàn thành'
-                                                        )
-                                                )
-                                        )
-                                }
-                            </Button>
-                        </div>
-                    </div>
-                </DialogActions>
+                    </DialogActions>
+                }
             </Dialog>
+
+            {
+                openDialog === 'OPT' && <OPTDialog isOPT className={classes.modalSmall} open={true} handleSave={handleSave2FA} />
+            }
         </div>
     );
 }

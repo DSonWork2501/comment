@@ -71,3 +71,12 @@
 .swal2-icon .swal2-icon-content {
   font-size: 1.75em;
 }
+
+.MuiSnackbar-anchorOriginTopCenter {
+  top: 41px;
+}
+
+.MuiSnackbar-root {
+  left: 24px;
+  right: 24px;
+}

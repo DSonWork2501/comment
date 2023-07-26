@@ -29,8 +29,38 @@ import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 import HeadDelivery from './components/Header';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import OPTDialog from './components/OPTDialog';
+import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 
-const useStyles = makeStyles((theme) => ({
+export const modalSmall = {
+    '& .MuiDialog-paperFullWidth': {
+        width: `calc(100% - 30px)`, // Change this to the desired background color
+    },
+    '& .MuiDialog-paper': {
+        margin: '15px 22px'
+    },
+    '& .MuiBackdrop-root': {
+        backgroundColor: 'rgb(159 155 155 / 50%)'
+    },
+    '& .MuiStepper-root': {
+        padding: 0
+    },
+    '& .MuiDialogTitle-root': {
+        borderBottom: '1px solid gray',
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
+        paddingBottom: 0
+    },
+    '& .MuiDialogContent-root': {
+        paddingLeft: 8,
+        paddingRight: 8
+    },
+    '& .MuiTab-root ,& .MuiTabs-root': {
+        minHeight: '35px !important'
+    }
+};
+
+export const useStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
     },
@@ -41,34 +71,7 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(1),
     },
-    modalSmall: {
-        '& .MuiDialog-paperFullWidth': {
-            width: `calc(100% - 30px)`, // Change this to the desired background color
-        },
-        '& .MuiDialog-paper': {
-            margin: '15px 22px'
-        },
-        '& .MuiBackdrop-root': {
-            backgroundColor: 'rgb(159 155 155 / 50%)'
-        },
-        '& .MuiStepper-root': {
-            padding: 0
-        },
-        '& .MuiDialogTitle-root': {
-            borderBottom: '1px solid gray',
-            paddingLeft: 0,
-            paddingRight: 0,
-            paddingTop: 0,
-            paddingBottom: 0
-        },
-        '& .MuiDialogContent-root': {
-            paddingLeft: 8,
-            paddingRight: 8
-        },
-        '& .MuiTab-root ,& .MuiTabs-root': {
-            minHeight: '35px !important'
-        }
-    },
+    modalSmall,
     modal: {
         '& .MuiDialog-paperFullWidth': {
             width: `calc(100% - 30px)`, // Change this to the desired background color
@@ -176,6 +179,7 @@ export const DropMenuMobile = ({ phone, name, className }) => {
     );
 }
 
+export const fileEndpoint = 'tempfile';
 const keyStore = 'stores';
 const initialValues = {
 
@@ -315,7 +319,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
 const handleSaveFileOut = async (value, handleRefresh, dispatch, file, successFc) => {
     try {
         const data = new FormData();
-        data.append('enpoint', 'tempfile');
+        data.append('enpoint', fileEndpoint);
         data.append('files', file);
         await Connect.live.uploadFile.insert(data);
         const resultAction = await dispatch(order.shipper.update(value))
@@ -363,9 +367,12 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
         <tbody key={val.id}>
             <tr key={val.sku}>
                 <td style={{ width: 20, borderRight: '1px dashed #bbbbbb' }} className='text-center'>
-                    <b>
-                        {index + 1}
-                    </b>
+                    <div>
+                        <b>
+                            {index + 1}
+                        </b>
+                    </div>
+
                     {
                         !noBorder
                         &&
@@ -644,7 +651,8 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
 }
 
-const TakePhotoDialog = ({ open, className, saveFile, check }) => {
+export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
+    const classes = useStyles();
     const webcamRef = useRef(null);
     const [frontCamera, setFrontCamera] = useState(false);
     const [photoData, setPhotoData] = useState(null);
@@ -709,7 +717,7 @@ const TakePhotoDialog = ({ open, className, saveFile, check }) => {
         return new Blob([ab], { type: mimeString });
     };
 
-    return <Dialog className={className} open={openCame} fullWidth maxWidth="md">
+    return <Dialog className={classes.modal2} open={openCame} fullWidth maxWidth="md">
         <DialogContent className='text-11' style={{ paddingTop: 8 }}>
             <div className="camera-container">
                 <div className="camera-view relative mb-8">
@@ -873,6 +881,7 @@ const EmployDelivery = () => {
 
     return (
         <div>
+            <FuseMessage />
             <Dialog className={classes.modal} open={true} fullWidth maxWidth="md">
 
                 <DialogTitle>
