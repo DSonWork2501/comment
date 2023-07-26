@@ -1,3 +1,5 @@
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import { CmsButtonProgress } from '@widgets/components';
 import { showMessage } from 'app/store/fuse/messageSlice';
@@ -25,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const OPTDialog = ({ open, className, handleSave, check, isOPT }) => {
+const OPTDialog = ({ open, className, handleSave,handleClose, check, isOPT }) => {
     const classes = useStyles();
     const [value, setValue] = useState('');
     const [fill, setFill] = useState(true);
@@ -37,10 +39,13 @@ const OPTDialog = ({ open, className, handleSave, check, isOPT }) => {
             {
                 isOPT
                     ? <>
-                        <div className='mb-8'>
+                        <div className='mb-8 flex justify-between items-center'>
                             <b>
                                 Nhập OPT từ điện thoại
                             </b>
+                            <div onClick={handleClose}>
+                                <FontAwesomeIcon icon={faCircleXmark} className='mr-2 text-18' />
+                            </div>
                         </div>
                         <div className={classes.googleAuthInputContainer}>
                             <InputMask
@@ -67,10 +72,13 @@ const OPTDialog = ({ open, className, handleSave, check, isOPT }) => {
                         </div>
                     </>
                     : <>
-                        <div className='mb-8'>
+                        <div className='mb-8 flex justify-between items-center'>
                             <b>
                                 Nhập mã code F2A
                             </b>
+                            <div onClick={handleClose}>
+                                <FontAwesomeIcon icon={faCircleXmark} className='mr-2 text-18' />
+                            </div>
                         </div>
                         <div className={classes.googleAuthInputContainer}>
                             <InputMask
