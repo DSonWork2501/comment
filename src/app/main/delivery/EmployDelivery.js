@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Menu, MenuItem, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { faArrowLeft, faCameraRotate, faCircle, faCircleXmark, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCameraRotate, faCircleXmark, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ArrowDropDown } from '@material-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
