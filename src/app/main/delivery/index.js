@@ -367,20 +367,14 @@ const Delivery = () => {
     }
 
     const handleSave2FA = (value, setLoading) => {
-        alertInformation({
-            text: `Xác nhận thao tác`,
-            data: {},
-            confirm: async (values) => {
-                if (currentOrder?.shipping?.code === value) {
-                    setLoading(true);
-                    handleSave(value, setLoading)
-                } else {
-                    setTimeout(() => {
-                        dispatch(showMessage({ variant: "error", message: 'Sai mã OPT' }))
-                    }, 0);
-                }
-            },
-        })
+        if (currentOrder?.shipping?.code === value) {
+            setLoading(true);
+            handleSave(value, setLoading)
+        } else {
+            setTimeout(() => {
+                dispatch(showMessage({ variant: "error", message: 'Sai mã OPT' }))
+            }, 0);
+        }
     }
 
     return (

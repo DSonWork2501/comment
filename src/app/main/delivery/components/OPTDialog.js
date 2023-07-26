@@ -1,7 +1,9 @@
 import { Button, Dialog, DialogContent, makeStyles } from '@material-ui/core';
 import { CmsButtonProgress } from '@widgets/components';
+import { showMessage } from 'app/store/fuse/messageSlice';
 import React, { useState } from 'react';
 import InputMask from 'react-input-mask';
+import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
     googleAuthInputContainer: {
@@ -28,6 +30,7 @@ const OPTDialog = ({ open, className, handleSave, check, isOPT }) => {
     const [value, setValue] = useState('');
     const [fill, setFill] = useState(true);
     const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
 
     return <Dialog className={className} open={open} fullWidth maxWidth="md">
         <DialogContent className='text-11' style={{ paddingTop: 8 }}>
@@ -94,7 +97,7 @@ const OPTDialog = ({ open, className, handleSave, check, isOPT }) => {
                         </div>
                     </>
             }
-            <div className='flex justify-between'>
+            <div className='flex justify-between pt-8'>
                 {/* <Button
                     size='small'
                     variant='contained'
@@ -113,12 +116,16 @@ const OPTDialog = ({ open, className, handleSave, check, isOPT }) => {
                     type="submit"
                     label={'Xác nhận'}
                     onClick={() => {
-                        if (value?.length === 7)
+                        if (value.replace(' ', '')?.length === 6) {
                             handleSave(value.replace(' ', ''), setLoading)
+                        } else {
+                            setTimeout(() => {
+                                dispatch(showMessage({ variant: "error", message: 'Nhập OPT' }))
+                            }, 0);
+                        }
                     }}
                     //startIcon='save_alt'
                     color='primary'
-                    className='mt-8'
                     //className={clsx(file ? 'bg-green-500' : '')}
                     size="small" />
 
@@ -129,7 +136,6 @@ const OPTDialog = ({ open, className, handleSave, check, isOPT }) => {
                         size='small'
                         variant='contained'
                         color='secondary'
-                        className='mt-8'
                         onClick={() => {
 
                         }}
