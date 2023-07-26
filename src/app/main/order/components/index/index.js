@@ -285,7 +285,7 @@ function OrderView() {
             />
         ),
         staffdescription: (
-            <div className={clsx("text-12  h-full w-full absolute top-8 right-8 bottom-8 left-8", classes.hoverOpenBtn)}>
+            <div className={clsx("text-12  h-full  absolute top-8 right-8 bottom-8 left-8", classes.hoverOpenBtn)}>
                 <div
                     onClick={() => {
                         setOpenDialog('note');

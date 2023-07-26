@@ -21,7 +21,6 @@ import { DropMenu } from '../order/components/index';
 import { Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { useRef } from 'react';
-import './css/CameraComponent.css'; // Import the CSS file
 import Connect from '@connect/@connect';
 import { shipStatus } from '../order/common';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -886,6 +885,7 @@ const EmployDelivery = () => {
 
     return (
         <div>
+            <link rel="stylesheet" href="assets/css/CameraComponent.css" />
             <FuseMessage />
             <Dialog className={classes.modal} open={true} fullWidth maxWidth="md">
 
