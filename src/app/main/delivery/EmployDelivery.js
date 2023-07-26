@@ -480,9 +480,10 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
         return returnTotalAllProduct(listProductTemp)
     }, [listProductTemp])
 
-    const handleSaveFile = async (file, name) => {
+    const handleSaveFile = async (file, name, setLoading) => {
         //setOpen(false)
         //window.alert(JSON.stringify(file));
+        setLoading(true);
         if (shipID) {
             const current = entities.data.find(element => {
                 return element.shipping.id === parseInt(shipID)
@@ -498,6 +499,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                     }
                 ]
             }, handleRefresh, dispatch, file, () => {
+                setLoading(false);
             })
         } else {
             const data = check.map(val => {
@@ -517,6 +519,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                 data
             }, handleRefresh, dispatch, file, () => {
                 setCheck([]);
+                setLoading(false);
             })
         }
 
@@ -658,9 +661,10 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     const [photoData, setPhotoData] = useState(null);
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , openCameUrl = parseInt(params2.get('openCame'));
-    const loading = useSelector(store => store[keyStore].order.btnLoading)
+    //const loading = useSelector(store => store[keyStore].order.btnLoading)
     const [file, setFile] = useState(null);
     const [openCame, setOpenCame] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const videoConstraints = {
         width: window.innerWidth,
@@ -676,8 +680,8 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
 
     const handleCapture = () => {
         const imageSrc = webcamRef.current.getScreenshot({
-            width: 1280, // Set the desired width for the screenshot (e.g., 1280)
-            height: 720, // Set the desired height for the screenshot (e.g., 720)
+            // width: 1280, // Set the desired width for the screenshot (e.g., 1280)
+            // height: 720, // Set the desired height for the screenshot (e.g., 720)
             screenshotQuality: 1.0, // Set the screenshot quality to 1.0 for maximum quality (no compression)
         });
         setPhotoData(imageSrc);
@@ -693,7 +697,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
             const name = `${Date.now()}.jpeg`;
             const file = new File([blob], name, { type: 'image/jpeg' });
             // Update the input file element's value to include the captured photo
-            saveFile(file, name)
+            saveFile(file, name, setLoading)
             // const inputFile = document.getElementById('photoInput');
             // inputFile.files = [file];
         }
@@ -701,7 +705,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
 
     const handleSaveFile = () => {
         if (file?.length) {
-            saveFile(file[0], file[0].name)
+            saveFile(file[0], file[0].name, setLoading)
         }
     }
 
@@ -749,8 +753,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                     <div style={{ width: 35, height: 35 }}>
 
                     </div>
-                    <button onClick={handleCapture} style={{ width: 40, height: 40, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '30px', color: 'white' }}>
-                        <FontAwesomeIcon icon={faCircle} />
+                    <button onClick={handleCapture} style={{ width: 40, height: 40, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '30px', background: 'white' }}>
                     </button>
                     <button onClick={handleCameraSwitch} style={{ width: 35, height: 35, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '18px', color: 'white' }}>
                         <FontAwesomeIcon icon={faCameraRotate} />
@@ -762,7 +765,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
             {photoData &&
                 <div className="photo-preview w-full mt-8 relative">
                     <img src={photoData} alt="Captured" className='w-full mb-8' />
-                    <Button
+                    {/* <Button
                         size='small'
                         variant='contained'
                         color='primary'
@@ -770,14 +773,15 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                         className='absolute top-8 right-8'
                     >
                         Lưu
-                    </Button>
-                    {/* <CmsButtonProgress
-                        loading={loading}
-                        type="submit"
-                        label={"Lưu"}
-                        onClick={handleAddCapturedPhoto}
-                        className='absolute top-8 right-8'
-                        size="small" /> */}
+                    </Button> */}
+                    <div className='absolute top-8 right-8'>
+                        <CmsButtonProgress
+                            loading={loading}
+                            type="submit"
+                            label={"Lưu"}
+                            onClick={handleAddCapturedPhoto}
+                            size="small" />
+                    </div>
                 </div>
             }
 
@@ -794,7 +798,6 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                         }
                         className='mr-8'
                         setValue={(value, setLoading, resetFileInput) => {
-                            console.log(value);
                             setFile(value)
                             resetFileInput();
                         }} />
@@ -812,12 +815,14 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                     // >
                     //     Lưu
                     // </Button>
-                    <CmsButtonProgress
-                        loading={loading}
-                        type="submit"
-                        label={"Lưu"}
-                        onClick={handleSaveFile}
-                        size="small" />
+                    <div>
+                        <CmsButtonProgress
+                            loading={loading}
+                            type="submit"
+                            label={"Lưu"}
+                            onClick={handleSaveFile}
+                            size="small" />
+                    </div>
                 }
             </div>
 
