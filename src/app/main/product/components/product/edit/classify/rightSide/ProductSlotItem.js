@@ -35,12 +35,12 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
     const handleClickSku = (event, value) => {
         console.log('value', value)
         setView(View.uniqueIdList.id)
-        setChosenSku({ ...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.image, sku: value?.sku, uniqueid: null })
+        setChosenSku({ ...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.image, sku: value?.sku, uniqueid: null, price: JSON.parse(value?.price || 0) })
         // formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.img, sku: value?.sku, uniqueid: null })
     }
 
     const handleChooseUniqueID = ({ uniqueid }) => {
-        formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: chosenSku?.name, img: chosenSku?.img, sku: chosenSku?.sku, uniqueid: uniqueid, type: "wine" })
+        formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: chosenSku?.name, img: chosenSku?.img, sku: chosenSku?.sku, uniqueid: uniqueid, temporaryprice: chosenSku.price, type: "wine" })
         otherProps.onChosenView && otherProps.onChosenView()
     }
 

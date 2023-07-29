@@ -149,7 +149,8 @@ export const initDetailModelSlot = (data) => {
                 "name": data?.item?.name || "",
                 "img": data?.item?.img || "",
                 "type": "wine",
-                "sku": data?.item?.sku || ""
+                "sku": data?.item?.sku || "",
+                "temporaryprice": data?.item?.price || 0
             }
         return ob
     }
