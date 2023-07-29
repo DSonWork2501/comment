@@ -657,7 +657,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     const classes = useStyles();
     const webcamRef = useRef(null);
     const [frontCamera, setFrontCamera] = useState(false);
-    const [photoData, setPhotoData] = useState([]);
+    const [photoData, setPhotoData] = useState(null);
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , openCameUrl = parseInt(params2.get('openCame'));
     //const loading = useSelector(store => store[keyStore].order.btnLoading)
@@ -673,17 +673,17 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
 
     useEffect(() => {
         setOpenCame(parseInt(openCameUrl) === 1);
-        setPhotoData([1, 2, 3]);
+        setPhotoData(null);
         setFile(null);
     }, [openCameUrl])
 
     const handleCapture = () => {
         const imageSrc = webcamRef.current.getScreenshot({
-            width: 960, // Set the desired width for the screenshot (e.g., 1280)
-            height: 540, // Set the desired height for the screenshot (e.g., 720)
+            // width: 1280, // Set the desired width for the screenshot (e.g., 1280)
+            // height: 720, // Set the desired height for the screenshot (e.g., 720)
             screenshotQuality: 1.0, // Set the screenshot quality to 1.0 for maximum quality (no compression)
         });
-        setPhotoData(prev => prev.push(imageSrc));
+        setPhotoData(imageSrc);
     };
 
     const handleCameraSwitch = () => {
@@ -691,16 +691,12 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     };
 
     const handleAddCapturedPhoto = () => {
-        if (photoData?.length) {
-            let fileArray = photoData.map(val => {
-                const blob = dataURItoBlob(val);
-                const name = `${Date.now()}.jpeg`;
-                const file = new File([blob], name, { type: 'image/jpeg' });
-                return { name, file }
-            })
-
+        if (photoData) {
+            const blob = dataURItoBlob(photoData);
+            const name = `${Date.now()}.jpeg`;
+            const file = new File([blob], name, { type: 'image/jpeg' });
             // Update the input file element's value to include the captured photo
-            saveFile(fileArray, setLoading)
+            saveFile(file, name, setLoading)
             // const inputFile = document.getElementById('photoInput');
             // inputFile.files = [file];
         }
@@ -765,31 +761,19 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
 
             </div>
 
-            {photoData?.length &&
-                <>
-                    <div className="photo-preview flex flex-wrap w-full mt-8 relative ">
-                        {
-                            photoData.map((val) => (<div className='w-1/2 mb-8'>
-                                <img src={val} alt="Captured" className='w-full mb-8' />
-                                <CmsButtonProgress
-                                    type="submit"
-                                    label={"Xóa"}
-                                    onClick={() => setPhotoData((prev) => prev.filter((data) => data !== val))}
-                                    className='bg-red-500 hover:bg-red-900 mt-8'
-                                    size="small" />
-                            </div>))
-                        }
-                        {/* <Button
-                            size='small'
-                            variant='contained'
-                            color='primary'
-                            onClick={handleAddCapturedPhoto}
-                            className='absolute top-8 right-8'
-                        >
-                            Lưu
-                        </Button> */}
-                    </div>
-                    <div>
+            {photoData &&
+                <div className="photo-preview w-full mt-8 relative">
+                    <img src={photoData} alt="Captured" className='w-full mb-8' />
+                    {/* <Button
+                        size='small'
+                        variant='contained'
+                        color='primary'
+                        onClick={handleAddCapturedPhoto}
+                        className='absolute top-8 right-8'
+                    >
+                        Lưu
+                    </Button> */}
+                    <div className='absolute top-8 right-8'>
                         <CmsButtonProgress
                             loading={loading}
                             type="submit"
@@ -797,7 +781,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                             onClick={handleAddCapturedPhoto}
                             size="small" />
                     </div>
-                </>
+                </div>
             }
 
             <div className='flex justify-between items-center mt-8'>
