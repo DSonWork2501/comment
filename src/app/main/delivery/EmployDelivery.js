@@ -698,7 +698,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
             height: 540, // Set the desired height for the screenshot (e.g., 720)
             screenshotQuality: 1.0, // Set the screenshot quality to 1.0 for maximum quality (no compression)
         });
-        setPhotoData(prev => prev.push(imageSrc));
+        setPhotoData(prev => [...prev, imageSrc]);
     };
 
     const handleCameraSwitch = () => {
@@ -793,7 +793,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
 
             </div>
 
-            {photoData?.length &&
+            {Boolean(photoData?.length) &&
                 <>
                     <div className="photo-preview flex flex-wrap w-full mt-8 relative ">
                         {
