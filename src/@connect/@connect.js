@@ -97,6 +97,7 @@ export default {
                 updateNote: entity => axios.put(`${baseurl}/order/update-order-des`, entity),
                 getUserDelivery: params => axios.get(`${baseurl}/customer/get-user-info`, { params }),
                 getVehicles: params => axios.get(`${baseurl}/customer/get-vehicles`, { params }),
+                checkOpt: entity => axios.post(`${baseurl}/order/check-otp`, entity),
             },
             shipper: {
                 insert: entity => axios.post(`${baseurl}/order/shipping-insert${entity[0]?.deliveryid ? '?exist=1' : ''}`, entity),
