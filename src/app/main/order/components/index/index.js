@@ -360,8 +360,8 @@ function OrderView() {
                     if (item.status === 2 && val.status === 6)
                         hide = false;
 
-                    if (item.status === 6 && val.status === 5)
-                        hide = false;
+                    if (item.status === 6)
+                        hide = true;
 
                     if (item.status === 5 && val.status === 3)
                         hide = false;
@@ -488,7 +488,7 @@ function OrderView() {
         }]))
         unwrapResult(resultAction);
 
-        detail.parentid === 1
+        Boolean(detail.parentid)
             ? dispatch(getShelf({ cusID: detail.cusId, type: 'wine', orderID: detail.id }))
             : dispatch(getWine({ cusId: detail.cusId, parentId: detail.hhid, cms: 1 }))
     }

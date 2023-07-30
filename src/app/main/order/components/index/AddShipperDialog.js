@@ -115,6 +115,7 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                                     setType(val.target.value);
                                     formik.setFieldValue('shipperid', null);
                                     formik.setFieldValue('deliveryid', null);
+                                    formik.setFieldValue('vehicleid', null);
                                 }}
                                 row
                             >
@@ -213,6 +214,7 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                                     formik.setFieldValue('vehicle', value?.vehiclename)
                                     formik.setFieldValue('licenseplate', value?.licenseplate)
                                 }}
+                                disabled={type === '2'}
                                 valueIsId />
                             <CmsFormikTextField
                                 size="small"

@@ -6,7 +6,7 @@ export const returnListProductByOrderID = (entities, orderID) => {
         entities.data.forEach(element => {
             element.productorder.forEach(e => {
                 if (parseInt(orderID) === element.id)
-                    if (element.parentid === 1) {
+                    if (Boolean(element.parentid)) {
                         data.push({
                             sku: e.sku,
                             img: e.image,

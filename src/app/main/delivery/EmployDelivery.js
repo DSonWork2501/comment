@@ -256,7 +256,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         if (entities?.data?.length) {
             entities.data.forEach(element => {
                 element.productorder.forEach(e => {
-                    if (element.parentid === 1) {
+                    if (Boolean(element.parentid)) {
                         data.push({
                             sku: e.sku,
                             img: e.image,
