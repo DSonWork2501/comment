@@ -1057,5 +1057,5 @@ const EmployDelivery = () => {
         </div>
     );
 }
-
+console.log(112312312);
 export default withReducer(keyStore, reducer)(EmployDelivery);

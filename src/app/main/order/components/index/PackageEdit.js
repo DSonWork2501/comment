@@ -476,7 +476,7 @@ function FormEdit() {
             {openDialog === 'productList' &&
                 <ListProductDialog
                     handleClose={() => handleCloseDialog()}
-                    data={[{
+                    data={Boolean(current.parentid) ? listWine : [{
                         "id": current.productorders[0].id,
                         "img": current.productorders[0].image,
                         "sku": current.productorders[0].uniqueid,
@@ -489,7 +489,6 @@ function FormEdit() {
                     open={true}
                     loading={popupLoading}
                     handleSave={() => {
-                        //History.push(`/package/${ID}?step=3`)
                         History.push({
                             pathname: `/package/${ID}`,
                             search: `?step=3`,
@@ -503,7 +502,7 @@ function FormEdit() {
             {openDialog === 'printQr' &&
                 <ListProductDialog
                     handleClose={() => setOpenDialog('')}
-                    data={[{
+                    data={Boolean(current.parentid) ? listWine :[{
                         "id": current.productorders[0].id,
                         "img": current.productorders[0].image,
                         "sku": current.productorders[0].uniqueid,

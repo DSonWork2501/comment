@@ -129,6 +129,12 @@ export default {
         },
         uploadFile: {
             insert: entity => axios.post(`${baseurl}/common/upload-file`, entity),
+        },
+        meta:{
+            userDelivery:{
+                getList: (params) => axios.get(`${baseurl}/customer/get-user-info`, { params }),
+                getCode: (params) => axios.get(`${baseurl}/customer/generate2fashipping`, { params }),
+            }
         }
     },
 }

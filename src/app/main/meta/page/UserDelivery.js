@@ -1,0 +1,341 @@
+
+import React, { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
+import {
+    CmsCardedPage,
+    CmsTableBasic,
+    CmsButton,
+    CmsLabel,
+    CmsIconButton,
+    CmsTab,
+    CmsFormikTextField,
+    CmsFilter,
+    CmsFormikAutocomplete,
+    CmsButtonGroup,
+} from '@widgets/components';
+import { Box, Button, Chip, Icon, styled } from '@material-ui/core';
+import { alertInformation, initColumn } from '@widgets/functions'
+import withReducer from 'app/store/withReducer'
+import reducer, { setSelected, meta } from '../store';
+import { useDispatch, useSelector } from 'react-redux'
+import FuseLoading from '@fuse/core/FuseLoading'
+import { keyI18n, keyStore } from '../common';
+import { unwrapResult } from '@reduxjs/toolkit';
+import History from '@history';
+import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+import { useFormik } from 'formik';
+import Connect from '@connect/@connect';
+import { GetApp } from '@material-ui/icons';
+import CodeDialog from '../components/CodeDialog';
+
+const LayoutCustom = styled(Box)({
+    height: "100%",
+    "& .inner-scroll>div": {
+        minHeight: '70px'
+    },
+});
+
+const initialValues = {
+    unitID: null,
+    groupID: null,
+    codeName: "",
+    status: null,
+    page: 1,
+    limit: 10,
+};
+
+// const Filter = ({ onSearch, filterOptions, options }) => {
+//     const { units, groups } = options;
+//     const formik = useFormik({
+//         initialValues,
+//         onSubmit: handleSubmit
+//     })
+
+//     function handleSubmit(value) {
+//         let values = { ...value };
+
+//         onSearch(values);
+//     }
+
+//     return <form onSubmit={formik.handleSubmit} >
+//         <CmsFilter
+//             ftype={filterOptions}
+//             fadvance={
+//                 <React.Fragment>
+//                     <div className="w-full flex flex-wrap">
+//                         <div className=" w-full md:w-1/3 sm:w-1/2 p-16  mb-6  relative z-10">
+//                             <div className="sm:flex flex-wrap">
+//                                 <CmsFormikTextField
+//                                     label="Tên hợp đồng"
+//                                     name={`codeName`}
+//                                     size="small"
+//                                     className="my-8"
+//                                     formik={formik} />
+//                                 <CmsFormikAutocomplete
+//                                     className="my-8 inline-flex"
+//                                     name="unitID"
+//                                     formik={formik}
+//                                     label="Đơn vị ban hành"
+//                                     data={units}
+//                                     size="small"
+//                                     autocompleteProps={{
+//                                         ChipProps: {
+//                                             size: 'small'
+//                                         },
+//                                         size: 'small',
+//                                     }}
+//                                     valueIsId />
+//                             </div>
+//                         </div>
+//                         <div className="w-full md:w-1/3 sm:w-1/2 p-16  mb-6 ">
+//                             <div className="sm:flex flex-wrap">
+//                                 <CmsFormikAutocomplete
+//                                     className="my-8 inline-flex"
+//                                     name="groupID"
+//                                     formik={formik}
+//                                     label="Nhóm hợp đồng"
+//                                     data={groups}
+//                                     size="small"
+//                                     autocompleteProps={{
+//                                         ChipProps: {
+//                                             size: 'small'
+//                                         },
+//                                         size: 'small',
+//                                     }}
+//                                     valueIsId />
+//                                 <CmsFormikAutocomplete
+//                                     className="my-8 inline-flex"
+//                                     name="status"
+//                                     formik={formik}
+//                                     label="Trạng thái"
+//                                     data={statusForm}
+//                                     size="small"
+//                                     autocompleteProps={{
+//                                         ChipProps: {
+//                                             size: 'small'
+//                                         },
+//                                         size: 'small',
+//                                     }}
+//                                     valueIsId />
+//                             </div>
+//                         </div>
+//                         <div className="flex items-end w-full p-16 md:w-1/3 sm:w-1/2 mb-6 ">
+//                             <div className="my-8">
+//                                 <Button
+//                                     style={{
+//                                         background: '#FF6231',
+//                                         color: 'white',
+//                                         position: 'relative',
+//                                         top: -1
+//                                     }}
+//                                     size='small'
+//                                     variant="contained"
+//                                     type='submit'
+//                                     className='mr-8'
+//                                 >
+//                                     <Icon>
+//                                         search
+//                                     </Icon>
+//                                 </Button>
+//                                 <Button
+//                                     style={{
+//                                         color: 'black',
+//                                         position: 'relative',
+//                                         top: -1
+//                                     }}
+//                                     size='small'
+//                                     variant="contained"
+//                                     type='submit'
+//                                     onClick={() => formik.handleReset()}
+//                                 >
+//                                     <Icon>
+//                                         refresh
+//                                     </Icon>
+//                                 </Button>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </React.Fragment>
+//             }
+//         />
+//     </form>
+// }
+
+function Form() {
+    const dispatch = useDispatch();
+    const { t } = useTranslation(keyI18n);
+    const loading = useSelector(store => store[keyStore].loading);
+    const entities = useSelector(store => store[keyStore].user);
+    const selected = useSelector(store => store[keyStore].selected);
+    const searchDefault = useSelector(store => store[keyStore].search);
+    const code = useSelector(store => store[keyStore]?.code);
+    const [search, setSearch] = useState(searchDefault);
+    const [openDialog, setOpenDialog] = useState('');
+    const [filterOptions, setFilterOptions] = useState(0);
+    const units = useSelector(store => store[keyStore]?.units?.data) || [];
+    const groups = useSelector(store => store[keyStore]?.groups?.data) || [];
+
+    const columns = [
+        new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
+        //new initColumn({ field: "id", label: `ID`, style: { width: 50 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "fullname", label: `Tên đầy đủ`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "phone", label: `Số điện thoại`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "cccd", label: `CCCD`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "address", label: `Địa chỉ`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "gender", label: `Giới tính`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+    ]
+
+    const getListTable = useCallback((search) => {
+        dispatch(meta.userDelivery.getList(search));
+    }, [dispatch])
+
+    const searchString = JSON.stringify(search);
+    useEffect(() => {
+        let search = JSON.parse(searchString);
+        getListTable(search);
+    }, [searchString, getListTable, dispatch])
+
+    const selectedFile = async (filePath) => {
+        const file = await Connect.live.upload.getFileS3({ documentName: filePath });
+        const url = window.URL.createObjectURL(new Blob([file.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', file.config.params.documentName.split('/').pop()); //or any other extension
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+
+    const data = entities && entities.data && entities.data.map((item, index) => ({
+        ...item,
+        original: item,
+        STT: (
+            <React.Fragment>
+                <CmsLabel content={`${(index + 1)}`} />
+            </React.Fragment>
+        ),
+        gender: (
+            <React.Fragment>
+                {
+                    item?.gender
+                        ? <CmsLabel content={`Nam`} />
+                        : <CmsLabel content={`Nữ`} />
+                }
+
+            </React.Fragment>
+        ),
+        action: (
+            <div className="flex space-x-3 ">
+                <CmsIconButton
+                    tooltip="Lẫy 2fa code"
+                    delay={50}
+                    icon="crop_free"
+                    className="bg-green-500 text-white shadow-3  hover:bg-green-900"
+                    onClick={() => {
+                        dispatch(meta.userDelivery.getCode({
+                            phone: item.phone
+                        }));
+                        setOpenDialog('f2a');
+                    }}
+                />
+            </div>
+        )
+    }))
+
+    const handleCloseDialog = () => {
+        setOpenDialog('');
+    }
+
+    const handleSubmit = async (values, form) => {
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: { values, form },
+            confirm: async () => {
+                try {
+                    const resultAction = values?.id
+                        ? await dispatch(meta.customer.update([values]))
+                        : await dispatch(meta.customer.create([values]));
+                    unwrapResult(resultAction);
+                    if (!values?.id) {
+                        form.resetForm();
+                    }
+                    setOpenDialog('');
+                    getListTable(search);
+                } catch (error) {
+                } finally {
+                    form.setSubmitting(false)
+                }
+            },
+            close: () => form.setSubmitting(false)
+        });
+    }
+    // const clearSearchValue = (value) => setSearch(prev => {
+    //     const values = { ...value };
+    //     const search = { ...prev };
+    //     for (const key in values) {
+    //         if (!values[key] && typeof values[key] !== 'number') {
+    //             delete search[key];
+    //             delete values[key];
+    //         }
+    //     }
+    //     return { ...search, ...values, page: 1 };
+    // })
+    const handleFilterType = (event, value) => {
+        setFilterOptions(value)
+    };
+
+    if (!data) {
+        return <FuseLoading />
+    }
+
+    return (
+        <LayoutCustom>
+            {
+
+                openDialog === 'f2a' && <CodeDialog open={true} code={code} handleClose={handleCloseDialog} title='Tạo 2fa code' />
+            }
+            <CmsCardedPage
+                classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
+                icon="whatshot"
+                title={"Quản lý nhân viên giao hàng"}
+                // toolbar={
+                //     <div className="w-full flex items-center justify-between px-12">
+                //         <CmsTab data={links} value={0} isLink={true} onChange={(e, value) => {
+                //             History.push(links.find(e => e.id === value)?.link)
+                //         }} />
+                //     </div>
+                // }
+                content={
+                    <>
+                        <CmsTableBasic
+                            className="w-full h-full"
+                            isServerSide={true}
+                            apiServerSide={params => setSearch(prev => {
+                                return { ...prev, ...params }
+                            })}
+                            isPagination={false}
+                            data={data}
+                            selected={selected}
+                            setSelected={entity => dispatch(setSelected(entity))}
+                            columns={columns}
+                            loading={loading}
+                        />
+                    </>
+                }
+            // rightHeaderButton={
+            //     <div>
+            //         <CmsButton
+            //             label={t("ADD_NEW")}
+            //             component={Link}
+            //             to={`/meta/form/edit`}
+            //             className="mx-2"
+            //             startIcon="add" />
+            //     </div>
+            // }
+            />
+        </LayoutCustom>
+    );
+}
+
+export default withReducer(keyStore, reducer)(Form);

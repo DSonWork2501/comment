@@ -17,8 +17,9 @@ import { Auth } from './auth';
 import routes from './fuse-configs/routesConfig';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import store from './store';
-import Delivery from './main/delivery';
-import EmployDelivery from './main/delivery/EmployDelivery';
+import { Suspense } from 'react';
+const Delivery = React.lazy(() => import('./main/delivery'));
+const EmployDelivery = React.lazy(() => import('./main/delivery/EmployDelivery'));
 
 const jss = create({
 	...jssPreset(),
@@ -41,10 +42,14 @@ const App = () => {
 						<Router history={history}>
 							<Switch>
 								<Route path="/delivery/:ship/:session/:order">
-									<Delivery />
+									<Suspense fallback={null}>
+										<Delivery />
+									</Suspense>
 								</Route>
 								<Route path="/employ-delivery/:type/:session">
-									<EmployDelivery />
+									<Suspense fallback={null}>
+										<EmployDelivery />
+									</Suspense>
 								</Route>
 								<Route path="/*">
 									<MuiPickersUtilsProvider utils={MomentUtils}>
