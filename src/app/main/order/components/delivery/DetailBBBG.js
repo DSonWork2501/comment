@@ -133,7 +133,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         if (entities?.data?.length) {
             entities.data.forEach(element => {
                 element.productorder.forEach(e => {
-                    if (element.parentid === 1) {
+                    if (Boolean(element.parentid)) {
                         data.push({
                             sku: e.sku,
                             img: e.image,
@@ -282,7 +282,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         if (entities?.data?.length) {
             entities.data.forEach(element => {
                 element?.productorder?.length && element.productorder.forEach(e => {
-                    if (element.parentid === 1) {
+                    if (Boolean(element.parentid)) {
                         data.push({
                             ...element,
                             dataOfItem: {
@@ -327,7 +327,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         if (entities?.data?.length) {
             entities.data.forEach(element => {
                 element.productorder.forEach(e => {
-                    if (element.parentid === 1) {
+                    if (Boolean(element.parentid)) {
                         data.push({
                             sku: e.sku,
                             img: e.image,

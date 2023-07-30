@@ -197,7 +197,7 @@ function PackageDialog({ open, handleClose, detail, handleCheck, handlePackage }
 
     return (
         <CmsDialog
-            title={`Thông tin chi tiết ${detail?.parentid === 1 ? 'chai rượu' : 'tủ rượu'}`}
+            title={`Thông tin chi tiết ${Boolean(detail?.parentid) ? 'chai rượu' : 'tủ rượu'}`}
             open={open}
             loading={popupLoading}
             handleClose={handleClose}
@@ -210,7 +210,7 @@ function PackageDialog({ open, handleClose, detail, handleCheck, handlePackage }
                     ? <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }} className="w-full">
                         <div className="w-full space-y-4">
                             {
-                                detail?.parentid === 1
+                                Boolean(detail?.parentid)
                                     ? <>
                                         {entities?.data?.length > 0 ? entities?.data?.map(val => ({ item: { ...val } })).map((item, index) => (
                                             <DetailShelfProductContent

@@ -169,7 +169,7 @@ function FormEdit() {
     const paramsURL = new URLSearchParams(location.search), step = paramsURL.get('step');
     const detailCheck = useMemo(() => {
         let totalWine = 0, totalCheck = 0;
-        current?.parentid !== 1
+        !Boolean(current?.parentid)
             ? detailEntities?.length && detailEntities.forEach(element => {
                 element.slots?.length && element.slots.forEach(val => {
                     if (val?.item?.id) {
@@ -235,7 +235,7 @@ function FormEdit() {
             }
         }
 
-        return current ? {
+        return (current && !Boolean(current?.parentid)) ? {
             [current.productorders[0].uniqueid]: {
                 item: {
                     id: current.productorders[0].id,
@@ -337,7 +337,7 @@ function FormEdit() {
                 if (rest?.payload && rest?.payload?.result) {
                     const values = rest?.payload?.data;
                     if (values?.length && current) {
-                        if (current?.parentid === 1) {
+                        if (Boolean(current?.parentid)) {
                             setReList([
                                 {
                                     name: 'Rượu Lẻ',
@@ -370,7 +370,7 @@ function FormEdit() {
         }, [crString])
 
     const getWines = useCallback(async (currentT) => {
-        const rest = currentT?.parentid === 1
+        const rest = Boolean(currentT?.parentid)
             ? await dispatch(getShelf({ cusID: currentT?.cusId, type: 'wine', orderID: currentT?.id }))
             : await dispatch(getWine({ cusId: currentT?.cusId, parentId: currentT?.hhid, cms: 1 }))
 
@@ -554,7 +554,7 @@ function FormEdit() {
                                             }
                                         })
                                     }}
-                                    disabled={Boolean(step || ID === '0' || (listWine?.length + 1) !== receive || !receive)}
+                                    disabled={Boolean(step || ID === '0' || (Boolean(current?.parentid) ? listWine?.length : listWine?.length + 1) !== receive || !receive)}
                                     size="small" />
                                 <CmsButtonProgress
                                     loading={formik.isSubmitting}
@@ -633,7 +633,7 @@ function FormEdit() {
                                             setLoading(false);
                                         }}
                                         onChange={async (id, value) => {
-                                            value.parentid === 1
+                                            Boolean(value.parentid)
                                                 ? await dispatch(getShelf({ cusID: value.cusId, type: 'wine', orderID: value.id }))
                                                 : await dispatch(getWine({ cusId: value.cusId, parentId: value.hhid, cms: 1 }))
                                             const qrcode = await generateQRCodeBase64(value?.productorders[0].uniqueid);
@@ -930,7 +930,7 @@ function FormEdit() {
                                                         size='small'
                                                         style={{ background: 'aliceblue' }}
                                                         className='text-right'>
-                                                        {listWine?.length + 1}
+                                                        {Boolean(current?.parentid) ? listWine?.length : listWine?.length + 1}
                                                     </TableCell>
                                                     <TableCell
                                                         size='small'
@@ -955,7 +955,7 @@ function FormEdit() {
                                                 // HandleAddStack={HandleAddStack}
                                                 // HandleAddSlot={HandleAddSlot}
                                                 HandleClickDetail={HandleClickDetail}
-                                                label={current?.parentid === 1 ? 'Thông tin rượu' : 'Thông tin tủ'}
+                                                label={Boolean(current?.parentid) ? 'Thông tin rượu' : 'Thông tin tủ'}
                                             // HandleDeleteSlot={HandleDeleteSlot}
                                             // HandleDeleteStack={HandleDeleteStack}
                                             // stackIndex={stackIndex}

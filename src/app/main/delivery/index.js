@@ -255,7 +255,7 @@ const Delivery = () => {
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
     const [file, setFile] = useState([]);
     const [openDialog, setOpenDialog] = useState('');
-
+    const [locationObject, setLocationObject] = useState(null);
     const currentOrder = useMemo(() => {
         if (entities?.data?.length)
             return entities.data.find(val => val.id === parseInt(orderID))
@@ -336,6 +336,10 @@ const Delivery = () => {
                         dataVL.data[0].completeimg = file.map(val => val.name).join(',');
                     }
 
+                    if (locationObject) {
+                        dataVL.data[0].location = JSON.stringify(locationObject);
+                    }
+
                     const resultAction = await dispatch(order.shipper.update(dataVL));
                     unwrapResult(resultAction);
                     getListTable();
@@ -379,9 +383,10 @@ const Delivery = () => {
         }
     }
 
-    const getLocation = () => {
+    const getLocation = (returnLocation) => {
         navigator.geolocation.getCurrentPosition(
             (position) => {
+                returnLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude })
                 // setLatitude(position.coords.latitude);
                 // setLongitude(position.coords.longitude);
             },
@@ -621,7 +626,9 @@ const Delivery = () => {
                                             }
 
                                             setOpenDialog('OPT');
-                                            getLocation();
+                                            getLocation(({ latitude, longitude }) => {
+                                                setLocationObject({ latitude, longitude })
+                                            });
                                         }
                                     }}
                                     size="small" />

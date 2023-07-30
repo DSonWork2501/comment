@@ -265,7 +265,7 @@ function FormEdit() {
                 if (rest?.payload && rest?.payload?.result) {
                     const values = rest?.payload?.data;
                     if (values?.length && current) {
-                        if (current?.parentid === 1) {
+                        if (Boolean(current?.parentid)) {
                             setReList([
                                 {
                                     name: 'Rượu Lẻ',
@@ -298,7 +298,7 @@ function FormEdit() {
         }, [crString])
 
     const getWines = useCallback(async (currentT) => {
-        const rest = currentT?.parentid === 1
+        const rest = Boolean(currentT?.parentid)
             ? await dispatch(getShelf({ cusID: currentT?.cusId, type: 'wine', orderID: currentT?.id }))
             : await dispatch(getWine({ cusId: currentT?.cusId, parentId: currentT?.hhid, cms: 1 }))
         await dispatch(getDetail({
@@ -498,7 +498,7 @@ function FormEdit() {
                                             setLoading(false);
                                         }}
                                         onChange={async (id, value) => {
-                                            value.parentid === 1
+                                            Boolean(value.parentid)
                                                 ? await dispatch(getShelf({ cusID: value.cusId, type: 'wine', orderID: value.id }))
                                                 : await dispatch(getWine({ cusId: value.cusId, parentId: value.hhid, cms: 1 }))
                                             await dispatch(getDetail({
@@ -769,7 +769,7 @@ function FormEdit() {
                                                             size="small" />
                                                     </div>
                                                 </div>
-                                                <Frame  fileName={orderDetail?.contract?.file} arrayForm={arrayForm} signature={orderDetail?.contract?.signature} />
+                                                <Frame fileName={orderDetail?.contract?.file} arrayForm={arrayForm} signature={orderDetail?.contract?.signature} />
                                             </BoxCustom>
                                         }
                                     </>
