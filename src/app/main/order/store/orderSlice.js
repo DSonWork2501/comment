@@ -111,6 +111,26 @@ export const order = {
         }),
     },
     other: {
+        getUserDelivery: createAsyncThunk(`${appName}/${moduleName}/order/other/getUserDelivery`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.other.getUserDelivery(params);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getVehicles: createAsyncThunk(`${appName}/${moduleName}/order/other/getVehicles`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.other.getVehicles(params);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
         getSummary: createAsyncThunk(`${appName}/${moduleName}/order/other/getSummary`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.order.other.getSummary(params);
@@ -515,6 +535,23 @@ const orderSlice = createSlice({
             return {
                 ...state,
                 btnLoading: false,
+            }
+        },
+
+        [order.other.getUserDelivery.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                userDelivery: payload,
+                error: null
+            }
+        },
+        [order.other.getVehicles.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                vehicles: payload,
+                error: null
             }
         },
 

@@ -48,6 +48,8 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
     const dispatch = useDispatch();
     const [type, setType] = useState('1');
     const deliveries = useSelector(store => store[keyStore].order.deliveries) || [];
+    const vehicles = useSelector(store => store[keyStore].order.vehicles?.data) || [];
+    const userDelivery = useSelector(store => store[keyStore].order.userDelivery?.data) || [];
 
     const handleSave = (values) => {
         if (formik)
@@ -67,9 +69,11 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
 
     useEffect(() => {
         dispatch(order.other.getDelivery());
+        dispatch(order.other.getVehicles());
+        dispatch(order.other.getUserDelivery());
     }, [dispatch])
 
-    const { setValues, values } = formik, { orders, shipperid } = values;
+    const { setValues, values } = formik, { orders, shipperid,vehicleid } = values;
 
     useEffect(() => {
         setValues(detail ? fillDefaultForm(initialValues, detail) : initialValues);
@@ -138,16 +142,20 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                                         name="shipperid"
                                         formik={formik}
                                         label={`Chọn người nội bộ`}
-                                        data={[]}
+                                        data={userDelivery}
                                         size="small"
                                         autocompleteProps={{
-                                            getOptionLabel: (option) => option?.name,
+                                            getOptionLabel: (option) => option?.fullname,
                                             ChipProps: {
                                                 size: 'small'
                                             },
                                             size: 'small',
                                         }}
-                                        setOption={(option) => option?.name}
+                                        setOption={(option) => option?.fullname}
+                                        onChangeValue={(value) => {
+                                            formik.setFieldValue('shipname', value?.fullname)
+                                            formik.setFieldValue('phone', value?.phone)
+                                        }}
                                         valueIsId />
                                     : <CmsFormikAutocomplete
                                         className="my-8"
@@ -177,35 +185,56 @@ function AddShipperDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                                 disabled={type === '2' || shipperid}
                                 formik={formik} />
                             <CmsFormikTextField
-                                size="small"
-                                label="Phương tiện"
-                                name="vehicle"
-                                className="my-8"
-                                disabled={type === '2' || shipperid}
-                                formik={formik} />
-                        </div>
-                        <div className='w-1/2 pl-8'>
-                            <CmsFormikTextField
                                 label="Số điện thoại"
                                 size="small"
                                 name="phone"
                                 disabled={type === '2' || shipperid}
                                 className="my-8"
                                 formik={formik} />
+
+                        </div>
+                        <div className='w-1/2 pl-8'>
+                            <CmsFormikAutocomplete
+                                className="my-8"
+                                name="vehicleid"
+                                formik={formik}
+                                label={`Phương tiện nội bộ`}
+                                data={vehicles}
+                                size="small"
+                                autocompleteProps={{
+                                    getOptionLabel: (option) => option?.vehiclename,
+                                    ChipProps: {
+                                        size: 'small'
+                                    },
+                                    size: 'small',
+                                }}
+                                setOption={(option) => option?.vehiclename}
+                                onChangeValue={(value) => {
+                                    formik.setFieldValue('vehicle', value?.vehiclename)
+                                    formik.setFieldValue('licenseplate', value?.licenseplate)
+                                }}
+                                valueIsId />
+                            <CmsFormikTextField
+                                size="small"
+                                label="Phương tiện"
+                                name="vehicle"
+                                className="my-8"
+                                disabled={type === '2' || vehicleid}
+                                formik={formik} />
                             <CmsFormikTextField
                                 size="small"
                                 label="Biển số"
                                 name="licenseplate"
-                                disabled={type === '2' || shipperid}
+                                disabled={type === '2' || vehicleid}
                                 className="my-8"
                                 formik={formik} />
-                            <CmsFormikTextField
+                            {/* <CmsFormikTextField
                                 size="small"
                                 label="Mã"
                                 name="code"
                                 disabled={type === '2' || shipperid}
                                 className="my-8"
-                                formik={formik} />
+                                formik={formik} /> */}
                             {/* <div className="my-8">
                                 <CmsFormikCheckbox
                                     formik={formik}
