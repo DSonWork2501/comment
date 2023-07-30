@@ -29,10 +29,9 @@ import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import { alertInformation } from '@widgets/functions';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CmsButtonProgress } from '@widgets/components';
-import { TakePhotoDialog, fileEndpoint, modalSmall } from './EmployDelivery';
+import { TakePhotoDialog, modalSmall, saveFile } from './EmployDelivery';
 import History from '@history/@history';
 import { useState } from 'react';
-import Connect from '@connect/@connect';
 import { Link } from 'react-router-dom';
 import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
@@ -254,7 +253,7 @@ const Delivery = () => {
         , orderID = (params.order);
     const loading = useSelector(store => store[keyStore].order.btnLoading);
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState([]);
     const [openDialog, setOpenDialog] = useState('');
 
     const currentOrder = useMemo(() => {
@@ -325,18 +324,21 @@ const Delivery = () => {
                         ]
                     }
 
-                    if (file) {
-                        const data = new FormData();
-                        data.append('enpoint', fileEndpoint);
-                        data.append('files', file);
-                        await Connect.live.uploadFile.insert(data);
-                        dataVL.data[0].completeimg = file.name;
+                    if (file?.length) {
+                        const pr = file.map(val => saveFile(val.file, val.name))
+                        await Promise.all(pr);
+
+                        // const data = new FormData();
+                        // data.append('enpoint', fileEndpoint);
+                        // data.append('files', file);
+                        // await Connect.live.uploadFile.insert(data);
+                        dataVL.data[0].completeimg = file.map(val => val.name).join(',');
                     }
 
                     const resultAction = await dispatch(order.shipper.update(dataVL));
                     unwrapResult(resultAction);
                     getListTable();
-                    setFile(null)
+                    setFile([])
                     setOpenDialog('');
                     setLoading && setLoading(false)
                 } catch (error) { }
@@ -360,8 +362,8 @@ const Delivery = () => {
     // async function upLoadFile(file, { setLoading, resetFile, form }) {
     // }
 
-    const handleSaveFile = (file, name) => {
-        setFile(file);
+    const handleSaveFile = (array) => {
+        setFile(array);
         History.push(window.location.pathname);
     }
 
@@ -378,7 +380,7 @@ const Delivery = () => {
 
     return (
         <div>
-             <link rel="stylesheet" href="assets/css/CameraComponent.css" />
+            <link rel="stylesheet" href="assets/css/CameraComponent.css" />
             {
                 parseInt(openCame) === 1 && <TakePhotoDialog saveFile={handleSaveFile} />
             }
@@ -560,8 +562,8 @@ const Delivery = () => {
                                             History.push(window.location.pathname + '?openCame=1')
                                         }}
                                         //startIcon='save_alt'
-                                        endIcon={file ? 'check' : false}
-                                        className={clsx(file ? 'bg-green-500' : '')}
+                                        endIcon={file?.length ? 'check' : false}
+                                        className={clsx(file?.length ? 'bg-green-500' : '')}
                                         size="small" />
                                 }
                                 {/* {
@@ -595,7 +597,7 @@ const Delivery = () => {
                                         if (currentOrder?.shipping?.status === 2)
                                             formik.handleSubmit()
                                         if (currentOrder?.shipping?.status === 3) {
-                                            if (!Boolean(file)) {
+                                            if (!Boolean(file?.length)) {
                                                 setTimeout(() => {
                                                     dispatch(showMessage({ variant: "error", message: 'Vui lòng đính kèm hình' }))
                                                 }, 0);

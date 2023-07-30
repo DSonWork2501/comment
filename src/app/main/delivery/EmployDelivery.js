@@ -315,12 +315,25 @@ const ProductTable = ({ entities, loading, setSearch }) => {
     </div>
 }
 
+export const saveFile = (file, name) => {
+    return new Promise((resolve, reject) => {
+        try {
+            const data = new FormData();
+            data.append('enpoint', fileEndpoint);
+            data.append('files', file, name);
+            return Connect.live.uploadFile.insert(data)
+                .then(res => resolve(res))
+                .catch(err => reject(err))
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
 const handleSaveFileOut = async (value, handleRefresh, dispatch, file, successFc) => {
     try {
-        const data = new FormData();
-        data.append('enpoint', fileEndpoint);
-        data.append('files', file);
-        await Connect.live.uploadFile.insert(data);
+        const pr = file.map(val => saveFile(val.file, val.name))
+        await Promise.all(pr);
         const resultAction = await dispatch(order.shipper.update(value))
         unwrapResult(resultAction);
         handleRefresh()
@@ -479,10 +492,11 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
         return returnTotalAllProduct(listProductTemp)
     }, [listProductTemp])
 
-    const handleSaveFile = async (file, name, setLoading) => {
+    const handleSaveFile = async (array, setLoading) => {
         //setOpen(false)
         //window.alert(JSON.stringify(file));
         setLoading(true);
+        const files = array.map(val => val.name).join(',');
         if (shipID) {
             const current = entities.data.find(element => {
                 return element.shipping.id === parseInt(shipID)
@@ -493,11 +507,12 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                 data: [
                     {
                         id: current.shipping.id,
-                        receiveimg: name,
-                        session: current.shipping.session
+                        receiveimg: files,
+                        session: current.shipping.session,
+                        orderid: current.shipping.orderid
                     }
                 ]
-            }, handleRefresh, dispatch, file, () => {
+            }, handleRefresh, dispatch, array, () => {
                 setLoading(false);
             })
         } else {
@@ -508,7 +523,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
                 return {
                     id: current.shipping.id,
-                    receiveimg: name,
+                    receiveimg: files,
                     session: current.shipping.session
                 }
             })
@@ -516,7 +531,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
             handleSaveFileOut({
                 typeItem: 2,
                 data
-            }, handleRefresh, dispatch, file, () => {
+            }, handleRefresh, dispatch, array, () => {
                 setCheck([]);
                 setLoading(false);
             })
@@ -657,7 +672,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     const classes = useStyles();
     const webcamRef = useRef(null);
     const [frontCamera, setFrontCamera] = useState(false);
-    const [photoData, setPhotoData] = useState(null);
+    const [photoData, setPhotoData] = useState([]);
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , openCameUrl = parseInt(params2.get('openCame'));
     //const loading = useSelector(store => store[keyStore].order.btnLoading)
@@ -673,17 +688,17 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
 
     useEffect(() => {
         setOpenCame(parseInt(openCameUrl) === 1);
-        setPhotoData(null);
+        setPhotoData([]);
         setFile(null);
     }, [openCameUrl])
 
     const handleCapture = () => {
         const imageSrc = webcamRef.current.getScreenshot({
-            // width: 1280, // Set the desired width for the screenshot (e.g., 1280)
-            // height: 720, // Set the desired height for the screenshot (e.g., 720)
+            width: 960, // Set the desired width for the screenshot (e.g., 1280)
+            height: 540, // Set the desired height for the screenshot (e.g., 720)
             screenshotQuality: 1.0, // Set the screenshot quality to 1.0 for maximum quality (no compression)
         });
-        setPhotoData(imageSrc);
+        setPhotoData(prev => prev.push(imageSrc));
     };
 
     const handleCameraSwitch = () => {
@@ -691,12 +706,16 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     };
 
     const handleAddCapturedPhoto = () => {
-        if (photoData) {
-            const blob = dataURItoBlob(photoData);
-            const name = `${Date.now()}.jpeg`;
-            const file = new File([blob], name, { type: 'image/jpeg' });
+        if (photoData?.length) {
+            let fileArray = photoData.map((val, i) => {
+                const blob = dataURItoBlob(val);
+                const name = `${Date.now()}_${i}.jpeg`;
+                const file = new File([blob], name, { type: 'image/jpeg' });
+                return { name, file }
+            })
+
             // Update the input file element's value to include the captured photo
-            saveFile(file, name, setLoading)
+            saveFile(fileArray, setLoading)
             // const inputFile = document.getElementById('photoInput');
             // inputFile.files = [file];
         }
@@ -704,7 +723,20 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
 
     const handleSaveFile = () => {
         if (file?.length) {
-            saveFile(file[0], file[0].name, setLoading)
+            let fileArray = [];
+            for (let i = 0; i < file.length; i++) {
+                const fileN = file[i];
+
+                const name = `${Date.now()}_${i}.jpeg`;
+                const fileWithMetadata = new Blob([fileN], { type: fileN.type });
+                fileWithMetadata.name = name;
+
+                fileArray.push({
+                    file: fileWithMetadata,
+                    name: name
+                })
+            }
+            saveFile(fileArray, setLoading)
         }
     }
 
@@ -761,19 +793,31 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
 
             </div>
 
-            {photoData &&
-                <div className="photo-preview w-full mt-8 relative">
-                    <img src={photoData} alt="Captured" className='w-full mb-8' />
-                    {/* <Button
-                        size='small'
-                        variant='contained'
-                        color='primary'
-                        onClick={handleAddCapturedPhoto}
-                        className='absolute top-8 right-8'
-                    >
-                        Lưu
-                    </Button> */}
-                    <div className='absolute top-8 right-8'>
+            {photoData?.length &&
+                <>
+                    <div className="photo-preview flex flex-wrap w-full mt-8 relative ">
+                        {
+                            photoData.map((val, i) => (<div className='w-1/2 mb-8' key={i}>
+                                <img src={val} alt="Captured" className='w-full mb-8' />
+                                <CmsButtonProgress
+                                    type="submit"
+                                    label={"Xóa"}
+                                    onClick={() => setPhotoData((prev) => prev.filter((data) => data !== val))}
+                                    className='bg-red-500 hover:bg-red-900 mt-8'
+                                    size="small" />
+                            </div>))
+                        }
+                        {/* <Button
+                            size='small'
+                            variant='contained'
+                            color='primary'
+                            onClick={handleAddCapturedPhoto}
+                            className='absolute top-8 right-8'
+                        >
+                            Lưu
+                        </Button> */}
+                    </div>
+                    <div>
                         <CmsButtonProgress
                             loading={loading}
                             type="submit"
@@ -781,7 +825,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                             onClick={handleAddCapturedPhoto}
                             size="small" />
                     </div>
-                </div>
+                </>
             }
 
             <div className='flex justify-between items-center mt-8'>
@@ -795,13 +839,14 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                                 accept: '.png, .jpeg, .jpg, .gif'
                             }
                         }
+                        isMultiple
                         className='mr-8'
                         setValue={(value, setLoading, resetFileInput) => {
                             setFile(value)
                             resetFileInput();
                         }} />
                     {
-                        file && 'Đã chọn 1 hình'
+                        file && `Đã chọn ${file?.length} hình`
                     }
                 </div>
                 {
