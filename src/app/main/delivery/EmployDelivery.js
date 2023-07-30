@@ -29,6 +29,7 @@ import HeadDelivery from './components/Header';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
+import { showMessage } from 'app/store/fuse/messageSlice';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {
@@ -501,7 +502,6 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
             const current = entities.data.find(element => {
                 return element.shipping.id === parseInt(shipID)
             });
-
             handleSaveFileOut({
                 typeItem: 2,
                 data: [
@@ -559,8 +559,8 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
     }
 
     return <>
-        {
-            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} saveFile={handleSaveFile} />
+        { 
+            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} saveFile={handleSaveFile} isNeedOpt />
         }
 
         <div className='p-8 rounded-4 shadow-4'>
@@ -668,7 +668,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
 }
 
-export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
+export const TakePhotoDialog = ({ open, className, saveFile, check, isNeedOpt }) => {
     const classes = useStyles();
     const webcamRef = useRef(null);
     const [frontCamera, setFrontCamera] = useState(false);
@@ -679,6 +679,9 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
     const [file, setFile] = useState(null);
     const [openCame, setOpenCame] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [openDialog, setOpenDialog] = useState('');
+    const [type, setType] = useState(true);
+    const dispatch = useDispatch();
 
     const videoConstraints = {
         width: window.innerWidth,
@@ -705,7 +708,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
         setFrontCamera(prevFrontCamera => !prevFrontCamera);
     };
 
-    const handleAddCapturedPhoto = () => {
+    const savePhoto = () => {
         if (photoData?.length) {
             let fileArray = photoData.map((val, i) => {
                 const blob = dataURItoBlob(val);
@@ -719,9 +722,18 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
             // const inputFile = document.getElementById('photoInput');
             // inputFile.files = [file];
         }
+    }
+
+    const handleAddCapturedPhoto = () => {
+        if (isNeedOpt) {
+            setType(true);
+            setOpenDialog('2FA');
+        } else {
+            savePhoto();
+        }
     };
 
-    const handleSaveFile = () => {
+    const saveFileSelect = () => {
         if (file?.length) {
             let fileArray = [];
             for (let i = 0; i < file.length; i++) {
@@ -740,6 +752,15 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
         }
     }
 
+    const handleSaveFile = () => {
+        if (isNeedOpt) {
+            setOpenDialog('2FA');
+            setType(false);
+        } else {
+            saveFileSelect();
+        }
+    }
+
     // Helper function to convert base64 to Blob
     const dataURItoBlob = (dataURI) => {
         const byteString = atob(dataURI.split(',')[1]);
@@ -752,62 +773,86 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
         return new Blob([ab], { type: mimeString });
     };
 
-    return <Dialog className={classes.modal2} open={openCame} fullWidth maxWidth="md">
-        <DialogContent className='text-11' style={{ paddingTop: 8 }}>
-            <div className="camera-container">
-                <div className="camera-view relative mb-8">
-                    <button onClick={() => History.push(window.location.pathname)}
-                        style={{
-                            position: 'absolute',
-                            top: 8,
-                            right: 8,
-                            opacity: .5,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            border: '1px solid white',
-                            borderRadius: '50%',
-                            fontSize: '25px',
-                            color: 'white',
-                            zIndex: 1
-                        }}>
-                        <FontAwesomeIcon icon={faCircleXmark} />
-                    </button>
-                    <Webcam
-                        audio={false}
-                        ref={webcamRef}
-                        screenshotFormat="image/jpeg"
-                        videoConstraints={videoConstraints}
-                    />
-                </div>
-                <div className="camera-controls flex justify-between w-full px-8 items-center ">
-                    <div style={{ width: 35, height: 35 }}>
+    const handleSave2FA = (otp) => {
+        Connect.live.order.other.checkOpt({ phone: '0585588221', otp }).then(val => {
+            if (type) {
+                if (photoData?.length) {
+                    savePhoto();
+                }
+            } else {
+                if (file?.length) {
+                    saveFileSelect()
+                }
+            }
+        }).catch(() => {
+            setTimeout(() => {
+                dispatch(showMessage({ variant: "error", message: 'Sai mã OPT' }))
+            }, 0);
+        })
+    }
 
+    return <>
+        {
+            openDialog === '2FA' && <OPTDialog className={classes.modalSmall} open={true} handleSave={handleSave2FA} handleClose={() => setOpenDialog('')} />
+        }
+        <Dialog className={classes.modal2} open={openCame} fullWidth maxWidth="md">
+            <DialogContent className='text-11' style={{ paddingTop: 8 }}>
+                <div className="camera-container">
+                    <div className="camera-view relative mb-8">
+                        <button onClick={() => History.push(window.location.pathname)}
+                            style={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                opacity: .5,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                border: '1px solid white',
+                                borderRadius: '50%',
+                                fontSize: '25px',
+                                color: 'white',
+                                zIndex: 1
+                            }}>
+                            <FontAwesomeIcon icon={faCircleXmark} />
+                        </button>
+                        <Webcam
+                            audio={false}
+                            ref={webcamRef}
+                            screenshotFormat="image/jpeg"
+                            videoConstraints={videoConstraints}
+                        />
                     </div>
-                    <button onClick={handleCapture} style={{ width: 40, height: 40, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '30px', background: 'white' }}>
-                    </button>
-                    <button onClick={handleCameraSwitch} style={{ width: 35, height: 35, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '18px', color: 'white' }}>
-                        <FontAwesomeIcon icon={faCameraRotate} />
-                    </button>
+                    <div className="camera-controls flex justify-between w-full px-8 items-center ">
+                        <div style={{ width: 35, height: 35 }}>
+
+                        </div>
+                        <button onClick={handleCapture} style={{ width: 40, height: 40, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '30px', background: 'white' }}>
+                        </button>
+                        <button onClick={handleCameraSwitch} style={{ width: 35, height: 35, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '18px', color: 'white' }}>
+                            <FontAwesomeIcon icon={faCameraRotate} />
+                        </button>
+                    </div>
+
                 </div>
 
-            </div>
-
-            {Boolean(photoData?.length) &&
-                <>
-                    <div className="photo-preview flex flex-wrap w-full mt-8 relative ">
-                        {
-                            photoData.map((val, i) => (<div className='w-1/2 mb-8' key={i}>
-                                <img src={val} alt="Captured" className='w-full mb-8' />
-                                <CmsButtonProgress
-                                    type="submit"
-                                    label={"Xóa"}
-                                    onClick={() => setPhotoData((prev) => prev.filter((data) => data !== val))}
-                                    className='bg-red-500 hover:bg-red-900 mt-8'
-                                    size="small" />
-                            </div>))
-                        }
-                        {/* <Button
+                {Boolean(photoData?.length) &&
+                    <>
+                        <div className="photo-preview flex flex-wrap w-full mt-8 ">
+                            {
+                                photoData.map((val, i) => (<div className='w-1/2 mb-8 relative' key={i}>
+                                    <img src={val} alt="Captured" className='w-full mb-8' />
+                                    <div className='absolute top-8 right-8'>
+                                        <CmsButtonProgress
+                                            type="submit"
+                                            label={"Xóa"}
+                                            onClick={() => setPhotoData((prev) => prev.filter((data) => data !== val))}
+                                            className='bg-red-500 hover:bg-red-900 absolute top-8 right-8'
+                                            size="small" />
+                                    </div>
+                                </div>))
+                            }
+                            {/* <Button
                             size='small'
                             variant='contained'
                             color='primary'
@@ -816,62 +861,63 @@ export const TakePhotoDialog = ({ open, className, saveFile, check }) => {
                         >
                             Lưu
                         </Button> */}
-                    </div>
-                    <div>
-                        <CmsButtonProgress
-                            loading={loading}
-                            type="submit"
-                            label={"Lưu"}
-                            onClick={handleAddCapturedPhoto}
-                            size="small" />
-                    </div>
-                </>
-            }
+                        </div>
+                        <div>
+                            <CmsButtonProgress
+                                loading={loading}
+                                type="submit"
+                                label={"Lưu"}
+                                onClick={handleAddCapturedPhoto}
+                                size="small" />
+                        </div>
+                    </>
+                }
 
-            <div className='flex justify-between items-center mt-8'>
-                <div className='flex items-center'>
-                    <CmsUploadFile
-                        size="small"
-                        label="Chọn file hình"
-                        id="uploadfile"
-                        fileProperties={
-                            {
-                                accept: '.png, .jpeg, .jpg, .gif'
+                <div className='flex justify-between items-center mt-8'>
+                    <div className='flex items-center'>
+                        <CmsUploadFile
+                            size="small"
+                            label="Chọn file hình"
+                            id="uploadfile"
+                            fileProperties={
+                                {
+                                    accept: '.png, .jpeg, .jpg, .gif'
+                                }
                             }
+                            isMultiple
+                            className='mr-8'
+                            setValue={(value, setLoading, resetFileInput) => {
+                                setFile(value)
+                                resetFileInput();
+                            }} />
+                        {
+                            file && `Đã chọn ${file?.length} hình`
                         }
-                        isMultiple
-                        className='mr-8'
-                        setValue={(value, setLoading, resetFileInput) => {
-                            setFile(value)
-                            resetFileInput();
-                        }} />
+                    </div>
                     {
-                        file && `Đã chọn ${file?.length} hình`
+                        file &&
+                        // <Button
+                        //     size='small'
+                        //     variant='contained'
+                        //     color='primary'
+                        //     onClick={handleSaveFile}
+                        // >
+                        //     Lưu
+                        // </Button>
+                        <div>
+                            <CmsButtonProgress
+                                loading={loading}
+                                type="submit"
+                                label={"Lưu"}
+                                onClick={handleSaveFile}
+                                size="small" />
+                        </div>
                     }
                 </div>
-                {
-                    file &&
-                    // <Button
-                    //     size='small'
-                    //     variant='contained'
-                    //     color='primary'
-                    //     onClick={handleSaveFile}
-                    // >
-                    //     Lưu
-                    // </Button>
-                    <div>
-                        <CmsButtonProgress
-                            loading={loading}
-                            type="submit"
-                            label={"Lưu"}
-                            onClick={handleSaveFile}
-                            size="small" />
-                    </div>
-                }
-            </div>
 
-        </DialogContent>
-    </Dialog>
+            </DialogContent>
+        </Dialog>
+    </>
 }
 
 const EmployDelivery = () => {
