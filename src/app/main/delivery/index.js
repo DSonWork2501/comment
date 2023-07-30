@@ -319,7 +319,8 @@ const Delivery = () => {
                         data: [
                             {
                                 id: currentOrder.shipping.id,
-                                session: currentOrder.shipping.session
+                                session: currentOrder.shipping.session,
+                                orderid: currentOrder.shipping.orderid
                             }
                         ]
                     }
@@ -378,6 +379,20 @@ const Delivery = () => {
         }
     }
 
+    const getLocation = () => {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                // setLatitude(position.coords.latitude);
+                // setLongitude(position.coords.longitude);
+            },
+            (error) => {
+                console.error('Error getting location:', error);
+                window.location.reload();
+                // Continuously ask for location again after a short delay
+                //setTimeout(getLocation, 50); // Wait for 2 seconds before retrying
+            }
+        );
+    }
     return (
         <div>
             <link rel="stylesheet" href="assets/css/CameraComponent.css" />
@@ -594,6 +609,7 @@ const Delivery = () => {
                                             )
                                     }
                                     onClick={() => {
+
                                         if (currentOrder?.shipping?.status === 2)
                                             formik.handleSubmit()
                                         if (currentOrder?.shipping?.status === 3) {
@@ -604,7 +620,8 @@ const Delivery = () => {
                                                 return
                                             }
 
-                                            setOpenDialog('OPT')
+                                            setOpenDialog('OPT');
+                                            getLocation();
                                         }
                                     }}
                                     size="small" />

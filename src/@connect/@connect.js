@@ -89,24 +89,18 @@ export default {
                 getSummary: params => axios.get(`${baseurl}/order/summary-order`, { params }),
                 getDetailDelivery: params => axios.get(`${baseurl}/order/get-delivery-detail`, {
                     params,
-                    headers: {
-                        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InF1YW5ndmluaDI5MTExNzZAZ21haWwuY29tIiwibmJmIjoxNjg4NDc3ODg1LCJleHAiOjE2OTA1NzY2ODV9.MA8WEdt4Rc89Ea_e4VYF2iz9AnDFhwdENzwNkJxOVF4`,
-                    },
                 }),
                 getDetailDeliverySession: params => axios.get(`${baseurl}/order/get-ship-info/${params.session}`, {
                     params,
                 }),
                 getDelivery: params => axios.get(`${baseurl}/order/get-delivery`, { params }),
                 updateNote: entity => axios.put(`${baseurl}/order/update-order-des`, entity),
+                getUserDelivery: params => axios.get(`${baseurl}/customer/get-user-info`, { params }),
+                getVehicles: params => axios.get(`${baseurl}/customer/get-vehicles`, { params }),
             },
             shipper: {
                 insert: entity => axios.post(`${baseurl}/order/shipping-insert${entity[0]?.deliveryid ? '?exist=1' : ''}`, entity),
-                update: entity => axios.put(`${baseurl}/order/shipping-update/${entity.typeItem}`, entity.data,
-                    {
-                        headers: {
-                            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InF1YW5ndmluaDI5MTExNzZAZ21haWwuY29tIiwibmJmIjoxNjg4NDc3ODg1LCJleHAiOjE2OTA1NzY2ODV9.MA8WEdt4Rc89Ea_e4VYF2iz9AnDFhwdENzwNkJxOVF4`,
-                        },
-                    }),
+                update: entity => axios.put(`${baseurl}/order/shipping-update/${entity.typeItem}`, entity.data),
                 getDetailShipDelivery: params => axios.get(`${baseurl}/order/get-delivery-shipping/${params.session}`, { params })
             }
         },
