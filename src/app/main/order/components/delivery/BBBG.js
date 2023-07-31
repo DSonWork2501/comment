@@ -5,6 +5,7 @@ import {
     CmsLabel,
     CmsFormikTextField,
     CmsFormikDateTimePicker,
+    CmsIconButton,
 } from '@widgets/components';
 import { Box, Button, Icon, styled } from '@material-ui/core';
 import { initColumn } from '@widgets/functions';
@@ -16,6 +17,8 @@ import reducer from '../../store';
 import { useFormik } from 'formik';
 import { format } from 'date-fns';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
+import Connect from '@connect/@connect';
+import { showMessage } from 'app/store/fuse/messageSlice';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -128,6 +131,7 @@ function DetailBBBG() {
     const loading = useSelector(store => store[keyStore].order.loading);
     const entities = useSelector(store => store[keyStore].order.deliveryList);
     const [search, setSearch] = useState(initialValues);
+    const [loadingBtn, setLoadingBtn] = useState(false);
 
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
@@ -188,7 +192,29 @@ function DetailBBBG() {
         ),
         action: (
             <div className="flex space-x-3 ">
+                <CmsIconButton
+                    tooltip="Copy Link nhận hàng"
+                    delay={50}
+                    disabled={loadingBtn}
+                    icon="link"
+                    className="bg-green-500 text-white shadow-3  hover:bg-green-900"
+                    onClick={() => {
+                        setLoadingBtn(true);
+                        Connect.live.order.other.getDetailDelivery({ id: item.deliveryid }).then(({ data }) => {
+                            const { result } = data;
+                            if (result) {
+                                navigator.clipboard.writeText(`https://ibp.tastycounter.vn/employ-delivery/1/${encodeURIComponent(data?.data[0]?.shipping?.deliverysession)}`).then(() => {
+                                    dispatch(showMessage({ variant: "success", message: 'Copy thành công' }))
+                                }).catch(err => {
+                                    dispatch(showMessage({ variant: "error", message: 'Copy không thành công' }))
+                                }).finally(() => {
+                                    setLoadingBtn(false);
+                                })
 
+                            }
+                        })
+                    }}
+                />
             </div>
         ),
     }))
