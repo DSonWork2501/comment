@@ -509,7 +509,8 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                         id: current.shipping.id,
                         receiveimg: files,
                         session: current.shipping.session,
-                        orderid: current.shipping.orderid
+                        orderid: current.shipping.orderid,
+                        deliveryid:current.shipping.deliveryid,
                     }
                 ]
             }, handleRefresh, dispatch, array, () => {
@@ -524,7 +525,9 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                 return {
                     id: current.shipping.id,
                     receiveimg: files,
-                    session: current.shipping.session
+                    session: current.shipping.session,
+                    orderid: current.shipping.orderid,
+                    deliveryid:current.shipping.deliveryid,
                 }
             })
 

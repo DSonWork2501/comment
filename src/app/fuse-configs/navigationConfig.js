@@ -119,6 +119,14 @@ const navigationConfig = [
 				url: '/package',
 			},
 			{
+				id: 'nvi-manager-delivery',
+				title: 'Biên bản bàn giao',
+				translate: 'CUSTOM_DELIVERY',
+				type: 'item',
+				icon: 'call_to_action',
+				url: '/order/delivery',
+			},
+			{
 				id: 'nvi-manager-user-delivery',
 				title: 'Nhân viên giao hàng',
 				translate: 'CUSTOM_USER_DELIVERY',
