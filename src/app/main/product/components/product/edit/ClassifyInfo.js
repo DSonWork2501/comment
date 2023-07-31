@@ -46,7 +46,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex, i
                 is: (value) => {
                     return ishs === 1
                 },
-                then: Yup.number().nullable().required("Nhập dung tích").min(1, "Nhập dung tích").typeError("Nhập dung tích")
+                then: Yup.number().nullable().required("Nhập sức chứa").min(1, "Nhập sức chứa").typeError("Nhập sức chứa")
             }),
             subname: Yup.string().nullable().required("Nhập tên sản phẩm")
         })
@@ -56,7 +56,7 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex, i
         <div className="grid grid-cols-4 gap-10 w-11/12">
             <CmsFormikTextField key={`${index}_uniqueid`} size="small" name={`uniqueid`} formik={formik_item} label="uniqueid" />
             <CmsFormikTextField key={`${index}_subname`} size="small" name={`subname`} formik={formik_item} label="Tên Sub" />
-            <CmsFormikTextField isNumberFormat key={`${index}_capacity`} isNumber size="small" name={`capacity`} formik={formik_item} label="dung tích" />
+            <CmsFormikTextField isNumberFormat key={`${index}_capacity`} isNumber size="small" name={`capacity`} formik={formik_item} label="Sức chứa" />
             {/* <CmsFormikTextField key={`${index}_nhanhid`} size="small" name={`nhanhid`} formik={formik_item} label="nhanhid" /> */}
             <CmsFormikAutocomplete
                 valueIsId
@@ -119,7 +119,7 @@ const InfoContent = ({ index, formik }) => {
             <div className="grid grid-cols-3 gap-10" >
                 <LabelInfo label={{ content: 'Unique ID' }} info={{ content: uniqueid }} />
                 <LabelInfo label={{ content: 'Tên Sub' }} info={{ content: subname }} />
-                <LabelInfo label={{ content: 'Dung tích' }} info={{ content: capacity }} />
+                <LabelInfo label={{ content: 'Sức chứa' }} info={{ content: capacity }} />
                 <LabelInfo label={{ content: 'nhanhid' }} info={{ content: nhanhid }} />
                 <LabelInfo label={{ content: 'màu' }} info={{ content: get(colorRes?.find(x => x.id === colorid), 'color') || '' }} />
                 <LabelInfo label={{ content: 'Size ID' }} info={{ content: get(sizeRes?.find(x => x.id === sizeid), 'sizename') || '' }} />
