@@ -13,7 +13,8 @@ const locale = {
 	'CUSTOM_SHELF': 'Quản Lý tủ rượu',
 	'CONTRACT': 'Quản Lý hợp đồng',
 	'CUSTOM_PACK':'Đóng gói',
-	'CUSTOM_DELIVERY':'Vận chuyển'
+	'CUSTOM_DELIVERY':'Vận chuyển',
+	'CUSTOM_USER_DELIVERY':'Nhân viên giao hàng'
 };
 
 export default locale;

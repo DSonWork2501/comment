@@ -31,7 +31,7 @@ const navigationConfig = [
 		translate: 'PRODUCT',
 		type: 'group',
 		icon: 'shop',
-		
+
 		// auth: ["GetLicense", "ReportLicense"],
 		children: [
 			{
@@ -119,13 +119,21 @@ const navigationConfig = [
 				url: '/package',
 			},
 			{
-				id: 'nvi-manager-delivery',
-				title: 'Vận chuyển',
-				translate: 'CUSTOM_DELIVERY',
+				id: 'nvi-manager-user-delivery',
+				title: 'Nhân viên giao hàng',
+				translate: 'CUSTOM_USER_DELIVERY',
 				type: 'item',
 				icon: 'call_to_action',
-				url: '/order-delivery',
+				url: '/meta/user-delivery',
 			},
+			// {
+			// 	id: 'nvi-manager-delivery',
+			// 	title: 'Vận chuyển',
+			// 	translate: 'CUSTOM_DELIVERY',
+			// 	type: 'item',
+			// 	icon: 'call_to_action',
+			// 	url: '/order-delivery',
+			// },
 		],
 	},
 	{
