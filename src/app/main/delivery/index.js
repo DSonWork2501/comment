@@ -320,7 +320,8 @@ const Delivery = () => {
                             {
                                 id: currentOrder.shipping.id,
                                 session: currentOrder.shipping.session,
-                                orderid: currentOrder.shipping.orderid
+                                orderid: currentOrder.shipping.orderid,
+                                deliveryid:currentOrder.shipping.deliveryid,
                             }
                         ]
                     }

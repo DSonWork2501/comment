@@ -142,14 +142,15 @@ function OrderView() {
     const totalValues = {
         0: summary?.da_huy ? summary?.da_huy?.toLocaleString('en-US') : 0,
         6: summary?.da_dong_goi ? summary?.da_dong_goi?.toLocaleString('en-US') : 0,
-        100: (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)
-            ? (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat)?.toLocaleString('en-US')
+        100: (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat + summary?.van_chuyen)
+            ? (summary?.da_huy + summary?.da_tao + summary?.da_xac_nhan + summary?.da_dong_goi + summary?.cho_thanh_toan + summary?.da_thanh_toan + summary?.hoan_tat + summary?.van_chuyen)?.toLocaleString('en-US')
             : 0,
         //5: summary?.cho_thanh_toan ? summary?.cho_thanh_toan?.toLocaleString('en-US') : 0,
         // 4: summary?.hoan_tat ? summary?.hoan_tat?.toLocaleString('en-US') : 0,
         // 3: summary?.da_thanh_toan ? summary?.da_thanh_toan?.toLocaleString('en-US') : 0,
         2: summary?.da_xac_nhan ? summary?.da_xac_nhan?.toLocaleString('en-US') : 0,
-        1: summary?.da_tao ? summary?.da_tao?.toLocaleString('en-US') : 0
+        1: summary?.da_tao ? summary?.da_tao?.toLocaleString('en-US') : 0,
+        7: summary?.van_chuyen ? summary?.van_chuyen?.toLocaleString('en-US') : 0,
     }
     const [selects, setSelects] = useState([]);
 

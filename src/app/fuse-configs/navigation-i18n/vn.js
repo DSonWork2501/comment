@@ -13,8 +13,9 @@ const locale = {
 	'SIGNED_CONTRACT_MANAGEMENT': 'Hợp Đồng Đã Ký',
 	'CONTRACT': 'Quản Lý hợp đồng',
 	'CUSTOM_PACK':'Đóng gói',
-	'CUSTOM_DELIVERY':'Vận chuyển',
-	'CUSTOM_USER_DELIVERY':'Nhân viên giao hàng'
+	//'CUSTOM_DELIVERY':'Vận chuyển',
+	'CUSTOM_USER_DELIVERY':'Nhân viên giao hàng',
+	'CUSTOM_DELIVERY':'Biên bản bàn giao'
 };
 
 export default locale;
