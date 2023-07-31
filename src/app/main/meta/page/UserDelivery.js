@@ -1,32 +1,13 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
-import {
-    CmsCardedPage,
-    CmsTableBasic,
-    CmsButton,
-    CmsLabel,
-    CmsIconButton,
-    CmsTab,
-    CmsFormikTextField,
-    CmsFilter,
-    CmsFormikAutocomplete,
-    CmsButtonGroup,
-} from '@widgets/components';
-import { Box, Button, Chip, Icon, styled } from '@material-ui/core';
-import { alertInformation, initColumn } from '@widgets/functions'
+import { CmsCardedPage, CmsTableBasic, CmsLabel, CmsIconButton } from '@widgets/components';
+import { Box, styled } from '@material-ui/core';
+import { initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer'
 import reducer, { setSelected, meta } from '../store';
 import { useDispatch, useSelector } from 'react-redux'
 import FuseLoading from '@fuse/core/FuseLoading'
-import { keyI18n, keyStore } from '../common';
-import { unwrapResult } from '@reduxjs/toolkit';
-import History from '@history';
-import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
-import { useFormik } from 'formik';
-import Connect from '@connect/@connect';
-import { GetApp } from '@material-ui/icons';
+import { keyStore } from '../common';
 import CodeDialog from '../components/CodeDialog';
 
 const LayoutCustom = styled(Box)({
@@ -36,14 +17,14 @@ const LayoutCustom = styled(Box)({
     },
 });
 
-const initialValues = {
-    unitID: null,
-    groupID: null,
-    codeName: "",
-    status: null,
-    page: 1,
-    limit: 10,
-};
+// const initialValues = {
+//     unitID: null,
+//     groupID: null,
+//     codeName: "",
+//     status: null,
+//     page: 1,
+//     limit: 10,
+// };
 
 // const Filter = ({ onSearch, filterOptions, options }) => {
 //     const { units, groups } = options;
@@ -164,7 +145,6 @@ const initialValues = {
 
 function Form() {
     const dispatch = useDispatch();
-    const { t } = useTranslation(keyI18n);
     const loading = useSelector(store => store[keyStore].loading);
     const entities = useSelector(store => store[keyStore].user);
     const selected = useSelector(store => store[keyStore].selected);
@@ -172,9 +152,6 @@ function Form() {
     const code = useSelector(store => store[keyStore]?.code);
     const [search, setSearch] = useState(searchDefault);
     const [openDialog, setOpenDialog] = useState('');
-    const [filterOptions, setFilterOptions] = useState(0);
-    const units = useSelector(store => store[keyStore]?.units?.data) || [];
-    const groups = useSelector(store => store[keyStore]?.groups?.data) || [];
 
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
@@ -196,16 +173,16 @@ function Form() {
         getListTable(search);
     }, [searchString, getListTable, dispatch])
 
-    const selectedFile = async (filePath) => {
-        const file = await Connect.live.upload.getFileS3({ documentName: filePath });
-        const url = window.URL.createObjectURL(new Blob([file.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', file.config.params.documentName.split('/').pop()); //or any other extension
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    }
+    // const selectedFile = async (filePath) => {
+    //     const file = await Connect.live.upload.getFileS3({ documentName: filePath });
+    //     const url = window.URL.createObjectURL(new Blob([file.data]));
+    //     const link = document.createElement('a');
+    //     link.href = url;
+    //     link.setAttribute('download', file.config.params.documentName.split('/').pop()); //or any other extension
+    //     document.body.appendChild(link);
+    //     link.click();
+    //     link.remove();
+    // }
 
     const data = entities && entities.data && entities.data.map((item, index) => ({
         ...item,
@@ -247,29 +224,29 @@ function Form() {
         setOpenDialog('');
     }
 
-    const handleSubmit = async (values, form) => {
-        alertInformation({
-            text: `Xác nhận thao tác`,
-            data: { values, form },
-            confirm: async () => {
-                try {
-                    const resultAction = values?.id
-                        ? await dispatch(meta.customer.update([values]))
-                        : await dispatch(meta.customer.create([values]));
-                    unwrapResult(resultAction);
-                    if (!values?.id) {
-                        form.resetForm();
-                    }
-                    setOpenDialog('');
-                    getListTable(search);
-                } catch (error) {
-                } finally {
-                    form.setSubmitting(false)
-                }
-            },
-            close: () => form.setSubmitting(false)
-        });
-    }
+    // const handleSubmit = async (values, form) => {
+    //     alertInformation({
+    //         text: `Xác nhận thao tác`,
+    //         data: { values, form },
+    //         confirm: async () => {
+    //             try {
+    //                 const resultAction = values?.id
+    //                     ? await dispatch(meta.customer.update([values]))
+    //                     : await dispatch(meta.customer.create([values]));
+    //                 unwrapResult(resultAction);
+    //                 if (!values?.id) {
+    //                     form.resetForm();
+    //                 }
+    //                 setOpenDialog('');
+    //                 getListTable(search);
+    //             } catch (error) {
+    //             } finally {
+    //                 form.setSubmitting(false)
+    //             }
+    //         },
+    //         close: () => form.setSubmitting(false)
+    //     });
+    // }
     // const clearSearchValue = (value) => setSearch(prev => {
     //     const values = { ...value };
     //     const search = { ...prev };
@@ -281,9 +258,6 @@ function Form() {
     //     }
     //     return { ...search, ...values, page: 1 };
     // })
-    const handleFilterType = (event, value) => {
-        setFilterOptions(value)
-    };
 
     if (!data) {
         return <FuseLoading />

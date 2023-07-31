@@ -559,8 +559,8 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
     }
 
     return <>
-        { 
-            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} saveFile={handleSaveFile} isNeedOpt />
+        {
+            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} phone={entities?.data[0]?.shipping?.phone} saveFile={handleSaveFile} isNeedOpt />
         }
 
         <div className='p-8 rounded-4 shadow-4'>
@@ -668,7 +668,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
 }
 
-export const TakePhotoDialog = ({ open, className, saveFile, check, isNeedOpt }) => {
+export const TakePhotoDialog = ({ open, phone, className, saveFile, check, isNeedOpt }) => {
     const classes = useStyles();
     const webcamRef = useRef(null);
     const [frontCamera, setFrontCamera] = useState(false);
@@ -774,7 +774,7 @@ export const TakePhotoDialog = ({ open, className, saveFile, check, isNeedOpt })
     };
 
     const handleSave2FA = (otp) => {
-        Connect.live.order.other.checkOpt({ phone: '0585588221', otp }).then(val => {
+        Connect.live.order.other.checkOpt({ phone, otp }).then(val => {
             if (type) {
                 if (photoData?.length) {
                     savePhoto();
@@ -943,7 +943,7 @@ const EmployDelivery = () => {
     }, [entities])
 
     const getListTable = useCallback((search) => {
-        dispatch(order.shipper.getDetailShipDelivery({ ...search, session }));
+        dispatch(order.shipper.getDetailShipDelivery({ ...search, session: decodeURIComponent(session) }));
     }, [dispatch, session])
 
     useEffect(() => {

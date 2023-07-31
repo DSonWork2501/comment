@@ -281,7 +281,7 @@ const Delivery = () => {
     //     setActiveStep(0);
     // };
     const getListTable = useCallback((search) => {
-        dispatch(order.shipper.getDetailShipDelivery({ ...search, session }));
+        dispatch(order.shipper.getDetailShipDelivery({ ...search, session: decodeURIComponent(session) }));
     }, [dispatch, session])
 
     useEffect(() => {

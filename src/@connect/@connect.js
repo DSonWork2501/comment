@@ -102,7 +102,8 @@ export default {
             shipper: {
                 insert: entity => axios.post(`${baseurl}/order/shipping-insert${entity[0]?.deliveryid ? '?exist=1' : ''}`, entity),
                 update: entity => axios.put(`${baseurl}/order/shipping-update/${entity.typeItem}`, entity.data),
-                getDetailShipDelivery: params => axios.get(`${baseurl}/order/get-delivery-shipping/${params.session}`, { params })
+                //getDetailShipDelivery: params => axios.get(`${baseurl}/order/get-delivery-shipping/${params.session}`, { params })
+                getDetailShipDelivery: params => axios.post(`${baseurl}/order/get-delivery-shipping`, params)
             }
         },
         location: {
@@ -130,8 +131,8 @@ export default {
         uploadFile: {
             insert: entity => axios.post(`${baseurl}/common/upload-file`, entity),
         },
-        meta:{
-            userDelivery:{
+        meta: {
+            userDelivery: {
                 getList: (params) => axios.get(`${baseurl}/customer/get-user-info`, { params }),
                 getCode: (params) => axios.get(`${baseurl}/customer/generate2fashipping`, { params }),
             }
