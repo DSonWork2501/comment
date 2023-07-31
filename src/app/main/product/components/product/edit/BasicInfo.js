@@ -65,7 +65,6 @@ function BasicInfo({ formik, SaveData, options, handleFresh }) {
 
     const { values, setFieldValue } = formik, { properties } = values;
     const cerValue = (typeof values.certification !== 'object' || !Array.isArray(values.certification) ? (values?.certification ? values.certification.split(',') : []) : values.certification);
-
     return (
         <FuseAnimateGroup className="flex flex-wrap p-20 overflow-hidden w-full h-full" enter={{ animation: 'transition.slideUpBigIn' }}>
             <div className="w-full space-y-16">
