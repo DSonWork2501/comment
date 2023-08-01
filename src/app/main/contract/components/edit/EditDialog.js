@@ -433,7 +433,7 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
         }
     }
 
-    const { file } = item;
+    const file = item?.file;
     useEffect(() => {
         if (file) {
             const link = baseurl + `/common/files/${file}?subfolder=contract`;

@@ -1032,10 +1032,10 @@ const EmployDelivery = () => {
                                         &&
                                         <Button
                                             size='small'
-                                            variant='contained'
+                                            variant='outlined'
                                             color='primary'
-                                            onClick={() => { setOpenDialog('2FA') }}
                                             style={{ textTransform: 'initial' }}
+                                            className='cursor-default'
                                         >
                                             Nhận đủ
                                         </Button>

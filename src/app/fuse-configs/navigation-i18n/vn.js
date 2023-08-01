@@ -14,7 +14,7 @@ const locale = {
 	'CONTRACT': 'Quản Lý hợp đồng',
 	'CUSTOM_PACK':'Đóng gói',
 	//'CUSTOM_DELIVERY':'Vận chuyển',
-	'CUSTOM_USER_DELIVERY':'Nhân viên giao hàng',
+	'CUSTOM_USER_DELIVERY':'Quản lý giao hàng',
 	'CUSTOM_DELIVERY':'Biên bản bàn giao'
 };
 
