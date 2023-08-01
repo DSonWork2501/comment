@@ -17,6 +17,26 @@ export const meta = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        insert: createAsyncThunk(`${appName}/${moduleName}/userDelivery/insert`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.meta.userDelivery.insert(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công' }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        update: createAsyncThunk(`${appName}/${moduleName}/userDelivery/update`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.meta.userDelivery.update(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công' }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
         getCode: createAsyncThunk(`${appName}/${moduleName}/userDelivery/getCode`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.meta.userDelivery.getCode(params);
@@ -27,6 +47,37 @@ export const meta = {
             }
         }),
     },
+    vehicleDelivery: {
+        getList: createAsyncThunk(`${appName}/${moduleName}/vehicleDelivery/getList`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.meta.vehicleDelivery.getList(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        insert: createAsyncThunk(`${appName}/${moduleName}/vehicleDelivery/insert`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.meta.vehicleDelivery.insert(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công' }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        update: createAsyncThunk(`${appName}/${moduleName}/vehicleDelivery/update`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.meta.vehicleDelivery.update(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công' }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+    }
 }
 
 const initSearchState = {
@@ -45,7 +96,8 @@ const metaSlice = createSlice({
         selected: null,
         search: initSearchState,
         user: null,
-        code:null
+        code: null,
+        vehicles: null
     },
     reducers: {
         /**
@@ -178,7 +230,7 @@ const metaSlice = createSlice({
                 error: null
             }
         },
-        [meta.userDelivery.getList.rejected]: (state, { payload }) => {
+        [meta.vehicleDelivery.getList.rejected]: (state, { payload }) => {
             return {
                 ...state,
                 loading: false,
@@ -188,7 +240,36 @@ const metaSlice = createSlice({
                 error: null
             }
         },
-        
+
+        [meta.vehicleDelivery.getList.pending]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: true,
+                vehicles: {
+                    data: []
+                },
+                error: null
+            }
+        },
+        [meta.vehicleDelivery.getList.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                vehicles: payload,
+                error: null
+            }
+        },
+        [meta.userDelivery.getList.rejected]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                vehicles: {
+                    data: []
+                },
+                error: null
+            }
+        },
+
         [meta.userDelivery.getCode.pending]: (state, { payload }) => {
             return {
                 ...state,

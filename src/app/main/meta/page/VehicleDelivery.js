@@ -1,17 +1,17 @@
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react';
 import { CmsCardedPage, CmsTableBasic, CmsLabel, CmsIconButton, CmsTab, CmsButton } from '@widgets/components';
 import { Box, styled } from '@material-ui/core';
 import { alertInformation, initColumn } from '@widgets/functions';
-import withReducer from 'app/store/withReducer'
+import withReducer from 'app/store/withReducer';
 import reducer, { setSelected, meta } from '../store';
-import { useDispatch, useSelector } from 'react-redux'
-import FuseLoading from '@fuse/core/FuseLoading'
+import { useDispatch, useSelector } from 'react-redux';
+import FuseLoading from '@fuse/core/FuseLoading';
 import { keyStore, links } from '../common';
 import CodeDialog from '../components/CodeDialog';
-import AddUserDialog from '../components/AddUserDialog';
 import { unwrapResult } from '@reduxjs/toolkit';
 import History from '@history';
+import AddVehicleDialog from '../components/AddVehicleDialog';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -149,7 +149,7 @@ const LayoutCustom = styled(Box)({
 function Form() {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].loading);
-    const entities = useSelector(store => store[keyStore].user);
+    const entities = useSelector(store => store[keyStore].vehicles);
     const selected = useSelector(store => store[keyStore].selected);
     const searchDefault = useSelector(store => store[keyStore].search);
     const code = useSelector(store => store[keyStore]?.code);
@@ -159,16 +159,12 @@ function Form() {
 
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        //new initColumn({ field: "id", label: `ID`, style: { width: 50 }, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "fullname", label: `Tên đầy đủ`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "phone", label: `Số điện thoại`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "cccd", label: `CCCD`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "address", label: `Địa chỉ`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "gender", label: `Giới tính`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "vehiclename", label: `Tên xe`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "licenseplate", label: `Biển số`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
     const getListTable = useCallback((search) => {
-        dispatch(meta.userDelivery.getList(search));
+        dispatch(meta.vehicleDelivery.getList(search));
     }, [dispatch])
 
     const searchString = JSON.stringify(search);
@@ -218,20 +214,6 @@ function Form() {
                         setOpenDialog('user');
                     }}
                 />
-
-                <CmsIconButton
-                    tooltip="Lẫy 2fa code"
-                    delay={50}
-                    icon="crop_free"
-                    className="bg-green-500 text-white shadow-3  hover:bg-green-900"
-                    onClick={() => {
-                        dispatch(meta.userDelivery.getCode({
-                            phone: item.phone
-                        }));
-                        setOpenDialog('f2a');
-                    }}
-                />
-
             </div>
         )
     }))
@@ -286,8 +268,8 @@ function Form() {
             confirm: async () => {
                 try {
                     const resultAction = values?.id
-                        ? await dispatch(meta.userDelivery.update([values]))
-                        : await dispatch(meta.userDelivery.insert([values]));
+                        ? await dispatch(meta.vehicleDelivery.update([values]))
+                        : await dispatch(meta.vehicleDelivery.insert([values]));
                     unwrapResult(resultAction);
                     if (!values?.id) {
                         form.resetForm();
@@ -311,18 +293,18 @@ function Form() {
             }
 
             {
-                openDialog === 'user' && <AddUserDialog
+                openDialog === 'user' && <AddVehicleDialog
                     open={true}
                     detail={detail}
                     handleClose={handleCloseDialog}
                     handleSubmit={handleSubmit}
-                    title='Thêm nhân viên'
+                    title='Thêm phương tiện'
                 />
             }
             <CmsCardedPage
                 classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
                 icon="whatshot"
-                title={"Quản lý nhân viên giao hàng"}
+                title={"Quản lý phương tiện giao hàng"}
                 toolbar={
                     <div className="w-full flex items-center justify-between px-12">
                         <CmsTab data={links} value={0} isLink={true} onChange={(e, value) => {

@@ -128,11 +128,11 @@ const navigationConfig = [
 			},
 			{
 				id: 'nvi-manager-user-delivery',
-				title: 'Nhân viên giao hàng',
+				title: 'Quản lý giao hàng',
 				translate: 'CUSTOM_USER_DELIVERY',
 				type: 'item',
 				icon: 'call_to_action',
-				url: '/meta/user-delivery',
+				url: '/meta',
 			},
 			// {
 			// 	id: 'nvi-manager-delivery',

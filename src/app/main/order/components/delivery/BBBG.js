@@ -215,6 +215,30 @@ function DetailBBBG() {
                         })
                     }}
                 />
+
+                <CmsIconButton
+                    tooltip="Copy opt"
+                    delay={50}
+                    disabled={loadingBtn}
+                    icon="code"
+                    className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
+                    onClick={() => {
+                        setLoadingBtn(true);
+                        Connect.live.order.other.getDetailDelivery({ id: item.deliveryid }).then(({ data }) => {
+                            const { result } = data;
+                            if (result) {
+                                navigator.clipboard.writeText(data?.data[0]?.shipping?.code).then(() => {
+                                    dispatch(showMessage({ variant: "success", message: 'Copy thành công' }))
+                                }).catch(err => {
+                                    dispatch(showMessage({ variant: "error", message: 'Copy không thành công' }))
+                                }).finally(() => {
+                                    setLoadingBtn(false);
+                                })
+
+                            }
+                        })
+                    }}
+                />
             </div>
         ),
     }))
