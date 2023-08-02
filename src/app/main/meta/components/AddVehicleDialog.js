@@ -30,6 +30,8 @@ function AddVehicleDialog({ type, detail, handleSubmit, handleClose, open, title
 
     const handleSave = (values) => {
         const value = { ...values };
+        if (value.licenseplate)
+            value.licensePlate = value.licenseplate
 
         handleSubmit(value, formik);
     }

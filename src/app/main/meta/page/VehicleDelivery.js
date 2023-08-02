@@ -220,6 +220,7 @@ function Form() {
 
     const handleCloseDialog = () => {
         setOpenDialog('');
+        setDetail(null);
     }
 
     // const handleSubmit = async (values, form) => {
@@ -262,6 +263,7 @@ function Form() {
     }
 
     const handleSubmit = (values, form) => {
+        console.log(values);
         alertInformation({
             text: `Xác nhận thao tác`,
             data: { values, form },
