@@ -220,6 +220,7 @@ function Form() {
 
     const handleCloseDialog = () => {
         setOpenDialog('');
+        setDetail(null);
     }
 
     // const handleSubmit = async (values, form) => {
