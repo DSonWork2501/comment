@@ -385,6 +385,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         new initColumn({ field: "type", label: `Loại`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "sl", label: `SL`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "price", label: `Giá`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "OPT", label: `OPT`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
     const data = listProduct.length && listProduct.map((item, index) => ({
@@ -394,7 +395,9 @@ const OrderTable = ({ entities, loading, setSearch }) => {
             id: item?.numberPR || 1,
             status: item?.numberPR || 1,
             STT: item?.numberPR || 1,
+            OPT: item?.numberPR || 1,
         },
+        OPT: (item?.shipping?.code),
         keyRow: item.keyRow,
         image: (<img style={{ height: 100, margin: '0 auto' }} src={`${item.dataOfItem.img ? `${process.env.REACT_APP_BASE_URL}api/product/img/${item.dataOfItem?.img}` : 'assets/images/etc/no-image-icon.png'}`} alt={item.dataOfItem?.img} />),
         name: (<>
@@ -490,7 +493,15 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                 >
                     {totalPr.money}
                 </TableCell>
+                <TableCell
+                    style={{
+                        borderRight: '1px solid #ddd',
+                        backgroundColor: '#F2F8F1'
+                    }}
+                    className='p-8'
+                >
 
+                </TableCell>
                 <TableCell
                     style={{
                         borderRight: '1px solid #ddd',
