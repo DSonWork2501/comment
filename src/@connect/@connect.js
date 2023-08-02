@@ -135,13 +135,13 @@ export default {
             userDelivery: {
                 getList: (params) => axios.get(`${baseurl}/customer/get-user-info`, { params }),
                 getCode: (params) => axios.get(`${baseurl}/customer/generate2fashipping`, { params }),
-                insert: entity => axios.post(`${baseurl}/customer/get-user-info`, entity),
-                update: entity => axios.post(`${baseurl}/customer/get-user-info`, entity),
+                insert: entity => axios.post(`${baseurl}/customer/insert-userinfo`, entity),
+                update: entity => axios.put(`${baseurl}/customer/update-userinfo`, entity),
             },
             vehicleDelivery:{
                 getList: (params) => axios.get(`${baseurl}/customer/get-vehicles`, { params }),
-                insert: entity => axios.post(`${baseurl}/customer/get-vehicles`, entity),
-                update: entity => axios.post(`${baseurl}/customer/get-vehicles`, entity),
+                insert: entity => axios.post(`${baseurl}/customer/insert-vehicle`, entity),
+                update: entity => axios.put(`${baseurl}/customer/update-vehicle`, entity),
             }
         }
     },
