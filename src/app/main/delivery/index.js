@@ -60,6 +60,24 @@ const useQontoStepIconStyles = makeStyles({
     },
 });
 
+export const getLocation = (returnLocation, dispatch) => {
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            returnLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude })
+            // setLatitude(position.coords.latitude);
+            // setLongitude(position.coords.longitude);
+        },
+        (error) => {
+            console.error('Error getting location:', error);
+            setTimeout(() => {
+                dispatch(showMessage({ variant: "error", message: 'Vui lòng cấp quyền định vị' }))
+            }, 0);
+            // Continuously ask for location again after a short delay
+            //setTimeout(getLocation, 50); // Wait for 2 seconds before retrying
+        }
+    );
+}
+
 function QontoStepIcon(props) {
     const classes = useQontoStepIconStyles();
     const { active, completed } = props;
@@ -321,7 +339,7 @@ const Delivery = () => {
                                 id: currentOrder.shipping.id,
                                 session: currentOrder.shipping.session,
                                 orderid: currentOrder.shipping.orderid,
-                                deliveryid:currentOrder.shipping.deliveryid,
+                                deliveryid: currentOrder.shipping.deliveryid,
                             }
                         ]
                     }
@@ -338,7 +356,10 @@ const Delivery = () => {
                     }
 
                     if (locationObject) {
-                        dataVL.data[0].location = JSON.stringify(locationObject);
+                        let newLocation = JSON.parse(currentOrder.shipping.location);
+                        newLocation.end = locationObject;
+
+                        dataVL.data[0].location = JSON.stringify(newLocation);
                     }
 
                     const resultAction = await dispatch(order.shipper.update(dataVL));
@@ -347,7 +368,9 @@ const Delivery = () => {
                     setFile([])
                     setOpenDialog('');
                     setLoading && setLoading(false)
-                } catch (error) { }
+                } catch (error) {
+                    console.log(error);
+                }
                 finally {
                     formik.setSubmitting(false);
                 }
@@ -384,21 +407,7 @@ const Delivery = () => {
         }
     }
 
-    const getLocation = (returnLocation) => {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                returnLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude })
-                // setLatitude(position.coords.latitude);
-                // setLongitude(position.coords.longitude);
-            },
-            (error) => {
-                console.error('Error getting location:', error);
-                window.location.reload();
-                // Continuously ask for location again after a short delay
-                //setTimeout(getLocation, 50); // Wait for 2 seconds before retrying
-            }
-        );
-    }
+
     return (
         <div>
             <link rel="stylesheet" href="assets/css/CameraComponent.css" />
@@ -629,7 +638,7 @@ const Delivery = () => {
                                             setOpenDialog('OPT');
                                             getLocation(({ latitude, longitude }) => {
                                                 setLocationObject({ latitude, longitude })
-                                            });
+                                            },dispatch);
                                         }
                                     }}
                                     size="small" />
