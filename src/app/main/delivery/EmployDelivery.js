@@ -30,6 +30,7 @@ import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 import { showMessage } from 'app/store/fuse/messageSlice';
+import { getLocation } from '.';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {
@@ -498,46 +499,60 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
         //window.alert(JSON.stringify(file));
         setLoading(true);
         const files = array.map(val => val.name).join(',');
+
         if (shipID) {
             const current = entities.data.find(element => {
                 return element.shipping.id === parseInt(shipID)
             });
-            handleSaveFileOut({
-                typeItem: 2,
-                data: [
-                    {
+
+            getLocation(({ latitude, longitude }) => {
+                handleSaveFileOut({
+                    typeItem: 2,
+                    data: [
+                        {
+                            id: current.shipping.id,
+                            receiveimg: files,
+                            session: current.shipping.session,
+                            orderid: current.shipping.orderid,
+                            deliveryid: current.shipping.deliveryid,
+                            location: JSON.stringify({
+                                start: { latitude, longitude },
+                            })
+                        }
+                    ]
+                }, handleRefresh, dispatch, array, () => {
+                    setLoading(false);
+                })
+            }, dispatch);
+
+        } else {
+            getLocation(({ latitude, longitude }) => {
+                const data = check.map(val => {
+                    const current = entities.data.find(element => {
+                        return element.id === parseInt(val)
+                    });
+
+                    return {
                         id: current.shipping.id,
                         receiveimg: files,
                         session: current.shipping.session,
                         orderid: current.shipping.orderid,
-                        deliveryid:current.shipping.deliveryid,
+                        deliveryid: current.shipping.deliveryid,
+                        location: JSON.stringify({
+                            start: { latitude, longitude },
+                        })
                     }
-                ]
-            }, handleRefresh, dispatch, array, () => {
-                setLoading(false);
-            })
-        } else {
-            const data = check.map(val => {
-                const current = entities.data.find(element => {
-                    return element.id === parseInt(val)
-                });
+                })
 
-                return {
-                    id: current.shipping.id,
-                    receiveimg: files,
-                    session: current.shipping.session,
-                    orderid: current.shipping.orderid,
-                    deliveryid:current.shipping.deliveryid,
-                }
-            })
+                handleSaveFileOut({
+                    typeItem: 2,
+                    data
+                }, handleRefresh, dispatch, array, () => {
+                    setCheck([]);
+                    setLoading(false);
+                })
+            }, dispatch)
 
-            handleSaveFileOut({
-                typeItem: 2,
-                data
-            }, handleRefresh, dispatch, array, () => {
-                setCheck([]);
-                setLoading(false);
-            })
         }
 
 
@@ -1060,5 +1075,4 @@ const EmployDelivery = () => {
         </div>
     );
 }
-console.log(112312312);
 export default withReducer(keyStore, reducer)(EmployDelivery);
