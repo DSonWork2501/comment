@@ -1,4 +1,4 @@
-import { CmsDialog, CmsLabel } from "@widgets/components"
+import { CmsDialog, CmsLabel, CmsSelect } from "@widgets/components"
 import { useFormik } from "formik"
 import { CheckStringIsJson } from "@widgets/functions/Common"
 import React from "react"
@@ -10,12 +10,23 @@ import { get } from "lodash"
 import clsx from "clsx"
 import FuseAnimate from "@fuse/core/FuseAnimate"
 import * as Yup from 'yup'
+import { useSelector } from "react-redux"
+import { keyStore } from "app/main/product/common"
+import { useMemo } from "react"
 
 
-function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
+function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalIndex }) {
     const [prefix, setPrefix] = useState('[0]')
     const [stackIndex, setStackIndex] = useState(0)
     const [slotIndex, setSlotIndex] = useState('')
+    const currentShelf = useSelector(store => store[keyStore].product.entity?.data)
+    const listTemp = useMemo(() => {
+        if (currentShelf && currentShelf?.detail?.length) {
+            return currentShelf.detail.filter((val, i) => i !== modalIndex).map(val => ({ ...val, id: val.uniqueid }))
+        }
+        return []
+    }, [currentShelf, modalIndex])
+    const [model, setModel] = useState(null);
 
     const formik_shelf = useFormik({
         initialValues: data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })],
@@ -70,16 +81,46 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index }) {
     const handleCloseModal = () => {
         handleClose(formik_shelf.values)
     }
-
     return (
         <CmsDialog
             className="w-full h-full"
             title={"Thông tin tủ hàng"}
             text={
-                <div className={'w-full flex flex-row space-x-8'}>
-                    <CmsLabel content={'Hướng dẫn:'} className="text-green-500" />
-                    <CmsLabel content={'Tích chọn thông tin tủ, thông tin chi tiết sẽ hiển thị tương ứng'} className="" />
-                </div>
+                <>
+                    <div className={'w-full flex flex-row space-x-8'}>
+                        <CmsLabel content={'Hướng dẫn:'} className="text-green-500" />
+                        <CmsLabel content={'Tích chọn thông tin tủ, thông tin chi tiết sẽ hiển thị tương ứng'} className="" />
+
+                    </div>
+                    {
+                        listTemp?.length
+                        &&
+                        <div className="w-1/5">
+                            <CmsSelect
+                                data={listTemp}
+                                size="small"
+                                setOptionLabel={(option) => option.subname}
+                                value={model}
+                                onChange={(e) => {
+                                    try {
+                                        setModel(e.target.value)
+                                        let temp = JSON.parse(listTemp.find(val => val.id === e.target.value).model);
+                                        temp = temp.map(val => ({
+                                            ...val,
+                                            slots: val.slots.map(va => ({ ...va, item: null }))
+                                        }))
+                                        formik_shelf.setValues(temp)
+                                    } catch (error) {
+
+                                    }
+                                }}
+                                label="Model có sẵn"
+                            />
+                        </div>
+                    }
+
+                </>
+
             }
             contentClass={'overflow-y-auto space-y-16'}
             // disabledSave={imageLoading || snapshot_loading}

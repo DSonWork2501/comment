@@ -225,6 +225,7 @@ function ClassifyInfo({ formik }) {
                     handleClose={HandleCloseShelfModal}
                     data_shelf={model}
                     index={editIndex}
+                    modalIndex={modalIndex}
                 />}
         </FuseAnimateGroup>
     )
