@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CmsCardedPage, CmsTableBasic, CmsButton, CmsLabel, CmsIconButton, CmsTab } from '@widgets/components';
-import { Box, Chip, styled } from '@material-ui/core';
+import { Box, Chip, TableCell, TableRow, styled } from '@material-ui/core';
 import { alertInformation, initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer';
 import reducer, { setSelected, productMeta } from '../store';
@@ -17,6 +17,10 @@ const LayoutCustom = styled(Box)({
     height: "100%",
     "& .inner-scroll>div": {
         minHeight: '70px'
+    },
+    "& .inner-scroll": {
+        position: 'relative',
+        top: -58
     },
 });
 
@@ -110,9 +114,15 @@ function Meta() {
     const [detail, setDetail] = useState(null);
 
     const columns = [
-        new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        new initColumn({ field: "name", label: `Tên`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "status", label: `Trạng thái biểu mẫu`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "STT", label: "STT [1]", style: { width: 75 }, sortable: false }),
+        new initColumn({ field: "name", label: `Khách hàng [2]`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Số điện thoại [3]`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Nợ phải thu [4]`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Có phải trả [5]`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Nợ [6]`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Có [7]`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Nợ phải thu [4+6-5-7]`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Có phải trả [5+7-4-6]`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
     const getListTable = useCallback((search) => {
@@ -269,7 +279,7 @@ function Meta() {
             <CmsCardedPage
                 classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
                 icon="whatshot"
-                title={pageName()}
+                title={'Quản lý thanh toán'}
                 toolbar={
                     <>
                         <CmsTab data={links} value={0} isLink={true} onChange={(e, value) => {
@@ -291,6 +301,38 @@ function Meta() {
                             setSelected={entity => dispatch(setSelected(entity))}
                             columns={columns}
                             loading={loading}
+                            upperHead={
+                                <TableRow>
+                                    <TableCell
+                                        className="text-center p-8"
+                                    >
+                                    </TableCell>
+                                    <TableCell
+                                        colSpan={2}
+                                        className="text-center p-8"
+                                    >
+                                        Đối tượng
+                                    </TableCell>
+                                    <TableCell
+                                        colSpan={2}
+                                        className="text-center p-8"
+                                    >
+                                        Số dư đầu kỳ
+                                    </TableCell>
+                                    <TableCell
+                                        colSpan={2}
+                                        className="text-center p-8"
+                                    >
+                                        Phát sinh trong kỳ
+                                    </TableCell>
+                                    <TableCell
+                                        colSpan={2}
+                                        className="text-center p-8"
+                                    >
+                                        Số dư cuối kỳ
+                                    </TableCell>
+                                </TableRow>
+                            }
                         />
                     </>
                 }
