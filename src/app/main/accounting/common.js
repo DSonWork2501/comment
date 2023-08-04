@@ -35,7 +35,7 @@ export const links = [
     {
         id: 2, name: "Hạn thanh toán", link: "/product-meta/meta/2", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
-            top: 8,
+            top: 5,
             padding: '0 5px',
             borderRadius: 5,
             color: 'white',
@@ -45,7 +45,7 @@ export const links = [
     {
         id: 3, name: "Quá hạn", link: "/product-meta/meta/3", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
-            top: 8,
+            top: 5,
             padding: '0 5px',
             borderRadius: 5,
             color: 'white',
@@ -55,7 +55,7 @@ export const links = [
     {
         id: 4, name: "Hạn hôm nay", link: "/product-meta/meta/4", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
-            top: 8,
+            top: 5,
             padding: '0 5px',
             borderRadius: 5,
             color: 'white',
@@ -65,7 +65,7 @@ export const links = [
     {
         id: 5, name: "Hạn 7 ngày tới", link: "/product-meta/meta/5", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
-            top: 8,
+            top: 5,
             padding: '0 5px',
             borderRadius: 5,
             color: 'white',
@@ -75,7 +75,7 @@ export const links = [
     {
         id: 6, name: "Hạn trên 7 ngày", link: "/product-meta/meta/5", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
-            top: 8,
+            top: 5,
             padding: '0 5px',
             borderRadius: 5,
             color: 'white',
