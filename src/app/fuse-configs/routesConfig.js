@@ -13,6 +13,7 @@ import ContractConfig from 'app/main/contract/config';
 import SignedContractConfig from 'app/main/signed-contract/config';
 import ProductMetaConfig from 'app/main/product-meta/config';
 import MetaConfig from 'app/main/meta/config';
+import AccountingConfig from 'app/main/accounting/config';
 
 const routeConfigs = [
 	LoginConfig,
@@ -26,7 +27,8 @@ const routeConfigs = [
 	ContractConfig,
 	SignedContractConfig,
 	ProductMetaConfig,
-	MetaConfig
+	MetaConfig,
+	AccountingConfig
 ];
 
 const routes = [
