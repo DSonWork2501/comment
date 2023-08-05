@@ -31,9 +31,9 @@ export const modelUpdate = (field = initModel) => {
 }
 
 export const links = [
-    { id: 1, name: "Công nợ khách hàng", link: "/product-meta/meta/1", icon: "star_rate" },
+    { id: 1, name: "Công nợ khách hàng", link: "/accounting/debts/1", icon: "star_rate" },
     {
-        id: 2, name: "Hạn thanh toán", link: "/product-meta/meta/2", icon: "star_rate", otherComp: <div  style={{
+        id: 2, name: "Hạn thanh toán", link: "/accounting/debts/2", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
             top: 5,
             padding: '0 5px',
@@ -43,7 +43,7 @@ export const links = [
         }}>10</div>
     },
     {
-        id: 3, name: "Quá hạn", link: "/product-meta/meta/3", icon: "star_rate", otherComp: <div  style={{
+        id: 3, name: "Quá hạn", link: "/accounting/debts/3", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
             top: 5,
             padding: '0 5px',
@@ -53,7 +53,7 @@ export const links = [
         }}>10</div>
     },
     {
-        id: 4, name: "Hạn hôm nay", link: "/product-meta/meta/4", icon: "star_rate", otherComp: <div  style={{
+        id: 4, name: "Hạn hôm nay", link: "/accounting/debts/4", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
             top: 5,
             padding: '0 5px',
@@ -63,7 +63,7 @@ export const links = [
         }}>10</div>
     },
     {
-        id: 5, name: "Hạn 7 ngày tới", link: "/product-meta/meta/5", icon: "star_rate", otherComp: <div  style={{
+        id: 5, name: "Hạn 7 ngày tới", link: "/accounting/debts/5", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
             top: 5,
             padding: '0 5px',
@@ -73,7 +73,7 @@ export const links = [
         }}>10</div>
     },
     {
-        id: 6, name: "Hạn trên 7 ngày", link: "/product-meta/meta/5", icon: "star_rate", otherComp: <div  style={{
+        id: 6, name: "Hạn trên 7 ngày", link: "/accounting/debts/5", icon: "star_rate", otherComp: <div  style={{
             position: 'relative',
             top: 5,
             padding: '0 5px',

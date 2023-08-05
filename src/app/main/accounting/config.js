@@ -22,7 +22,12 @@ const PageConfig = {
         {
             exact: true,
             path: '/accounting/debts',
-            component: React.lazy(() => import('./pages/Meta')),
+            component: React.lazy(() => import('./pages/Debt')),
+        },
+        {
+            exact: true,
+            path: '/accounting/debts/:type',
+            component: React.lazy(() => import('./pages/Debt')),
         },
     ]
 };

@@ -169,6 +169,23 @@ const navigationConfig = [
 			},
 		],
 	},
+	{
+		id: 'nvi-accounting',
+		title: 'Quản lý thanh toán',
+		translate: 'ACCOUNTING',
+		type: 'group',
+		icon: 'reorder',
+		children: [
+			{
+				id: 'nvi-accounting-debt',
+				title: 'Công nợ',
+				translate: 'ACCOUNTING_DEBT',
+				type: 'item',
+				icon: 'gavel',
+				url: '/accounting/debts/:type',
+			},
+		],
+	},
 ];
 
 export default navigationConfig;
