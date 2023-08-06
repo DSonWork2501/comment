@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { CmsCardedPage, CmsTableBasic, CmsButton, CmsLabel, CmsIconButton, CmsTab, CmsFormikTextField, CmsFormikDateTimePicker } from '@widgets/components';
+import { CmsCardedPage, CmsTableBasic, CmsLabel, CmsIconButton, CmsTab, CmsFormikTextField, CmsFormikDateTimePicker } from '@widgets/components';
 import { Box, Button, Chip, Icon, TableCell, TableRow, styled } from '@material-ui/core';
 import { alertInformation, initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer';
-import reducer, { setSelected, productMeta } from '../store';
+import reducer, { productMeta } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import FuseLoading from '@fuse/core/FuseLoading';
-import { keyI18n, keyStore, links } from '../common';
+import { keyStore, links } from '../common';
 import AddMetaDialog from '../components/AddMetaDialog';
 import { unwrapResult } from '@reduxjs/toolkit';
 import History from '@history';
@@ -229,7 +228,7 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog }) =
     </>
 }
 
-const TableDebtOther = ({ entities, setSearch, loading }) => {
+const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog }) => {
 
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
@@ -268,6 +267,18 @@ const TableDebtOther = ({ entities, setSearch, loading }) => {
                 }
             </React.Fragment>
         ),
+        action: (
+            <CmsIconButton
+                tooltip="Cập nhật tiền"
+                delay={50}
+                icon="attach_money"
+                className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
+                onClick={() => {
+                    setDetail(item);
+                    setOpenDialog('money');
+                }}
+            />
+        )
     }))
 
     if (!data) {
@@ -293,10 +304,8 @@ const TableDebtOther = ({ entities, setSearch, loading }) => {
 
 function Meta() {
     const dispatch = useDispatch();
-    const { t } = useTranslation(keyI18n);
     const loading = useSelector(store => store[keyStore].loading);
     const entities = useSelector(store => store[keyStore].entities);
-    const selected = useSelector(store => store[keyStore].selected);
     const searchDefault = useSelector(store => store[keyStore].search);
     const params = useParams(), type = (params.type);
     const [search, setSearch] = useState(searchDefault);
@@ -362,18 +371,7 @@ function Meta() {
     //     }
     //     return { ...search, ...values, page: 1 };
     // })
-
-
-
-    const nameDialog = () => {
-        if (type === 1)
-            return detail ? 'Chỉnh sửa thương hiệu' : 'Thêm mới thương hiệu';
-    }
-
-    const pageName = () => {
-        return links.find(val => val.id === type)?.name;
-    }
-
+  
     return (
         <LayoutCustom>
             {
