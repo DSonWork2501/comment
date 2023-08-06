@@ -182,7 +182,7 @@ const navigationConfig = [
 				translate: 'ACCOUNTING_DEBT',
 				type: 'item',
 				icon: 'gavel',
-				url: '/accounting/debts/:type',
+				url: '/accounting/debts',
 			},
 		],
 	},
