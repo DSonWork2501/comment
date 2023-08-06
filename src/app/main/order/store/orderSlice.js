@@ -349,7 +349,25 @@ const orderSlice = createSlice({
         [order.shipper.getDetailShipDelivery.fulfilled]: (state, { payload, meta }) => {
             const { arg } = meta, { orderID, status } = arg;
             let data = { ...payload };
-            data = { ...data, data: payload.data.filter(val => (orderID ? val.id === parseInt(orderID) : true) && (status ? val.shipping.status === status : true)) }
+            let temp = payload.data.map(val => {
+                return {
+                    ...val, productorder: val.productorder.map(va => {
+                        const item = { ...va };
+
+                        if (item?.model)
+                            item.model = JSON.stringify(JSON.parse(item.model).map(ite => {
+                                return {
+                                    ...ite, slots: ite.slots.map(it => {
+                                        return { ...it, item: { ...it.item, price: it.item?.temporaryprice || 0 } }
+                                    })
+                                }
+                            }))
+                        return item
+                    })
+                }
+            })
+
+            data = { ...data, data: temp.filter(val => (orderID ? val.id === parseInt(orderID) : true) && (status ? val.shipping.status === status : true)) }
 
             return {
                 ...state,

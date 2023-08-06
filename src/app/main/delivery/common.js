@@ -23,7 +23,7 @@ export const returnListProductByOrderID = (entities, orderID) => {
                             sku: e.sku,
                             img: e.image,
                             name: e.name,
-                            price: 0,
+                            price: e?.price || 0,
                             type: 'table'
                         })
                     }
@@ -47,7 +47,7 @@ export const returnListProductByOrderID = (entities, orderID) => {
     return []
 }
 
-export const returnTotalAllProduct=(listProductTemp)=>{
+export const returnTotalAllProduct = (listProductTemp) => {
     let total = 0, money = 0;
     if (listProductTemp?.length)
         listProductTemp.forEach(element => {
