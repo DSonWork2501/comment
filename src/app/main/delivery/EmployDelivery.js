@@ -31,6 +31,7 @@ import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 import { showMessage } from 'app/store/fuse/messageSlice';
 import { getLocation } from '.';
+import MapLocation from './components/MapLocation';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {
@@ -190,6 +191,7 @@ export const deliveryLink = (session) => [
     { id: 1, name: "Sản phẩm", link: `/employ-delivery/1/${session}`, icon: "" },
     { id: 2, name: "Đơn hàng", link: `/employ-delivery/2/${session}`, icon: "" },
     { id: 3, name: "Tỉnh thành", link: `/employ-delivery/3/${session}`, icon: "" },
+    { id: 4, name: "Bản đồ", link: `/employ-delivery/4/${session}`, icon: "" },
 ];
 
 const List = ({ listProduct, totalPr }) => {
@@ -1252,7 +1254,9 @@ const EmployDelivery = () => {
                             ? <ProductTable entities={entities} loading={loading} setSearch={setSearch} />
                             : type === '2'
                                 ? <OrderTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
-                                : <DistrictTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                                : type === '3'
+                                    ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                                    : <MapLocation entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
                     }
                 </DialogContent>
                 <DialogActions>
