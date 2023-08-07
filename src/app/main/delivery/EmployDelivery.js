@@ -31,6 +31,7 @@ import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 import { showMessage } from 'app/store/fuse/messageSlice';
 import { getLocation } from '.';
+import MapLocation from './components/MapLocation';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {
@@ -189,11 +190,13 @@ const initialValues = {
 export const deliveryLink = (session) => [
     { id: 1, name: "Sản phẩm", link: `/employ-delivery/1/${session}`, icon: "" },
     { id: 2, name: "Đơn hàng", link: `/employ-delivery/2/${session}`, icon: "" },
+    { id: 3, name: "Tỉnh thành", link: `/employ-delivery/3/${session}`, icon: "" },
+    { id: 4, name: "Bản đồ", link: `/employ-delivery/4/${session}`, icon: "" },
 ];
 
 const List = ({ listProduct, totalPr }) => {
     return <div className='flex '>
-        <table className='w-full'>
+        <table className='w-full text-10'>
             <tbody>
                 <tr>
                     <td colSpan={3} className='p-4'>
@@ -275,7 +278,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
                             sku: e.sku,
                             img: e.image,
                             name: e.name,
-                            price: 0,
+                            price: e?.price || 0,
                             type: 'table'
                         })
                     }
@@ -479,6 +482,20 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
     </>
 }
 
+const DetailOrder = ({ entities, listProductTemp, totalPr, orderID }) => {
+    return <>
+        <table className='w-full text-10'>
+            {
+                entities?.data?.length && entities.data.map((val, index) => {
+                    return val.id === parseInt(orderID) ? <TableWithCustomer val={val} key={val.id} index={0} noBorder /> : null
+                })
+            }
+        </table>
+
+        <List listProduct={listProductTemp} totalPr={totalPr} />
+    </>
+}
+
 const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
     const classes = useStyles();
     const location = useLocation(), params2 = new URLSearchParams(location.search)
@@ -516,7 +533,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                             orderid: current.shipping.orderid,
                             deliveryid: current.shipping.deliveryid,
                             location: JSON.stringify({
-                                start: { latitude, longitude },
+                                start: { latitude: 10.811704, longitude: 106.64554 },
                             })
                         }
                     ]
@@ -631,19 +648,9 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
             </div>
             {
                 orderID
-                    ? <>
-                        <table style={{ width: '100%' }}>
-                            {
-                                entities?.data?.length && entities.data.map((val, index) => {
-                                    return val.id === parseInt(orderID) ? <TableWithCustomer val={val} key={val.id} index={0} noBorder /> : null
-                                })
-                            }
-                        </table>
-
-                        <List listProduct={listProductTemp} totalPr={totalPr} />
-                    </>
+                    ? <DetailOrder entities={entities} listProductTemp={listProductTemp} totalPr={totalPr} orderID={orderID} />
                     : <div className='flex '>
-                        <table className='w-full'>
+                        <table className='w-full text-10'>
                             <tbody>
                                 <tr>
                                     <td colSpan={3} className='p-4'>
@@ -657,30 +664,212 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                     <TableWithCustomer setCheck={setCheck} val={{ ...val, checked: check.includes(val.id) }} key={val.id} index={index} handleRefresh={handleRefresh} />
                                 ))
                             }
-                            {/* <tbody>
-                    {
-                        listProduct.map(val => (
-                            <tr style={{ verticalAlign: 'baseline' }} key={val.sku}>
-                                <td>
-                                    <b>
-                                        {val.numberPR}x
-                                    </b>
-                                </td>
-                                <td>
-                                    {val.name}
-                                </td>
-                                <td className='text-right'>
-                                    {typeof val.price === 'number'
-                                        ? val.price.toLocaleString('en-US')
-                                        : '-'}đ
-                                </td>
-                            </tr>
-                        ))
-                    }
-                </tbody> */}
                         </table>
                     </div>
             }
+        </div>
+    </>
+
+}
+
+const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
+    const classes = useStyles();
+    const location = useLocation(), params2 = new URLSearchParams(location.search)
+        , orderID = parseInt(params2.get('orderID')), openCame = parseInt(params2.get('openCame'))
+        , shipID = parseInt(params2.get('shipID'));
+    const [check, setCheck] = useState([]);
+    const dispatch = useDispatch();
+    const districtTemp = useMemo(() => {
+        if (entities?.data?.length)
+            return groupBy(entities.data, 'districtid');
+
+        return null
+    }, [entities])
+    const listProductTemp = useMemo(() => {
+        return returnListProductByOrderID(entities, orderID)
+    }, [entities, orderID])
+
+    const totalPr = useMemo(() => {
+        return returnTotalAllProduct(listProductTemp)
+    }, [listProductTemp])
+
+    const handleSaveFile = async (array, setLoading) => {
+        //setOpen(false)
+        //window.alert(JSON.stringify(file));
+        setLoading(true);
+        const files = array.map(val => val.name).join(',');
+
+        if (shipID) {
+            const current = entities.data.find(element => {
+                return element.shipping.id === parseInt(shipID)
+            });
+
+            getLocation(({ latitude, longitude }) => {
+                handleSaveFileOut({
+                    typeItem: 2,
+                    data: [
+                        {
+                            id: current.shipping.id,
+                            receiveimg: files,
+                            session: current.shipping.session,
+                            orderid: current.shipping.orderid,
+                            deliveryid: current.shipping.deliveryid,
+                            location: JSON.stringify({
+                                start: { latitude, longitude },
+                            })
+                        }
+                    ]
+                }, handleRefresh, dispatch, array, () => {
+                    setLoading(false);
+                })
+            }, dispatch);
+
+        } else {
+            getLocation(({ latitude, longitude }) => {
+                const data = check.map(val => {
+                    const current = entities.data.find(element => {
+                        return element.id === parseInt(val)
+                    });
+
+                    return {
+                        id: current.shipping.id,
+                        receiveimg: files,
+                        session: current.shipping.session,
+                        orderid: current.shipping.orderid,
+                        deliveryid: current.shipping.deliveryid,
+                        location: JSON.stringify({
+                            start: { latitude, longitude },
+                        })
+                    }
+                })
+
+                handleSaveFileOut({
+                    typeItem: 2,
+                    data
+                }, handleRefresh, dispatch, array, () => {
+                    setCheck([]);
+                    setLoading(false);
+                })
+            }, dispatch)
+
+        }
+
+
+        // handleSaveFileOut({
+        //     typeItem: 2,
+        //     data: check.map(val => ({ id: val, receiveimg: name }))
+        // }, handleRefresh, dispatch, file, () => {
+        //     setCheck([]);
+        // })
+        // try {
+        //     const data = new FormData();
+        //     data.append('enpoint', 'tempfile');
+        //     data.append('files', file);
+        //     await Connect.live.uploadFile.insert(data);
+        //     const resultAction = await dispatch(order.shipper.update())
+        //     unwrapResult(resultAction);
+        //     handleRefresh()
+        //     History.push(window.location.pathname)
+        // } catch (error) {
+        //     window.alert(error)
+        // }
+    }
+
+    return <>
+        {
+            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} phone={entities?.data[0]?.shipping?.phone} saveFile={handleSaveFile} isNeedOpt />
+        }
+
+        <div className='p-8 rounded-4 shadow-4'>
+            <div className='flex justify-between' style={{ height: 25 }}>
+                <b>
+                    Tổng đơn hàng {Boolean(orderID) ? orderID : ''}
+                </b>
+            </div>
+            <div >
+                {
+                    orderID
+                        ? <DetailOrder entities={entities} listProductTemp={listProductTemp} totalPr={totalPr} orderID={orderID} />
+                        : <table className='w-full text-10' >
+                            <tbody>
+                                {
+                                    Object.keys(districtTemp).map(val => (
+                                        districtTemp[val].map((item, index) => (
+                                            <tr>
+                                                <td colSpan={1} rowSpan={index === 0 ? districtTemp[val]?.length : 0}
+                                                    className={clsx('p-4', index > 0 ? 'hidden' : '')}
+                                                    style={{ borderBottom: (Object.keys(districtTemp)?.length > 1) ? '1px solid rgb(219 219 219)' : '', borderRight: '1px solid rgb(219 219 219)' }}>
+                                                    {
+                                                        item.customerdistrict
+                                                    }
+                                                </td>
+                                                <td className='pl-4 py-4' style={{ borderBottom: (Object.keys(districtTemp)?.length > 1) ? '1px solid rgb(219 219 219)' : '' }}>
+                                                    <div className='flex items-baseline mb-2'>
+                                                        <b className='mr-2'>
+                                                            ID
+                                                        </b>
+                                                        <Link
+                                                            to={`${window.location.pathname}?orderID=${item.id}`}
+                                                        >
+                                                            <div style={{ color: 'aqua', textDecoration: 'underline', cursor: 'pointer' }}>
+                                                                {item.id}
+                                                            </div>
+                                                        </Link>
+                                                    </div>
+                                                    <div className='flex items-baseline mb-2'>
+                                                        <FontAwesomeIcon icon={faUser} className='mr-2 text-10' />
+                                                        {item.customername} - {item.customeremail}
+                                                    </div>
+                                                    <div className='flex items-baseline mb-2'>
+                                                        <FontAwesomeIcon icon={faPhone} className='mr-2 text-10' />
+                                                        {item.customermoblie}
+                                                    </div>
+                                                    <div className='flex items-baseline'>
+                                                        <FontAwesomeIcon icon={faLocationDot} className='mr-2 text-10' />
+                                                        {item.customeraddress}, {item.customerward}, {item.customerdistrict}, {item.customercity}
+                                                    </div>
+                                                </td>
+                                                <td className='text-right' style={{ width: 100, borderBottom: (Object.keys(districtTemp)?.length > 1) ? '1px solid rgb(219 219 219)' : '' }}>
+                                                    <DropMenu
+                                                        crName={shipStatus[item.shipping.status].name}
+                                                        className={clsx('text-white px-4 py-2 text-9'
+                                                            , `hover:${shipStatus[item.shipping.status].className}`
+                                                            , shipStatus[item.shipping.status].className
+                                                        )}
+                                                        data={[
+                                                            {
+                                                                name: 'Chụp hình',
+                                                                id: 1,
+                                                                show: item.shipping.status === 1
+                                                            },
+                                                            {
+                                                                name: 'Giao hàng',
+                                                                id: 2,
+                                                                show: item.shipping.status === 2
+                                                            }
+                                                        ]
+                                                            //  .filter(val => val.show)
+                                                        }
+                                                        handleClose={(value, setAnchorEl) => {
+                                                            if (value?.id === 1) {
+                                                                History.push(window.location.pathname + `?openCame=1&&shipID=${item.shipping.id}`)
+                                                            }
+
+                                                            if (value?.id === 2) {
+                                                                History.push(`/delivery/${item.shipping.id}/${encodeURIComponent(item.shipping.deliverysession)}/${item.shipping.orderid}`)
+                                                            }
+                                                            //setOpenDialog('photo')
+                                                            setAnchorEl(null)
+                                                        }} />
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ))
+                                }
+                            </tbody>
+                        </table>
+                }
+            </div>
         </div>
     </>
 
@@ -1063,7 +1252,11 @@ const EmployDelivery = () => {
                     {
                         type === '1'
                             ? <ProductTable entities={entities} loading={loading} setSearch={setSearch} />
-                            : <OrderTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                            : type === '2'
+                                ? <OrderTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                                : type === '3'
+                                    ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                                    : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
                     }
                 </DialogContent>
                 <DialogActions>

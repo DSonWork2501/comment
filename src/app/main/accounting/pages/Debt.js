@@ -58,7 +58,7 @@ const Filter = ({ onSearch, search, namePage }) => {
         onSearch(values);
     }
 
-    return <form onSubmit={formik.handleSubmit} className="flex items-center justify-items-start w-2/4 space-x-8 px-8" >
+    return <form onSubmit={formik.handleSubmit} className="flex items-center justify-items-start lg:w-3/4 xl:w-2/4 w-full space-x-8 px-8" >
         <CmsFormikTextField
             label={`Khách hàng`}
             name="name"
@@ -232,11 +232,11 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
 
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
+        new initColumn({ field: "status3", label: `Hóa đơn`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "name", label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "status", label: `Người lập phiếu`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "status1", label: `Hạn thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "statu2", label: `Khách hàng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "status3", label: `Hóa đơn`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "statu4", label: `Tiền hàng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "status5", label: `Chiết khấu`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "statu6", label: `Tổng thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
@@ -371,7 +371,7 @@ function Meta() {
     //     }
     //     return { ...search, ...values, page: 1 };
     // })
-  
+
     return (
         <LayoutCustom>
             {
