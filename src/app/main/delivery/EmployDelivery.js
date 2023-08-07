@@ -533,7 +533,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                             orderid: current.shipping.orderid,
                             deliveryid: current.shipping.deliveryid,
                             location: JSON.stringify({
-                                start: { latitude, longitude },
+                                start: { latitude: 10.811704, longitude: 106.64554 },
                             })
                         }
                     ]
@@ -1256,7 +1256,7 @@ const EmployDelivery = () => {
                                 ? <OrderTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
                                 : type === '3'
                                     ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
-                                    : <MapLocation entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                                    : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
                     }
                 </DialogContent>
                 <DialogActions>
