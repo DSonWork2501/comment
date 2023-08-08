@@ -290,10 +290,12 @@ const ProductTable = ({ entities, loading, setSearch }) => {
             return [
                 ...map(groupedTable, (products, sku) => ({
                     ...products[0],
+                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
                     numberPR: products.length,
                 })),
                 ...map(groupedData, (products, sku) => ({
                     ...products[0],
+                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
                     numberPR: products.length,
                 }))
             ];
@@ -306,7 +308,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         if (listProduct?.length)
             listProduct.forEach(element => {
                 total = total + element.numberPR;
-                money = money + ((element.price || 0) * element.numberPR);
+                money = money + ((element.price || 0));
             });
         return { total, money }
     }, [listProduct])
@@ -533,7 +535,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                             orderid: current.shipping.orderid,
                             deliveryid: current.shipping.deliveryid,
                             location: JSON.stringify({
-                                start: { latitude: 10.811704, longitude: 106.64554 },
+                                start: { latitude, longitude },
                             })
                         }
                     ]
