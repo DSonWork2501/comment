@@ -129,6 +129,7 @@ const MapWrapped = withScriptjs(withGoogleMap(Map));
 const MapLocation = ({ open, entities }) => {
     const classes = useStyles();
     const [userLocations, setUserLocations] = useState(null);
+    const [listMap, setListMap] = useState(null);
     const listLocation = useMemo(() => {
         let locations = [];
         if (entities?.data?.length)
@@ -150,13 +151,20 @@ const MapLocation = ({ open, entities }) => {
     }, [entities])
 
     useEffect(() => {
-        if (userLocations?.length)
-            Promise.allSettled(userLocations.map(val => val.func)).then(value => {
-                console.log(value);
+        if (userLocations?.length) {
+            let object = {}
+            Promise.allSettled(userLocations.map(val => val.func)).then((value) => {
+                value.forEach((element, i) => {
+                    const { value, status } = element;
+                    object[userLocations[i].id] = status === "fulfilled" ? value : null;
+                });
+            }).finally(() => {
+                setListMap(object)
             })
+        }
     }, [userLocations])
 
-
+    console.log(listMap);
     //console.log(listAddressUser);
 
     return (
