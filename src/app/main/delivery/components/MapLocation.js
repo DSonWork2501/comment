@@ -10,10 +10,44 @@ import {
 import { useStyles } from '../EmployDelivery';
 import History from '@history/@history';
 
-function Map({ listLocation }) {
+const getLocationFromAddress = (address) => {
+    return new Promise((resolve, reject) => {
+        const geocoder = new window.google.maps.Geocoder();
+
+        geocoder.geocode({ address }, (results, status) => {
+            if (status === 'OK' && results.length > 0) {
+                const { lat, lng } = results[0].geometry.location;
+                resolve({ latitude: lat(), longitude: lng() })
+            } else {
+                reject('Geocode was not successful for the following reason:', status)
+            }
+        });
+    });
+}
+
+const returnAdd = (currentOrder) => {
+    return (currentOrder?.customeraddress ? currentOrder?.customeraddress + ',' : '')
+        + (currentOrder?.customerward ? currentOrder?.customerward + ',' : '')
+        + (currentOrder?.customerdistrict ? currentOrder?.customerdistrict + ',' : '')
+        + (currentOrder?.customercity ? currentOrder?.customercity + '' : '')
+}
+
+function Map({ listLocation, entities, setUserLocations, userLocations }) {
     const [selectedPark, setSelectedPark] = useState(null);
     const mapRef = React.createRef();
     const [mapZoom, setMapZoom] = useState(11);
+
+    useEffect(() => {
+        console.log(userLocations);
+        if (!userLocations?.length) {
+            let data = [];
+            if (entities?.data?.length)
+                entities.data.forEach(val => {
+                    data.push(getLocationFromAddress(returnAdd(val)))
+                })
+            setUserLocations(data)
+        }
+    }, [entities])
 
     const handleZoomChanged = () => {
         const newZoom = mapRef.current.getZoom();
@@ -27,18 +61,6 @@ function Map({ listLocation }) {
             }
         };
         window.addEventListener("keydown", listener);
-
-        const geocoder = new window.google.maps.Geocoder();
-        const address = '285 cách mạng tháng 8, Phường 12, Quận 10, Hồ Chí Minh'; // Replace with the desired address
-
-        geocoder.geocode({ address }, (results, status) => {
-            if (status === 'OK' && results.length > 0) {
-                const { lat, lng } = results[0].geometry.location;
-                console.log({ lat: lat(), lng: lng() });
-            } else {
-                console.error('Geocode was not successful for the following reason:', status);
-            }
-        });
 
         return () => {
             window.removeEventListener("keydown", listener);
@@ -104,6 +126,7 @@ const MapWrapped = withScriptjs(withGoogleMap(Map));
 
 const MapLocation = ({ open, entities }) => {
     const classes = useStyles();
+    const [setUserLocations, userLocations] = useState(null)
     const listLocation = useMemo(() => {
         let locations = [];
         if (entities?.data?.length)
@@ -123,6 +146,17 @@ const MapLocation = ({ open, entities }) => {
             });
         return locations
     }, [entities])
+
+    useEffect(() => {
+        // if (userLocations?.length)
+        //     Promise.all(userLocations).then(value => {
+        //         console.log(value);
+        //     })
+        console.log(userLocations);
+    }, [userLocations])
+
+
+    //console.log(listAddressUser);
 
     return (
         <Dialog className={classes.modal2} open={open} fullWidth maxWidth="md" tabIndex={1000}>
@@ -160,6 +194,9 @@ const MapLocation = ({ open, entities }) => {
                         containerElement={<div style={{ height: `100%` }} />}
                         mapElement={<div style={{ height: `100%` }} />}
                         listLocation={listLocation}
+                        entities={entities}
+                        setUserLocations={setUserLocations}
+                        userLocations={userLocations}
                     />
                 </div>
             </DialogContent>
