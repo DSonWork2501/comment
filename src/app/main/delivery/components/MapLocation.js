@@ -49,8 +49,8 @@ function Map({ listLocation, entities, setUserLocations }) {
             }
             return prev
         })
-    }, [entities])
-
+    }, [entities, setUserLocations])
+    console.log(selectedPark);
     const handleZoomChanged = () => {
         const newZoom = mapRef.current.getZoom();
         setMapZoom(newZoom);
@@ -103,22 +103,46 @@ function Map({ listLocation, entities, setUserLocations }) {
                 </Marker>
             ))}
 
-            {selectedPark && (
-                <InfoWindow
-                    onCloseClick={() => {
-                        setSelectedPark(null);
-                    }}
-                    position={{
-                        lat: selectedPark.geometry.coordinates[1],
-                        lng: selectedPark.geometry.coordinates[0]
-                    }}
-                >
-                    <div>
-                        <h2>{selectedPark.properties.NAME}</h2>
-                        <p>{selectedPark.properties.DESCRIPTIO}</p>
-                    </div>
-                </InfoWindow>
-            )}
+            {Boolean(entities?.data?.length) && entities.data.map(element => (
+                element?.localMap
+                    ? <Marker
+                        key={element.id}
+                        position={{
+                            lat: element.localMap.latitude,
+                            lng: element.localMap.longitude
+                        }}
+                        onClick={() => {
+                            //setSelectedPark(park);
+                        }}
+                        //icon={<FontAwesomeIcon icon={faBox} />}
+                        icon={{
+                            url: 'https://images.freeimages.com/fic/images/icons/61/dragon_soft/512/user.png',
+                            scaledSize: new window.google.maps.Size(20 * (mapZoom / 13), 20 * (mapZoom / 13)),
+                        }}
+                    >
+                        <InfoWindow
+                            // onCloseClick={() => {
+                            //     setSelectedPark(null);
+                            // }}
+                            position={{
+                                lat: element.localMap.latitude,
+                                lng: element.localMap.longitude
+                            }}
+                        >
+                            <div className='text-10'>
+                                <div>
+                                    {element.customername}
+                                </div>
+                                <div>
+                                    <span className='text-blue'>{element.id}</span> -  {element.customermoblie}
+                                </div>
+                            </div>
+                        </InfoWindow>
+                    </Marker>
+                    : null
+            ))}
+
+
         </GoogleMap>
 
     );
@@ -164,8 +188,6 @@ const MapLocation = ({ open, entities }) => {
         }
     }, [userLocations])
 
-    console.log(listMap);
-    //console.log(listAddressUser);
 
     return (
         <Dialog className={classes.modal2} open={open} fullWidth maxWidth="md" tabIndex={1000}>
@@ -182,8 +204,10 @@ const MapLocation = ({ open, entities }) => {
                 <div style={{
                     position: 'absolute',
                     zIndex: 1,
-                    top: 16,
-                    left: 8,
+                    bottom: 6,
+                    left: 10,
+                    width: 70,
+                    textAlign: 'center'
                 }}>
                     <div className='bg-white p-8 cursor-pointer rounded-4 shadow-4' onClick={() => History.push(window.location.pathname.replace('/4/', '/3/'))}>
                         Trở về
@@ -203,7 +227,7 @@ const MapLocation = ({ open, entities }) => {
                         containerElement={<div style={{ height: `100%` }} />}
                         mapElement={<div style={{ height: `100%` }} />}
                         listLocation={listLocation}
-                        entities={entities}
+                        entities={entities ? { ...entities, data: listMap ? entities.data.map(val => ({ ...val, localMap: listMap[val.id] })) : entities.data } : entities}
                         setUserLocations={setUserLocations}
                     />
                 </div>
