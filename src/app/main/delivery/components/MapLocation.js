@@ -29,7 +29,7 @@ function Map({ listLocation }) {
         window.addEventListener("keydown", listener);
 
         const geocoder = new window.google.maps.Geocoder();
-        const address = '1600 Amphitheatre Parkway, Mountain View, CA'; // Replace with the desired address
+        const address = '285 cách mạng tháng 8, Phường 12, Quận 10, Hồ Chí Minh'; // Replace with the desired address
 
         geocoder.geocode({ address }, (results, status) => {
             if (status === 'OK' && results.length > 0) {
@@ -155,7 +155,7 @@ const MapLocation = ({ open, entities }) => {
                 }}>
 
                     <MapWrapped
-                        googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAzo9Xzk5QwuAixqF8Kxdxp1zgMfL2DtKA&v=3.exp&libraries=geometry,drawing,places}`}
+                        googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyCIhqUEC9g0C1jwJnqR3_fiTUicJXfEguc&v=3.exp&libraries=geometry,drawing,places}`}
                         loadingElement={<div style={{ height: `100%` }} />}
                         containerElement={<div style={{ height: `100%` }} />}
                         mapElement={<div style={{ height: `100%` }} />}

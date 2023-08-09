@@ -17,6 +17,7 @@ import { DropMenu } from '../index';
 import { Link } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 import MapLocation from 'app/main/delivery/components/MapLocation';
+import { baseurl } from '@connect/@connect';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -455,7 +456,14 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                     </b>
                     {item?.customeraddress}, {item?.customerward}, {item?.customerdistrict}, {item?.customercity}
                 </div>
-
+                {/* <div>
+                    <b className='mr-4'>
+                        Hình nhận hàng:
+                    </b>
+                    {item.shipping?.receiveimg.split(',').map(val => (
+                        val ? <img alt='val' src={`${baseurl}/common/files/${val}?application=3`} /> : null
+                    ))}
+                </div> */}
             </>
         ),
         status: <div>
