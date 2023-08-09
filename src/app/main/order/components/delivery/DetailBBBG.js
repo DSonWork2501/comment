@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { CmsTableBasic, CmsLabel, CmsTab, CmsFormikTextField, CmsFormikAutocomplete, CmsButton } from '@widgets/components';
 import { Box, Button, Icon, TableCell, TableRow, Typography, styled } from '@material-ui/core';
 import { initColumn } from '@widgets/functions';
-import withReducer from 'app/store/withReducer'
-import { useDispatch, useSelector } from 'react-redux'
+import withReducer from 'app/store/withReducer';
+import { useDispatch, useSelector } from 'react-redux';
 import History from '@history';
 import { deliveryLink, keyStore, shipStatus } from '../../common';
 import { order } from '../../store/orderSlice';
@@ -14,8 +14,9 @@ import { useFormik } from 'formik';
 import { groupBy, map } from 'lodash';
 import clsx from 'clsx';
 import { DropMenu } from '../index';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
+import MapLocation from 'app/main/delivery/components/MapLocation';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -162,10 +163,12 @@ const ProductTable = ({ entities, loading, setSearch }) => {
             return [
                 ...map(groupedTable, (products, sku) => ({
                     ...products[0],
+                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
                     numberPR: products.length,
                 })),
                 ...map(groupedData, (products, sku) => ({
                     ...products[0],
+                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
                     numberPR: products.length,
                 }))
             ];
@@ -178,7 +181,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         if (listProduct?.length)
             listProduct.forEach(element => {
                 total = total + element.numberPR;
-                money = money + ((element.price || 0) * element.numberPR);
+                money = money + ((element.price || 0));
             });
         return { total, money }
     }, [listProduct])
@@ -299,7 +302,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                                 sku: e.sku,
                                 img: e.image,
                                 name: e.name,
-                                price: 0,
+                                price: e.price,
                                 type: 'table',
                             },
                             keyRow: 1
@@ -344,7 +347,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                             sku: e.sku,
                             img: e.image,
                             name: e.name,
-                            price: 0,
+                            price: e.price,
                             type: 'table'
                         })
                     }
@@ -356,10 +359,12 @@ const OrderTable = ({ entities, loading, setSearch }) => {
             return [
                 ...map(groupedTable, (products, sku) => ({
                     ...products[0],
+                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
                     numberPR: products.length,
                 })),
                 ...map(groupedData, (products, sku) => ({
                     ...products[0],
+                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
                     numberPR: products.length,
                 }))
             ];
@@ -372,7 +377,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         if (listProductTemp?.length)
             listProductTemp.forEach(element => {
                 total = total + element.numberPR;
-                money = money + ((element.price || 0) * element.numberPR);
+                money = money + ((element.price || 0));
             });
         return { total, money }
     }, [listProductTemp])
@@ -382,12 +387,14 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
         new initColumn({ field: "image", label: `Hình ảnh`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "name", label: `Sản phẩm`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
         new initColumn({ field: "type", label: `Loại`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "sl", label: `SL`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "price", label: `Giá`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "OPT", label: `OPT`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
+
     const data = listProduct.length && listProduct.map((item, index) => ({
         original: item,
         id: item.id,
@@ -396,6 +403,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
             status: item?.numberPR || 1,
             STT: item?.numberPR || 1,
             OPT: item?.numberPR || 1,
+            customer: item?.numberPR || 1,
         },
         OPT: (item?.shipping?.code),
         keyRow: item.keyRow,
@@ -418,7 +426,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         price: (
             <div>
                 {
-                    typeof item?.price === 'number' ? (item.price || 0).toLocaleString('en-US') : '-'
+                    typeof item?.dataOfItem?.price === 'number' ? (item?.dataOfItem?.price || 0).toLocaleString('en-US') : '-'
                 }
             </div>
         ),
@@ -427,7 +435,29 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                 <CmsLabel content={`${(index + 1)}`} />
             </React.Fragment>
         ),
+        customer: (
+            <>
+                <div>
+                    <b className='mr-4'>
+                        Tên khách hàng:
+                    </b>
+                    {item?.customername}
+                </div>
+                <div>
+                    <b className='mr-4'>
+                        Số điện thoại:
+                    </b>
+                    {item?.customermoblie}
+                </div>
+                <div>
+                    <b className='mr-4'>
+                        Địa chỉ:
+                    </b>
+                    {item?.customeraddress}, {item?.customerward}, {item?.customerdistrict}, {item?.customercity}
+                </div>
 
+            </>
+        ),
         status: <div>
             <DropMenu
                 crName={shipStatus[item.shipping.status].name}
@@ -464,7 +494,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         moreFooter={
             <TableRow>
                 <TableCell
-                    colSpan={4}
+                    colSpan={5}
                     className="text-center p-8"
                     style={{
                         borderRight: '1px solid #ddd',
@@ -475,6 +505,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                         TỔNG:
                     </b>
                 </TableCell>
+
                 <TableCell
                     className="text-right p-8"
                     style={{
@@ -491,7 +522,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                     }}
                     className='p-8 text-right'
                 >
-                    {totalPr.money}
+                    {totalPr.money.toLocaleString('en-US')}
                 </TableCell>
                 <TableCell
                     style={{
@@ -511,9 +542,107 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                 >
 
                 </TableCell>
+
             </TableRow>
         }
     />
+}
+
+const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
+    const districtTemp = useMemo(() => {
+        if (entities?.data?.length)
+            return groupBy(entities.data, 'districtid');
+
+        return null
+    }, [entities])
+
+    const mergedArray = useMemo(() => {
+        let array = [];
+        if (districtTemp) {
+            Object.keys(districtTemp).forEach(element => {
+                array = [...array, ...districtTemp[element].map((val, index) => ({ ...val, keyRow: index + 1 }))]
+            });
+        }
+
+        return array
+    }, [districtTemp])
+
+
+    const columns = [
+        new initColumn({ field: "district", label: "Tỉnh thành", classHeader: "w-128", sortable: false }),
+        new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+    ]
+
+    const data = mergedArray.length && mergedArray.map((item, index) => ({
+        original: item,
+        rowSpan: {
+            district: districtTemp[item.districtid]?.length || 1,
+            status: districtTemp[item.districtid]?.length || 1,
+        },
+        keyRow: item.keyRow,
+        district: (
+            <>
+                {item?.customerdistrict}
+            </>
+        ),
+        customer: (
+            <>
+                <div>
+                    <b className='mr-4'>
+                        Tên khách hàng:
+                    </b>
+                    {item?.customername}
+                </div>
+                <div>
+                    <b className='mr-4'>
+                        Số điện thoại:
+                    </b>
+                    {item?.customermoblie}
+                </div>
+                <div>
+                    <b className='mr-4'>
+                        Địa chỉ:
+                    </b>
+                    {item?.customeraddress}, {item?.customerward}, {item?.customerdistrict}, {item?.customercity}
+                </div>
+            </>
+        ),
+        status: <div>
+            <DropMenu
+                crName={shipStatus[item.shipping.status].name}
+                className={clsx('text-white px-4 py-2  text-12'
+                    , `hover:${shipStatus[item.shipping.status].className}`
+                    , shipStatus[item.shipping.status].className
+                )}
+                data={[]}
+
+                handleClose={(value, setAnchorEl) => {
+                    setAnchorEl(null)
+                }} />
+            {/* <CmsLabel component={'span'} content={orderStatus[item.status].name} className={clsx('text-white p-6 rounded-12', orderStatus[item.status].className)} /> */}
+        </div>,
+        action: (
+            <div className="flex space-x-3 ">
+
+            </div>
+        ),
+    }))
+
+    return <CmsTableBasic
+        className="w-full h-full"
+        isServerSide={true}
+        apiServerSide={params => setSearch(prev => {
+            return { ...prev, ...params }
+        })}
+        isPagination={false}
+        data={data}
+        columns={columns}
+        loading={loading}
+        isClearHoverBg
+        removeSelect
+    />
+
 }
 
 function DetailBBBG() {
@@ -530,8 +659,6 @@ function DetailBBBG() {
     useEffect(() => {
         getListTable(search);
     }, [search, getListTable, dispatch])
-
-    console.log(loading);
 
     if (loading) {
         return <FuseLoading />
@@ -610,7 +737,13 @@ function DetailBBBG() {
                         {
                             type === '1'
                                 ? <ProductTable entities={entities} loading={loading} setSearch={setSearch} />
-                                : <OrderTable entities={entities} loading={loading} setSearch={setSearch} />
+                                : type === '2'
+                                    ? <OrderTable entities={entities} loading={loading} setSearch={setSearch} />
+                                    : type === '3'
+                                        ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} />
+                                        : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} />
+                            // ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                            // : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
                         }
 
                     </div>

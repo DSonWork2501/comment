@@ -35,10 +35,12 @@ export const returnListProductByOrderID = (entities, orderID) => {
         return [
             ...map(groupedTable, (products, sku) => ({
                 ...products[0],
+                price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
                 numberPR: products.length,
             })),
             ...map(groupedData, (products, sku) => ({
                 ...products[0],
+                price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
                 numberPR: products.length,
             }))
         ];
@@ -52,7 +54,7 @@ export const returnTotalAllProduct = (listProductTemp) => {
     if (listProductTemp?.length)
         listProductTemp.forEach(element => {
             total = total + element.numberPR;
-            money = money + ((element.price || 0) * element.numberPR);
+            money = money + ((element.price || 0));
         });
     return { total, money }
 }

@@ -8,6 +8,7 @@ import {
     InfoWindow,
 } from "react-google-maps";
 import { useStyles } from '../EmployDelivery';
+import History from '@history/@history';
 
 function Map({ listLocation }) {
     const [selectedPark, setSelectedPark] = useState(null);
@@ -19,7 +20,6 @@ function Map({ listLocation }) {
         setMapZoom(newZoom);
     };
 
-    console.log(listLocation);
     useEffect(() => {
         const listener = e => {
             if (e.key === "Escape") {
@@ -57,7 +57,7 @@ function Map({ listLocation }) {
         <GoogleMap
             defaultZoom={11}
             defaultCenter={{ lat: 10.8231, lng: 106.6297 }}
-            onZoomChanged={handleZoomChanged} 
+            onZoomChanged={handleZoomChanged}
             ref={mapRef}
         >
             {listLocation.map(element => (
@@ -136,6 +136,16 @@ const MapLocation = ({ open, entities }) => {
                 left: 0,
                 width: '100%'
             }}>
+                <div style={{
+                    position: 'absolute',
+                    zIndex: 1,
+                    top: 16,
+                    left: 8,
+                }}>
+                    <div className='bg-white p-8 cursor-pointer rounded-4 shadow-4' onClick={() => History.push(window.location.pathname.replace('/4/', '/3/'))}>
+                        Trở về
+                    </div>
+                </div>
                 <div style={{
                     position: 'absolute',
                     height: '100%',
