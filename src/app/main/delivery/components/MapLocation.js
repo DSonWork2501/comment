@@ -32,21 +32,23 @@ const returnAdd = (currentOrder) => {
         + (currentOrder?.customercity ? currentOrder?.customercity + '' : '')
 }
 
-function Map({ listLocation, entities, setUserLocations, userLocations }) {
+function Map({ listLocation, entities, setUserLocations }) {
     const [selectedPark, setSelectedPark] = useState(null);
     const mapRef = React.createRef();
     const [mapZoom, setMapZoom] = useState(11);
 
     useEffect(() => {
-        console.log(userLocations);
-        if (!userLocations?.length) {
-            let data = [];
-            if (entities?.data?.length)
-                entities.data.forEach(val => {
-                    data.push(getLocationFromAddress(returnAdd(val)))
-                })
-            setUserLocations(data)
-        }
+        setUserLocations(prev => {
+            if (!prev?.length) {
+                let data = [];
+                if (entities?.data?.length)
+                    entities.data.forEach(val => {
+                        data.push({ ...val, func: getLocationFromAddress(returnAdd(val)) })
+                    })
+                return data
+            }
+            return prev
+        })
     }, [entities])
 
     const handleZoomChanged = () => {
@@ -126,7 +128,7 @@ const MapWrapped = withScriptjs(withGoogleMap(Map));
 
 const MapLocation = ({ open, entities }) => {
     const classes = useStyles();
-    const [setUserLocations, userLocations] = useState(null)
+    const [userLocations, setUserLocations] = useState(null);
     const listLocation = useMemo(() => {
         let locations = [];
         if (entities?.data?.length)
@@ -148,11 +150,10 @@ const MapLocation = ({ open, entities }) => {
     }, [entities])
 
     useEffect(() => {
-        // if (userLocations?.length)
-        //     Promise.all(userLocations).then(value => {
-        //         console.log(value);
-        //     })
-        console.log(userLocations);
+        if (userLocations?.length)
+            Promise.allSettled(userLocations.map(val => val.func)).then(value => {
+                console.log(value);
+            })
     }, [userLocations])
 
 
@@ -196,7 +197,6 @@ const MapLocation = ({ open, entities }) => {
                         listLocation={listLocation}
                         entities={entities}
                         setUserLocations={setUserLocations}
-                        userLocations={userLocations}
                     />
                 </div>
             </DialogContent>
