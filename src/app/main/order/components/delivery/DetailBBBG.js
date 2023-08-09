@@ -455,7 +455,14 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                     </b>
                     {item?.customeraddress}, {item?.customerward}, {item?.customerdistrict}, {item?.customercity}
                 </div>
-
+                {/* <div>
+                    <b className='mr-4'>
+                        Hình nhận hàng:
+                    </b>
+                    {item.shipping?.receiveimg.split(',').map(val => (
+                        val ? <img alt='val' src={`${baseurl}/common/files/${val}?application=3`} /> : null
+                    ))}
+                </div> */}
             </>
         ),
         status: <div>

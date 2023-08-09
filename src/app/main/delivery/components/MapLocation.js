@@ -10,11 +10,47 @@ import {
 import { useStyles } from '../EmployDelivery';
 import History from '@history/@history';
 
-function Map({ listLocation }) {
+const getLocationFromAddress = (address) => {
+    return new Promise((resolve, reject) => {
+        const geocoder = new window.google.maps.Geocoder();
+
+        geocoder.geocode({ address }, (results, status) => {
+            if (status === 'OK' && results.length > 0) {
+                const { lat, lng } = results[0].geometry.location;
+                resolve({ latitude: lat(), longitude: lng() })
+            } else {
+                reject('Geocode was not successful for the following reason:', status)
+            }
+        });
+    });
+}
+
+const returnAdd = (currentOrder) => {
+    return (currentOrder?.customeraddress ? currentOrder?.customeraddress + ',' : '')
+        + (currentOrder?.customerward ? currentOrder?.customerward + ',' : '')
+        + (currentOrder?.customerdistrict ? currentOrder?.customerdistrict + ',' : '')
+        + (currentOrder?.customercity ? currentOrder?.customercity + '' : '')
+}
+
+function Map({ listLocation, entities, setUserLocations }) {
     const [selectedPark, setSelectedPark] = useState(null);
     const mapRef = React.createRef();
     const [mapZoom, setMapZoom] = useState(11);
 
+    useEffect(() => {
+        setUserLocations(prev => {
+            if (!prev?.length) {
+                let data = [];
+                if (entities?.data?.length)
+                    entities.data.forEach(val => {
+                        data.push({ ...val, func: getLocationFromAddress(returnAdd(val)) })
+                    })
+                return data
+            }
+            return prev
+        })
+    }, [entities, setUserLocations])
+    console.log(selectedPark);
     const handleZoomChanged = () => {
         const newZoom = mapRef.current.getZoom();
         setMapZoom(newZoom);
@@ -27,18 +63,6 @@ function Map({ listLocation }) {
             }
         };
         window.addEventListener("keydown", listener);
-
-        const geocoder = new window.google.maps.Geocoder();
-        const address = '1600 Amphitheatre Parkway, Mountain View, CA'; // Replace with the desired address
-
-        geocoder.geocode({ address }, (results, status) => {
-            if (status === 'OK' && results.length > 0) {
-                const { lat, lng } = results[0].geometry.location;
-                console.log({ lat: lat(), lng: lng() });
-            } else {
-                console.error('Geocode was not successful for the following reason:', status);
-            }
-        });
 
         return () => {
             window.removeEventListener("keydown", listener);
@@ -79,22 +103,46 @@ function Map({ listLocation }) {
                 </Marker>
             ))}
 
-            {selectedPark && (
-                <InfoWindow
-                    onCloseClick={() => {
-                        setSelectedPark(null);
-                    }}
-                    position={{
-                        lat: selectedPark.geometry.coordinates[1],
-                        lng: selectedPark.geometry.coordinates[0]
-                    }}
-                >
-                    <div>
-                        <h2>{selectedPark.properties.NAME}</h2>
-                        <p>{selectedPark.properties.DESCRIPTIO}</p>
-                    </div>
-                </InfoWindow>
-            )}
+            {Boolean(entities?.data?.length) && entities.data.map(element => (
+                element?.localMap
+                    ? <Marker
+                        key={element.id}
+                        position={{
+                            lat: element.localMap.latitude,
+                            lng: element.localMap.longitude
+                        }}
+                        onClick={() => {
+                            //setSelectedPark(park);
+                        }}
+                        //icon={<FontAwesomeIcon icon={faBox} />}
+                        icon={{
+                            url: 'https://images.freeimages.com/fic/images/icons/61/dragon_soft/512/user.png',
+                            scaledSize: new window.google.maps.Size(20 * (mapZoom / 13), 20 * (mapZoom / 13)),
+                        }}
+                    >
+                        <InfoWindow
+                            // onCloseClick={() => {
+                            //     setSelectedPark(null);
+                            // }}
+                            position={{
+                                lat: element.localMap.latitude,
+                                lng: element.localMap.longitude
+                            }}
+                        >
+                            <div className='text-10'>
+                                <div>
+                                    {element.customername}
+                                </div>
+                                <div>
+                                    <span className='text-blue'>{element.id}</span> -  {element.customermoblie}
+                                </div>
+                            </div>
+                        </InfoWindow>
+                    </Marker>
+                    : null
+            ))}
+
+
         </GoogleMap>
 
     );
@@ -104,6 +152,8 @@ const MapWrapped = withScriptjs(withGoogleMap(Map));
 
 const MapLocation = ({ open, entities }) => {
     const classes = useStyles();
+    const [userLocations, setUserLocations] = useState(null);
+    const [listMap, setListMap] = useState(null);
     const listLocation = useMemo(() => {
         let locations = [];
         if (entities?.data?.length)
@@ -124,6 +174,21 @@ const MapLocation = ({ open, entities }) => {
         return locations
     }, [entities])
 
+    useEffect(() => {
+        if (userLocations?.length) {
+            let object = {}
+            Promise.allSettled(userLocations.map(val => val.func)).then((value) => {
+                value.forEach((element, i) => {
+                    const { value, status } = element;
+                    object[userLocations[i].id] = status === "fulfilled" ? value : null;
+                });
+            }).finally(() => {
+                setListMap(object)
+            })
+        }
+    }, [userLocations])
+
+
     return (
         <Dialog className={classes.modal2} open={open} fullWidth maxWidth="md" tabIndex={1000}>
             <DialogContent className='text-11' style={{
@@ -139,8 +204,10 @@ const MapLocation = ({ open, entities }) => {
                 <div style={{
                     position: 'absolute',
                     zIndex: 1,
-                    top: 16,
-                    left: 8,
+                    bottom: 6,
+                    left: 10,
+                    width: 70,
+                    textAlign: 'center'
                 }}>
                     <div className='bg-white p-8 cursor-pointer rounded-4 shadow-4' onClick={() => History.push(window.location.pathname.replace('/4/', '/3/'))}>
                         Trở về
@@ -155,11 +222,13 @@ const MapLocation = ({ open, entities }) => {
                 }}>
 
                     <MapWrapped
-                        googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAzo9Xzk5QwuAixqF8Kxdxp1zgMfL2DtKA&v=3.exp&libraries=geometry,drawing,places}`}
+                        googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyCIhqUEC9g0C1jwJnqR3_fiTUicJXfEguc&v=3.exp&libraries=geometry,drawing,places}`}
                         loadingElement={<div style={{ height: `100%` }} />}
                         containerElement={<div style={{ height: `100%` }} />}
                         mapElement={<div style={{ height: `100%` }} />}
                         listLocation={listLocation}
+                        entities={entities ? { ...entities, data: listMap ? entities.data.map(val => ({ ...val, localMap: listMap[val.id] })) : entities.data } : entities}
+                        setUserLocations={setUserLocations}
                     />
                 </div>
             </DialogContent>

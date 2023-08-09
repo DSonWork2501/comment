@@ -131,6 +131,9 @@ export const useStyles = makeStyles((theme) => ({
         },
         '& .MuiTab-root ,& .MuiTabs-root': {
             minHeight: '35px !important'
+        },
+        '& .gm-style-iw': {
+            padding: '4px !important'
         }
     },
     menu: {
