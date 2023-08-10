@@ -1,12 +1,6 @@
 import { Dialog, DialogContent } from '@material-ui/core';
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-    withScriptjs,
-    withGoogleMap,
-    GoogleMap,
-    Marker,
-    InfoWindow,
-} from "react-google-maps";
+import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow, Polyline } from "react-google-maps";
 import { useStyles } from '../EmployDelivery';
 import History from '@history/@history';
 
@@ -25,6 +19,29 @@ const getLocationFromAddress = (address) => {
     });
 }
 
+const calculateDistance = (currentLocation, destination) => {
+    if (!currentLocation) return null;
+
+    const startLatLng = new window.google.maps.LatLng(
+        currentLocation.lat,
+        currentLocation.lng
+    );
+
+    const endLatLng = new window.google.maps.LatLng(
+        destination.lat,
+        destination.lng
+    );
+
+    const distanceInMeters = window.google.maps.geometry.spherical.computeDistanceBetween(
+        startLatLng,
+        endLatLng
+    );
+
+    const distanceInKilometers = distanceInMeters / 1000;
+
+    return distanceInKilometers;
+};
+
 const returnAdd = (currentOrder) => {
     return (currentOrder?.customeraddress ? currentOrder?.customeraddress + ',' : '')
         + (currentOrder?.customerward ? currentOrder?.customerward + ',' : '')
@@ -36,6 +53,67 @@ function Map({ listLocation, entities, setUserLocations }) {
     const [selectedPark, setSelectedPark] = useState(null);
     const mapRef = React.createRef();
     const [mapZoom, setMapZoom] = useState(11);
+    const [origin, setOrigin] = useState(null); // Current location
+    const [directions, setDirections] = useState(null);
+    const [destination, setDestination] = useState(null);
+    const reEntitiesList = useMemo(() => {
+        if (entities?.data?.length && origin) {
+            return entities.data.map(val => {
+                return { ...val, kilometer: val?.localMap ? calculateDistance(origin, { lat: val.localMap.latitude, lng: val.localMap.longitude }) : null }
+            })
+        }
+        return []
+    }, [entities, origin])
+    console.log(reEntitiesList);
+    const calculateAndDisplayDirections = (origin, destination) => {
+        if (origin && destination) {
+            const directionsService = new window.google.maps.DirectionsService();
+
+            directionsService.route(
+                {
+                    origin,
+                    destination,
+                    travelMode: window.google.maps.TravelMode.DRIVING, // Change to your preferred travel mode
+                },
+                (response, status) => {
+                    if (status === window.google.maps.DirectionsStatus.OK) {
+                        setDirections(response.routes[0].overview_path);
+                    } else {
+                        console.error('Directions request failed:', status);
+                    }
+                }
+            );
+        }
+    };
+
+    useEffect(() => {
+        const watchId = navigator.geolocation.watchPosition(
+            (position) => {
+                setOrigin({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                });
+            },
+            (error) => {
+                console.error('Error getting current location:', error);
+            }
+        );
+
+        return () => {
+            navigator.geolocation.clearWatch(watchId);
+        };
+    }, []);
+
+    const originString = JSON.stringify(origin), destinationString = JSON.stringify(destination);
+    useEffect(() => {
+        const origin_ = JSON.parse(originString), destination_ = JSON.parse(destinationString);
+
+        calculateAndDisplayDirections(origin_?.lat ? { lat: origin_.lat, lng: origin_.lng } : null, destination_?.lat ? { lat: destination_.lat, lng: destination_.lng } : null);
+    }, [originString, destinationString]);
+
+    // const onDirectionsLoad = (directions) => {
+    //     setDirections(directions);
+    // };
 
     useEffect(() => {
         setUserLocations(prev => {
@@ -76,7 +154,7 @@ function Map({ listLocation, entities, setUserLocations }) {
             ? "https://cdn-icons-png.flaticon.com/128/7274/7274660.png"
             : "https://cdn-icons-png.flaticon.com/128/3967/3967503.png"
     }
-
+    console.log(directions?.length && directions[0]);
     return (
         <GoogleMap
             defaultZoom={11}
@@ -84,6 +162,42 @@ function Map({ listLocation, entities, setUserLocations }) {
             onZoomChanged={handleZoomChanged}
             ref={mapRef}
         >
+            {origin && (
+                <Marker
+                    icon={{
+                        url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Location_dot_blue.svg/480px-Location_dot_blue.svg.png',
+                        scaledSize: new window.google.maps.Size(10, 10),
+                    }}
+                    position={origin}
+                />
+            )}
+
+            {directions && (
+                <>
+                    <Polyline
+                        path={[origin, new window.google.maps.LatLng(
+                            directions[0].lat(),
+                            directions[0].lng()
+                        )]}
+                        options={{
+                            strokeColor: '#5c6268', // Color of the dashed line
+                            strokeOpacity: 0.8,
+                            strokeWeight: 2,
+                            strokeDasharray: [10, 9], // Dashed pattern: 10px dash, 5px gap
+                        }}
+                    />
+                    <Polyline
+                        path={directions}
+                        options={{
+                            strokeColor: '#007bff', // Change color as needed
+                            strokeOpacity: 0.5,
+                            strokeWeight: 6,
+                        }}
+                    />
+                </>
+
+            )}
+
             {listLocation.map(element => (
                 <Marker
                     key={element.orderID}
@@ -103,7 +217,7 @@ function Map({ listLocation, entities, setUserLocations }) {
                 </Marker>
             ))}
 
-            {Boolean(entities?.data?.length) && entities.data.map(element => (
+            {Boolean(reEntitiesList?.length) && reEntitiesList.map(element => (
                 element?.localMap
                     ? <Marker
                         key={element.id}
@@ -131,7 +245,12 @@ function Map({ listLocation, entities, setUserLocations }) {
                         >
                             <div className='text-10'>
                                 <div>
-                                    {element.customername}
+                                    {element.customername} - <span onClick={() => {
+                                        setDestination({
+                                            lat: element.localMap.latitude,
+                                            lng: element.localMap.longitude
+                                        })
+                                    }} className='text-blue cursor-pointer'>{element.kilometer.toFixed(2)} km</span>
                                 </div>
                                 <div>
                                     <span className='text-blue'>{element.id}</span> -  {element.customermoblie}
