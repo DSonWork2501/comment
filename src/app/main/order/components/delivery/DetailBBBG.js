@@ -658,6 +658,7 @@ function DetailBBBG() {
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
     const [search, setSearch] = useState(initialValues);
     const params = useParams(), id = params.id, type = params.type;
+    // const [openDialog, setOpenDialog] = useState('');
 
     const getListTable = useCallback((search) => {
         dispatch(order.other.getDetailDelivery({ ...search, id }));
@@ -673,6 +674,11 @@ function DetailBBBG() {
 
     return (
         <LayoutCustom>
+            {/* {
+                openDialog === 'media'
+                &&
+                <MediaDialog open entities={entities} />
+            } */}
             <div className='w-full  h-full' style={{ padding: '0 3.2rem' }}>
                 <div className="w-full flex justify-between items-start py-8">
                     <div className='flex'>
