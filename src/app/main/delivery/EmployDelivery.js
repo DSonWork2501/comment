@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Menu, MenuItem, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { faArrowLeft, faCameraRotate, faCircleXmark, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCameraRotate, faCircleXmark, faImages, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ArrowDropDown } from '@material-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,6 +32,7 @@ import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 import { showMessage } from 'app/store/fuse/messageSlice';
 import { getLocation } from '.';
 import MapLocation from './components/MapLocation';
+import MediaDialog from './components/MediaDialog';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {
@@ -454,7 +455,7 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                                 show: val.shipping.status >= 2
                             }
                         ]
-                              .filter(val => val.show)
+                            .filter(val => val.show)
                         }
                         handleClose={(value, setAnchorEl) => {
                             if (value?.id === 1) {
@@ -1145,10 +1146,21 @@ const EmployDelivery = () => {
     const checkAllReceive = useMemo(() => {
         if (entities?.data?.length) {
             const pass = entities.data.filter(val => {
-                return val.shipping.status === 2
+                return val.shipping.status >= 2
             })
 
             return pass.length === entities.data.length
+        }
+
+        return false
+    }, [entities])
+    const isPassReceive = useMemo(() => {
+        if (entities?.data?.length) {
+            const pass = entities.data.filter(val => {
+                return val.shipping.status >= 2
+            })
+
+            return Boolean(pass?.length)
         }
 
         return false
@@ -1188,6 +1200,15 @@ const EmployDelivery = () => {
 
     return (
         <div>
+            {
+                openDialog === 'media'
+                &&
+                <MediaDialog
+                    open
+                    entities={entities}
+                    classes={classes.modal2}
+                    handleClose={() => setOpenDialog('')} />
+            }
             <link rel="stylesheet" href="assets/css/CameraComponent.css" />
             <FuseMessage />
             <Dialog className={classes.modal} open={true} fullWidth maxWidth="md">
@@ -1203,7 +1224,7 @@ const EmployDelivery = () => {
                 </DialogTitle>
                 <DialogContent className='text-11'>
                     <div className='flex flex-wrap w-full p-8 rounded-4 shadow-4'>
-                        <div>
+                        <div className='w-3/4'>
                             <div>
                                 <b className='mr-4'>
                                     Mã biên bản:
@@ -1216,6 +1237,27 @@ const EmployDelivery = () => {
                                 </b>
                                 {entities?.data?.length}
                             </div>
+                        </div>
+                        <div className='w-1/4 text-right'>
+                            {
+                                isPassReceive
+                                &&
+                                <Button
+                                    size='small'
+                                    variant="contained"
+                                    type='submit'
+                                    color='primary'
+                                    style={{
+                                        textTransform: 'initial',
+                                        minWidth: 'initial'
+                                    }}
+                                    onClick={() => {
+                                        setOpenDialog('media')
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon={faImages} />
+                                </Button>
+                            }
                         </div>
                     </div>
                     <hr className='my-8' style={{ borderColor: 'aliceblue' }}></hr>
@@ -1237,7 +1279,7 @@ const EmployDelivery = () => {
                                 </Link>
                                 : <>
                                     {
-                                        (checkAllReceive && type === '2')
+                                        (checkAllReceive && type === '2' && false)
                                         &&
                                         <Button
                                             size='small'
