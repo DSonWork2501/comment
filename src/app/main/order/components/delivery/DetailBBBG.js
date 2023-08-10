@@ -17,6 +17,7 @@ import { DropMenu } from '../index';
 import { Link } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 import MapLocation from 'app/main/delivery/components/MapLocation';
+import MediaDialog from 'app/main/delivery/components/MediaDialog';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -658,7 +659,7 @@ function DetailBBBG() {
     const entities = useSelector(store => store[keyStore].order.detailDelivery);
     const [search, setSearch] = useState(initialValues);
     const params = useParams(), id = params.id, type = params.type;
-    // const [openDialog, setOpenDialog] = useState('');
+    const [openDialog, setOpenDialog] = useState('');
 
     const getListTable = useCallback((search) => {
         dispatch(order.other.getDetailDelivery({ ...search, id }));
@@ -674,11 +675,14 @@ function DetailBBBG() {
 
     return (
         <LayoutCustom>
-            {/* {
+            {
                 openDialog === 'media'
                 &&
-                <MediaDialog open entities={entities} />
-            } */}
+                <MediaDialog
+                    open
+                    entities={entities}
+                    handleClose={() => setOpenDialog('')} />
+            }
             <div className='w-full  h-full' style={{ padding: '0 3.2rem' }}>
                 <div className="w-full flex justify-between items-start py-8">
                     <div className='flex'>
@@ -738,9 +742,29 @@ function DetailBBBG() {
 
                 <div className='p-8 '>
                     <div className='py-8 rounded-4 shadow-4 bg-white'>
-                        <CmsTab data={deliveryLink(id)} value={0} isLink={true} onChange={(e, value) => {
-                            History.push(deliveryLink(id).find(e => e.id === value)?.link)
-                        }} />
+                        <div className='flex justify-between items-center'>
+                            <CmsTab data={deliveryLink(id)} value={0} isLink={true} onChange={(e, value) => {
+                                History.push(deliveryLink(id).find(e => e.id === value)?.link)
+                            }} />
+                            <div className='pr-8'>
+                                <Button
+                                    size='small'
+                                    variant="contained"
+                                    type='submit'
+                                    color='primary'
+                                    style={{
+                                        width: 100,
+                                        textTransform: 'initial'
+                                    }}
+                                    onClick={() => {
+                                        setOpenDialog('media')
+                                    }}
+                                >
+                                    Hình ảnh
+                                </Button>
+                            </div>
+                        </div>
+
                         <div className='w-3/6 py-8'>
                             <Filter
                                 onSearch={setSearch}

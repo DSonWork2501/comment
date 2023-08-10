@@ -446,15 +446,15 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                             {
                                 name: 'Chụp hình',
                                 id: 1,
-                                show: val.shipping.status === 1
+                                show: val.shipping.status <= 2
                             },
                             {
                                 name: 'Giao hàng',
                                 id: 2,
-                                show: val.shipping.status === 2
+                                show: val.shipping.status >= 2
                             }
                         ]
-                            //  .filter(val => val.show)
+                              .filter(val => val.show)
                         }
                         handleClose={(value, setAnchorEl) => {
                             if (value?.id === 1) {
@@ -845,15 +845,15 @@ const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                                             {
                                                                 name: 'Chụp hình',
                                                                 id: 1,
-                                                                show: item.shipping.status === 1
+                                                                show: item.shipping.status <= 2
                                                             },
                                                             {
                                                                 name: 'Giao hàng',
                                                                 id: 2,
-                                                                show: item.shipping.status === 2
+                                                                show: item.shipping.status >= 2
                                                             }
                                                         ]
-                                                            //  .filter(val => val.show)
+                                                            .filter(val => val.show)
                                                         }
                                                         handleClose={(value, setAnchorEl) => {
                                                             if (value?.id === 1) {
