@@ -453,6 +453,10 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                                 name: 'Giao hàng',
                                 id: 2,
                                 show: val.shipping.status >= 2
+                            },
+                            {
+                                name: 'Mở google map',
+                                id: 3,
                             }
                         ]
                             .filter(val => val.show)
