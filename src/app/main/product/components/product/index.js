@@ -24,7 +24,7 @@ const columns = [
     new initColumn({ field: "shortname", label: "Tên Ngắn", alignHeader: "left", alignValue: "left", sortable: false }),
     new initColumn({ field: "image", label: "Hình Ảnh", alignHeader: "center", alignValue: "center", sortable: false }),
     new initColumn({ field: "price", label: "Giá", alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "hold", label: "Tồn", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "inventory", label: "Tồn", alignHeader: "center", alignValue: "center", sortable: false }),
     new initColumn({
         field: "run", label: <Tooltip title="Đang giao hàng">
             <FontAwesomeIcon icon={faTruck} style={{ color: '#03a9f4', fontSize: 17 }} />
