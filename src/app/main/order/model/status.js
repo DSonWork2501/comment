@@ -17,7 +17,7 @@ export const orderStatusArray = [
     { id: '7', name: 'Vận chuyển', className: 'bg-purple-500' },
     // { id: '5', name: 'Chờ thanh toán', className: 'bg-purple-500' },
     // { id: '3', name: 'Đã thanh toán', className: 'bg-green-500' },
-    // { id: '4', name: 'Hoàn thành', className: 'bg-blue-500' },
+    { id: '4', name: 'Hoàn thành', className: 'bg-blue-500' },
     { id: '0', name: 'Đã hủy', className: 'bg-red-500' },
 ]
 
