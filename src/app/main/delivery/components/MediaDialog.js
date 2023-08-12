@@ -1,21 +1,52 @@
 import React from 'react';
-import { CmsButtonProgress } from '@widgets/components';
-import { Dialog, DialogActions, DialogContent } from '@material-ui/core';
+import { CmsButtonProgress, CmsTextField } from '@widgets/components';
+import { Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 import { baseurl } from '@connect/@connect';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot, faUser } from '@fortawesome/free-solid-svg-icons';
+import { useState } from 'react';
+import { useMemo } from 'react';
 
+function customLike(searchText, targetText) {
+    // Escape special characters in the search text
+    const escapedSearchText = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // Create a regular expression with the escaped search text and the 'i' flag for case-insensitive matching
+    const regex = new RegExp(escapedSearchText, 'i');
+
+    // Test if the target text matches the regular expression
+    return regex.test(targetText);
+}
 
 function MediaDialog({ entities, handleClose, open, classes }) {
+    const [value, setValue] = useState('');
+    const reEntities = useMemo(() => {
+        if (entities?.data?.length) {
+            return entities.data.filter(val => {
+                return value ? (val.id === parseInt(value) || customLike(value, val.customermoblie)) : true
+            })
+        }
+    }, [value, entities])
 
     return (
         <React.Fragment>
             <Dialog className={classes} open={open} fullWidth maxWidth="lg" tabIndex={1000}>
+                <DialogTitle>
+                    <CmsTextField
+                        value={value}
+                        onChange={event => setValue(event.target.value)}
+                        placeholder="Tìm kiếm bằng ID hoặc SĐT"
+                        size="small"
+                    />
+                </DialogTitle>
                 <DialogContent>
                     {
-                        entities?.data?.length && entities?.data.map((val, index) => (
-                            <>
+                        reEntities?.length && reEntities.map((val, index) => (
+                            <div key={val.id}>
                                 <div>
+                                    <div>
+                                        ID {val?.id}
+                                    </div>
                                     <div>
                                         <FontAwesomeIcon icon={faUser} className='mr-2' /> {val?.customername} - {val?.customermoblie}
                                     </div>
@@ -63,7 +94,7 @@ function MediaDialog({ entities, handleClose, open, classes }) {
                                     </hr>
                                 }
 
-                            </>
+                            </div>
                         ))
                     }
                 </DialogContent>
