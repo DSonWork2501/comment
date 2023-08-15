@@ -77,6 +77,7 @@ export default {
             },
             getList: params => axios.get(`${baseurl}/customer/get-customer`, { params }),
             insert: entity => axios.post(`${baseurl}/customer/insert-customer`, entity),
+            update: entity => axios.put(`${baseurl}/customer/update-customer`, entity),
             getShelf: params => axios.get(`${baseurl}/customer/get-households`, { params }),
             getWine: params => axios.get(`${baseurl}/customer/get-wines`, { params }),
         },
