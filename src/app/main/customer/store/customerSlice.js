@@ -25,7 +25,7 @@ export const getList = createAsyncThunk(`${appName}/${moduleName}/getList`, asyn
 export const getCusById = createAsyncThunk(`${appName}/${moduleName}/getCusById`, async (params, thunkAPI) => {
     try {
         const response = await connect.live.customer.getList(params);
-        const data = await response?.data?.data?.find(x=>true);
+        const data = await response?.data?.data?.find(x => true);
         return data
     } catch (error) {
         thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
@@ -40,6 +40,44 @@ export const insertCus = createAsyncThunk(`${appName}/${moduleName}/insertCus`, 
     try {
         const search = thunkAPI.getState().customers.customer.search
         const response = await connect.live.customer.insert(entity);
+        const data = await response?.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+        thunkAPI.dispatch(getList(search))
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return error
+    }
+});
+
+export const insertUser = createAsyncThunk(`${appName}/${moduleName}/insertUser`, async (entity, thunkAPI) => {
+    try {
+        const response = await connect.live.customer.insert(entity);
+        const data = await response?.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return error
+    }
+});
+
+export const updateUser= createAsyncThunk(`${appName}/${moduleName}/updateUser`, async (entity, thunkAPI) => {
+    try {
+        const response = await connect.live.customer.update(entity);
+        const data = await response?.data;
+        thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return error
+    }
+});
+
+export const updateCus = createAsyncThunk(`${appName}/${moduleName}/updateCus`, async (entity, thunkAPI) => {
+    try {
+        const search = thunkAPI.getState().customers.customer.search
+        const response = await connect.live.customer.update(entity);
         const data = await response?.data;
         thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
         thunkAPI.dispatch(getList(search))
