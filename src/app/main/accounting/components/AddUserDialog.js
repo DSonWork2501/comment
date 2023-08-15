@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CmsDialog, CmsFormikAutocomplete } from '@widgets/components';
+import { CmsDialog, CmsFormikAutocomplete, CmsFormikTextField } from '@widgets/components';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
@@ -56,7 +56,7 @@ function AddUserDialog({ handleClose, detail, onSave, open, title = 'Thêm thu�
         })
     })
 
-    const { setValues } = formik;
+    const { setValues, values } = formik, { shipperid } = values;
 
     useEffect(() => {
         setValues(detail ? fillDefaultForm(initialValues, detail) : initialValues);
@@ -94,6 +94,20 @@ function AddUserDialog({ handleClose, detail, onSave, open, title = 'Thêm thu�
                         formik.setFieldValue('phone', value?.phone)
                     }}
                     valueIsId />
+                <CmsFormikTextField
+                    label="Tên"
+                    name="shipname"
+                    size="small"
+                    className="my-8"
+                    disabled={shipperid}
+                    formik={formik} />
+                <CmsFormikTextField
+                    label="Số điện thoại"
+                    size="small"
+                    name="phone"
+                    disabled={shipperid}
+                    className="my-8"
+                    formik={formik} />
             </CmsDialog>
         </React.Fragment>
     )

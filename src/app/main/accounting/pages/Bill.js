@@ -148,6 +148,7 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
         new initColumn({ field: "id", label: `ID`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "datecreate", label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "moneytotal1", label: `Tổng đơn`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "moneytotal", label: `Tổng tiền`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "moneycollected", label: `Đã trả`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "type", label: `Loại chuyển khoản`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
@@ -170,6 +171,9 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
                 disabled={Boolean(item?.shipped)}
                 name="select"
             />
+        ),
+        moneytotal1: (
+            item?.moneytotal1 || '0'
         ),
         type: (
             item?.type === 1 ? 'Tiền mặt' : 'Chuyển khoản'
@@ -272,7 +276,7 @@ function Meta() {
     //         close: () => form.setSubmitting(false)
     //     });
     // }
-  
+
 
     return (
         <LayoutCustom>
@@ -283,7 +287,7 @@ function Meta() {
                     title='Chọn nhân viên thu tiền'
                     detail={{ orders: selects }}
                     open={openDialog === 'addUser'}
-                    onSave={()=>{
+                    onSave={() => {
 
                     }}
                     handleClose={handleCloseDialog} />
