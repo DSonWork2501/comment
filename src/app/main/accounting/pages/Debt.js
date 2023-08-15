@@ -3,7 +3,7 @@ import { CmsCardedPage, CmsTableBasic, CmsLabel, CmsIconButton, CmsTab, CmsFormi
 import { Box, Button, Chip, Icon, TableCell, TableRow, styled } from '@material-ui/core';
 import { alertInformation, initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer';
-import reducer, { productMeta } from '../store';
+import reducer, { accounting } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import FuseLoading from '@fuse/core/FuseLoading';
 import { keyStore, links } from '../common';
@@ -316,9 +316,12 @@ function Meta() {
         History.push('/accounting/debts/1')
     }
 
-
     const getListTable = useCallback((search) => {
-        dispatch(productMeta.meta.getList({ ...search, type }));
+        if (type === 1) {
+            dispatch(accounting.meta.getList({ ...search, type }));
+        } else {
+            dispatch(accounting.bill.getList({ ...search }));
+        }
     }, [dispatch, type])
 
     const searchString = JSON.stringify(search);
@@ -344,8 +347,8 @@ function Meta() {
             confirm: async () => {
                 try {
                     const resultAction = values?.id
-                        ? await dispatch(productMeta.meta.update({ value: [values], type }))
-                        : await dispatch(productMeta.meta.create({ value: [values], type }));
+                        ? await dispatch(accounting.meta.update({ value: [values], type }))
+                        : await dispatch(accounting.meta.create({ value: [values], type }));
                     unwrapResult(resultAction);
                     if (!values?.id) {
                         form.resetForm();

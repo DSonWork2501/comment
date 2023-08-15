@@ -17,7 +17,8 @@ const locale = {
 	'CUSTOM_USER_DELIVERY':'Quản lý giao hàng',
 	'CUSTOM_DELIVERY':'Biên bản bàn giao',
 	'ACCOUNTING':'Quản lý thanh toán',
-	'ACCOUNTING_DEBT':'Công nợ'
+	'ACCOUNTING_DEBT':'Công nợ',
+	'ACCOUNTING_BILL':'Billing'
 };
 
 export default locale;
