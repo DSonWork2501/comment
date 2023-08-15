@@ -7,7 +7,7 @@ import {
     CmsFormikDateTimePicker,
     CmsCheckbox,
 } from '@widgets/components';
-import { Box, Button, Icon, styled } from '@material-ui/core';
+import { Box, Button, Chip, Icon, styled } from '@material-ui/core';
 import { initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer';
 import reducer, { accounting } from '../store';
@@ -152,11 +152,17 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
         new initColumn({ field: "moneytotal", label: `Tổng tiền`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "moneycollected", label: `Đã trả`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "type", label: `Loại chuyển khoản`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Tình trạng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
     const data = entities && entities.data && entities.data.map((item, index) => ({
         ...item,
         original: item,
+        status: (
+            item?.moneycollected === item?.moneytotal 
+            ? <Chip label="Đã thanh toán" className="bg-green-500 text-white" /> 
+            : <Chip label="Chưa thanh toán" className="bg-red-500 text-white" />
+        ),
         select: (
             <CmsCheckbox
                 key={`${index}_select`}
