@@ -58,7 +58,7 @@ export const insertUser = createAsyncThunk(`${appName}/${moduleName}/insertUser`
         return data
     } catch (error) {
         thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
-        return error
+        return (thunkAPI.rejectWithValue(error))
     }
 });
 
@@ -70,7 +70,7 @@ export const updateUser= createAsyncThunk(`${appName}/${moduleName}/updateUser`,
         return data
     } catch (error) {
         thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
-        return error
+        return (thunkAPI.rejectWithValue(error))
     }
 });
 
