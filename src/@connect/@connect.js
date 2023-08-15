@@ -143,6 +143,11 @@ export default {
                 insert: entity => axios.post(`${baseurl}/customer/insert-vehicle`, entity),
                 update: entity => axios.put(`${baseurl}/customer/update-vehicle`, entity),
             }
+        },
+        accounting:{
+            bill:{
+                getList: (params) => axios.get(`${baseurl}/order/get-billing`, { params }),
+            }
         }
     },
 }
