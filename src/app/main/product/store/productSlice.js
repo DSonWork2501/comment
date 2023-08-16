@@ -175,6 +175,17 @@ export const insertProPrice = createAsyncThunk(`${appName}/${moduleName}/insertP
 });
 
 export const product = {
+    delete: createAsyncThunk(`${appName}/${moduleName}/delete`, async (entity, thunkAPI) => {
+        try {
+            const response = await connect.live.product.delete(entity);
+            thunkAPI.dispatch(showMessage({ variant: "success", message: 'Xóa thành công !' }))
+            const data = await response.data;
+            return data
+        } catch (error) {
+            thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+            return thunkAPI.rejectWithValue(error)
+        }
+    }),
     other: {
         removeProperties: createAsyncThunk(`${appName}/${moduleName}/other/removeProperties`, async (entity, thunkAPI) => {
             try {
