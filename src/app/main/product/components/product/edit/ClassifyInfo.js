@@ -7,7 +7,7 @@ import { keyStore } from "app/main/product/common"
 import { initDetail } from "app/main/product/model/product/model"
 import { useFormik } from "formik"
 import { get } from "lodash"
-import React from "react"
+import React, { useEffect } from "react"
 import { useState } from "react"
 import { useSelector } from "react-redux"
 import ShelfContent from "./classify/Shelf"
@@ -101,7 +101,9 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex, i
             </div>
             <div className="col-span-4 flex flex-row space-x-12 items-start justify-end">
                 <CmsButton type="button" size="small" label={"Lưu tạm"} startIcon="save" className="text-white bg-blue-500 hover:bg-green-700" onClick={() => formik_item.handleSubmit()} />
-                <CmsButton size="small" label={"Hủy"} startIcon="cancel" className="text-white bg-grey-500 hover:bg-grey-700" onClick={() => handleCancelSetIndex()} />
+                <CmsButton size="small" label={"Hủy"} startIcon="cancel" className="text-white bg-grey-500 hover:bg-grey-700" onClick={() => {
+                    handleCancelSetIndex();
+                }} />
             </div>
         </div>
 
@@ -145,16 +147,24 @@ function ClassifyInfo({ formik }) {
     const [editIndex, setEditIndex] = useState('')
     const [modalIndex, setModalIndex] = useState('')
 
+    const { setSubmitting } = formik;
+    useEffect(() => {
+        setSubmitting(editIndex !== '')
+    }, [setSubmitting, editIndex])
+
+
     const HandleAddItem = () => {
         if (!sku) {
             CmsAlert.fire({ heightAuto: false, text: 'Chưa nhập SKU !', icon: 'warning' })
-        } else {
+        } 
+        else {
             formik.setFieldValue(`detail[${formik.values.detail.length}]`,
                 {
                     ...initDetail(),
                     uniqueid: `${sku}.${formik.values.detail.length + 1}`,
                     sku: sku
                 })
+            setEditIndex(formik.values.detail.length)
         }
     }
 
@@ -199,7 +209,9 @@ function ClassifyInfo({ formik }) {
         thaotac:
             <div className="flex flex-row space-x-8">
                 {editIndex !== index &&
-                    <CmsButton size="small" label={"Sửa"} className="text-white bg-green-500 hover:bg-green-700" onClick={() => { setEditIndex(index) }} />
+                    <CmsButton size="small" label={"Sửa"} className="text-white bg-green-500 hover:bg-green-700" onClick={() => {
+                        setEditIndex(index);
+                    }} />
                 }
                 {ishs === parseInt(HomeSubscription[1].id) && <CmsButton size="small" label={"Ngăn/tủ"} className="text-white bg-blue-500 hover:bg-blue-700" onClick={() => { setModalIndex(index) }} />}
                 {editIndex !== index &&
@@ -216,7 +228,9 @@ function ClassifyInfo({ formik }) {
                     isPagination={false}
                 />
                 <div className="w-full text-center m-0">
-                    <CmsButton label="Thêm mới" className="bg-yellow-700 hover:bg-yellow-900" onClick={() => HandleAddItem()} />
+                    <CmsButton label="Thêm mới" disabled={formik.isSubmitting} className="bg-yellow-700 hover:bg-yellow-900" onClick={() => {
+                        HandleAddItem()
+                    }} />
                 </div>
             </div>
             {!isNaN(parseInt(modalIndex)) &&

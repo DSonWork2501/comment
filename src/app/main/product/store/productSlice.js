@@ -83,20 +83,23 @@ export const insertProduct = createAsyncThunk(`${appName}/${moduleName}/insertPr
 export const updateProduct = createAsyncThunk(`${appName}/${moduleName}/updateProduct`, async (entity, thunkAPI) => {
     try {
         const { details } = entity
-        const modal = [...details]?.map(x => ({
-            "uniqueid": x.uniqueid,
-            "retailprice": x.retailprice,
-            "wholesaleprice": x.wholesaleprice,
-            "price": x.price,
-            "discount": 0,
-            "vat": 0
-        }))
-        if (modal) {
-            const priceResponse = await thunkAPI.dispatch(insertProPrice(modal))
-            if (!priceResponse?.payload?.result) {
-                thunkAPI.dispatch(showMessage({ variant: "error", message: '' }))
+        if (details?.length) {
+            const modal = [...details]?.map(x => ({
+                "uniqueid": x.uniqueid,
+                "retailprice": x.retailprice,
+                "wholesaleprice": x.wholesaleprice,
+                "price": x.price,
+                "discount": 0,
+                "vat": 0
+            }))
+            if (modal) {
+                const priceResponse = await thunkAPI.dispatch(insertProPrice(modal))
+                if (!priceResponse?.payload?.result) {
+                    thunkAPI.dispatch(showMessage({ variant: "error", message: '' }))
+                }
             }
         }
+
         const response = await connect.live.product.update(entity);
         const data = await response.data;
         thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))

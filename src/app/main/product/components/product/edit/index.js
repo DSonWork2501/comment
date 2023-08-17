@@ -65,7 +65,7 @@ function EditProduct(props) {
     }, [entity])
 
     const handleSaveData = (values) => {
-     
+
         let value = { ...values };
         if (value?.certification && Array.isArray(value?.certification))
             value.certification = value.certification.join(',');
@@ -98,7 +98,7 @@ function EditProduct(props) {
                     )),
                     properties: data?.properties?.length ? data?.properties.map(val => ({ ...val, sku: data.sku })) : []
                 }
-              
+
                 params?.id === '0' ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))
                 if (data?.newCates?.length)
                     await dispatch(product.other.addProductCate(data?.newCates))
@@ -181,7 +181,11 @@ function EditProduct(props) {
                             </div>
                         </div>
                         <div className="flex items-center justify-end space-x-8">
-                            <CmsButtonProgress label="Lưu" onClick={formik.handleSubmit} loading={loading} />
+                            <CmsButtonProgress
+                                disabled={formik.isSubmitting}
+                                label="Lưu"
+                                onClick={formik.handleSubmit}
+                                loading={loading} />
                             <CmsButtonProgress color="default" label="Reset" onClick={handleResetData} />
                         </div>
                     </div>
