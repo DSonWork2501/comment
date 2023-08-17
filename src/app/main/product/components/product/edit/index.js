@@ -119,6 +119,7 @@ function EditProduct(props) {
             confirmButtonColor: colors.green[500]
         }).then(result => {
             formik.setValues(initData(data))
+            formik.setSubmitting(false);
         })
 
     }
