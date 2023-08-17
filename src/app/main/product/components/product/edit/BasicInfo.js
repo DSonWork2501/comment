@@ -62,7 +62,7 @@ function BasicInfo({ formik, SaveData, options, handleFresh }) {
             formik.setFieldValue('image', `${formik?.values?.sku}/${file.name}`)
         }
     }
-
+    console.log(formik);
     const { values, setFieldValue } = formik, { properties } = values;
     const cerValue = (typeof values.certification !== 'object' || !Array.isArray(values.certification) ? (values?.certification ? values.certification.split(',') : []) : values.certification);
     return (
