@@ -4,11 +4,11 @@ import { showMessage } from 'app/store/fuse/messageSlice'
 import { getErrorMessage } from '@widgets/functions/GetErrorMessage';
 
 const appName = "App";
-const moduleName = "productMeta";
+const moduleName = "accounting";
 
-export const productMeta = {
+export const accounting = {
     other: {
-        getUnit: createAsyncThunk(`${appName}/${moduleName}/productMeta/other/getUnit`, async (params, thunkAPI) => {
+        getUnit: createAsyncThunk(`${appName}/${moduleName}/accounting/other/getUnit`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.ads.other.getUnit(params);
                 return response.data
@@ -19,19 +19,48 @@ export const productMeta = {
         }),
 
     },
-    meta: {
-        getList: createAsyncThunk(`${appName}/${moduleName}/productMeta/meta/getList`, async (params, thunkAPI) => {
+    bill: {
+        getList: createAsyncThunk(`${appName}/${moduleName}/bill/getList`, async (params, thunkAPI) => {
             try {
-                const response = await connect.live.productMeta.meta.getList(params);
+                const response = await connect.live.accounting.bill.getList(params);
                 return response.data
             } catch (error) {
                 thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
-        create: createAsyncThunk(`${appName}/${moduleName}/productMeta/meta/create`, async (params, thunkAPI) => {
+        createCollect: createAsyncThunk(`${appName}/${moduleName}/bill/createCollect`, async (params, thunkAPI) => {
             try {
-                const response = await connect.live.productMeta.meta.create(params.value, params.type);
+                const response = await connect.live.accounting.bill.createCollect(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getCollect: createAsyncThunk(`${appName}/${moduleName}/bill/getCollect`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.getCollect(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+    },
+    meta: {
+        getList: createAsyncThunk(`${appName}/${moduleName}/accounting/meta/getList`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.meta.getList(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        create: createAsyncThunk(`${appName}/${moduleName}/accounting/meta/create`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.meta.create(params.value, params.type);
                 thunkAPI.dispatch(showMessage({ variant: "success", message: "Thêm mới thành công!" }))
                 return response.data
             } catch (error) {
@@ -39,9 +68,9 @@ export const productMeta = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
-        update: createAsyncThunk(`${appName}/${moduleName}/productMeta/meta/update`, async (params, thunkAPI) => {
+        update: createAsyncThunk(`${appName}/${moduleName}/accounting/meta/update`, async (params, thunkAPI) => {
             try {
-                const response = await connect.live.productMeta.meta.update(params.value, params.type);
+                const response = await connect.live.accounting.meta.update(params.value, params.type);
                 thunkAPI.dispatch(showMessage({ variant: "success", message: "Cập nhật thành công!" }))
                 return response.data
             } catch (error) {
@@ -49,9 +78,9 @@ export const productMeta = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
-        delete: createAsyncThunk(`${appName}/${moduleName}/productMeta/meta/delete`, async (params, thunkAPI) => {
+        delete: createAsyncThunk(`${appName}/${moduleName}/accounting/meta/delete`, async (params, thunkAPI) => {
             try {
-                const response = await connect.live.productMeta.meta.delete(params.value, params.type);
+                const response = await connect.live.accounting.meta.delete(params.value, params.type);
                 thunkAPI.dispatch(showMessage({ variant: "success", message: "Xóa thành công!" }))
                 return response.data
             } catch (error) {
@@ -68,7 +97,7 @@ const initSearchState = {
     type: 1
 }
 
-const productMetaSlice = createSlice({
+const accountingSlice = createSlice({
     name: `${appName}/${moduleName}`,
     initialState: {
         loading: false,
@@ -76,6 +105,7 @@ const productMetaSlice = createSlice({
         entity: null,
         error: null,
         selected: null,
+        collections: null,
         search: initSearchState,
     },
     reducers: {
@@ -180,7 +210,7 @@ const productMetaSlice = createSlice({
         }
     },
     extraReducers: {
-        [productMeta.meta.getList.pending]: state => ({
+        [accounting.meta.getList.pending]: state => ({
             ...state,
             loading: true,
             entities: {
@@ -188,7 +218,7 @@ const productMetaSlice = createSlice({
             },
             error: null
         }),
-        [productMeta.meta.getList.fulfilled]: (state, { payload }) => {
+        [accounting.meta.getList.fulfilled]: (state, { payload }) => {
             return {
                 ...state,
                 loading: false,
@@ -196,7 +226,7 @@ const productMetaSlice = createSlice({
                 error: null
             }
         },
-        [productMeta.meta.getList.rejected]: (state, { error }) => ({
+        [accounting.meta.getList.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             entities: {
@@ -204,9 +234,60 @@ const productMetaSlice = createSlice({
             },
             error: error
         }),
+
+        [accounting.bill.getList.pending]: state => ({
+            ...state,
+            loading: true,
+            entities: {
+                data: []
+            },
+            error: null
+        }),
+        [accounting.bill.getList.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                entities: payload,
+                error: null
+            }
+        },
+        [accounting.bill.getList.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            entities: {
+                data: []
+            },
+            error: error
+        }),
+
+
+        [accounting.bill.getCollect.pending]: state => ({
+            ...state,
+            loading: true,
+            collections: {
+                data: []
+            },
+            error: null
+        }),
+        [accounting.bill.getCollect.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                collections: payload,
+                error: null
+            }
+        },
+        [accounting.bill.getCollect.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            collections: {
+                data: []
+            },
+            error: error
+        }),
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setPosition1, setPosition2, resetContractDetail, setContractDetail, resetIncome, resetForm } = productMetaSlice.actions;
+export const { setSelected, setSearch, resetSearch, setPosition1, setPosition2, resetContractDetail, setContractDetail, resetIncome, resetForm } = accountingSlice.actions;
 
-export default productMetaSlice.reducer;
+export default accountingSlice.reducer;

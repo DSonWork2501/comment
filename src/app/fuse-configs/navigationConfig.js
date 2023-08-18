@@ -184,6 +184,14 @@ const navigationConfig = [
 				icon: 'gavel',
 				url: '/accounting/debts',
 			},
+			{
+				id: 'nvi-accounting-bill',
+				title: 'Billing',
+				translate: 'ACCOUNTING_BILL',
+				type: 'item',
+				icon: 'gavel',
+				url: '/accounting/bill',
+			},
 		],
 	},
 ];

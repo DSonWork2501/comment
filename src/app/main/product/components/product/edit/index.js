@@ -120,6 +120,7 @@ function EditProduct(props) {
             confirmButtonColor: colors.green[500]
         }).then(result => {
             formik.setValues(initData(data))
+            formik.setSubmitting(false);
         })
 
     }
@@ -182,7 +183,11 @@ function EditProduct(props) {
                             </div>
                         </div>
                         <div className="flex items-center justify-end space-x-8">
-                            <CmsButtonProgress label="Lưu" onClick={formik.handleSubmit} loading={loading} />
+                            <CmsButtonProgress
+                                disabled={formik.isSubmitting}
+                                label="Lưu"
+                                onClick={formik.handleSubmit}
+                                loading={loading} />
                             <CmsButtonProgress color="default" label="Reset" onClick={handleResetData} />
                         </div>
                     </div>

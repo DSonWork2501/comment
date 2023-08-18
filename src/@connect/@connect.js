@@ -42,7 +42,7 @@ export default {
             getDetail: params => axios.get(`${baseurl}/product/get-product-detail`, { params }),
             insert: entity => axios.post(`${baseurl}/product/insert-product`, entity),
             update: entity => axios.put(`${baseurl}/product/update-product`, entity),
-            delete: entity => axios.delete(`${baseurl}/product/delete-product`, entity),
+            delete: entity => axios.put(`${baseurl}/product/delete-product`, entity),
             uploadImage: (entity) => axios.post(`${baseurl}/product/upload-image`, entity, { headers: { 'Content-Type': 'multipart/form-data' } }),
             getHistoryPrice: params => axios.get(`${baseurl}/product/get-history-price`, { params }),
             price: {
@@ -77,6 +77,7 @@ export default {
             },
             getList: params => axios.get(`${baseurl}/customer/get-customer`, { params }),
             insert: entity => axios.post(`${baseurl}/customer/insert-customer`, entity),
+            update: entity => axios.put(`${baseurl}/customer/update-customer`, entity),
             getShelf: params => axios.get(`${baseurl}/customer/get-households`, { params }),
             getWine: params => axios.get(`${baseurl}/customer/get-wines`, { params }),
         },
@@ -138,10 +139,17 @@ export default {
                 insert: entity => axios.post(`${baseurl}/customer/insert-userinfo`, entity),
                 update: entity => axios.put(`${baseurl}/customer/update-userinfo`, entity),
             },
-            vehicleDelivery:{
+            vehicleDelivery: {
                 getList: (params) => axios.get(`${baseurl}/customer/get-vehicles`, { params }),
                 insert: entity => axios.post(`${baseurl}/customer/insert-vehicle`, entity),
                 update: entity => axios.put(`${baseurl}/customer/update-vehicle`, entity),
+            }
+        },
+        accounting: {
+            bill: {
+                getList: (params) => axios.get(`${baseurl}/order/get-billing`, { params }),
+                createCollect: entity => axios.post(`${baseurl}/order/collection-insert`, entity),
+                getCollect: (params) => axios.get(`${baseurl}/order/get-collection-group`, { params }),
             }
         }
     },

@@ -29,6 +29,16 @@ const PageConfig = {
             path: '/accounting/debts/:type',
             component: React.lazy(() => import('./pages/Debt')),
         },
+        {
+            exact: true,
+            path: '/accounting/bill',
+            component: React.lazy(() => import('./pages/Bill')),
+        },
+        {
+            exact: true,
+            path: '/collection',
+            component: React.lazy(() => import('./pages/BBBG')),
+        },
     ]
 };
 

@@ -83,21 +83,24 @@ export const insertProduct = createAsyncThunk(`${appName}/${moduleName}/insertPr
 export const updateProduct = createAsyncThunk(`${appName}/${moduleName}/updateProduct`, async (entity, thunkAPI) => {
     try {
         const { details } = entity
-        const modal = [...details]?.map(x => ({
-            "uniqueid": x.uniqueid,
-            "retailprice": x.retailprice,
-            "wholesaleprice": x.wholesaleprice,
-            "temporaryprice": x.temporaryprice,
-            "price": x.price,
-            "discount": 0,
-            "vat": 0
-        }))
-        if (modal) {
-            const priceResponse = await thunkAPI.dispatch(insertProPrice(modal))
-            if (!priceResponse?.payload?.result) {
-                thunkAPI.dispatch(showMessage({ variant: "error", message: '' }))
+        if (details?.length) {
+            const modal = [...details]?.map(x => ({
+                "uniqueid": x.uniqueid,
+                "retailprice": x.retailprice,
+                "wholesaleprice": x.wholesaleprice,
+                "temporaryprice": x.temporaryprice,
+                "price": x.price,
+                "discount": 0,
+                "vat": 0
+            }))
+            if (modal) {
+                const priceResponse = await thunkAPI.dispatch(insertProPrice(modal))
+                if (!priceResponse?.payload?.result) {
+                    thunkAPI.dispatch(showMessage({ variant: "error", message: '' }))
+                }
             }
         }
+
         const response = await connect.live.product.update(entity);
         const data = await response.data;
         thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
@@ -176,6 +179,17 @@ export const insertProPrice = createAsyncThunk(`${appName}/${moduleName}/insertP
 });
 
 export const product = {
+    delete: createAsyncThunk(`${appName}/${moduleName}/delete`, async (entity, thunkAPI) => {
+        try {
+            const response = await connect.live.product.delete(entity);
+            thunkAPI.dispatch(showMessage({ variant: "success", message: 'Xóa thành công !' }))
+            const data = await response.data;
+            return data
+        } catch (error) {
+            thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+            return thunkAPI.rejectWithValue(error)
+        }
+    }),
     other: {
         removeProperties: createAsyncThunk(`${appName}/${moduleName}/other/removeProperties`, async (entity, thunkAPI) => {
             try {

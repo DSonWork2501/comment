@@ -1,21 +1,21 @@
 import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsLabel, CmsTableBasic } from "@widgets/components";
-import { initColumn } from "@widgets/functions";
+import { alertInformation, initColumn } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import FilterOptionView from "./filterOptionView";
 import reducer from "../../store";
-import { getList as getProduct, resetSearch, setSearch } from "../../store/productSlice";
+import { getList as getProduct, product, resetSearch, setSearch } from "../../store/productSlice";
 import { getList as getCategory } from "../../store/categorySlice";
 import History from "@history";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArchive, faHome, faTruck } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "@material-ui/core";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 const columns = [
     new initColumn({ field: "sku", label: "SKU", alignHeader: "center", alignValue: "left", sortable: false }),
@@ -65,7 +65,7 @@ function ProductView() {
         dispatch(getCategory())
     }, [dispatch])
 
-    const data = useMemo(() => entities?.data?.map(item => ({
+    const data = entities?.data?.map(item => ({
         id: item.id,
         name: item.name,
         catename: JsonParseString(item.catename) ? JsonParseString(item.catename).join(', ') : <div></div>,
@@ -73,17 +73,45 @@ function ProductView() {
         image: (<img style={{ height: 100, margin: '0 auto' }} src={`${item.image ? `${process.env.REACT_APP_BASE_URL}api/product/img/${item?.image}` : 'assets/images/etc/no-image-icon.png'}`} alt={item?.img} />),
         sku: item.sku,
         price: item.price ? parseInt(item.price).toLocaleString() : 0,
+        inventory: item.inventory || '0',
         action: (
-            <div className="flex flex-row">
+            <div className="flex flex-row space-x-4">
                 <CmsIconButton
                     tooltip={<CmsLabel content={"Cập nhật"} className="text-10" />}
                     icon="edit"
                     className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white"
                     onClick={() => History.push(`/product/${item.sku}`)}
                 />
+                <CmsIconButton
+                    tooltip={<CmsLabel content={"Xóa"} className="text-10" />}
+                    icon="delete"
+                    className="bg-red-500 hover:bg-red-700 hover:shadow-2 text-white"
+                    onClick={() => {
+                        alertInformation({
+                            text: `Xác nhận thao tác`,
+                            data: {},
+                            confirm: async () => {
+                                try {
+                                    const resultAction = await dispatch(product.delete({
+                                        products: [
+                                            {
+                                                sku: item.sku,
+                                                status: 0
+                                            }
+                                        ]
+                                    }));
+                                    unwrapResult(resultAction);
+                                    dispatch(getProduct(search));
+                                } catch (error) {
+                                } finally {
+                                }
+                            },
+                        });
+                    }}
+                />
             </div>
         ) || []
-    })), [entities])
+    }));
 
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
