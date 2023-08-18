@@ -146,7 +146,7 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
             isSelectAllDisabled: false
         }),
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        new initColumn({ field: "collectid", label: `ID`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "id", label: `ID`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "datecreate", label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "moneytotal1", label: `Tổng đơn`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
@@ -237,7 +237,7 @@ function Meta() {
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
     const [selects, setSelects] = useState([]);
-
+    console.log(detail);
     const getListTable = useCallback((search) => {
         dispatch(accounting.bill.getList({ ...search }));
     }, [dispatch])
