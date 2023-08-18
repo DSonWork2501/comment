@@ -5,23 +5,8 @@ import * as Yup from 'yup'
 
 const initialValues = {
     id: 0,
-    orderid: null,
-    shipperid: 0,
-    shipname: "",
-    phone: "",
-    code: "",
-    type: 0,
-    session: "",
-    vehicle: "",
-    licenseplate: "",
-    receiveimg: "",
-    completeimg: "",
-    contractfile: "",
-    contractValid: 0,
-    deliveryid: null,
-    deliverysession: null,
-    note: '',
-    orders: []
+    collector: "",
+    phone: ""
 }
 
 const fillDefaultForm = (def, detail, setId = true) => {
@@ -52,7 +37,8 @@ function AddUserDialog({ handleClose, detail, onSave, open, title = 'Thêm thu�
         enableReinitialize: true,
         onSubmit: handleSave,
         validationSchema: Yup.object({
-            shipperid: Yup.number().nullable().required('Chọn nhân viên'),
+            collector: Yup.string().nullable().required('Nhập nhân viên'),
+            phone: Yup.string().nullable().required('Nhập số điện thoại'),
         })
     })
 
@@ -96,7 +82,7 @@ function AddUserDialog({ handleClose, detail, onSave, open, title = 'Thêm thu�
                     valueIsId />
                 <CmsFormikTextField
                     label="Tên"
-                    name="shipname"
+                    name="collector"
                     size="small"
                     className="my-8"
                     disabled={shipperid}

@@ -73,6 +73,7 @@ function ProductView() {
         image: (<img style={{ height: 100, margin: '0 auto' }} src={`${item.image ? `${process.env.REACT_APP_BASE_URL}api/product/img/${item?.image}` : 'assets/images/etc/no-image-icon.png'}`} alt={item?.img} />),
         sku: item.sku,
         price: item.price ? parseInt(item.price).toLocaleString() : 0,
+        inventory: item.inventory || '0',
         action: (
             <div className="flex flex-row space-x-4">
                 <CmsIconButton

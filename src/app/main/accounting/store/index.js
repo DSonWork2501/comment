@@ -19,10 +19,28 @@ export const accounting = {
         }),
 
     },
-    bill:{
-        getList: createAsyncThunk(`${appName}/${moduleName}/bill/meta/getList`, async (params, thunkAPI) => {
+    bill: {
+        getList: createAsyncThunk(`${appName}/${moduleName}/bill/getList`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.accounting.bill.getList(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        createCollect: createAsyncThunk(`${appName}/${moduleName}/bill/createCollect`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.createCollect(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getCollect: createAsyncThunk(`${appName}/${moduleName}/bill/getCollect`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.getCollect(params);
                 return response.data
             } catch (error) {
                 thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
@@ -87,6 +105,7 @@ const accountingSlice = createSlice({
         entity: null,
         error: null,
         selected: null,
+        collections: null,
         search: initSearchState,
     },
     reducers: {
@@ -240,7 +259,32 @@ const accountingSlice = createSlice({
             },
             error: error
         }),
-        
+
+
+        [accounting.bill.getCollect.pending]: state => ({
+            ...state,
+            loading: true,
+            collections: {
+                data: []
+            },
+            error: null
+        }),
+        [accounting.bill.getCollect.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                collections: payload,
+                error: null
+            }
+        },
+        [accounting.bill.getCollect.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            collections: {
+                data: []
+            },
+            error: error
+        }),
     }
 });
 

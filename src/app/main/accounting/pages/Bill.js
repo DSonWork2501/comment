@@ -8,7 +8,7 @@ import {
     CmsCheckbox,
 } from '@widgets/components';
 import { Box, Button, Chip, Icon, styled } from '@material-ui/core';
-import { initColumn } from '@widgets/functions';
+import { alertInformation, initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer';
 import reducer, { accounting } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +18,7 @@ import { useFormik } from 'formik';
 import { format } from 'date-fns';
 import { DropMenu } from 'app/main/order/components/index';
 import AddUserDialog from '../components/AddUserDialog';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -136,7 +137,7 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
                     return;
                 }
 
-                let values = entities?.data.map(value => value.id);
+                let values = entities?.data.filter(val => val?.incomed !== val?.ordcount).map(value => value.id);
                 setSelects(values);
             },
             classCheckAll: 'w-full',
@@ -145,7 +146,7 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
             isSelectAllDisabled: false
         }),
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        new initColumn({ field: "id", label: `ID`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "collectid", label: `ID`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "datecreate", label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "moneytotal1", label: `Tổng đơn`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
@@ -159,9 +160,9 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
         ...item,
         original: item,
         status: (
-            item?.moneycollected === item?.moneytotal 
-            ? <Chip label="Đã thanh toán" className="bg-green-500 text-white" /> 
-            : <Chip label="Chưa thanh toán" className="bg-red-500 text-white" />
+            item?.moneycollected === item?.moneytotal
+                ? <Chip label="Đã thanh toán" className="bg-green-500 text-white" />
+                : <Chip label="Chưa thanh toán" className="bg-red-500 text-white" />
         ),
         select: (
             <CmsCheckbox
@@ -174,7 +175,7 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
                         ? setSelects(value => value.filter(e => e !== item.id))
                         : setSelects(value => [...value, item.id])
                 }}
-                disabled={Boolean(item?.shipped)}
+                disabled={Boolean(item?.incomed === item?.ordcount)}
                 name="select"
             />
         ),
@@ -241,8 +242,6 @@ function Meta() {
         dispatch(accounting.bill.getList({ ...search }));
     }, [dispatch])
 
-    console.log(detail);
-
     const searchString = JSON.stringify(search);
     useEffect(() => {
         let search = JSON.parse(searchString);
@@ -259,29 +258,27 @@ function Meta() {
         setOpenDialog('');
     }
 
-    // const handleSubmit = async (values, form) => {
-    //     alertInformation({
-    //         text: `Xác nhận thao tác`,
-    //         data: { values, form },
-    //         confirm: async () => {
-    //             try {
-    //                 const resultAction = values?.id
-    //                     ? await dispatch(accounting.meta.update({ value: [values], type }))
-    //                     : await dispatch(accounting.meta.create({ value: [values], type }));
-    //                 unwrapResult(resultAction);
-    //                 if (!values?.id) {
-    //                     form.resetForm();
-    //                 }
-    //                 setOpenDialog('');
-    //                 getListTable(search);
-    //             } catch (error) {
-    //             } finally {
-    //                 form.setSubmitting(false)
-    //             }
-    //         },
-    //         close: () => form.setSubmitting(false)
-    //     });
-    // }
+    const handleSubmit = async (values, form) => {
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: { values, form },
+            confirm: async () => {
+                try {
+                    const resultAction = await dispatch(accounting.bill.createCollect(selects.map(val => {
+                        return { ...values, orderid: 0, billingid: val }
+                    })));
+                    unwrapResult(resultAction);
+                    setOpenDialog('');
+                    getListTable(search);
+                    setSelects([]);
+                } catch (error) {
+                } finally {
+                    form.setSubmitting(false)
+                }
+            },
+            close: () => form.setSubmitting(false)
+        });
+    }
 
 
     return (
@@ -293,9 +290,7 @@ function Meta() {
                     title='Chọn nhân viên thu tiền'
                     detail={{ orders: selects }}
                     open={openDialog === 'addUser'}
-                    onSave={() => {
-
-                    }}
+                    onSave={handleSubmit}
                     handleClose={handleCloseDialog} />
             }
             <CmsCardedPage
