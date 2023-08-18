@@ -65,7 +65,7 @@ function EditProduct(props) {
     }, [entity])
 
     const handleSaveData = (values) => {
-     
+
         let value = { ...values };
         if (value?.certification && Array.isArray(value?.certification))
             value.certification = value.certification.join(',');
@@ -93,12 +93,13 @@ function EditProduct(props) {
                             "wholesaleprice": parseInt(x.wholesaleprice) || 0,
                             "price": parseInt(x.price) || 0,
                             "discount": parseInt(x.discount) || 0,
-                            "vat": parseInt(x.vat) || 0
+                            "vat": parseInt(x.vat) || 0,
+                            "temporaryprice": parseInt(x.temporaryprice) || 0,
                         }
                     )),
                     properties: data?.properties?.length ? data?.properties.map(val => ({ ...val, sku: data.sku })) : []
                 }
-              
+
                 params?.id === '0' ? await dispatch(insertProduct(model)) : await dispatch(updateProduct(model))
                 if (data?.newCates?.length)
                     await dispatch(product.other.addProductCate(data?.newCates))

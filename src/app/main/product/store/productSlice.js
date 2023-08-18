@@ -87,6 +87,7 @@ export const updateProduct = createAsyncThunk(`${appName}/${moduleName}/updatePr
             "uniqueid": x.uniqueid,
             "retailprice": x.retailprice,
             "wholesaleprice": x.wholesaleprice,
+            "temporaryprice": x.temporaryprice,
             "price": x.price,
             "discount": 0,
             "vat": 0
