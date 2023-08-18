@@ -93,7 +93,8 @@ function EditProduct(props) {
                             "wholesaleprice": parseInt(x.wholesaleprice) || 0,
                             "price": parseInt(x.price) || 0,
                             "discount": parseInt(x.discount) || 0,
-                            "vat": parseInt(x.vat) || 0
+                            "vat": parseInt(x.vat) || 0,
+                            "temporaryprice": parseInt(x.temporaryprice) || 0,
                         }
                     )),
                     properties: data?.properties?.length ? data?.properties.map(val => ({ ...val, sku: data.sku })) : []

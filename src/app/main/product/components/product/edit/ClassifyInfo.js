@@ -93,9 +93,11 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex, i
             <CmsFormikDateTimePicker key={`${index}_expiretime`} size="small" name={`expiretime`} formik={formik_item} label="ngày hết hạn" />
             {/* <CmsFormikTextField key={`${index}_code`} size="small" name={`Code`} formik={formik_item} label="mã Code" /> */}
             <CmsFormikTextField key={`${index}_sizename`} size="small" name={`sizename`} formik={formik_item} label="kích thước" />
+            <br></br>
             <CmsFormikTextField isNumberFormat key={`${index}_price`} size="small" name={`price`} formik={formik_item} label="giá" />
             <CmsFormikTextField isNumberFormat key={`${index}_retailprice`} size="small" name={`retailprice`} formik={formik_item} label="giá bán lẻ" />
             <CmsFormikTextField isNumberFormat key={`${index}_wholesaleprice`} size="small" name={`wholesaleprice`} formik={formik_item} label="giá bán sỉ" />
+            <CmsFormikTextField isNumberFormat key={`${index}_temporaryprice`} size="small" name={`temporaryprice`} formik={formik_item} label="giá tạm" />
             <div className="col-span-2 items-start">
                 <CmsFormikRadioGroup fieldsetclass="m-0" className="border-0 m-0 p-0" vertical={false} key={`${index}_status`} size="small" name={`status`} formik={formik_item} label="" data={Object.values(ProductStatus)} />
             </div>
@@ -115,7 +117,7 @@ const InfoContent = ({ index, formik }) => {
     const colorRes = useSelector(store => store[keyStore].product.color)
     const sizeRes = useSelector(store => store[keyStore].product.size)
     const { nhanhid, colorid, sizeid, volume, weight, height, maketime, expiretime, status, uniqueid, code,
-        price, retailprice, wholesaleprice, capacity, subname } = formik.values.detail[index]
+        price, retailprice, wholesaleprice, capacity, subname ,temporaryprice} = formik.values.detail[index]
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-3 gap-10" >
@@ -135,6 +137,7 @@ const InfoContent = ({ index, formik }) => {
                 <LabelInfo label={{ content: 'giá' }} info={{ content: !isNaN(parseInt(price)) ? price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
                 <LabelInfo label={{ content: 'giá bán lẻ' }} info={{ content: !isNaN(parseInt(retailprice)) ? retailprice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
                 <LabelInfo label={{ content: 'giá bán sỉ' }} info={{ content: !isNaN(parseInt(wholesaleprice)) ? wholesaleprice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
+                <LabelInfo label={{ content: 'giá tạm' }} info={{ content: !isNaN(parseInt(temporaryprice)) ? temporaryprice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0 }} />
                 <LabelInfo label={{ content: 'Trạng Thái' }} info={{ content: ProductStatus[status]?.name, className: ProductStatus[status]?.className }} />
             </div>
         </div>
