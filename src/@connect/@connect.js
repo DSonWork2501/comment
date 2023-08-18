@@ -139,15 +139,17 @@ export default {
                 insert: entity => axios.post(`${baseurl}/customer/insert-userinfo`, entity),
                 update: entity => axios.put(`${baseurl}/customer/update-userinfo`, entity),
             },
-            vehicleDelivery:{
+            vehicleDelivery: {
                 getList: (params) => axios.get(`${baseurl}/customer/get-vehicles`, { params }),
                 insert: entity => axios.post(`${baseurl}/customer/insert-vehicle`, entity),
                 update: entity => axios.put(`${baseurl}/customer/update-vehicle`, entity),
             }
         },
-        accounting:{
-            bill:{
+        accounting: {
+            bill: {
                 getList: (params) => axios.get(`${baseurl}/order/get-billing`, { params }),
+                createCollect: entity => axios.post(`${baseurl}/order/collection-insert`, entity),
+                getCollect: (params) => axios.get(`${baseurl}/order/get-collection-group`, { params }),
             }
         }
     },
