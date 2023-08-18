@@ -137,35 +137,34 @@ function DetailBBBG() {
         new initColumn({ field: "collectid", label: "ID", classHeader: "w-128", sortable: false }),
         new initColumn({ field: "customer", label: `Người giao hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
         new initColumn({ field: "numberOrder", label: `Tổng đơn`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "cho_lay_hang", label: `Chờ lấy`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "da_lay_hang", label: `Đã lấy`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "dang_giao_hang", label: `Đang giao`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "hoan_tat", label: `Hoàn thành`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "note", label: `Ghi chú`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "cho_thu", label: `Chờ thu`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "dang_thu", label: `Đang thu`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "da_thu", label: `Đã thu`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "da_ban_giao", label: `Đã bàn giao`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         //new initColumn({ field: "date", label: `Người tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
     const data = entities && entities.data && entities.data.map((item, index) => ({
         ...item,
         original: item,
-        cho_lay_hang: (
+        cho_thu: (
             <div>
-                {item.cho_lay_hang || 0}
+                {item.cho_thu || 0}
             </div>
         ),
-        da_lay_hang: (
+        dang_thu: (
             <div>
-                {item.da_lay_hang || 0}
+                {item.dang_thu || 0}
             </div>
         ),
-        dang_giao_hang: (
+        da_thu: (
             <div>
-                {item.dang_giao_hang || 0}
+                {item.da_thu || 0}
             </div>
         ),
-        hoan_tat: (
+        da_ban_giao: (
             <div>
-                {item.hoan_tat || 0}
+                {item.da_ban_giao || 0}
             </div>
         ),
         collectid: (
@@ -264,7 +263,7 @@ function DetailBBBG() {
             <CmsCardedPage
                 classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
                 icon="whatshot"
-                title={"Quản lý danh sách thu"}
+                title={"Quản lý danh sách phiếu thu"}
                 toolbar={
                     <Filter
                         onSearch={setSearch}
