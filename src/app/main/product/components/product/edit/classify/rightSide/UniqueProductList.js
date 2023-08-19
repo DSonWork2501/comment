@@ -2,7 +2,7 @@ import { CmsButton, CmsLabel, CmsLoading } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
 import { NumberWithCommas } from "@widgets/functions"
 import { keyStore } from "app/main/product/common"
-import { searchDetail } from "app/main/product/store/productSlice"
+import { searchDetail, setStateRedux } from "app/main/product/store/productSlice"
 import React, { } from "react"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -12,6 +12,20 @@ const DetailUniqueProductComponent = React.memo(({ item, index, skuItem, onClick
     const price = NumberWithCommas(item?.price)
     const retailprice = NumberWithCommas(item?.retailprice)
     const wholesaleprice = NumberWithCommas(item?.wholesaleprice)
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(setStateRedux({
+            isOpenViewSelectProduct: true
+        }))
+
+        return () => {
+            dispatch(setStateRedux({
+                isOpenViewSelectProduct: false
+            }))
+        }
+    }, [dispatch])
+
     return (<div
         className="flex flex-row p-10 shadow-2 hover:shadow-6 w-full cursor-pointer rounded-6 space-x-8 items-center"
         key={`${index}_div_DetailUniqueProductComponent`}
@@ -71,7 +85,6 @@ function UniqueProductListComponent({ sku, onClickView, skuItem, onClickChooseUn
             dispatch(searchDetail({ sku }))
         }
     }, [dispatch, sku])
-    console.log('entities', entities)
     const data = entities || []
     return (
         <div className="w-full h-full">

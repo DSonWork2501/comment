@@ -41,7 +41,7 @@ function CategoryView() {
         History.push('/product-category/1');
 
     const getListTable = useCallback((search) => {
-        dispatch(getCategory({ ...search, rowsPage: 1000 }))
+        dispatch(getCategory({ ...search, rowsPage: 1000, status: 1 }))
     }, [dispatch])
 
     useEffect(() => {
@@ -76,7 +76,6 @@ function CategoryView() {
         dispatch(getCategory(search))
     };
 
-    console.log(loading);
     return (
         <LayoutCustom>
             <CmsCardedPage
@@ -93,7 +92,7 @@ function CategoryView() {
                     <div className="w-full h-full overflow-x-hidden">
                         <div className="flex  px-8 pt-8 -mx-8 flex-wrap">
                             {
-                                !loading && entities?.data?.length && entities?.data.map(val => (
+                                Boolean(!loading && entities?.data?.length) && entities?.data.map(val => (
                                     <div className="lg:w-1/5 md:w-1/4 sm:w-1/2 w-full p-8" key={val.id}>
                                         <div className="item shadow-4 rounded-8 p-8 relative">
                                             <img className="object-contain h-256 m-auto" src={`${process.env.REACT_APP_BASE_URL_IMG}${val.image}`} alt="imageProduct" />

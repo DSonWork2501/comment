@@ -104,7 +104,12 @@ function EditProduct(props) {
                 if (data?.newCates?.length)
                     await dispatch(product.other.addProductCate(data?.newCates))
                 dispatch(getDetail({ sku: value.sku }))
+                formik.setSubmitting(false)
+
             },
+            close:()=>{
+                formik.setSubmitting(false)
+            }
         })
     }
 

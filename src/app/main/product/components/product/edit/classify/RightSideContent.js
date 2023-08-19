@@ -11,13 +11,11 @@ const TabType = {
     danh_sach: { id: '2', name: 'Danh sách sản phẩm' },
 }
 
-function RightSideContent({ formik, prefix, isCanSelect, handleCheck }) {
+function RightSideContent({ formik, prefix, isCanSelect, handleCheck, listCheckTemp, setListCheckTemp }) {
     const [tabValue, setTabValue] = useState(TabType.da_chon.id);
     const item = get(formik?.values, `[${prefix}].item`) || null;
     const key = window.location.pathname.split('/')[1] === 'order' ? 'orders' : keyStore;
     // const sku = get(formik?.values, `[${prefix}].item.sku`) ? get(formik?.values, `[${prefix}].item.sku`) : null
-
-    console.log(formik?.values, prefix, item, 'oke');
 
     function handleChangeTab(event, value) {
         setTabValue(value);
@@ -42,6 +40,8 @@ function RightSideContent({ formik, prefix, isCanSelect, handleCheck }) {
                                     formik={formik}
                                     prefix={prefix}
                                     onChosenView={() => setTabValue(TabType.da_chon.id)}
+                                    listCheckTemp={listCheckTemp}
+                                    setListCheckTemp={setListCheckTemp}
                                 />
                             </CmsBoxLine>
                         }
