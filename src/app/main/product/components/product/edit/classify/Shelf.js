@@ -27,7 +27,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
         return []
     }, [currentShelf, modalIndex])
     const [model, setModel] = useState(null);
-    //const [listCheckTemp,setListCheckTemp]=useState();
+    const [listCheckTemp, setListCheckTemp] = useState({});
 
     const formik_shelf = useFormik({
         initialValues: data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })],
@@ -56,14 +56,13 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
     const HandleAddSlot = (stack_index) => {
         const leg = formik_shelf.values[stack_index]?.slots?.length || 0;
 
-        var array = [...get(formik_shelf.values[stack_index], 'slots').map(x => Object.assign({}, initDetailModelSlot(x))), initDetailModelSlot({ name: 'Vị trí ' + (leg + 1) })]
+        var array = [...get(formik_shelf.values[stack_index], 'slots').map(x => Object.assign({}, initDetailModelSlot(x))), initDetailModelSlot({ name: `Vị trí ${stack_index + 1}.` + (leg + 1) })]
 
         formik_shelf.setFieldValue(`[${stack_index}].slots`, array)
     }
 
     const HandleClickDetail = (event, stack_index, slot_index) => {
         var data = !isNaN(parseInt(slot_index)) ? `[${stack_index}].slots[${slot_index}]` : `[${stack_index}]`
-        console.log({ data, stack_index, slot_index });
         setPrefix(data)
         setStackIndex(stack_index)
         setSlotIndex(slot_index)
@@ -143,6 +142,8 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                             HandleDeleteStack={HandleDeleteStack}
                             stackIndex={stackIndex}
                             slotIndex={slotIndex}
+                            listCheckTemp={listCheckTemp}
+                            setListCheckTemp={setListCheckTemp}
                         />
                     </div>
                 </FuseAnimate>
@@ -151,6 +152,8 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                         <RightSideContent
                             formik={formik_shelf}
                             prefix={prefix}
+                            listCheckTemp={listCheckTemp}
+                            setListCheckTemp={setListCheckTemp}
                         />
                     </div>
                 </FuseAnimate>}

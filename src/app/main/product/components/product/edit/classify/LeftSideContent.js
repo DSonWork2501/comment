@@ -2,6 +2,8 @@ import { CmsBoxLine, CmsButton, CmsCheckbox, CmsIconButton, CmsLabel } from "@wi
 import React from "react"
 import { Tooltip, makeStyles, styled } from "@material-ui/core"
 import clsx from "clsx"
+import { useSelector } from "react-redux";
+import { keyStore } from "app/main/product/common";
 
 const BoxCustom = styled(CmsBoxLine)({
     "& .contain-stack": {
@@ -14,7 +16,7 @@ const BoxCustom = styled(CmsBoxLine)({
         "position": "relative",
         "display": "flex",
         "alignItems": "center",
-        "justifyContent": "center",
+        //"justifyContent": "center",
         "color": "white"
     },
     "& .contain-stack .close-stack": {
@@ -73,13 +75,12 @@ const CheckIndex = (type, stack, slot, stack_index, slot_index) => {
     }
 }
 
-function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_index, slotIndex, stackIndex, classes, isCanFix, productID, handleCheckBox }) {
+function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_id, stack_index, slotIndex, stackIndex, classes, isCanFix, productID, handleCheckBox, setListCheckTemp, listCheckTemp, isShow }) {
 
     const handleChildClick = (e, stack_index, index) => {
         e.stopPropagation()
         HandleClickDetail(e, stack_index, index);
     }
-
     return data?.map((item, index) =>
     (
         <div className="flex flex-row-reverse  w-1/3 item-card px-4" key={`${index}_div_slot_5`}>
@@ -100,14 +101,27 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
                     !item?.item
                     &&
                     <div key={`${index}_div_1_slot`} className={clsx("flex items-center justify-items-start")}>
-                        {/* <CmsCheckbox
-                            key={`box`}
-                            checked={false}
-                            value={false}
-                            onChange={(e) => {
-                            }}
-                            name="status"
-                        /> */}
+                        {
+                            Boolean(isShow)
+                            &&
+                            <CmsCheckbox
+                                className="listTempCheck"
+                                key={`box`}
+                                checked={Boolean(listCheckTemp[stack_id] && listCheckTemp[stack_id].includes(index))}
+                                onChange={(e) => {
+                                    e.stopPropagation()
+                                    setListCheckTemp(item => {
+                                        let val = { ...item };
+                                        val[stack_id] = val[stack_id]?.length
+                                            ? val[stack_id].includes(index) ? val[stack_id].filter(va => va !== index) : [...val[stack_id], index]
+                                            : [index]
+                                        return val
+                                    })
+                                }}
+                                name="status"
+                            />
+                        }
+
                         <CmsLabel content={item.name || 'New slot'} key={`${index}_name_slot`} />
 
                         {/* <CmsLabel content={item.type ? `(${item.type})` : ''} key={`${index}_type_slot`} /> */}
@@ -170,8 +184,10 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
     ))
 }
 
-function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix, productID, label, handleCheckBox, detailCheck }) {
-    const classes = useStyles()
+function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix, productID, label, handleCheckBox, detailCheck, listCheckTemp, setListCheckTemp }) {
+    const classes = useStyles();
+    const isShow = useSelector(store => store[keyStore].product?.isOpenViewSelectProduct);
+
     return (
         <BoxCustom label={label || 'Thông tin tủ'}>
             {
@@ -186,6 +202,37 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                 {data?.map((item, index) => (
                     <div key={`${index}_div_stack_1`} className={clsx("contain-stack w-full")} onClick={(e) => HandleClickDetail(e, index)}>
                         <div className="w-full flex flex-row space-x-4 head-stack" key={`${index}_div_stack_7`}>
+                            {
+                                Boolean(isShow)
+                                &&
+                                <div onClick={e => e.stopPropagation()}>
+                                    <CmsCheckbox
+                                        key={`box`}
+                                        className="listTempCheck"
+                                        checked={Boolean(listCheckTemp[index]?.length === item.slots.filter(va => !va.item)?.length)}
+                                        indeterminate={Boolean(listCheckTemp[index]?.length >= 1 && listCheckTemp[index]?.length < item.slots.filter(va => !va.item)?.length)}
+                                        value={false}
+                                        onChange={(e) => {
+                                            setListCheckTemp(t => {
+                                                let val = { ...t };
+                                                val[index] = val[index]?.length
+                                                    ? []
+                                                    : (() => {
+                                                        let ar = [];
+                                                        item.slots.forEach((element, i) => {
+                                                            if (!element.item)
+                                                                ar = [...ar, i]
+                                                        });
+                                                        return ar
+                                                    })()
+                                                return val
+                                            })
+                                        }}
+                                        name="status"
+                                    />
+                                </div>
+                            }
+
                             <div
                                 key={`${index}_div_2_stack`}
                             >
@@ -218,6 +265,9 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 isCanFix={isCanFix}
                                 productID={productID}
                                 handleCheckBox={handleCheckBox}
+                                listCheckTemp={listCheckTemp}
+                                setListCheckTemp={setListCheckTemp}
+                                isShow={isShow}
                             />
                             {
                                 !isCanFix

@@ -21,7 +21,7 @@ const initialSearch = {
     homeSubscription: 2
 }
 
-function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
+function ProductSlotItemComponent({ keyStore, formik, prefix, listCheckTemp, setListCheckTemp, ...otherProps }) {
     const dispatch = useDispatch()
     const [chosenSku, setChosenSku] = useState(null)
     const [view, setView] = useState(View.skuList.id)
@@ -40,8 +40,21 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, ...otherProps }) {
     }
 
     const handleChooseUniqueID = ({ uniqueid }) => {
-        formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: chosenSku?.name, img: chosenSku?.img, sku: chosenSku?.sku, uniqueid: uniqueid, temporaryprice: chosenSku.price, type: "wine" })
+        if (Object.keys(listCheckTemp)?.length) {
+            Object.keys(listCheckTemp).forEach(element => {
+                listCheckTemp[element]?.length && listCheckTemp[element].forEach(e => {
+                    const string = `${element}.slots[${e}]`;
+                    formik.setFieldValue(`${string}.item`, { ...get(formik.values, `${string}.item`), name: chosenSku?.name, img: chosenSku?.img, sku: chosenSku?.sku, uniqueid: uniqueid, temporaryprice: chosenSku.price, type: "wine" })
+                });
+            });
+
+        } else {
+            console.log(listCheckTemp);
+            console.log(prefix);
+            formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: chosenSku?.name, img: chosenSku?.img, sku: chosenSku?.sku, uniqueid: uniqueid, temporaryprice: chosenSku.price, type: "wine" })
+        }
         otherProps.onChosenView && otherProps.onChosenView()
+
     }
 
     // const setSearch = (value) => {
