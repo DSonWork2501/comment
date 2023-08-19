@@ -67,11 +67,13 @@ function BasicInfo({ formik, SaveData, options, handleFresh }) {
     const cerValue = (typeof values.certification !== 'object' || !Array.isArray(values.certification) ? (values?.certification ? values.certification.split(',') : []) : values.certification);
 
     useEffect(() => {
-        setFieldValue('sku', sku.trim())
+        if (sku)
+            setFieldValue('sku', sku.trim())
     }, [sku, setFieldValue])
 
     useEffect(() => {
-        setFieldValue('barcode', barcode.trim())
+        if (barcode)
+            setFieldValue('barcode', barcode.trim())
     }, [barcode, setFieldValue])
 
     return (

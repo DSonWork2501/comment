@@ -27,6 +27,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
         return []
     }, [currentShelf, modalIndex])
     const [model, setModel] = useState(null);
+    //const [listCheckTemp,setListCheckTemp]=useState();
 
     const formik_shelf = useFormik({
         initialValues: data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })],

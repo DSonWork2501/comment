@@ -37,7 +37,7 @@ const BoxCustom = styled(CmsBoxLine)({
     },
     "& .item-card >div.isSearchBC": {
         "box-shadow": " 1px 3px 7px orange",
-        border:'1px solid orange'
+        border: '1px solid orange'
     },
     "& .item-card >div.isSearchBC p": {
         color: '#b1b145'
@@ -100,9 +100,19 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_ind
                     !item?.item
                     &&
                     <div key={`${index}_div_1_slot`} className={clsx("flex items-center justify-items-start")}>
+                        {/* <CmsCheckbox
+                            key={`box`}
+                            checked={false}
+                            value={false}
+                            onChange={(e) => {
+                            }}
+                            name="status"
+                        /> */}
                         <CmsLabel content={item.name || 'New slot'} key={`${index}_name_slot`} />
+
                         {/* <CmsLabel content={item.type ? `(${item.type})` : ''} key={`${index}_type_slot`} /> */}
                         {/* <CmsLabel content={item.capacity ? `Dung tích: ${item.capacity}` : ''} key={`${index}_capacity_slot`} /> */}
+
                     </div>
                 }
 
