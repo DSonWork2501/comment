@@ -93,7 +93,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
 
                     </div>
                     {
-                        listTemp?.length
+                        Boolean(listTemp?.length)
                         &&
                         <div className="w-1/5">
                             <CmsSelect
