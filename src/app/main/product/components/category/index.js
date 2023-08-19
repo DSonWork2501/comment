@@ -41,7 +41,7 @@ function CategoryView() {
         History.push('/product-category/1');
 
     const getListTable = useCallback((search) => {
-        dispatch(getCategory(search))
+        dispatch(getCategory({ ...search, rowsPage: 1000 }))
     }, [dispatch])
 
     useEffect(() => {

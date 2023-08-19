@@ -47,6 +47,15 @@ export const accounting = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        getCollectBill: createAsyncThunk(`${appName}/${moduleName}/bill/getCollectBill`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.getCollectBill(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     },
     meta: {
         getList: createAsyncThunk(`${appName}/${moduleName}/accounting/meta/getList`, async (params, thunkAPI) => {
@@ -107,6 +116,7 @@ const accountingSlice = createSlice({
         selected: null,
         collections: null,
         search: initSearchState,
+        collectionBill: null
     },
     reducers: {
         /**
@@ -281,6 +291,31 @@ const accountingSlice = createSlice({
             ...state,
             loading: false,
             collections: {
+                data: []
+            },
+            error: error
+        }),
+
+        [accounting.bill.getCollectBill.pending]: state => ({
+            ...state,
+            loading: true,
+            collectionBill: {
+                data: []
+            },
+            error: null
+        }),
+        [accounting.bill.getCollectBill.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                collectionBill: payload,
+                error: null
+            }
+        },
+        [accounting.bill.getCollectBill.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            collectionBill: {
                 data: []
             },
             error: error

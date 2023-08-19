@@ -168,7 +168,7 @@ function DetailBBBG() {
             </div>
         ),
         collectid: (
-            <a href={`/order/delivery/1/${item.collectid}`}>
+            <a href={`/collection/1/${item.collectid}`}>
                 {item.collectid}
             </a>
         ),

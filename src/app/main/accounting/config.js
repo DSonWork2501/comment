@@ -39,6 +39,11 @@ const PageConfig = {
             path: '/collection',
             component: React.lazy(() => import('./pages/BBBG')),
         },
+        {
+            exact: true,
+            path: '/collection/:type/:id',
+            component: React.lazy(() => import('./pages/DetailBBBG')),
+        },
     ]
 };
 
