@@ -95,11 +95,35 @@ export const metaStatus = [
     }
 ];
 
-export const shipStatus = [
-
-]
+export const shipStatus = {
+    1: {
+        id: 1,
+        status: 1,
+        name: 'Đã tạo',
+        className: 'bg-orange-500'
+    },
+    2: {
+        id: 2,
+        status: 2,
+        name: 'Đang thu',
+        className: 'bg-blue-500'
+    },
+    3: {
+        id: 3,
+        status: 3,
+        name: 'Đã thu',
+        className: 'bg-green-500'
+    },
+    4: {
+        id: 4,
+        status: 4,
+        name: 'Đã bàn giao',
+        className: 'bg-green-900'
+    }
+}
 
 export const deliveryLink = (id) => [
-    { id: 1, name: "Bill", link: `/order/delivery/1/${id}`, icon: "" },
-    { id: 2, name: "Bản đồ", link: `/order/delivery/4/${id}`, icon: "" },
+    { id: 1, name: "Bill", link: `/collection/1/${id}`, icon: "" },
+    { id: 2, name: "Đơn hàng", link: `/collection/2/${id}`, icon: "" },
+    { id: 3, name: "Bản đồ", link: `/collection/4/${id}`, icon: "" },
 ];

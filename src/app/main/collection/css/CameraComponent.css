@@ -1,0 +1,82 @@
+/* Camera container */
+.camera-container {
+  padding: 8px 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+}
+.camera-view{
+  margin-bottom: 8;
+}
+
+/* Webcam video element */
+.webcam-video {
+  max-width: 100%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+/* Buttons container */
+.button-container {
+  margin-top: 20px;
+}
+
+/* Common button styles */
+.button {
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Take photo button */
+.take-photo-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+}
+
+/* Switch camera button */
+.switch-camera-button {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+}
+
+/* Button hover effect */
+.button:hover {
+  opacity: 0.8;
+}
+
+.MuiIconButton-root{
+  padding: 0;
+}
+
+.swal2-popup{
+  width: 200px !important;
+  font-size:12px !important;
+  padding: 8px 0px !important;
+}
+
+.swal2-icon{
+  margin: 8px;
+  width: 50px;
+  height: 50px;
+}
+
+.swal2-icon .swal2-icon-content {
+  font-size: 1.75em;
+}
+
+.MuiSnackbar-anchorOriginTopCenter {
+  top: 41px;
+}
+
+.MuiSnackbar-root {
+  left: 24px;
+  right: 24px;
+}

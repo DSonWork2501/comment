@@ -151,6 +151,7 @@ export default {
                 createCollect: entity => axios.post(`${baseurl}/order/collection-insert`, entity),
                 getCollect: (params) => axios.get(`${baseurl}/order/get-collection-group`, { params }),
                 getCollectBill: (params) => axios.get(`${baseurl}/order/get-collection`, { params }),
+                getCollectOrder: (params) => axios.get(`${baseurl}/order/get-collection-detail`, { params }),
             }
         }
     },
