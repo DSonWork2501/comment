@@ -23,19 +23,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
 import { order } from '../order/store/orderSlice';
-import HeadDelivery from './components/Header';
 import { useMemo } from 'react';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import { alertInformation } from '@widgets/functions';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CmsButtonProgress } from '@widgets/components';
-import { TakePhotoDialog, modalSmall, saveFile } from './EmployDelivery';
+import { TakePhotoDialog, modalSmall, saveFile } from './EmployCollection';
 import History from '@history/@history';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 import { showMessage } from 'app/store/fuse/messageSlice';
+import HeadDelivery from '../delivery/components/Header';
 
 const useQontoStepIconStyles = makeStyles({
     root: {
@@ -422,7 +422,7 @@ const Delivery = () => {
                             background: '#fafafa!important',
                             borderBottom: '1px solid rgb(128 128 128 / 21%)'
                         }} className='mb-8'>
-                            <HeadDelivery entities={entities} />
+                            <HeadDelivery phone={entities?.data[0]?.shipping?.phone} name={entities?.data[0]?.shipping?.shipname} />
                         </div>
 
                         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>

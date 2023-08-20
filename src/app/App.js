@@ -20,7 +20,7 @@ import store from './store';
 import { Suspense } from 'react';
 const Delivery = React.lazy(() => import('./main/delivery'));
 const EmployDelivery = React.lazy(() => import('./main/delivery/EmployDelivery'));
-const Collection = React.lazy(() => import('./main/collection'));
+const Collection = React.lazy(() => import('./main/collection/EmployCollection'));
 
 const jss = create({
 	...jssPreset(),
@@ -42,6 +42,11 @@ const App = () => {
 					<Provider store={store}>
 						<Router history={history}>
 							<Switch>
+								<Route path="/employ-collection/:type/:session">
+									<Suspense fallback={null}>
+										<Collection />
+									</Suspense>
+								</Route>
 								<Route path="/delivery/:ship/:session/:order">
 									<Suspense fallback={null}>
 										<Delivery />

@@ -422,7 +422,7 @@ const Delivery = () => {
                             background: '#fafafa!important',
                             borderBottom: '1px solid rgb(128 128 128 / 21%)'
                         }} className='mb-8'>
-                            <HeadDelivery entities={entities} />
+                            <HeadDelivery phone={entities?.data[0]?.shipping?.phone} name={entities?.data[0]?.shipping?.shipname} />
                         </div>
 
                         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>

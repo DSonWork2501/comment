@@ -1222,7 +1222,7 @@ const EmployDelivery = () => {
                         <div style={{
                             background: '#fafafa!important',
                         }} >
-                            <HeadDelivery entities={entities} />
+                            <HeadDelivery phone={entities?.data[0]?.shipping?.phone} name={entities?.data[0]?.shipping?.shipname} />
                         </div>
                     </div>
                 </DialogTitle>

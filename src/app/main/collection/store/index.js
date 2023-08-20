@@ -1,8 +1,8 @@
 import { combineReducers } from '@reduxjs/toolkit'
-import order from 'app/main/order/store/orderSlice'
+import accounting from 'app/main/accounting/store/index'
 
 const reducer = combineReducers({
-    order
+    //accounting
 });
 
 export default reducer;

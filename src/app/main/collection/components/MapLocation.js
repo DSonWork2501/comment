@@ -1,7 +1,7 @@
 import { Dialog, DialogContent } from '@material-ui/core';
 import React, { useEffect, useMemo, useState } from 'react';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow, Polyline } from "react-google-maps";
-import { useStyles } from '../EmployDelivery';
+import { useStyles } from '../EmployCollection';
 import History from '@history/@history';
 
 const getLocationFromAddress = (address) => {

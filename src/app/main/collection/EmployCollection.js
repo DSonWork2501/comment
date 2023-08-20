@@ -17,15 +17,13 @@ import withReducer from 'app/store/withReducer';
 import { CmsButtonProgress, CmsCheckbox, CmsTab, CmsUploadFile } from '@widgets/components';
 import History from '@history/@history';
 import { groupBy, map } from 'lodash';
-import { DropMenu } from '../order/components/index';
+import { DropMenu } from '../order/components/index/index';
 import { Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { useRef } from 'react';
 import Connect from '@connect/@connect';
-import { shipStatus } from '../order/common';
 import { unwrapResult } from '@reduxjs/toolkit';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
-import HeadDelivery from './components/Header';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
@@ -33,6 +31,10 @@ import { showMessage } from 'app/store/fuse/messageSlice';
 import { getLocation } from '.';
 import MapLocation from './components/MapLocation';
 import MediaDialog from './components/MediaDialog';
+import { accounting as acc } from '../accounting/store';
+import accounting from 'app/main/accounting/store/index'
+import { shipStatus } from '../accounting/common';
+import HeadDelivery from '../delivery/components/Header';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {
@@ -186,16 +188,14 @@ export const DropMenuMobile = ({ phone, name, className }) => {
 }
 
 export const fileEndpoint = 'tempfile';
-const keyStore = 'stores';
+const keyStore = 'accounting';
 const initialValues = {
 
 };
 
 export const deliveryLink = (session) => [
-    { id: 1, name: "Sản phẩm", link: `/employ-delivery/1/${session}`, icon: "" },
-    { id: 2, name: "Đơn hàng", link: `/employ-delivery/2/${session}`, icon: "" },
-    { id: 3, name: "Tỉnh thành", link: `/employ-delivery/3/${session}`, icon: "" },
-    { id: 4, name: "Bản đồ", link: `/employ-delivery/4/${session}`, icon: "" },
+    { id: 1, name: "Bill", link: `/employ-collection/1/${session}`, icon: "" },
+    { id: 4, name: "Bản đồ", link: `/employ-collection/4/${session}`, icon: "" },
 ];
 
 const List = ({ listProduct, totalPr }) => {
@@ -406,7 +406,7 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                                     return e.includes(val.id) ? e.filter(el => el !== val.id) : [...e, val.id];
                                 })
                             }}
-                            disabled={val.shipping.status !== 1 && val.shipping.status !== 2}
+                            disabled={val.status !== 1 && val.status !== 2}
                         />
                     }
                 </td>
@@ -419,13 +419,13 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                             to={`${window.location.pathname}?orderID=${val.id}`}
                         >
                             <div style={{ color: 'aqua', textDecoration: 'underline', cursor: 'pointer' }}>
-                                {val.id}
+                                {val.billingid}
                             </div>
                         </Link>
                     </div>
                     <div className='flex items-baseline mb-2'>
                         <FontAwesomeIcon icon={faUser} className='mr-2 text-10' />
-                        {val.customername} - {val.customeremail}
+                        {val.cusname} 
                     </div>
                     <div className='flex items-baseline mb-2'>
                         <FontAwesomeIcon icon={faPhone} className='mr-2 text-10' />
@@ -433,26 +433,26 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                     </div>
                     <div className='flex items-baseline'>
                         <FontAwesomeIcon icon={faLocationDot} className='mr-2 text-10' />
-                        {val.customeraddress}, {val.customerward}, {val.customerdistrict}, {val.customercity}
+                        {val.address}, {val.ward}, {val.district}, {val.city}
                     </div>
                 </td>
                 <td className='text-right' style={{ width: 85 }}>
                     <DropMenu
-                        crName={shipStatus[val.shipping.status].name}
+                        crName={shipStatus[val.status].name}
                         className={clsx('text-white px-4 py-2 text-9'
-                            , `hover:${shipStatus[val.shipping.status].className}`
-                            , shipStatus[val.shipping.status].className
+                            , `hover:${shipStatus[val.status].className}`
+                            , shipStatus[val.status].className
                         )}
                         data={[
                             {
                                 name: 'Chụp hình',
                                 id: 1,
-                                show: val.shipping.status <= 2
+                                show: val.status <= 2
                             },
                             {
                                 name: 'Giao hàng',
                                 id: 2,
-                                show: val.shipping.status >= 2
+                                show: val.status >= 2
                             },
                             {
                                 name: 'Mở google map',
@@ -463,11 +463,11 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                         }
                         handleClose={(value, setAnchorEl) => {
                             if (value?.id === 1) {
-                                History.push(window.location.pathname + `?openCame=1&&shipID=${val.shipping.id}`)
+                                History.push(window.location.pathname + `?openCame=1&&shipID=${val.id}`)
                             }
 
                             if (value?.id === 2) {
-                                History.push(`/delivery/${val.shipping.id}/${encodeURIComponent(val.shipping.deliverysession)}/${val.shipping.orderid}`)
+                                History.push(`/delivery/${val.id}/${encodeURIComponent(val.deliverysession)}/${val.orderid}`)
                             }
                             //setOpenDialog('photo')
                             setAnchorEl(null)
@@ -513,13 +513,6 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
         , shipID = parseInt(params2.get('shipID'));
     const [check, setCheck] = useState([]);
     const dispatch = useDispatch();
-
-    const listProductTemp = useMemo(() => {
-        return returnListProductByOrderID(entities, orderID)
-    }, [entities, orderID])
-    const totalPr = useMemo(() => {
-        return returnTotalAllProduct(listProductTemp)
-    }, [listProductTemp])
 
     const handleSaveFile = async (array, setLoading) => {
         //setOpen(false)
@@ -610,12 +603,13 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
         <div className='p-8 rounded-4 shadow-4'>
             <div className='flex justify-between' style={{ height: 25 }}>
-                <b>
+                <b >
                     {
                         !Boolean(orderID)
                         &&
                         <CmsCheckbox
                             //checked={false}
+                            className='relative -top-1'
                             onChange={event => {
                                 if (check?.length) {
                                     setCheck([]);
@@ -630,7 +624,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                         />
                     }
 
-                    Tổng đơn hàng {Boolean(orderID) ? orderID : ''}
+                    Tổng bill {Boolean(orderID) ? orderID : ''}
                 </b>
                 {
                     Boolean(check?.length)
@@ -656,10 +650,11 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                         }} />
                 }
             </div>
-            {
+            {/* {
                 orderID
                     ? <DetailOrder entities={entities} listProductTemp={listProductTemp} totalPr={totalPr} orderID={orderID} />
-                    : <div className='flex '>
+                    :  */}
+                    <div className='flex '>
                         <table className='w-full text-10'>
                             <tbody>
                                 <tr>
@@ -676,7 +671,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                             }
                         </table>
                     </div>
-            }
+            {/* } */}
         </div>
     </>
 
@@ -1140,8 +1135,8 @@ export const TakePhotoDialog = ({ open, phone, className, saveFile, check, isNee
 const EmployDelivery = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const loading = useSelector(store => store[keyStore].order.loading);
-    const entities = useSelector(store => store[keyStore].order.detailDelivery);
+    const loading = useSelector(store => store[keyStore].loading);
+    const entities = useSelector(store => store[keyStore].collectionBill);
     const [search, setSearch] = useState(initialValues);
     const params = useParams(), type = params.type, session = params.session;
     const location = useLocation(), params2 = new URLSearchParams(location.search)
@@ -1150,7 +1145,7 @@ const EmployDelivery = () => {
     const checkAllReceive = useMemo(() => {
         if (entities?.data?.length) {
             const pass = entities.data.filter(val => {
-                return val.shipping.status >= 2
+                return val.status >= 2
             })
 
             return pass.length === entities.data.length
@@ -1161,7 +1156,7 @@ const EmployDelivery = () => {
     const isPassReceive = useMemo(() => {
         if (entities?.data?.length) {
             const pass = entities.data.filter(val => {
-                return val.shipping.status >= 2
+                return val.status >= 2
             })
 
             return Boolean(pass?.length)
@@ -1171,7 +1166,7 @@ const EmployDelivery = () => {
     }, [entities])
 
     const getListTable = useCallback((search) => {
-        dispatch(order.shipper.getDetailShipDelivery({ ...search, session: decodeURIComponent(session) }));
+        dispatch(acc.bill.getCollectBill({ ...search, id: 1692368138 }));
     }, [dispatch, session])
 
     useEffect(() => {
@@ -1222,7 +1217,7 @@ const EmployDelivery = () => {
                         <div style={{
                             background: '#fafafa!important',
                         }} >
-                            <HeadDelivery entities={entities} />
+                            <HeadDelivery phone={entities?.data[0]?.phone} name={entities?.data[0]?.collector} />
                         </div>
                     </div>
                 </DialogTitle>
@@ -1233,11 +1228,11 @@ const EmployDelivery = () => {
                                 <b className='mr-4'>
                                     Mã biên bản:
                                 </b>
-                                {entities?.data?.length && entities.data[0]?.shipping?.deliveryid}
+                                {entities?.data?.length && entities.data[0]?.collectid}
                             </div>
                             <div>
                                 <b className='mr-4'>
-                                    Tổng đơn:
+                                    Tổng bill:
                                 </b>
                                 {entities?.data?.length}
                             </div>
@@ -1302,12 +1297,10 @@ const EmployDelivery = () => {
 
                     {
                         type === '1'
-                            ? <ProductTable entities={entities} loading={loading} setSearch={setSearch} />
-                            : type === '2'
-                                ? <OrderTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
-                                : type === '3'
-                                    ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
-                                    : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                            ? <OrderTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                            : type === '3'
+                                ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                                : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
                     }
                 </DialogContent>
                 <DialogActions>
@@ -1319,4 +1312,4 @@ const EmployDelivery = () => {
         </div>
     );
 }
-export default withReducer(keyStore, reducer)(EmployDelivery);
+export default withReducer(keyStore, accounting)(EmployDelivery);
