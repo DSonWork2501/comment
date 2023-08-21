@@ -36,6 +36,7 @@ import accounting from 'app/main/accounting/store/index'
 import { shipStatus } from '../accounting/common';
 import HeadDelivery from '../delivery/components/Header';
 import { TakePhotoDialog } from '../delivery/EmployDelivery';
+import { format } from 'date-fns';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {
@@ -204,26 +205,21 @@ const List = ({ listProduct, totalPr }) => {
         <table className='w-full text-10'>
             <tbody>
                 <tr>
-                    <td colSpan={3} className='p-4'>
+                    <td colSpan={2} className='p-4'>
                         <hr style={{ borderColor: 'aliceblue' }}></hr>
                     </td>
                 </tr>
             </tbody>
             <tbody>
                 {
-                    listProduct.map(val => (
-                        <tr style={{ verticalAlign: 'baseline' }} key={val.sku}>
+                    listProduct.map((val, index) => (
+                        <tr style={{ verticalAlign: 'baseline' }} key={index}>
                             <td>
-                                <b>
-                                    {val.numberPR}x
-                                </b>
-                            </td>
-                            <td>
-                                {val.name}
+                                Order ID: {val.collection.orderid} - {format(new Date(val.collection.createdate), 'dd-MM-yyyy HH:mm')}
                             </td>
                             <td className='text-right'>
-                                {typeof val.price === 'number'
-                                    ? val.price.toLocaleString('en-US')
+                                {typeof val.collection.valuecollect === 'number'
+                                    ? val.collection.valuecollect.toLocaleString('en-US')
                                     : '-'}đ
                             </td>
                         </tr>
@@ -232,18 +228,13 @@ const List = ({ listProduct, totalPr }) => {
             </tbody>
             <tbody>
                 <tr>
-                    <td colSpan={3} className='p-4'>
+                    <td colSpan={2} className='p-4'>
                         <hr style={{ borderColor: 'aliceblue' }}></hr>
                     </td>
                 </tr>
             </tbody>
             <tbody>
                 <tr style={{ verticalAlign: 'baseline' }}>
-                    <td >
-                        <b>
-                            {totalPr.total}
-                        </b>
-                    </td>
                     <td>
                         <b>
                             Tổng tiền:
@@ -251,7 +242,7 @@ const List = ({ listProduct, totalPr }) => {
                     </td>
                     <td className='text-right'>
                         <b>
-                            {totalPr.money.toLocaleString('en-US')} đ
+                            {totalPr.toLocaleString('en-US')} đ
                         </b>
                     </td>
                 </tr>
@@ -419,7 +410,7 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                             ID
                         </b>
                         <Link
-                            to={`${window.location.pathname}?orderID=${val.id}`}
+                            to={`${window.location.pathname}?billingID=${val.billingid}`}
                         >
                             <div style={{ color: 'aqua', textDecoration: 'underline', cursor: 'pointer' }}>
                                 {val.billingid}
@@ -439,7 +430,7 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                         {val.address}, {val.ward}, {val.district}, {val.city}
                     </div>
                     <div className='flex items-baseline text-green-500'>
-                        <FontAwesomeIcon icon={faDollarSign} className='mr-2 text-10 relative top-2' />
+                        <FontAwesomeIcon icon={faDollarSign} className='mr-2 text-10 relative top-1' />
                         {(val.valuecollect || 0).toLocaleString('en-US')}
                     </div>
                 </td>
@@ -499,17 +490,29 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
     </>
 }
 
-const DetailOrder = ({ entities, listProductTemp, totalPr, orderID }) => {
+const DetailOrder = ({ entities, objectCollection, billingID }) => {
+    const total = useMemo(() => {
+        let t = 0;
+        if (objectCollection[billingID]?.length)
+            objectCollection[billingID].forEach(element => {
+                t = t + element.collection.valuecollect;
+            });
+
+        return t
+    }, [objectCollection]);
     return <>
         <table className='w-full text-10'>
             {
                 entities?.data?.length && entities.data.map((val, index) => {
-                    return val.id === parseInt(orderID) ? <TableWithCustomer val={val} key={val.id} index={0} noBorder /> : null
+                    return val.billingid === billingID ? <TableWithCustomer val={val} key={val.id} index={0} noBorder /> : null
                 })
             }
         </table>
-
-        <List listProduct={listProductTemp} totalPr={totalPr} />
+        {
+            Boolean(objectCollection[billingID]?.length)
+            &&
+            <List listProduct={objectCollection[billingID]} totalPr={total} />
+        }
     </>
 }
 
@@ -608,7 +611,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh, objectCollect
             <div className='flex justify-between' style={{ height: 25 }}>
                 <b >
                     {
-                        !Boolean(orderID)
+                        !Boolean(billingID)
                         &&
                         <CmsCheckbox
                             className='relative -top-1'
@@ -626,7 +629,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh, objectCollect
                         />
                     }
 
-                    Tổng bill {Boolean(orderID) ? orderID : ''}
+                    Tổng bill {Boolean(billingID) ? billingID : ''}
                 </b>
                 {
                     Boolean(check?.length)
@@ -652,28 +655,28 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh, objectCollect
                         }} />
                 }
             </div>
-            {/* {
-                orderID
-                    ? <DetailOrder entities={entities} listProductTemp={listProductTemp} totalPr={totalPr} orderID={orderID} />
-                    :  */}
-            <div className='flex '>
-                <table className='w-full text-10'>
-                    <tbody>
-                        <tr>
-                            <td colSpan={3} className='p-4'>
-                                <hr style={{ borderColor: 'aliceblue' }}></hr>
-                            </td>
-                        </tr>
-                    </tbody>
+            {
+                billingID
+                    ? <DetailOrder entities={entities} objectCollection={objectCollection} billingID={billingID} />
+                    :
+                    <div className='flex '>
+                        <table className='w-full text-10'>
+                            <tbody>
+                                <tr>
+                                    <td colSpan={3} className='p-4'>
+                                        <hr style={{ borderColor: 'aliceblue' }}></hr>
+                                    </td>
+                                </tr>
+                            </tbody>
 
-                    {
-                        entities?.data?.length && entities.data.map((val, index) => (
-                            <TableWithCustomer setCheck={setCheck} val={{ ...val, checked: check.includes(val.billingid) }} key={val.billingid} index={index} handleRefresh={handleRefresh} />
-                        ))
-                    }
-                </table>
-            </div>
-            {/* } */}
+                            {
+                                entities?.data?.length && entities.data.map((val, index) => (
+                                    <TableWithCustomer setCheck={setCheck} val={{ ...val, checked: check.includes(val.billingid) }} key={val.billingid} index={index} handleRefresh={handleRefresh} />
+                                ))
+                            }
+                        </table>
+                    </div>
+            }
         </div>
     </>
 
@@ -891,7 +894,7 @@ const EmployDelivery = () => {
     const [search, setSearch] = useState(initialValues);
     const params = useParams(), type = params.type, session = params.session;
     const location = useLocation(), params2 = new URLSearchParams(location.search)
-        , orderID = (params2.get('orderID'));
+        , billingID = (params2.get('billingID'));
     const [openDialog, setOpenDialog] = useState('');
     const checkAllReceive = useMemo(() => {
         if (entities?.data?.length) {
@@ -1028,7 +1031,7 @@ const EmployDelivery = () => {
                         }} />
 
                         {
-                            orderID
+                            billingID
                                 ?
                                 <Link
                                     to={`${window.location.pathname}`}
