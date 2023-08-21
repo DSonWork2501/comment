@@ -56,6 +56,15 @@ export const accounting = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        getCollectOrder: createAsyncThunk(`${appName}/${moduleName}/bill/getCollectOrder`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.getCollectOrder(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     },
     meta: {
         getList: createAsyncThunk(`${appName}/${moduleName}/accounting/meta/getList`, async (params, thunkAPI) => {
@@ -116,7 +125,8 @@ const accountingSlice = createSlice({
         selected: null,
         collections: null,
         search: initSearchState,
-        collectionBill: null
+        collectionBill: null,
+        collectionOrder: null
     },
     reducers: {
         /**
@@ -320,6 +330,15 @@ const accountingSlice = createSlice({
             },
             error: error
         }),
+
+        [accounting.bill.getCollectOrder.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                //loading: false,
+                collectionOrder: payload,
+                error: null
+            }
+        },
     }
 });
 

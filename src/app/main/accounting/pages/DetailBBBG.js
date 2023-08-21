@@ -10,13 +10,14 @@ import reducer, { accounting } from '../store';
 import { useParams } from 'react-router';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { useFormik } from 'formik';
-import { groupBy, map } from 'lodash';
+import { flatMap, groupBy, map } from 'lodash';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 import MapLocation from 'app/main/delivery/components/MapLocation';
 import MediaDialog from 'app/main/delivery/components/MediaDialog';
 import { DropMenu } from 'app/main/order/components/index';
+const _ = require('lodash');
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -129,14 +130,21 @@ const Filter = ({ onSearch, search, namePage }) => {
 }
 
 const ProductTable = ({ entities, loading, setSearch }) => {
+    const total = useMemo(() => {
+        let totalP = 0;
+        entities?.data?.length && entities.data.forEach((val) => {
+            totalP = totalP + val.valuecollect;
+        })
+        return totalP
+    }, [entities])
 
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
         new initColumn({ field: "billingid", label: "ID", classHeader: "w-128", sortable: false }),
         new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
         new initColumn({ field: "type", label: `Loại`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "price", label: `Giá`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "numberPR", label: `Tổng số lượng`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "valuecollect", label: `Tổng tiền`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
     ]
     const data = entities?.data?.length && entities.data.map((item, index) => ({
         ...item,
@@ -149,8 +157,9 @@ const ProductTable = ({ entities, loading, setSearch }) => {
         ),
         customer: (
             <React.Fragment>
-                <CmsLabel content={`${(item.collector)}`} />
+                <CmsLabel content={`${(item.cusname)}`} />
                 <CmsLabel content={`${(item.phone)}`} />
+                <CmsLabel content={`${(item.address)}, ${(item.ward)}, ${(item.district)}, ${(item.city)}`} />
             </React.Fragment>
         ),
         name: (
@@ -160,17 +169,30 @@ const ProductTable = ({ entities, loading, setSearch }) => {
                 </div>
             </>
         ),
+        status: (
+            <React.Fragment>
+                {
+                    item.status === 1
+                        ? 'Đã tạo'
+                        : item.status === 2
+                            ? 'Đang thu'
+                            : item.status === 3
+                                ? 'Đã thu'
+                                : 'Đã bàn giao kế toán'
+                }
+            </React.Fragment>
+        ),
         type: (
             <>
                 {
-                    item.type === 'table' ? 'Tủ' : 'Chai'
+                    item.type === 1 ? 'Thu tiền mặt' : 'Chuyển khoản online'
                 }
             </>
         ),
-        price: (
+        valuecollect: (
             <div>
                 {
-                    typeof item?.price === 'number' ? (item.price || 0).toLocaleString('en-US') : '-'
+                    typeof item?.valuecollect === 'number' ? (item.valuecollect || 0).toLocaleString('en-US') : '-'
                 }
             </div>
         ),
@@ -211,16 +233,7 @@ const ProductTable = ({ entities, loading, setSearch }) => {
                         backgroundColor: '#F2F8F1'
                     }}
                 >
-                    {/* {(totalPr.money || 0).toLocaleString('en-US')} */}
-                </TableCell>
-                <TableCell
-                    className="text-right p-8"
-                    style={{
-                        borderRight: '1px solid #ddd',
-                        backgroundColor: '#F2F8F1'
-                    }}
-                >
-                    {/* {totalPr.total} */}
+                    {(total || 0).toLocaleString('en-US')}
                 </TableCell>
             </TableRow>
         }
@@ -228,153 +241,62 @@ const ProductTable = ({ entities, loading, setSearch }) => {
 }
 
 const OrderTable = ({ entities, loading, setSearch }) => {
-    const listProduct = useMemo(() => {
-        let data = [];
+    const list = useMemo(() => {
         if (entities?.data?.length) {
-            entities.data.forEach(element => {
-                element?.productorder?.length && element.productorder.forEach(e => {
-                    if (Boolean(element.parentid)) {
-                        data.push({
-                            ...element,
-                            dataOfItem: {
-                                sku: e.sku,
-                                img: e.image,
-                                name: e.name,
-                                price: e.price,
-                            },
-                            keyRow: 1
-                        });
-                    } else {
-                        data.push({
-                            ...element, dataOfItem: {
-                                sku: e.sku,
-                                img: e.image,
-                                name: e.name,
-                                price: e.price,
-                                type: 'table',
-                            },
-                            keyRow: 1
-                        });
-
-                        JSON.parse(e?.model).forEach(el => {
-                            el?.slots?.length && el.slots.forEach(elm => {
-                                data.push({ ...element, dataOfItem: elm.item, keyRow: 2 });
-                            })
-                        })
-                    }
-                })
-            });
-            const groupedData = groupBy(data, 'id');
-            return data.map(val => {
-                return { ...val, numberPR: groupedData[val.id]?.length }
-            })
-        }
-
-        return []
-    }, [entities])
-
-    const listProductTemp = useMemo(() => {
-        let data = [], table = [];
-        if (entities?.data?.length) {
-            entities.data.forEach(element => {
-                element.productorder.forEach(e => {
-                    if (Boolean(element.parentid)) {
-                        data.push({
-                            sku: e.sku,
-                            img: e.image,
-                            name: e.name,
-                            price: e.price,
-                        });
-                    } else {
-                        JSON.parse(e.model).forEach(el => {
-                            el?.slots?.length && el.slots.forEach(elm => {
-                                data.push(elm.item);
-                            })
-                        })
-                        table.push({
-                            sku: e.sku,
-                            img: e.image,
-                            name: e.name,
-                            price: e.price,
-                            type: 'table'
-                        })
-                    }
-                })
-            });
-            const groupedData = groupBy(data, 'sku');
-            const groupedTable = groupBy(table, 'sku');
-
-            return [
-                ...map(groupedTable, (products, sku) => ({
-                    ...products[0],
-                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
-                    numberPR: products.length,
-                })),
-                ...map(groupedData, (products, sku) => ({
-                    ...products[0],
-                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
-                    numberPR: products.length,
-                }))
+            const data = [...entities.data.map(val => ({ ...val, billingid: val.collection.billingid })),
             ];
+            const groupedData = _.map(_.groupBy(data, 'billingid'), group =>
+                _.flatMap(group, (va, index) => {
+                    return ({ ...va, keyRow: index + 1, length: group?.length })
+                })
+            );
+
+            return flatMap(groupedData);
         }
 
         return []
     }, [entities])
-    const totalPr = useMemo(() => {
-        let total = 0, money = 0;
-        if (listProductTemp?.length)
-            listProductTemp.forEach(element => {
-                total = total + element.numberPR;
-                money = money + ((element.price || 0));
-            });
-        return { total, money }
-    }, [listProductTemp])
+
+    const total = useMemo(() => {
+        let totalP = 0;
+        list?.length && list.forEach((val) => {
+            totalP = totalP + val.collection.valuecollect;
+        })
+        return totalP
+    }, [list])
 
     const columns = [
         // new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
         new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-        new initColumn({ field: "image", label: `Hình ảnh`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "name", label: `Sản phẩm`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "infor", label: `Thông tin chung`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "orderID", label: `Order ID`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "type", label: `Loại`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "sl", label: `SL`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "price", label: `Giá`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "OPT", label: `OPT`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "valuecollect", label: `Tổng tiền`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
     ]
 
-    const data = listProduct.length && listProduct.map((item, index) => ({
+    const data = list.length && list.map((item, index) => ({
         original: item,
         id: item.id,
         rowSpan: {
-            id: item?.numberPR || 1,
-            status: item?.numberPR || 1,
-            STT: item?.numberPR || 1,
-            OPT: item?.numberPR || 1,
-            customer: item?.numberPR || 1,
+            id: item?.length || 1,
+            infor: item?.length || 1,
         },
+        orderID: item?.collection?.orderid,
         OPT: (item?.shipping?.code),
         keyRow: item.keyRow,
-        image: (<img style={{ height: 100, margin: '0 auto' }} src={`${item.dataOfItem.img ? `${process.env.REACT_APP_BASE_URL}api/product/img/${item.dataOfItem?.img}` : 'assets/images/etc/no-image-icon.png'}`} alt={item.dataOfItem?.img} />),
-        name: (<>
-            {
-                item.dataOfItem.type === 'table'
-                    ? <b className='text-blue-500'>{item.dataOfItem.name}</b>
-                    : <CmsLabel content={`--- ${(item.dataOfItem.name)}`} />
-            }
-        </>),
         sl: (1),
-        type: (<>
-            {
-                item.dataOfItem.type === 'table'
-                    ? 'Tủ'
-                    : 'Chai'
-            }
-        </>),
-        price: (
+        type: (
+            <>
+                {
+                    item.type === 1 ? 'Thu tiền mặt' : 'Chuyển khoản online'
+                }
+            </>
+        ),
+        valuecollect: (
             <div>
                 {
-                    typeof item?.dataOfItem?.price === 'number' ? (item?.dataOfItem?.price || 0).toLocaleString('en-US') : '-'
+                    typeof item?.collection?.valuecollect === 'number' ? (item?.collection?.valuecollect || 0).toLocaleString('en-US') : '-'
                 }
             </div>
         ),
@@ -383,8 +305,14 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                 <CmsLabel content={`${(index + 1)}`} />
             </React.Fragment>
         ),
-        customer: (
+        infor: (
             <>
+                <div>
+                    <b className='mr-4'>
+                        Bill:
+                    </b>
+                    {item?.collection?.billingid}
+                </div>
                 <div>
                     <b className='mr-4'>
                         Tên khách hàng:
@@ -415,10 +343,10 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         ),
         status: <div>
             <DropMenu
-                crName={shipStatus[item.shipping.status].name}
+                crName={shipStatus[item.collection.status].name}
                 className={clsx('text-white px-4 py-2  text-12'
-                    , `hover:${shipStatus[item.shipping.status].className}`
-                    , shipStatus[item.shipping.status].className
+                    , `hover:${shipStatus[item.collection.status].className}`
+                    , shipStatus[item.collection.status].className
                 )}
                 data={[]}
 
@@ -460,7 +388,6 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                         TỔNG:
                     </b>
                 </TableCell>
-
                 <TableCell
                     className="text-right p-8"
                     style={{
@@ -468,36 +395,8 @@ const OrderTable = ({ entities, loading, setSearch }) => {
                         backgroundColor: '#F2F8F1'
                     }}
                 >
-                    {totalPr.total}
+                    {(total || 0).toLocaleString('en-US')}
                 </TableCell>
-                <TableCell
-                    style={{
-                        borderRight: '1px solid #ddd',
-                        backgroundColor: '#F2F8F1'
-                    }}
-                    className='p-8 text-right'
-                >
-                    {totalPr.money.toLocaleString('en-US')}
-                </TableCell>
-                <TableCell
-                    style={{
-                        borderRight: '1px solid #ddd',
-                        backgroundColor: '#F2F8F1'
-                    }}
-                    className='p-8'
-                >
-
-                </TableCell>
-                <TableCell
-                    style={{
-                        borderRight: '1px solid #ddd',
-                        backgroundColor: '#F2F8F1'
-                    }}
-                    className='p-8'
-                >
-
-                </TableCell>
-
             </TableRow>
         }
     />
@@ -604,12 +503,14 @@ function DetailBBBG() {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].loading);
     const entities = useSelector(store => store[keyStore].collectionBill);
+    const orders = useSelector(store => store[keyStore].collectionOrder);
     const [search, setSearch] = useState(initialValues);
     const params = useParams(), id = params.id, type = params.type;
     const [openDialog, setOpenDialog] = useState('');
 
     const getListTable = useCallback((search) => {
         dispatch(accounting.bill.getCollectBill({ ...search, id }));
+        dispatch(accounting.bill.getCollectOrder({ ...search, collectId: id }));
     }, [dispatch, id])
 
     useEffect(() => {
@@ -672,17 +573,7 @@ function DetailBBBG() {
 
                         </div>
                         <div className='w-1/2'>
-                            <div>
-                                <b className='mr-4'>
-                                    Số đơn:
-                                </b>
-                                {entities?.data?.length}
-                            </div>
-                            <div>
-                                <b className='mr-4'>
-                                    Ghi chú:
-                                </b>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -712,17 +603,22 @@ function DetailBBBG() {
                             </div>
                         </div>
 
-                        <div className='w-3/6 py-8'>
-                            <Filter
-                                onSearch={setSearch}
-                                search={search}
-                            />
-                        </div>
+                        {
+                            false
+                            &&
+                            <div className='w-3/6 py-8'>
+                                <Filter
+                                    onSearch={setSearch}
+                                    search={search}
+                                />
+                            </div>
+                        }
+
                         {
                             type === '1'
                                 ? <ProductTable entities={entities} loading={loading} setSearch={setSearch} />
                                 : type === '2'
-                                    ? <OrderTable entities={entities} loading={loading} setSearch={setSearch} />
+                                    ? <OrderTable entities={orders} loading={loading} setSearch={setSearch} />
                                     : type === '3'
                                         ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} />
                                         : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} />
