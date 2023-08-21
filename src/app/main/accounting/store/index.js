@@ -65,6 +65,17 @@ export const accounting = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        update: createAsyncThunk(`${appName}/${moduleName}/bill/update`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.update(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     },
     meta: {
         getList: createAsyncThunk(`${appName}/${moduleName}/accounting/meta/getList`, async (params, thunkAPI) => {

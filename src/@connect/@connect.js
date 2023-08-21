@@ -150,13 +150,19 @@ export default {
                 getList: (params) => axios.get(`${baseurl}/order/get-billing`, { params }),
                 createCollect: entity => axios.post(`${baseurl}/order/collection-insert`, entity),
                 getCollect: (params) => axios.get(`${baseurl}/order/get-collection-group`, { params }),
-                getCollectBill: (params) => axios.get(`${baseurl}/order/get-collection`, {
+                update: entity => axios.put(`${baseurl}/order/collection-update/${entity.typeItem}`, entity.data),
+                getCollectBill: (params) => axios.get(`${baseurl}/order/get-collection-cms`, {
                     params,
                     headers: {
-                        Authorization:`Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InF1YW5ndmluaDI5MTExNzZAZ21haWwuY29tIiwibmJmIjoxNjkyMTk1MzI4LCJleHAiOjE2OTQyOTQxMjh9.SVRvTq8ahV2xfEUVFZb7zkXQV48F9w6d64TvhZadb2Q`
+                        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InF1YW5ndmluaDI5MTExNzZAZ21haWwuY29tIiwibmJmIjoxNjkyMTk1MzI4LCJleHAiOjE2OTQyOTQxMjh9.SVRvTq8ahV2xfEUVFZb7zkXQV48F9w6d64TvhZadb2Q`
                     }
                 }),
-                getCollectOrder: (params) => axios.get(`${baseurl}/order/get-collection-detail`, { params }),
+                getCollectOrder: (params) => axios.get(`${baseurl}/order/get-collection-detail-cms`, {
+                    params,
+                    headers: {
+                        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InF1YW5ndmluaDI5MTExNzZAZ21haWwuY29tIiwibmJmIjoxNjkyMTk1MzI4LCJleHAiOjE2OTQyOTQxMjh9.SVRvTq8ahV2xfEUVFZb7zkXQV48F9w6d64TvhZadb2Q`
+                    }
+                }),
             }
         }
     },

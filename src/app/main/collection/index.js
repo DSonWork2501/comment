@@ -28,7 +28,7 @@ import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import { alertInformation } from '@widgets/functions';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CmsButtonProgress } from '@widgets/components';
-import { TakePhotoDialog, modalSmall, saveFile } from './EmployCollection';
+import {  modalSmall, saveFile } from './EmployCollection';
 import History from '@history/@history';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -36,6 +36,7 @@ import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 import { showMessage } from 'app/store/fuse/messageSlice';
 import HeadDelivery from '../delivery/components/Header';
+import { TakePhotoDialog } from '../delivery/EmployDelivery';
 
 const useQontoStepIconStyles = makeStyles({
     root: {

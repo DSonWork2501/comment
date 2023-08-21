@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Menu, MenuItem, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { faArrowLeft, faCameraRotate, faCircleXmark, faImages, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCameraRotate, faCircleXmark, faDollarSign, faImages, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ArrowDropDown } from '@material-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +16,7 @@ import reducer from './store';
 import withReducer from 'app/store/withReducer';
 import { CmsButtonProgress, CmsCheckbox, CmsTab, CmsUploadFile } from '@widgets/components';
 import History from '@history/@history';
-import { groupBy, map } from 'lodash';
+import { flatMap, groupBy, map } from 'lodash';
 import { DropMenu } from '../order/components/index/index';
 import { Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
@@ -35,6 +35,7 @@ import { accounting as acc } from '../accounting/store';
 import accounting from 'app/main/accounting/store/index'
 import { shipStatus } from '../accounting/common';
 import HeadDelivery from '../delivery/components/Header';
+import { TakePhotoDialog } from '../delivery/EmployDelivery';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {
@@ -345,7 +346,7 @@ const handleSaveFileOut = async (value, handleRefresh, dispatch, file, successFc
     try {
         const pr = file.map(val => saveFile(val.file, val.name))
         await Promise.all(pr);
-        const resultAction = await dispatch(order.shipper.update(value))
+        const resultAction = await dispatch(acc.bill.update(value))
         unwrapResult(resultAction);
         handleRefresh()
         successFc()
@@ -386,6 +387,8 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
     //     // }
     // }
 
+    console.log(val);
+
     return <>
         <tbody key={val.id}>
             <tr key={val.sku}>
@@ -403,7 +406,7 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                             checked={val.checked}
                             onChange={event => {
                                 setCheck(e => {
-                                    return e.includes(val.id) ? e.filter(el => el !== val.id) : [...e, val.id];
+                                    return e.includes(val.billingid) ? e.filter(el => el !== val.billingid) : [...e, val.billingid];
                                 })
                             }}
                             disabled={val.status !== 1 && val.status !== 2}
@@ -425,15 +428,19 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                     </div>
                     <div className='flex items-baseline mb-2'>
                         <FontAwesomeIcon icon={faUser} className='mr-2 text-10' />
-                        {val.cusname} 
+                        {val.cusname}
                     </div>
                     <div className='flex items-baseline mb-2'>
                         <FontAwesomeIcon icon={faPhone} className='mr-2 text-10' />
-                        {val.customermoblie}
+                        {val.cusphone}
                     </div>
                     <div className='flex items-baseline'>
                         <FontAwesomeIcon icon={faLocationDot} className='mr-2 text-10' />
                         {val.address}, {val.ward}, {val.district}, {val.city}
+                    </div>
+                    <div className='flex items-baseline text-green-500'>
+                        <FontAwesomeIcon icon={faDollarSign} className='mr-2 text-10 relative top-2' />
+                        {(val.valuecollect || 0).toLocaleString('en-US')}
                     </div>
                 </td>
                 <td className='text-right' style={{ width: 85 }}>
@@ -450,7 +457,7 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                                 show: val.status <= 2
                             },
                             {
-                                name: 'Giao hàng',
+                                name: 'Thu tiền',
                                 id: 2,
                                 show: val.status >= 2
                             },
@@ -463,7 +470,7 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                         }
                         handleClose={(value, setAnchorEl) => {
                             if (value?.id === 1) {
-                                History.push(window.location.pathname + `?openCame=1&&shipID=${val.id}`)
+                                History.push(window.location.pathname + `?openCame=1&&billingID=${val.billingid}`)
                             }
 
                             if (value?.id === 2) {
@@ -506,11 +513,11 @@ const DetailOrder = ({ entities, listProductTemp, totalPr, orderID }) => {
     </>
 }
 
-const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
+const OrderTable = ({ entities, loading, setSearch, handleRefresh, objectCollection }) => {
     const classes = useStyles();
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , orderID = parseInt(params2.get('orderID')), openCame = parseInt(params2.get('openCame'))
-        , shipID = parseInt(params2.get('shipID'));
+        , billingID = (params2.get('billingID'));
     const [check, setCheck] = useState([]);
     const dispatch = useDispatch();
 
@@ -520,26 +527,22 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
         setLoading(true);
         const files = array.map(val => val.name).join(',');
 
-        if (shipID) {
-            const current = entities.data.find(element => {
-                return element.shipping.id === parseInt(shipID)
-            });
+        if (billingID) {
+            const current = objectCollection[billingID]
+            console.log(objectCollection, current, billingID);
 
             getLocation(({ latitude, longitude }) => {
                 handleSaveFileOut({
                     typeItem: 2,
-                    data: [
+                    data: current.map(va => (
                         {
-                            id: current.shipping.id,
-                            receiveimg: files,
-                            session: current.shipping.session,
-                            orderid: current.shipping.orderid,
-                            deliveryid: current.shipping.deliveryid,
+                            ...va.collection,
+                            avatar: files,
                             location: JSON.stringify({
                                 start: { latitude, longitude },
                             })
                         }
-                    ]
+                    ))
                 }, handleRefresh, dispatch, array, () => {
                     setLoading(false);
                 })
@@ -548,25 +551,25 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
         } else {
             getLocation(({ latitude, longitude }) => {
                 const data = check.map(val => {
-                    const current = entities.data.find(element => {
-                        return element.id === parseInt(val)
-                    });
+                    const current = objectCollection[val]
 
-                    return {
-                        id: current.shipping.id,
-                        receiveimg: files,
-                        session: current.shipping.session,
-                        orderid: current.shipping.orderid,
-                        deliveryid: current.shipping.deliveryid,
+                    return current.map(va => ({
+                        ...va.collection,
+                        // id: va.collection.id,
+                        avatar: files,
+                        // session: va.collection.session,
+                        // orderid: va.collection.orderid,
+                        // billingid: va.collection.billingid,
+                        // collectid: va.collection.collectid,
                         location: JSON.stringify({
                             start: { latitude, longitude },
                         })
-                    }
+                    }))
                 })
 
                 handleSaveFileOut({
                     typeItem: 2,
-                    data
+                    data: flatMap(data)
                 }, handleRefresh, dispatch, array, () => {
                     setCheck([]);
                     setLoading(false);
@@ -598,7 +601,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
     return <>
         {
-            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} phone={entities?.data[0]?.shipping?.phone} saveFile={handleSaveFile} isNeedOpt />
+            parseInt(openCame) === 1 && <TakePhotoDialog className={classes.modal2} phone={entities?.data[0]?.phone} saveFile={handleSaveFile} isNeedOpt />
         }
 
         <div className='p-8 rounded-4 shadow-4'>
@@ -608,7 +611,6 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                         !Boolean(orderID)
                         &&
                         <CmsCheckbox
-                            //checked={false}
                             className='relative -top-1'
                             onChange={event => {
                                 if (check?.length) {
@@ -616,7 +618,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                     return;
                                 }
 
-                                let values = entities?.data.map(value => value.id);
+                                let values = entities?.data.map(value => value.billingid);
                                 setCheck(values);
                             }}
                             checked={(check?.length > 0 && check?.length === entities?.data?.length)}
@@ -636,7 +638,7 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                         )}
                         data={[
                             {
-                                name: 'Chụp hình đơn đã chọn',
+                                name: 'Chụp hình mặt cá nhân',
                                 id: 1,
                             },
                         ]
@@ -654,23 +656,23 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh }) => {
                 orderID
                     ? <DetailOrder entities={entities} listProductTemp={listProductTemp} totalPr={totalPr} orderID={orderID} />
                     :  */}
-                    <div className='flex '>
-                        <table className='w-full text-10'>
-                            <tbody>
-                                <tr>
-                                    <td colSpan={3} className='p-4'>
-                                        <hr style={{ borderColor: 'aliceblue' }}></hr>
-                                    </td>
-                                </tr>
-                            </tbody>
+            <div className='flex '>
+                <table className='w-full text-10'>
+                    <tbody>
+                        <tr>
+                            <td colSpan={3} className='p-4'>
+                                <hr style={{ borderColor: 'aliceblue' }}></hr>
+                            </td>
+                        </tr>
+                    </tbody>
 
-                            {
-                                entities?.data?.length && entities.data.map((val, index) => (
-                                    <TableWithCustomer setCheck={setCheck} val={{ ...val, checked: check.includes(val.id) }} key={val.id} index={index} handleRefresh={handleRefresh} />
-                                ))
-                            }
-                        </table>
-                    </div>
+                    {
+                        entities?.data?.length && entities.data.map((val, index) => (
+                            <TableWithCustomer setCheck={setCheck} val={{ ...val, checked: check.includes(val.billingid) }} key={val.billingid} index={index} handleRefresh={handleRefresh} />
+                        ))
+                    }
+                </table>
+            </div>
             {/* } */}
         </div>
     </>
@@ -681,7 +683,7 @@ const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
     const classes = useStyles();
     const location = useLocation(), params2 = new URLSearchParams(location.search)
         , orderID = parseInt(params2.get('orderID')), openCame = parseInt(params2.get('openCame'))
-        , shipID = parseInt(params2.get('shipID'));
+        , billingID = (params2.get('billingID'));
     const [check, setCheck] = useState([]);
     const dispatch = useDispatch();
     const districtTemp = useMemo(() => {
@@ -704,9 +706,9 @@ const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
         setLoading(true);
         const files = array.map(val => val.name).join(',');
 
-        if (shipID) {
+        if (billingID) {
             const current = entities.data.find(element => {
-                return element.shipping.id === parseInt(shipID)
+                return element.shipping.id === billingID
             });
 
             getLocation(({ latitude, longitude }) => {
@@ -857,11 +859,11 @@ const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                                         }
                                                         handleClose={(value, setAnchorEl) => {
                                                             if (value?.id === 1) {
-                                                                History.push(window.location.pathname + `?openCame=1&&shipID=${item.shipping.id}`)
+                                                                History.push(window.location.pathname + `?openCame=1&&billingID=${item.billingid}`)
                                                             }
 
                                                             if (value?.id === 2) {
-                                                                History.push(`/delivery/${item.shipping.id}/${encodeURIComponent(item.shipping.deliverysession)}/${item.shipping.orderid}`)
+                                                                History.push(`/delivery/${item.billingid}/${encodeURIComponent(item.shipping.deliverysession)}/${item.shipping.orderid}`)
                                                             }
                                                             //setOpenDialog('photo')
                                                             setAnchorEl(null)
@@ -880,263 +882,12 @@ const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
 
 }
 
-export const TakePhotoDialog = ({ open, phone, className, saveFile, check, isNeedOpt }) => {
-    const classes = useStyles();
-    const webcamRef = useRef(null);
-    const [frontCamera, setFrontCamera] = useState(false);
-    const [photoData, setPhotoData] = useState([]);
-    const location = useLocation(), params2 = new URLSearchParams(location.search)
-        , openCameUrl = parseInt(params2.get('openCame'));
-    //const loading = useSelector(store => store[keyStore].order.btnLoading)
-    const [file, setFile] = useState(null);
-    const [openCame, setOpenCame] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [openDialog, setOpenDialog] = useState('');
-    const [type, setType] = useState(true);
-    const dispatch = useDispatch();
-
-    const videoConstraints = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        facingMode: frontCamera ? 'user' : 'environment',
-    };
-
-    useEffect(() => {
-        setOpenCame(parseInt(openCameUrl) === 1);
-        setPhotoData([]);
-        setFile(null);
-    }, [openCameUrl])
-
-    const handleCapture = () => {
-        const imageSrc = webcamRef.current.getScreenshot({
-            width: 960, // Set the desired width for the screenshot (e.g., 1280)
-            height: 540, // Set the desired height for the screenshot (e.g., 720)
-            screenshotQuality: 1.0, // Set the screenshot quality to 1.0 for maximum quality (no compression)
-        });
-        setPhotoData(prev => [...prev, imageSrc]);
-    };
-
-    const handleCameraSwitch = () => {
-        setFrontCamera(prevFrontCamera => !prevFrontCamera);
-    };
-
-    const savePhoto = () => {
-        if (photoData?.length) {
-            let fileArray = photoData.map((val, i) => {
-                const blob = dataURItoBlob(val);
-                const name = `${Date.now()}_${i}.jpeg`;
-                const file = new File([blob], name, { type: 'image/jpeg' });
-                return { name, file }
-            })
-
-            // Update the input file element's value to include the captured photo
-            saveFile(fileArray, setLoading)
-            // const inputFile = document.getElementById('photoInput');
-            // inputFile.files = [file];
-        }
-    }
-
-    const handleAddCapturedPhoto = () => {
-        if (isNeedOpt) {
-            setType(true);
-            setOpenDialog('2FA');
-        } else {
-            savePhoto();
-        }
-    };
-
-    const saveFileSelect = () => {
-        if (file?.length) {
-            let fileArray = [];
-            for (let i = 0; i < file.length; i++) {
-                const fileN = file[i];
-
-                const name = `${Date.now()}_${i}.jpeg`;
-                const fileWithMetadata = new Blob([fileN], { type: fileN.type });
-                fileWithMetadata.name = name;
-
-                fileArray.push({
-                    file: fileWithMetadata,
-                    name: name
-                })
-            }
-            saveFile(fileArray, setLoading)
-        }
-    }
-
-    const handleSaveFile = () => {
-        if (isNeedOpt) {
-            setOpenDialog('2FA');
-            setType(false);
-        } else {
-            saveFileSelect();
-        }
-    }
-
-    // Helper function to convert base64 to Blob
-    const dataURItoBlob = (dataURI) => {
-        const byteString = atob(dataURI.split(',')[1]);
-        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ab], { type: mimeString });
-    };
-
-    const handleSave2FA = (otp) => {
-        Connect.live.order.other.checkOpt({ phone, otp }).then(val => {
-            if (type) {
-                if (photoData?.length) {
-                    savePhoto();
-                }
-            } else {
-                if (file?.length) {
-                    saveFileSelect()
-                }
-            }
-        }).catch(() => {
-            setTimeout(() => {
-                dispatch(showMessage({ variant: "error", message: 'Sai mã OPT' }))
-            }, 0);
-        })
-    }
-
-    return <>
-        {
-            openDialog === '2FA' && <OPTDialog className={classes.modalSmall} open={true} handleSave={handleSave2FA} handleClose={() => setOpenDialog('')} />
-        }
-        <Dialog className={classes.modal2} open={openCame} fullWidth maxWidth="md">
-            <DialogContent className='text-11' style={{ paddingTop: 8 }}>
-                <div className="camera-container">
-                    <div className="camera-view relative mb-8">
-                        <button onClick={() => History.push(window.location.pathname)}
-                            style={{
-                                position: 'absolute',
-                                top: 8,
-                                right: 8,
-                                opacity: .5,
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                border: '1px solid white',
-                                borderRadius: '50%',
-                                fontSize: '25px',
-                                color: 'white',
-                                zIndex: 1
-                            }}>
-                            <FontAwesomeIcon icon={faCircleXmark} />
-                        </button>
-                        <Webcam
-                            audio={false}
-                            ref={webcamRef}
-                            screenshotFormat="image/jpeg"
-                            videoConstraints={videoConstraints}
-                        />
-                    </div>
-                    <div className="camera-controls flex justify-between w-full px-8 items-center ">
-                        <div style={{ width: 35, height: 35 }}>
-
-                        </div>
-                        <button onClick={handleCapture} style={{ width: 40, height: 40, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '30px', background: 'white' }}>
-                        </button>
-                        <button onClick={handleCameraSwitch} style={{ width: 35, height: 35, display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid white', borderRadius: '50%', fontSize: '18px', color: 'white' }}>
-                            <FontAwesomeIcon icon={faCameraRotate} />
-                        </button>
-                    </div>
-
-                </div>
-
-                {Boolean(photoData?.length) &&
-                    <>
-                        <div className="photo-preview flex flex-wrap w-full mt-8 ">
-                            {
-                                photoData.map((val, i) => (<div className='w-1/2 mb-8 relative' key={i}>
-                                    <img src={val} alt="Captured" className='w-full mb-8' />
-                                    <div className='absolute top-8 right-8'>
-                                        <CmsButtonProgress
-                                            type="submit"
-                                            label={"Xóa"}
-                                            onClick={() => setPhotoData((prev) => prev.filter((data) => data !== val))}
-                                            className='bg-red-500 hover:bg-red-900 absolute top-8 right-8'
-                                            size="small" />
-                                    </div>
-                                </div>))
-                            }
-                            {/* <Button
-                            size='small'
-                            variant='contained'
-                            color='primary'
-                            onClick={handleAddCapturedPhoto}
-                            className='absolute top-8 right-8'
-                        >
-                            Lưu
-                        </Button> */}
-                        </div>
-                        <div>
-                            <CmsButtonProgress
-                                loading={loading}
-                                type="submit"
-                                label={"Lưu"}
-                                onClick={handleAddCapturedPhoto}
-                                size="small" />
-                        </div>
-                    </>
-                }
-
-                <div className='flex justify-between items-center mt-8'>
-                    <div className='flex items-center'>
-                        <CmsUploadFile
-                            size="small"
-                            label="Chọn file hình"
-                            id="uploadfile"
-                            fileProperties={
-                                {
-                                    accept: '.png, .jpeg, .jpg, .gif'
-                                }
-                            }
-                            isMultiple
-                            className='mr-8'
-                            setValue={(value, setLoading, resetFileInput) => {
-                                setFile(value)
-                                resetFileInput();
-                            }} />
-                        {
-                            file && `Đã chọn ${file?.length} hình`
-                        }
-                    </div>
-                    {
-                        file &&
-                        // <Button
-                        //     size='small'
-                        //     variant='contained'
-                        //     color='primary'
-                        //     onClick={handleSaveFile}
-                        // >
-                        //     Lưu
-                        // </Button>
-                        <div>
-                            <CmsButtonProgress
-                                loading={loading}
-                                type="submit"
-                                label={"Lưu"}
-                                onClick={handleSaveFile}
-                                size="small" />
-                        </div>
-                    }
-                </div>
-
-            </DialogContent>
-        </Dialog>
-    </>
-}
-
 const EmployDelivery = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].loading);
     const entities = useSelector(store => store[keyStore].collectionBill);
+    const collectionOrder = useSelector(store => store[keyStore].collectionOrder);
     const [search, setSearch] = useState(initialValues);
     const params = useParams(), type = params.type, session = params.session;
     const location = useLocation(), params2 = new URLSearchParams(location.search)
@@ -1164,9 +915,20 @@ const EmployDelivery = () => {
 
         return false
     }, [entities])
+    const objectCollection = useMemo(() => {
+        if (collectionOrder?.data?.length) {
+            const data = [...collectionOrder.data.map(val => ({ ...val, billingid: val.collection.billingid })),
+            ];
+
+            return groupBy(data, 'billingid')
+        }
+
+        return {}
+    }, [collectionOrder])
 
     const getListTable = useCallback((search) => {
         dispatch(acc.bill.getCollectBill({ ...search, id: 1692368138 }));
+        dispatch(acc.bill.getCollectOrder({ ...search, collectId: 1692368138 }));
     }, [dispatch, session])
 
     useEffect(() => {
@@ -1297,9 +1059,18 @@ const EmployDelivery = () => {
 
                     {
                         type === '1'
-                            ? <OrderTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                            ? <OrderTable
+                                objectCollection={objectCollection}
+                                entities={entities}
+                                loading={loading}
+                                setSearch={setSearch}
+                                handleRefresh={handleRefresh} />
                             : type === '3'
-                                ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                                ? <DistrictTable
+                                    entities={entities}
+                                    loading={loading}
+                                    setSearch={setSearch}
+                                    handleRefresh={handleRefresh} />
                                 : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
                     }
                 </DialogContent>
