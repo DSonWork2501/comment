@@ -163,6 +163,8 @@ export default {
                         Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InF1YW5ndmluaDI5MTExNzZAZ21haWwuY29tIiwibmJmIjoxNjkyMTk1MzI4LCJleHAiOjE2OTQyOTQxMjh9.SVRvTq8ahV2xfEUVFZb7zkXQV48F9w6d64TvhZadb2Q`
                     }
                 }),
+                getCollectOrderPhone:entity => axios.post(`${baseurl}/order/get-collection-detail`, entity),
+                getCollectBillPhone:entity => axios.post(`${baseurl}/order/get-collection`, entity),
             }
         }
     },

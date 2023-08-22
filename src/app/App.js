@@ -18,9 +18,11 @@ import routes from './fuse-configs/routesConfig';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import store from './store';
 import { Suspense } from 'react';
+
 const Delivery = React.lazy(() => import('./main/delivery'));
 const EmployDelivery = React.lazy(() => import('./main/delivery/EmployDelivery'));
-const Collection = React.lazy(() => import('./main/collection/EmployCollection'));
+const EmployCollection = React.lazy(() => import('./main/collection/EmployCollection'));
+const Collection = React.lazy(() => import('./main/collection'));
 
 const jss = create({
 	...jssPreset(),
@@ -43,6 +45,11 @@ const App = () => {
 						<Router history={history}>
 							<Switch>
 								<Route path="/employ-collection/:type/:session">
+									<Suspense fallback={null}>
+										<EmployCollection />
+									</Suspense>
+								</Route>
+								<Route path="/collect/:collect/:session">
 									<Suspense fallback={null}>
 										<Collection />
 									</Suspense>

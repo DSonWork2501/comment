@@ -448,9 +448,9 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                                 show: val.status <= 2
                             },
                             {
-                                name: 'Thu tiền',
+                                name: 'Thu tiên',
                                 id: 2,
-                                show: val.status >= 2
+                                show: true
                             },
                             {
                                 name: 'Mở google map',
@@ -465,7 +465,7 @@ const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) =>
                             }
 
                             if (value?.id === 2) {
-                                History.push(`/delivery/${val.id}/${encodeURIComponent(val.deliverysession)}/${val.orderid}`)
+                                History.push(`/collect/${val.billingid}/${encodeURIComponent(val.collectsession)}`)
                             }
                             //setOpenDialog('photo')
                             setAnchorEl(null)
@@ -850,12 +850,12 @@ const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                                             {
                                                                 name: 'Chụp hình',
                                                                 id: 1,
-                                                                show: item.shipping.status <= 2
+                                                                show: item.collection.status <= 2
                                                             },
                                                             {
-                                                                name: 'Giao hàng',
+                                                                name: 'Thu tiên',
                                                                 id: 2,
-                                                                show: item.shipping.status >= 2
+                                                                show: true
                                                             }
                                                         ]
                                                             .filter(val => val.show)
@@ -866,7 +866,7 @@ const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                                             }
 
                                                             if (value?.id === 2) {
-                                                                History.push(`/delivery/${item.billingid}/${encodeURIComponent(item.shipping.deliverysession)}/${item.shipping.orderid}`)
+                                                                History.push(`/employ-collection/${item.billingid}/${encodeURIComponent(item.shipping.deliverysession)}/${item.shipping.orderid}`)
                                                             }
                                                             //setOpenDialog('photo')
                                                             setAnchorEl(null)
