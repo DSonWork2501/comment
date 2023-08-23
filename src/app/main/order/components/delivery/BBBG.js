@@ -187,7 +187,7 @@ function DetailBBBG() {
         ),
         numberOrder: (
             <React.Fragment>
-                <CmsLabel content={`${(item.cho_lay_hang + item.da_lay_hang + item.dang_giao_hang)}`} />
+                <CmsLabel content={`${(item.cho_lay_hang + item.da_lay_hang + item.dang_giao_hang + item.hoan_tat)}`} />
             </React.Fragment>
         ),
         action: (

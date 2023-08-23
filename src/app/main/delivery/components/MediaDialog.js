@@ -23,7 +23,7 @@ function MediaDialog({ entities, handleClose, open, classes }) {
     const reEntities = useMemo(() => {
         if (entities?.data?.length) {
             return entities.data.filter(val => {
-                return value ? (val.id === parseInt(value) || customLike(value, val.customermoblie)) : true
+                return value ? (customLike(value, val.customermoblie)) : true
             })
         }
     }, [value, entities])
@@ -32,12 +32,14 @@ function MediaDialog({ entities, handleClose, open, classes }) {
         <React.Fragment>
             <Dialog className={classes} open={open} fullWidth maxWidth="lg" tabIndex={1000}>
                 <DialogTitle>
-                    <CmsTextField
-                        value={value}
-                        onChange={event => setValue(event.target.value)}
-                        placeholder="Tìm kiếm bằng ID hoặc SĐT"
-                        size="small"
-                    />
+                    <div className='p-4'>
+                        <CmsTextField
+                            value={value}
+                            onChange={event => setValue(event.target.value)}
+                            placeholder="Tìm kiếm bằng ID hoặc SĐT"
+                            size="small"
+                        />
+                    </div>
                 </DialogTitle>
                 <DialogContent>
                     {
@@ -45,7 +47,7 @@ function MediaDialog({ entities, handleClose, open, classes }) {
                             <div key={val.id}>
                                 <div>
                                     <div>
-                                        ID {val?.id}
+                                        Order ID:  {val?.collection?.orderid || val?.shipping?.orderid}
                                     </div>
                                     <div>
                                         <FontAwesomeIcon icon={faUser} className='mr-2' /> {val?.customername} - {val?.customermoblie}
@@ -79,6 +81,40 @@ function MediaDialog({ entities, handleClose, open, classes }) {
                                             </div>
                                             <div className='flex flex-wrap -mx-8'>
                                                 {val.shipping.completeimg.split(',').map(val => (
+                                                    val ? <div className='lg:w-1/3 md:w-1/2 px-8 pb-8'>
+                                                        <img className='w-full' alt='val' src={`${baseurl}/common/files/${val}?application=3`} />
+                                                    </div> : null
+                                                ))}
+                                            </div>
+                                        </div>
+                                    }
+
+                                    {
+                                        val?.collection?.avatar
+                                        &&
+                                        <div>
+                                            <div>
+                                                Ảnh người thu:
+                                            </div>
+                                            <div className='flex flex-wrap -mx-8'>
+                                                {val.collection.avatar.split(',').map(val => (
+                                                    val ? <div className='lg:w-1/3 md:w-1/2 px-8 pb-8'>
+                                                        <img className='w-full' alt='val' src={`${baseurl}/common/files/${val}?application=3`} />
+                                                    </div> : null
+                                                ))}
+                                            </div>
+                                        </div>
+                                    }
+
+                                    {
+                                        val?.collection?.completeimg
+                                        &&
+                                        <div>
+                                            <div>
+                                                Ảnh thu tiền:
+                                            </div>
+                                            <div className='flex flex-wrap -mx-8'>
+                                                {val.collection.completeimg.split(',').map(val => (
                                                     val ? <div className='lg:w-1/3 md:w-1/2 px-8 pb-8'>
                                                         <img className='w-full' alt='val' src={`${baseurl}/common/files/${val}?application=3`} />
                                                     </div> : null

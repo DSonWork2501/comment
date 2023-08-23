@@ -136,6 +136,7 @@ function DetailBBBG() {
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
         new initColumn({ field: "collectid", label: "ID", classHeader: "w-128", sortable: false }),
         new initColumn({ field: "customer", label: `Người giao hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "billcount", label: `Tổng Bill`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "numberOrder", label: `Tổng đơn`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "cho_thu", label: `Chờ thu`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "dang_thu", label: `Đang thu`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
@@ -198,10 +199,10 @@ function DetailBBBG() {
                     className="bg-green-500 text-white shadow-3  hover:bg-green-900"
                     onClick={() => {
                         setLoadingBtn(true);
-                        Connect.live.order.other.getDetailDelivery({ id: item.deliveryid }).then(({ data }) => {
+                        Connect.live.accounting.bill.getCollectBill({ id: item.collectid }).then(({ data }) => {
                             const { result } = data;
                             if (result) {
-                                navigator.clipboard.writeText(`https://ibp.tastycounter.vn/employ-delivery/1/${encodeURIComponent(data?.data[0]?.shipping?.deliverysession)}`).then(() => {
+                                navigator.clipboard.writeText(`https://ibp.tastycounter.vn/employ-collection/1/${encodeURIComponent(data?.data[0]?.collectsession)}`).then(() => {
                                     dispatch(showMessage({ variant: "success", message: 'Copy thành công' }))
                                 }).catch(err => {
                                     dispatch(showMessage({ variant: "error", message: 'Copy không thành công' }))

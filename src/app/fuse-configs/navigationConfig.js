@@ -192,6 +192,14 @@ const navigationConfig = [
 				icon: 'gavel',
 				url: '/accounting/bill',
 			},
+			{
+				id: 'nvi-accounting-collection',
+				title: 'Quản lý phiếu thu',
+				translate: 'ACCOUNTING_COLLECTION',
+				type: 'item',
+				icon: 'gavel',
+				url: '/collection',
+			},
 		],
 	},
 ];

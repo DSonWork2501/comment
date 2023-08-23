@@ -11,31 +11,34 @@ import Check from '@material-ui/icons/Check';
 import StepConnector from '@material-ui/core/StepConnector';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { faArrowLeft, faBox, faCircleCheck, faHandHoldingHand, faTruckFast } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCircleCheck, faHandHoldingDollar, faTruckFast } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useLocation, useParams } from 'react-router';
-import { keyStore } from '../order/common';
 import reducer from './store';
 import withReducer from 'app/store/withReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
-import { order } from '../order/store/orderSlice';
-import HeadDelivery from './components/Header';
 import { useMemo } from 'react';
-import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import { alertInformation } from '@widgets/functions';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CmsButtonProgress } from '@widgets/components';
-import { TakePhotoDialog, modalSmall, saveFile } from './EmployDelivery';
+import { modalSmall, saveFile } from './EmployCollection';
 import History from '@history/@history';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 import { showMessage } from 'app/store/fuse/messageSlice';
+import HeadDelivery from '../delivery/components/Header';
+import { TakePhotoDialog } from '../delivery/EmployDelivery';
+import { accounting } from '../accounting/store';
+import { groupBy } from 'lodash';
+import { format } from 'date-fns';
+
+const keyStore = 'accounting';
 
 const useQontoStepIconStyles = makeStyles({
     root: {
@@ -156,20 +159,20 @@ function ColorlibStepIcon(props) {
     const { active, completed } = props;
     const icons = {
         2: <FontAwesomeIcon
-            icon={faHandHoldingHand}
-            style={{ color: "white", fontSize: 19 }} />,
-        3: <FontAwesomeIcon
             icon={faTruckFast}
             style={{ color: "white", fontSize: 19 }} />,
+        3: <FontAwesomeIcon
+            icon={faHandHoldingDollar}
+            style={{ color: "white", fontSize: 19 }} />,
         4: <FontAwesomeIcon
-            icon={faBox}
+            icon={faCircleCheck}
             style={{ color: "white", fontSize: 19 }} />,
         // 4: <FontAwesomeIcon
         //     icon={faHandHoldingDollar}
         //     style={{ color: "white", fontSize: 19 }} />,
-        5: <FontAwesomeIcon
-            icon={faCircleCheck}
-            style={{ color: "white", fontSize: 19 }} />,
+        // 5: <FontAwesomeIcon
+        //     icon={faCircleCheck}
+        //     style={{ color: "white", fontSize: 19 }} />,
     };
 
     return (
@@ -247,15 +250,15 @@ const useStyles = makeStyles((theme) => ({
 function getSteps() {
     return [{
         id: 2,
-        name: 'Nhận hàng'
+        name: 'Đi thu'
     },
     {
         id: 3,
-        name: 'Đang vận chuyển'
+        name: 'Đã thu'
     },
     {
-        id: 5,
-        name: 'Hoàn thành'
+        id: 4,
+        name: 'Bàn giao'
     }];
 }
 
@@ -268,23 +271,47 @@ const Delivery = () => {
         , openCame = parseInt(params2.get('openCame'));
     const params = useParams()
         , session = (params.session)
-        , orderID = (params.order);
-    const loading = useSelector(store => store[keyStore].order.btnLoading);
-    const entities = useSelector(store => store[keyStore].order.detailDelivery);
+        , billingID = (params.collect);
+    const loading = useSelector(store => store[keyStore].loading);
+    const entities = useSelector(store => store[keyStore].collectionOrder);
+    const bill = useSelector(store => store[keyStore].collectionBill);
     const [file, setFile] = useState([]);
     const [openDialog, setOpenDialog] = useState('');
     const [locationObject, setLocationObject] = useState(null);
+
     const currentOrder = useMemo(() => {
-        if (entities?.data?.length)
-            return entities.data.find(val => val.id === parseInt(orderID))
+        if (bill?.data?.length)
+            return bill.data.find(x => x.billingid === billingID)
         return null
-    }, [entities, orderID])
+    }, [bill, billingID])
+
+    const objectCollection = useMemo(() => {
+        if (entities?.data?.length) {
+            const data = [...entities.data.map(val => ({ ...val, billingid: val.collection.billingid })),
+            ];
+
+            return groupBy(data, 'billingid')
+        }
+
+        return {}
+    }, [entities])
+
     const listProductTemp = useMemo(() => {
-        return returnListProductByOrderID(entities, orderID)
-    }, [entities, orderID])
-    const totalPr = useMemo(() => {
-        return returnTotalAllProduct(listProductTemp)
-    }, [listProductTemp])
+        if (objectCollection[billingID]?.length)
+            return objectCollection[billingID]
+
+        return []
+    }, [objectCollection, billingID])
+
+    const total = useMemo(() => {
+        let t = 0;
+        if (objectCollection[billingID]?.length)
+            objectCollection[billingID].forEach(element => {
+                t = t + element.collection.valuecollect;
+            });
+
+        return t
+    }, [objectCollection, billingID]);
 
 
     // const handleNext = () => {
@@ -299,20 +326,21 @@ const Delivery = () => {
     //     setActiveStep(0);
     // };
     const getListTable = useCallback((search) => {
-        dispatch(order.shipper.getDetailShipDelivery({ ...search, session: decodeURIComponent(session) }));
+        dispatch(accounting.bill.getCollectOrderPhone({ ...search, session: decodeURIComponent(session) }));
+        dispatch(accounting.bill.getCollectBillPhone({ ...search, session: decodeURIComponent(session) }));
     }, [dispatch, session])
 
     useEffect(() => {
         let step = 0;
         if (currentOrder)
-            switch (currentOrder.shipping.status) {
+            switch (currentOrder.status) {
                 case 2:
                     step = 0;
                     break;
                 case 3:
                     step = 1;
                     break;
-                case 5:
+                case 4:
                     step = 2;
                     break;
                 default:
@@ -332,17 +360,7 @@ const Delivery = () => {
             confirm: async (values) => {
                 formik.setSubmitting(true);
                 try {
-                    const dataVL = {
-                        typeItem: currentOrder.shipping.status === 2 ? 3 : 5,
-                        data: [
-                            {
-                                id: currentOrder.shipping.id,
-                                session: currentOrder.shipping.session,
-                                orderid: currentOrder.shipping.orderid,
-                                deliveryid: currentOrder.shipping.deliveryid,
-                            }
-                        ]
-                    }
+                    let completeimg = null;
 
                     if (file?.length) {
                         const pr = file.map(val => saveFile(val.file, val.name))
@@ -352,17 +370,39 @@ const Delivery = () => {
                         // data.append('enpoint', fileEndpoint);
                         // data.append('files', file);
                         // await Connect.live.uploadFile.insert(data);
-                        dataVL.data[0].completeimg = file.map(val => val.name).join(',');
+                        completeimg = file.map(val => val.name).join(',');
                     }
 
-                    if (locationObject) {
-                        let newLocation = JSON.parse(currentOrder.shipping.location) || {};
-                        newLocation.end = locationObject;
+                    const dataVL = {
+                        typeItem: currentOrder.status === 1
+                            ? 3
+                            : currentOrder.status === 2
+                                ? 4
+                                : 5,
+                        data: listProductTemp.map(val => {
+                            let data = { ...val.collection };
 
-                        dataVL.data[0].location = JSON.stringify(newLocation);
+                            if (locationObject) {
+                                let newLocation = JSON.parse(val.collection.location) || {};
+                                newLocation.end = locationObject;
+
+                                data = {
+                                    ...data,
+                                    location: JSON.stringify(newLocation)
+                                }
+                            }
+
+                            if (completeimg)
+                                data = {
+                                    ...data,
+                                    completeimg
+                                }
+
+                            return { ...data }
+                        })
                     }
 
-                    const resultAction = await dispatch(order.shipper.update(dataVL));
+                    const resultAction = await dispatch(accounting.bill.update(dataVL));
                     unwrapResult(resultAction);
                     getListTable();
                     setFile([])
@@ -422,7 +462,7 @@ const Delivery = () => {
                             background: '#fafafa!important',
                             borderBottom: '1px solid rgb(128 128 128 / 21%)'
                         }} className='mb-8'>
-                            <HeadDelivery phone={entities?.data[0]?.shipping?.phone} name={entities?.data[0]?.shipping?.shipname} />
+                            <HeadDelivery phone={currentOrder?.phone} name={currentOrder?.collector} />
                         </div>
 
                         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
@@ -436,16 +476,16 @@ const Delivery = () => {
                 </DialogTitle>
                 <DialogContent className='text-11'>
                     <div className='flex flex-wrap w-full p-8 rounded-4 shadow-4'>
-                        <div>
+                        <div className='w-full'>
                             <div className='flex justify-between'>
                                 <div>
                                     <b className='mr-4'>
-                                        Mã đơn hàng:
+                                        Mã bill:
                                     </b>
-                                    {orderID}
+                                    {billingID}
                                 </div>
                                 <Link
-                                    to={`/employ-delivery/2/${session}`}
+                                    to={`/employ-collection/1/${session}`}
                                 >
                                     <div className='text-10' style={{ width: 85, color: '#e35c5c', textDecoration: 'underline', cursor: 'pointer' }}>
                                         <FontAwesomeIcon icon={faArrowLeft} className='mr-2' />
@@ -457,19 +497,19 @@ const Delivery = () => {
                                 <b className='mr-4'>
                                     Tên khách hàng:
                                 </b>
-                                {currentOrder?.customername}
+                                {currentOrder?.cusname}
                             </div>
                             <div>
                                 <b className='mr-4'>
                                     Số điện thoại:
                                 </b>
-                                {currentOrder?.customermoblie}
+                                {currentOrder?.cusphone}
                             </div>
                             <div>
                                 <b className='mr-4'>
                                     Địa chỉ:
                                 </b>
-                                {currentOrder?.customeraddress}, {currentOrder?.customerward}, {currentOrder?.customerdistrict}, {currentOrder?.customercity}
+                                {currentOrder?.address}, {currentOrder?.ward}, {currentOrder?.district}, {currentOrder?.city}
                             </div>
                         </div>
                     </div>
@@ -484,19 +524,14 @@ const Delivery = () => {
                             <table className='w-full'>
                                 <tbody>
                                     {
-                                        listProductTemp.map(val => (
-                                            <tr style={{ verticalAlign: 'baseline' }} key={val.sku}>
+                                        listProductTemp.map((val, index) => (
+                                            <tr style={{ verticalAlign: 'baseline' }} key={index}>
                                                 <td>
-                                                    <b>
-                                                        {val.numberPR}x
-                                                    </b>
-                                                </td>
-                                                <td>
-                                                    {val.name}
+                                                    Order ID: {val.collection.orderid} - {format(new Date(val.collection.createdate), 'dd-MM-yyyy HH:mm')}
                                                 </td>
                                                 <td className='text-right'>
-                                                    {typeof val.price === 'number'
-                                                        ? val.price.toLocaleString('en-US')
+                                                    {typeof val.collection.valuecollect === 'number'
+                                                        ? val.collection.valuecollect.toLocaleString('en-US')
                                                         : '-'}đ
                                                 </td>
                                             </tr>
@@ -506,18 +541,18 @@ const Delivery = () => {
 
                                 <tbody>
                                     <tr>
-                                        <td colSpan={3} className='p-4'>
+                                        <td colSpan={2} className='p-4'>
                                             <hr style={{ borderColor: 'aliceblue' }}></hr>
                                         </td>
                                     </tr>
                                 </tbody>
                                 <tbody>
                                     <tr style={{ verticalAlign: 'baseline' }}>
-                                        <td colSpan={2}>
+                                        <td colSpan={1}>
                                             Tạm tính
                                         </td>
                                         <td className='text-right'>
-                                            {totalPr?.money}đ
+                                            {(total || 0).toLocaleString('en-US')}đ
                                         </td>
                                     </tr>
                                     {/* <tr style={{ verticalAlign: 'baseline' }}>
@@ -529,7 +564,7 @@ const Delivery = () => {
                                         </td>
                                     </tr> */}
                                     <tr style={{ verticalAlign: 'baseline' }}>
-                                        <td colSpan={2}>
+                                        <td colSpan={1}>
                                             Discount
                                         </td>
                                         <td className='text-right'>
@@ -539,21 +574,21 @@ const Delivery = () => {
                                 </tbody>
                                 <tbody>
                                     <tr>
-                                        <td colSpan={3} className='p-4'>
+                                        <td colSpan={2} className='p-4'>
                                             <hr style={{ borderColor: 'aliceblue', borderStyle: 'dashed' }}></hr>
                                         </td>
                                     </tr>
                                 </tbody>
                                 <tbody>
                                     <tr style={{ verticalAlign: 'baseline' }}>
-                                        <td colSpan={2}>
+                                        <td colSpan={1}>
                                             <b>
                                                 Tổng Cộng
                                             </b>
                                         </td>
                                         <td className='text-right'>
                                             <b>
-                                                {totalPr?.money}đ
+                                                {(total || 0).toLocaleString('en-US')}đ
                                             </b>
                                         </td>
                                     </tr>
@@ -576,13 +611,13 @@ const Delivery = () => {
                     </div>
                 </DialogContent>
                 {
-                    currentOrder?.shipping?.status !== 5
+                    currentOrder?.status !== 4
                     &&
                     <DialogActions>
                         <div className='flex justify-between w-full items-center'>
                             <div className='w-1/2 text-left flex'>
                                 {
-                                    currentOrder?.shipping?.status !== 2
+                                    currentOrder?.status === 2
                                     &&
                                     <CmsButtonProgress
                                         loading={loading}
@@ -615,19 +650,21 @@ const Delivery = () => {
                                     type="submit"
                                     color="primary"
                                     label={
-                                        currentOrder?.shipping?.status === 2
-                                            ? 'Vận chuyển' :
+                                        currentOrder?.status === 1
+                                            ? 'Đi thu' :
                                             (
-                                                currentOrder?.shipping?.status === 3
-                                                    ? 'Hoàn thành'
-                                                    : 'Hoàn thành'
+                                                currentOrder?.status === 2
+                                                    ? 'Đã thu'
+                                                    : currentOrder?.status === 3
+                                                        ? 'Bàn giao'
+                                                        : 'Bàn giao'
                                             )
                                     }
                                     onClick={() => {
 
-                                        if (currentOrder?.shipping?.status === 2)
+                                        if (currentOrder?.status !== 2)
                                             formik.handleSubmit()
-                                        if (currentOrder?.shipping?.status === 3) {
+                                        if (currentOrder?.status === 2) {
                                             if (!Boolean(file?.length)) {
                                                 setTimeout(() => {
                                                     dispatch(showMessage({ variant: "error", message: 'Vui lòng đính kèm hình' }))
@@ -635,9 +672,12 @@ const Delivery = () => {
                                                 return
                                             }
 
-                                            setOpenDialog('OPT');
+                                            //setOpenDialog('OPT');
                                             getLocation(({ latitude, longitude }) => {
                                                 setLocationObject({ latitude, longitude })
+                                                setTimeout(() => {
+                                                    formik.handleSubmit()
+                                                }, 250);
                                             }, dispatch);
                                         }
                                     }}

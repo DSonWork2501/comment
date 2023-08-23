@@ -56,6 +56,44 @@ export const accounting = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        getCollectBillPhone: createAsyncThunk(`${appName}/${moduleName}/bill/getCollectBillPhone`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.getCollectBillPhone(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getCollectOrder: createAsyncThunk(`${appName}/${moduleName}/bill/getCollectOrder`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.getCollectOrder(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getCollectOrderPhone: createAsyncThunk(`${appName}/${moduleName}/bill/getCollectOrderPhone`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.getCollectOrderPhone(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        update: createAsyncThunk(`${appName}/${moduleName}/bill/update`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.update(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     },
     meta: {
         getList: createAsyncThunk(`${appName}/${moduleName}/accounting/meta/getList`, async (params, thunkAPI) => {
@@ -116,7 +154,8 @@ const accountingSlice = createSlice({
         selected: null,
         collections: null,
         search: initSearchState,
-        collectionBill: null
+        collectionBill: null,
+        collectionOrder: null
     },
     reducers: {
         /**
@@ -320,6 +359,50 @@ const accountingSlice = createSlice({
             },
             error: error
         }),
+
+        [accounting.bill.getCollectOrder.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                //loading: false,
+                collectionOrder: payload,
+                error: null
+            }
+        },
+
+        
+        [accounting.bill.getCollectOrderPhone.pending]: state => ({
+            ...state,
+            loading: true,
+            collectionOrder: {
+                data: []
+            },
+            error: null
+        }),
+        [accounting.bill.getCollectOrderPhone.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                collectionOrder: payload,
+                error: null
+            }
+        },
+        [accounting.bill.getCollectOrderPhone.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            collectionOrder: {
+                data: []
+            },
+            error: error
+        }),
+
+        [accounting.bill.getCollectBillPhone.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                collectionBill: payload,
+                error: null
+            }
+        },
     }
 });
 

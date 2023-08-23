@@ -63,11 +63,11 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, listCheckTemp, set
 
     const handleKeyPressSearch = (event) => {
         if (event.key === 'Enter')
-            setSearch(prev => ({ ...prev, search: event.target.value }))
+            setSearch(prev => ({ ...prev, search: event.target.value, pageNumber: 1 }))
         // /dispatch(getListHS({ search: valueSearch, homeSubscription: 2 }))
 
         if (typeof event === 'string')
-            setSearch(prev => ({ ...prev, search: event }))
+            setSearch(prev => ({ ...prev, search: event, pageNumber: 1 }))
 
     }
 
