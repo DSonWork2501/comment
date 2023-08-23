@@ -11,7 +11,7 @@ import Check from '@material-ui/icons/Check';
 import StepConnector from '@material-ui/core/StepConnector';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { faArrowLeft, faBox, faCircleCheck, faHandHoldingDollar, faHandHoldingHand, faTruckFast } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCircleCheck, faHandHoldingDollar, faTruckFast } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -21,9 +21,7 @@ import withReducer from 'app/store/withReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback } from 'react';
 import { useEffect } from 'react';
-import { order } from '../order/store/orderSlice';
 import { useMemo } from 'react';
-import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import { alertInformation } from '@widgets/functions';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { CmsButtonProgress } from '@widgets/components';
@@ -313,7 +311,7 @@ const Delivery = () => {
             });
 
         return t
-    }, [objectCollection]);
+    }, [objectCollection, billingID]);
 
 
     // const handleNext = () => {
@@ -487,7 +485,7 @@ const Delivery = () => {
                                     {billingID}
                                 </div>
                                 <Link
-                                    to={`/employ-delivery/2/${session}`}
+                                    to={`/employ-collection/1/${session}`}
                                 >
                                     <div className='text-10' style={{ width: 85, color: '#e35c5c', textDecoration: 'underline', cursor: 'pointer' }}>
                                         <FontAwesomeIcon icon={faArrowLeft} className='mr-2' />

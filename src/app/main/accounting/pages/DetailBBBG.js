@@ -10,7 +10,7 @@ import reducer, { accounting } from '../store';
 import { useParams } from 'react-router';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { useFormik } from 'formik';
-import { flatMap, groupBy, map } from 'lodash';
+import { flatMap, groupBy } from 'lodash';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
@@ -528,7 +528,7 @@ function DetailBBBG() {
                 &&
                 <MediaDialog
                     open
-                    entities={entities}
+                    entities={orders}
                     handleClose={() => setOpenDialog('')} />
             }
             <div className='w-full  h-full' style={{ padding: '0 3.2rem' }}>
@@ -551,7 +551,7 @@ function DetailBBBG() {
                         variant="text"
                         color="default"
                         component={Link}
-                        to={'/order/delivery'}
+                        to={'/collection'}
                         className="mx-2"
                         startIcon="arrow_back" />
                 </div>
@@ -621,27 +621,22 @@ function DetailBBBG() {
                                     ? <OrderTable entities={orders} loading={loading} setSearch={setSearch} />
                                     : type === '3'
                                         ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} />
-                                        : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} />
-                            // ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
-                            // : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                                        : <MapLocation open={type === '4'} entities={{
+                                            ...entities,
+                                            data: entities?.data?.length ? entities.data.map(val => ({
+                                                ...val,
+                                                customeraddress: val.address,
+                                                customerward: val.ward,
+                                                customerdistrict: val.district,
+                                                customercity: val.city
+                                            }))
+                                                : []
+                                        }} loading={loading} setSearch={setSearch} />
                         }
 
                     </div>
                 </div>
             </div>
-            {/* <CmsCardedPage
-                classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
-                icon="whatshot"
-                title={"Quản lý hợp đồng"}
-                toolbar={
-
-                }
-                content={
-                    <>
-                      
-                    </>
-                }
-            /> */}
         </LayoutCustom>
     );
 }

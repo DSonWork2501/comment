@@ -356,7 +356,7 @@ const Delivery = () => {
                     }
 
                     if (locationObject) {
-                        let newLocation = JSON.parse(currentOrder.shipping.location);
+                        let newLocation = JSON.parse(currentOrder.shipping.location) || {};
                         newLocation.end = locationObject;
 
                         dataVL.data[0].location = JSON.stringify(newLocation);
@@ -638,7 +638,7 @@ const Delivery = () => {
                                             setOpenDialog('OPT');
                                             getLocation(({ latitude, longitude }) => {
                                                 setLocationObject({ latitude, longitude })
-                                            },dispatch);
+                                            }, dispatch);
                                         }
                                     }}
                                     size="small" />

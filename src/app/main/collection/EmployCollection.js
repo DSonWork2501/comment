@@ -6,37 +6,32 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Menu, MenuItem, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { faArrowLeft, faCameraRotate, faCircleXmark, faDollarSign, faImages, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faDollarSign, faImages, faLocationDot, faPhone, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ArrowDropDown } from '@material-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { order } from '../order/store/orderSlice';
 import { useLocation, useParams } from 'react-router';
-import reducer from './store';
 import withReducer from 'app/store/withReducer';
-import { CmsButtonProgress, CmsCheckbox, CmsTab, CmsUploadFile } from '@widgets/components';
+import { CmsCheckbox, CmsTab } from '@widgets/components';
 import History from '@history/@history';
-import { flatMap, groupBy, map } from 'lodash';
+import { flatMap, groupBy } from 'lodash';
 import { DropMenu } from '../order/components/index/index';
 import { Link } from 'react-router-dom';
-import Webcam from 'react-webcam';
-import { useRef } from 'react';
 import Connect from '@connect/@connect';
 import { unwrapResult } from '@reduxjs/toolkit';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
 import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
-import { showMessage } from 'app/store/fuse/messageSlice';
 import { getLocation } from '.';
 import MapLocation from './components/MapLocation';
-import MediaDialog from './components/MediaDialog';
 import { accounting as acc } from '../accounting/store';
-import accounting from 'app/main/accounting/store/index'
 import { shipStatus } from '../accounting/common';
 import HeadDelivery from '../delivery/components/Header';
 import { TakePhotoDialog } from '../delivery/EmployDelivery';
 import { format } from 'date-fns';
+import reducer from './store';
+import MediaDialog from '../delivery/components/MediaDialog';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {
@@ -251,73 +246,6 @@ const List = ({ listProduct, totalPr }) => {
     </div>
 }
 
-const ProductTable = ({ entities, loading, setSearch }) => {
-    const listProduct = useMemo(() => {
-        let data = [], table = [];
-        if (entities?.data?.length) {
-            entities.data.forEach(element => {
-                element.productorder.forEach(e => {
-                    if (Boolean(element.parentid)) {
-                        data.push({
-                            sku: e.sku,
-                            img: e.image,
-                            name: e.name,
-                            price: e.price,
-                        });
-                    } else {
-                        JSON.parse(e.model).forEach(el => {
-                            el?.slots?.length && el.slots.forEach(elm => {
-                                data.push(elm.item);
-                            })
-                        })
-                        table.push({
-                            sku: e.sku,
-                            img: e.image,
-                            name: e.name,
-                            price: e?.price || 0,
-                            type: 'table'
-                        })
-                    }
-                })
-            });
-            const groupedData = groupBy(data, 'sku');
-            const groupedTable = groupBy(table, 'sku');
-
-            return [
-                ...map(groupedTable, (products, sku) => ({
-                    ...products[0],
-                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
-                    numberPR: products.length,
-                })),
-                ...map(groupedData, (products, sku) => ({
-                    ...products[0],
-                    price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
-                    numberPR: products.length,
-                }))
-            ];
-        }
-
-        return []
-    }, [entities])
-    const totalPr = useMemo(() => {
-        let total = 0, money = 0;
-        if (listProduct?.length)
-            listProduct.forEach(element => {
-                total = total + element.numberPR;
-                money = money + ((element.price || 0));
-            });
-        return { total, money }
-    }, [listProduct])
-
-    return <div className='p-8 rounded-4 shadow-4'>
-        <div>
-            <b>
-                Tổng sản phẩm
-            </b>
-        </div> <List listProduct={listProduct} totalPr={totalPr} />
-    </div>
-}
-
 export const saveFile = (file, name) => {
     return new Promise((resolve, reject) => {
         try {
@@ -348,37 +276,6 @@ const handleSaveFileOut = async (value, handleRefresh, dispatch, file, successFc
 }
 
 const TableWithCustomer = ({ setCheck, val, index, noBorder, handleRefresh }) => {
-    // const dispatch = useDispatch();
-    // const location = useLocation(), params2 = new URLSearchParams(location.search)
-    //     , shipID = parseInt(params2.get('shipID'));
-
-    // const handleSaveFile = async (file, name) => {
-    //     //setOpen(false)
-    //     //window.alert(JSON.stringify(file));
-    //     handleSaveFileOut({
-    //         typeItem: 2,
-    //         data: [
-    //             {
-    //                 id: parseInt(shipID),
-    //                 receiveimg: name,
-    //             }
-    //         ]
-    //     }, handleRefresh, dispatch, file, () => { })
-    //     // try {
-    //     //     const data = new FormData();
-    //     //     data.append('enpoint', 'tempfile');
-    //     //     data.append('files', file);
-    //     //     await Connect.live.uploadFile.insert(data);
-    //     //     const resultAction = await dispatch(order.shipper.update())
-    //     //     unwrapResult(resultAction);
-    //     //     handleRefresh()
-    //     //     History.push(window.location.pathname)
-    //     // } catch (error) {
-    //     //     window.alert(error)
-    //     // }
-    // }
-
-    console.log(val);
 
     return <>
         <tbody key={val.id}>
@@ -499,7 +396,7 @@ const DetailOrder = ({ entities, objectCollection, billingID }) => {
             });
 
         return t
-    }, [objectCollection]);
+    }, [objectCollection, billingID]);
     return <>
         <table className='w-full text-10'>
             {
@@ -519,7 +416,7 @@ const DetailOrder = ({ entities, objectCollection, billingID }) => {
 const OrderTable = ({ entities, loading, setSearch, handleRefresh, objectCollection }) => {
     const classes = useStyles();
     const location = useLocation(), params2 = new URLSearchParams(location.search)
-        , orderID = parseInt(params2.get('orderID')), openCame = parseInt(params2.get('openCame'))
+        , openCame = parseInt(params2.get('openCame'))
         , billingID = (params2.get('billingID'));
     const [check, setCheck] = useState([]);
     const dispatch = useDispatch();
@@ -532,7 +429,6 @@ const OrderTable = ({ entities, loading, setSearch, handleRefresh, objectCollect
 
         if (billingID) {
             const current = objectCollection[billingID]
-            console.log(objectCollection, current, billingID);
 
             getLocation(({ latitude, longitude }) => {
                 handleSaveFileOut({
@@ -930,8 +826,8 @@ const EmployDelivery = () => {
     }, [collectionOrder])
 
     const getListTable = useCallback((search) => {
-        dispatch(acc.bill.getCollectBill({ ...search, id: 1692368138 }));
-        dispatch(acc.bill.getCollectOrder({ ...search, collectId: 1692368138 }));
+        dispatch(acc.bill.getCollectOrderPhone({ ...search, session: decodeURIComponent(session) }));
+        dispatch(acc.bill.getCollectBillPhone({ ...search, session: decodeURIComponent(session) }));
     }, [dispatch, session])
 
     useEffect(() => {
@@ -969,7 +865,7 @@ const EmployDelivery = () => {
                 &&
                 <MediaDialog
                     open
-                    entities={entities}
+                    entities={collectionOrder}
                     classes={classes.modal2}
                     handleClose={() => setOpenDialog('')} />
             }
@@ -1074,7 +970,17 @@ const EmployDelivery = () => {
                                     loading={loading}
                                     setSearch={setSearch}
                                     handleRefresh={handleRefresh} />
-                                : <MapLocation open={type === '4'} entities={entities} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
+                                : <MapLocation open={type === '4'} entities={{
+                                    ...entities,
+                                    data: entities?.data?.length ? entities.data.map(val => ({
+                                        ...val,
+                                        customeraddress: val.address,
+                                        customerward: val.ward,
+                                        customerdistrict: val.district,
+                                        customercity: val.city
+                                    }))
+                                        : []
+                                }} loading={loading} setSearch={setSearch} handleRefresh={handleRefresh} />
                     }
                 </DialogContent>
                 <DialogActions>
@@ -1086,4 +992,4 @@ const EmployDelivery = () => {
         </div>
     );
 }
-export default withReducer(keyStore, accounting)(EmployDelivery);
+export default withReducer(keyStore, reducer)(EmployDelivery);
