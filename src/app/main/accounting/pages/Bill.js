@@ -153,6 +153,7 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
         new initColumn({ field: "moneytotal", label: `Tổng tiền`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "moneycollected", label: `Đã trả`, alignHeader: "right", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "type", label: `Loại chuyển khoản`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "link", label: `Chi tiết phiếu thu`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "status", label: `Tình trạng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
@@ -163,6 +164,11 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
             item?.moneycollected === item?.moneytotal
                 ? <Chip label="Đã thanh toán" className="bg-green-500 text-white" />
                 : <Chip label="Chưa thanh toán" className="bg-red-500 text-white" />
+        ),
+        link: (
+            <a href={`/collection/1/${item.collectid}`} target='_blank' rel="noopener noreferrer">
+                Tới trang
+            </a>
         ),
         select: (
             <CmsCheckbox
@@ -179,6 +185,7 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
                 name="select"
             />
         ),
+        customer: (item?.cusname),
         moneytotal1: (
             item?.moneytotal1 || '0'
         ),

@@ -751,7 +751,7 @@ const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                                             {
                                                                 name: 'Thu tiên',
                                                                 id: 2,
-                                                                show: true
+                                                                show: Boolean(item.collection.avatar)
                                                             }
                                                         ]
                                                             .filter(val => val.show)
@@ -804,16 +804,16 @@ const EmployDelivery = () => {
         return false
     }, [entities])
     const isPassReceive = useMemo(() => {
-        if (entities?.data?.length) {
-            const pass = entities.data.filter(val => {
-                return val.status >= 2
+        if (collectionOrder?.data?.length) {
+            const pass = collectionOrder.data.filter(val => {
+                return val?.collection?.avatar;
             })
 
             return Boolean(pass?.length)
         }
 
         return false
-    }, [entities])
+    }, [collectionOrder])
     const objectCollection = useMemo(() => {
         if (collectionOrder?.data?.length) {
             const data = [...collectionOrder.data.map(val => ({ ...val, billingid: val.collection.billingid })),
