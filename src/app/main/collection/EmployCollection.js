@@ -191,8 +191,8 @@ const initialValues = {
 };
 
 export const deliveryLink = (session) => [
-    { id: 1, name: "Bill", link: `/employ-collection/1/${session}`, icon: "" },
-    { id: 4, name: "Bản đồ", link: `/employ-collection/4/${session}`, icon: "" },
+    { id: 1, name: "Bill", link: `/employ-collect/1/${session}`, icon: "" },
+    { id: 4, name: "Bản đồ", link: `/employ-collect/4/${session}`, icon: "" },
 ];
 
 const List = ({ listProduct, totalPr }) => {
@@ -762,7 +762,7 @@ const DistrictTable = ({ entities, loading, setSearch, handleRefresh }) => {
                                                             }
 
                                                             if (value?.id === 2) {
-                                                                History.push(`/employ-collection/${item.billingid}/${encodeURIComponent(item.shipping.deliverysession)}/${item.shipping.orderid}`)
+                                                                History.push(`/employ-collect/${item.billingid}/${encodeURIComponent(item.shipping.deliverysession)}/${item.shipping.orderid}`)
                                                             }
                                                             //setOpenDialog('photo')
                                                             setAnchorEl(null)

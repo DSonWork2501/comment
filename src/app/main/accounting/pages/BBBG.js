@@ -202,7 +202,7 @@ function DetailBBBG() {
                         Connect.live.accounting.bill.getCollectBill({ id: item.collectid }).then(({ data }) => {
                             const { result } = data;
                             if (result) {
-                                navigator.clipboard.writeText(`https://ibp.tastycounter.vn/employ-collection/1/${encodeURIComponent(data?.data[0]?.collectsession)}`).then(() => {
+                                navigator.clipboard.writeText(`https://ibp.tastycounter.vn/employ-collect/1/${encodeURIComponent(data?.data[0]?.collectsession)}`).then(() => {
                                     dispatch(showMessage({ variant: "success", message: 'Copy thành công' }))
                                 }).catch(err => {
                                     dispatch(showMessage({ variant: "error", message: 'Copy không thành công' }))
