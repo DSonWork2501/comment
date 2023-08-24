@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 import { getErrorMessage } from '@widgets/functions/GetErrorMessage';
+import { order } from 'app/main/order/store/orderSlice';
 
 const appName = "App";
 const moduleName = "accounting";
@@ -400,6 +401,15 @@ const accountingSlice = createSlice({
                 ...state,
                 loading: false,
                 collectionBill: payload,
+                error: null
+            }
+        },
+
+        [order.other.getUserDelivery.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                userDelivery: payload,
                 error: null
             }
         },

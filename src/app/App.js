@@ -44,7 +44,7 @@ const App = () => {
 					<Provider store={store}>
 						<Router history={history}>
 							<Switch>
-								<Route path="/employ-collection/:type/:session">
+								<Route path="/employ-collect/:type/:session">
 									<Suspense fallback={null}>
 										<EmployCollection />
 									</Suspense>
