@@ -289,7 +289,7 @@ const OrderTable = ({ entities, loading, setSearch }) => {
         type: (
             <>
                 {
-                    item.type === 1 ? 'Thu tiền mặt' : 'Chuyển khoản online'
+                    item.collection.type === 1 ? 'Thu tiền mặt' : 'Chuyển khoản online'
                 }
             </>
         ),
