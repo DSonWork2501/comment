@@ -485,7 +485,7 @@ const Delivery = () => {
                                     {billingID}
                                 </div>
                                 <Link
-                                    to={`/employ-collection/1/${session}`}
+                                    to={`/employ-collect/1/${session}`}
                                 >
                                     <div className='text-10' style={{ width: 85, color: '#e35c5c', textDecoration: 'underline', cursor: 'pointer' }}>
                                         <FontAwesomeIcon icon={faArrowLeft} className='mr-2' />

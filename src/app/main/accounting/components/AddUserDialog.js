@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { CmsDialog, CmsFormikAutocomplete, CmsFormikTextField } from '@widgets/components';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { order } from 'app/main/order/store/orderSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { keyStore } from '../common';
 
 const initialValues = {
     id: 0,
@@ -25,6 +28,8 @@ const fillDefaultForm = (def, detail, setId = true) => {
 }
 
 function AddUserDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc tính', status }) {
+    const dispatch = useDispatch();
+    const userDelivery = useSelector(store => store[keyStore]?.userDelivery?.data) || [];
 
     const handleSave = (values) => {
         if (formik)
@@ -41,6 +46,10 @@ function AddUserDialog({ handleClose, detail, onSave, open, title = 'Thêm thu�
             phone: Yup.string().nullable().required('Nhập số điện thoại'),
         })
     })
+
+    useEffect(() => {
+        dispatch(order.other.getUserDelivery());
+    }, [dispatch])
 
     const { setValues, values } = formik, { shipperid } = values;
 
@@ -65,7 +74,7 @@ function AddUserDialog({ handleClose, detail, onSave, open, title = 'Thêm thu�
                     name="shipperid"
                     formik={formik}
                     label={`Chọn người nội bộ`}
-                    data={[]}
+                    data={userDelivery}
                     size="small"
                     autocompleteProps={{
                         getOptionLabel: (option) => option?.fullname,
@@ -76,7 +85,7 @@ function AddUserDialog({ handleClose, detail, onSave, open, title = 'Thêm thu�
                     }}
                     setOption={(option) => option?.fullname}
                     onChangeValue={(value) => {
-                        formik.setFieldValue('shipname', value?.fullname)
+                        formik.setFieldValue('collector', value?.fullname)
                         formik.setFieldValue('phone', value?.phone)
                     }}
                     valueIsId />
