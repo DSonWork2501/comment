@@ -11,7 +11,7 @@ import Check from '@material-ui/icons/Check';
 import StepConnector from '@material-ui/core/StepConnector';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { faArrowLeft, faCircleCheck, faHandHoldingDollar, faTruckFast } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCircleCheck, faHandHoldingDollar, faReceipt, faTruckFast } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -158,6 +158,9 @@ function ColorlibStepIcon(props) {
     const classes = useColorlibStepIconStyles();
     const { active, completed } = props;
     const icons = {
+        1: <FontAwesomeIcon
+            icon={faReceipt}
+            style={{ color: "white", fontSize: 19 }} />,
         2: <FontAwesomeIcon
             icon={faTruckFast}
             style={{ color: "white", fontSize: 19 }} />,
@@ -249,6 +252,9 @@ const useStyles = makeStyles((theme) => ({
 
 function getSteps() {
     return [{
+        id: 1,
+        name: 'Nhận đơn'
+    },{
         id: 2,
         name: 'Đi thu'
     },
@@ -334,14 +340,17 @@ const Delivery = () => {
         let step = 0;
         if (currentOrder)
             switch (currentOrder.status) {
-                case 2:
+                case 1:
                     step = 0;
                     break;
-                case 3:
+                case 2:
                     step = 1;
                     break;
-                case 4:
+                case 3:
                     step = 2;
+                    break;
+                case 4:
+                    step = 3;
                     break;
                 default:
                     break;
