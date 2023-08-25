@@ -6,6 +6,7 @@ import {
     CmsFormikTextField,
     CmsFormikDateTimePicker,
     CmsCheckbox,
+    CmsTab,
 } from '@widgets/components';
 import { Box, Button, Chip, Icon, styled } from '@material-ui/core';
 import { alertInformation, initColumn } from '@widgets/functions';
@@ -13,12 +14,14 @@ import withReducer from 'app/store/withReducer';
 import reducer, { accounting } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import FuseLoading from '@fuse/core/FuseLoading';
-import { keyStore } from '../common';
+import { keyStore, linksBill } from '../common';
 import { useFormik } from 'formik';
 import { format } from 'date-fns';
 import { DropMenu } from 'app/main/order/components/index';
 import AddUserDialog from '../components/AddUserDialog';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { useParams } from 'react-router';
+import History from '@history/@history';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -244,7 +247,11 @@ function Meta() {
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
     const [selects, setSelects] = useState([]);
-    console.log(detail);
+    const params = useParams(), type = params.type;
+
+    if(!type)
+    History.push('/accounting/bill/1')
+
     const getListTable = useCallback((search) => {
         dispatch(accounting.bill.getList({ ...search }));
     }, [dispatch])
@@ -306,27 +313,27 @@ function Meta() {
                 title={'Quản lý Billing'}
                 toolbar={
                     <div className='flex items-center w-full'>
-                        <div className='w-1/2'>
-                            <Filter />
+                        <div className='w-1/3'>
+                            <CmsTab data={linksBill} value={0} isLink={true} onChange={(e, value) => {
+                                History.push(linksBill.find(e => e.id === value)?.link);
+                            }} />
                         </div>
-                        <div className='w-1/2 text-right pr-8'>
-                            {
-                                Boolean(selects?.length)
-                                &&
-                                <DropMenu
-                                    crName={`Lựa chọn`}
-                                    handleClose={(value, setAnchorEl) => {
-                                        if (value?.id === 1)
-                                            setOpenDialog('addUser')
-                                        setAnchorEl(null)
-                                    }}
-                                    className={`min-w-128`}
-                                    data={
-                                        [
-                                            { id: 1, name: 'Chọn nhân viên thu tiền' }
-                                        ]
-                                    } />
-                            }
+                        <div className='w-2/3 text-right pr-8 flex items-center'>
+                            <DropMenu
+                                disabled={selects?.length === 0}
+                                crName={`Lựa chọn`}
+                                handleClose={(value, setAnchorEl) => {
+                                    if (value?.id === 1)
+                                        setOpenDialog('addUser')
+                                    setAnchorEl(null)
+                                }}
+                                className={`min-w-128`}
+                                data={
+                                    [
+                                        { id: 1, name: 'Chọn nhân viên thu tiền' }
+                                    ]
+                                } />
+                            <Filter />
                         </div>
                     </div>
                 }
