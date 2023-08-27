@@ -29,7 +29,6 @@ import { modalSmall, saveFile } from './EmployCollection';
 import History from '@history/@history';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 import { showMessage } from 'app/store/fuse/messageSlice';
 import HeadDelivery from '../delivery/components/Header';
@@ -37,6 +36,8 @@ import { TakePhotoDialog } from '../delivery/EmployDelivery';
 import { accounting } from '../accounting/store';
 import { groupBy } from 'lodash';
 import { format } from 'date-fns';
+import Connect from '@connect/@connect';
+import OPTDialog from '../delivery/components/OPTDialog';
 
 const keyStore = 'accounting';
 
@@ -254,7 +255,7 @@ function getSteps() {
     return [{
         id: 1,
         name: 'Nhận đơn'
-    },{
+    }, {
         id: 2,
         name: 'Đi thu'
     },
@@ -445,17 +446,19 @@ const Delivery = () => {
         History.push(window.location.pathname);
     }
 
-    const handleSave2FA = (value, setLoading) => {
-        if (currentOrder?.shipping?.code === value) {
-            setLoading(true);
-            handleSave(value, setLoading)
-        } else {
-            setTimeout(() => {
-                dispatch(showMessage({ variant: "error", message: 'Sai mã OPT' }))
-            }, 0);
-        }
-    }
+    const handleSave2FA = (otp, setLoading) => {
+        setLoading(true);
 
+        Connect.live.order.other.checkOpt({ phone: currentOrder?.phone, otp }).then(val => {
+            formik.handleSubmit()
+        }).catch(() => {
+            setTimeout(() => {
+                dispatch(showMessage({ variant: "error", message: 'Sai mã code' }))
+            }, 0);
+        }).finally(() => {
+            setLoading(false);
+        })
+    }
 
     return (
         <div>
@@ -681,12 +684,12 @@ const Delivery = () => {
                                                 return
                                             }
 
-                                            //setOpenDialog('OPT');
+                                            setOpenDialog('OPT');
                                             getLocation(({ latitude, longitude }) => {
                                                 setLocationObject({ latitude, longitude })
-                                                setTimeout(() => {
-                                                    formik.handleSubmit()
-                                                }, 250);
+                                                // setTimeout(() => {
+                                                //     formik.handleSubmit()
+                                                // }, 250);
                                             }, dispatch);
                                         }
                                     }}
@@ -698,7 +701,7 @@ const Delivery = () => {
             </Dialog>
 
             {
-                openDialog === 'OPT' && <OPTDialog isOPT className={classes.modalSmall} open={true} handleSave={handleSave2FA} handleClose={() => setOpenDialog('')} />
+                openDialog === 'OPT' && <OPTDialog className={classes.modalSmall} open={true} handleSave={handleSave2FA} handleClose={() => setOpenDialog('')} />
             }
         </div>
     );

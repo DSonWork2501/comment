@@ -21,7 +21,6 @@ import Connect from '@connect/@connect';
 import { unwrapResult } from '@reduxjs/toolkit';
 import FuseLoading from '@fuse/core/FuseLoading/FuseLoading';
 import { returnListProductByOrderID, returnTotalAllProduct } from './common';
-import OPTDialog from './components/OPTDialog';
 import FuseMessage from '@fuse/core/FuseMessage/FuseMessage';
 import { getLocation } from '.';
 import MapLocation from './components/MapLocation';
@@ -32,6 +31,7 @@ import { TakePhotoDialog } from '../delivery/EmployDelivery';
 import { format } from 'date-fns';
 import reducer from './store';
 import MediaDialog from '../delivery/components/MediaDialog';
+import OPTDialog from '../delivery/components/OPTDialog';
 
 export const modalSmall = {
     '& .MuiDialog-paperFullWidth': {

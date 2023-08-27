@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const OPTDialog = ({ open, className, handleSave,handleClose, check, isOPT }) => {
+const OPTDialog = ({ open, className, handleSave, handleClose, check, isOPT }) => {
     const classes = useStyles();
     const [value, setValue] = useState('');
     const [fill, setFill] = useState(true);
@@ -118,6 +118,22 @@ const OPTDialog = ({ open, className, handleSave,handleClose, check, isOPT }) =>
                 >
                     Xác nhận
                 </Button> */}
+                <div>
+                    {
+                        isOPT
+                        &&
+                        <Button
+                            size='small'
+                            variant='contained'
+                            color='secondary'
+                            onClick={() => {
+
+                            }}
+                        >
+                            Gửi lại
+                        </Button>
+                    }
+                </div>
 
                 <CmsButtonProgress
                     loading={loading}
@@ -137,20 +153,7 @@ const OPTDialog = ({ open, className, handleSave,handleClose, check, isOPT }) =>
                     //className={clsx(file ? 'bg-green-500' : '')}
                     size="small" />
 
-                {
-                    isOPT
-                    &&
-                    <Button
-                        size='small'
-                        variant='contained'
-                        color='secondary'
-                        onClick={() => {
 
-                        }}
-                    >
-                        Gửi lại
-                    </Button>
-                }
             </div>
         </DialogContent>
     </Dialog>
