@@ -196,7 +196,7 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
             item?.type === 1 ? 'Tiền mặt' : 'Chuyển khoản'
         ),
         datecreate: (
-            item?.datecreate ? format(new Date(item.datecreate), 'dd-MM-yyyy HH:MM') : ''
+            item?.datecreate ? format(new Date(item.datecreate), 'dd-MM-yyyy HH:mm') : ''
         ),
         moneytotal: (
             item?.moneytotal ? item.moneytotal.toLocaleString('en-US') : '0'
@@ -248,13 +248,13 @@ function Meta() {
     const [detail, setDetail] = useState(null);
     const [selects, setSelects] = useState([]);
     const params = useParams(), type = params.type;
-
-    if(!type)
-    History.push('/accounting/bill/1')
+    console.log(detail);
+    if (!type)
+        History.push('/accounting/bill/1')
 
     const getListTable = useCallback((search) => {
-        dispatch(accounting.bill.getList({ ...search }));
-    }, [dispatch])
+        dispatch(accounting.bill.getList({ ...search, type }));
+    }, [dispatch, type])
 
     const searchString = JSON.stringify(search);
     useEffect(() => {
@@ -325,13 +325,41 @@ function Meta() {
                                 handleClose={(value, setAnchorEl) => {
                                     if (value?.id === 1)
                                         setOpenDialog('addUser')
+
+                                    if (value?.id === 2)
+                                        alertInformation({
+                                            text: `Xác nhận thao tác`,
+                                            data: {},
+                                            confirm: async () => {
+                                                try {
+                                                    const resultAction = await dispatch(accounting.income.insert(selects.map(val => {
+                                                        return { billingid: val, type: 2 }
+                                                    })));
+                                                    unwrapResult(resultAction);
+                                                    setOpenDialog('');
+                                                    getListTable(search);
+                                                    setSelects([]);
+                                                } catch (error) {
+                                                } finally {
+                                                }
+                                            },
+                                        });
                                     setAnchorEl(null)
                                 }}
                                 className={`min-w-128`}
                                 data={
                                     [
-                                        { id: 1, name: 'Chọn nhân viên thu tiền' }
-                                    ]
+                                        {
+                                            id: 1,
+                                            name: 'Chọn nhân viên thu tiền',
+                                            show: type === '1'
+                                        },
+                                        {
+                                            id: 2,
+                                            name: 'Tạo công nợ',
+                                            show: type === '2'
+                                        }
+                                    ].filter(val => val.show)
                                 } />
                             <Filter />
                         </div>

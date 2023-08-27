@@ -320,7 +320,8 @@ function Meta() {
         if (type === 1) {
             dispatch(accounting.meta.getList({ ...search, type }));
         } else {
-            dispatch(accounting.bill.getList({ ...search }));
+            dispatch(accounting.income.getList({ ...search }));
+            dispatch(accounting.income.getSummary({ ...search }));
         }
     }, [dispatch, type])
 

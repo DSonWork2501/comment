@@ -20,7 +20,38 @@ export const accounting = {
         }),
 
     },
+    income: {
+        insert: createAsyncThunk(`${appName}/${moduleName}/income/insert`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.income.insert(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getList: createAsyncThunk(`${appName}/${moduleName}/income/getList`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.income.getList(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getSummary: createAsyncThunk(`${appName}/${moduleName}/income/getSummary`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.income.getSummary(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+    },
     bill: {
+
         getList: createAsyncThunk(`${appName}/${moduleName}/bill/getList`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.accounting.bill.getList(params);
@@ -156,7 +187,8 @@ const accountingSlice = createSlice({
         collections: null,
         search: initSearchState,
         collectionBill: null,
-        collectionOrder: null
+        collectionOrder: null,
+        incomes: null
     },
     reducers: {
         /**
@@ -370,7 +402,7 @@ const accountingSlice = createSlice({
             }
         },
 
-        
+
         [accounting.bill.getCollectOrderPhone.pending]: state => ({
             ...state,
             loading: true,
@@ -391,6 +423,31 @@ const accountingSlice = createSlice({
             ...state,
             loading: false,
             collectionOrder: {
+                data: []
+            },
+            error: error
+        }),
+
+        [accounting.income.getList.pending]: state => ({
+            ...state,
+            loading: true,
+            incomes: {
+                data: []
+            },
+            error: null
+        }),
+        [accounting.income.getList.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                incomes: payload,
+                error: null
+            }
+        },
+        [accounting.income.getList.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            incomes: {
                 data: []
             },
             error: error
