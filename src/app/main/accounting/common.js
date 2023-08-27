@@ -30,8 +30,8 @@ export const modelUpdate = (field = initModel) => {
     return { ...initModel, ...field }
 }
 
-export const links = [
-    { id: 1, name: "Công nợ khách hàng", link: "/accounting/debts/1", icon: "star_rate" },
+export const links = (summary) => [
+    // { id: 1, name: "Công nợ khách hàng", link: "/accounting/debts/1", icon: "star_rate" },
     {
         id: 2, name: "Hạn thanh toán", link: "/accounting/debts/2", icon: "star_rate", otherComp: <div style={{
             position: 'relative',
@@ -40,7 +40,7 @@ export const links = [
             borderRadius: 5,
             color: 'white',
             background: 'gray'
-        }}>10</div>
+        }}>{summary?.han_thanh_toan || 0}</div>
     },
     {
         id: 3, name: "Quá hạn", link: "/accounting/debts/3", icon: "star_rate", otherComp: <div style={{
@@ -50,7 +50,7 @@ export const links = [
             borderRadius: 5,
             color: 'white',
             background: 'gray'
-        }}>10</div>
+        }}>{summary?.qua_han || 0}</div>
     },
     {
         id: 4, name: "Hạn hôm nay", link: "/accounting/debts/4", icon: "star_rate", otherComp: <div style={{
@@ -60,28 +60,28 @@ export const links = [
             borderRadius: 5,
             color: 'white',
             background: 'gray'
-        }}>10</div>
+        }}>{summary?.hom_nay || 0}</div>
     },
-    {
-        id: 5, name: "Hạn 7 ngày tới", link: "/accounting/debts/5", icon: "star_rate", otherComp: <div style={{
-            position: 'relative',
-            top: 5,
-            padding: '0 5px',
-            borderRadius: 5,
-            color: 'white',
-            background: 'gray'
-        }}>10</div>
-    },
-    {
-        id: 6, name: "Hạn trên 7 ngày", link: "/accounting/debts/5", icon: "star_rate", otherComp: <div style={{
-            position: 'relative',
-            top: 5,
-            padding: '0 5px',
-            borderRadius: 5,
-            color: 'white',
-            background: 'gray'
-        }}>10</div>
-    },
+    // {
+    //     id: 5, name: "Hạn 7 ngày tới", link: "/accounting/debts/5", icon: "star_rate", otherComp: <div style={{
+    //         position: 'relative',
+    //         top: 5,
+    //         padding: '0 5px',
+    //         borderRadius: 5,
+    //         color: 'white',
+    //         background: 'gray'
+    //     }}>10</div>
+    // },
+    // {
+    //     id: 6, name: "Hạn trên 7 ngày", link: "/accounting/debts/5", icon: "star_rate", otherComp: <div style={{
+    //         position: 'relative',
+    //         top: 5,
+    //         padding: '0 5px',
+    //         borderRadius: 5,
+    //         color: 'white',
+    //         background: 'gray'
+    //     }}>10</div>
+    // },
 ];
 
 export const linksBill = [

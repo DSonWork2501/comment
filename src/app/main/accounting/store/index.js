@@ -188,7 +188,8 @@ const accountingSlice = createSlice({
         search: initSearchState,
         collectionBill: null,
         collectionOrder: null,
-        incomes: null
+        incomes: null,
+        summary: null
     },
     reducers: {
         /**
@@ -467,6 +468,15 @@ const accountingSlice = createSlice({
                 ...state,
                 loading: false,
                 userDelivery: payload,
+                error: null
+            }
+        },
+
+        [accounting.income.getSummary.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                summary: payload?.data,
                 error: null
             }
         },
