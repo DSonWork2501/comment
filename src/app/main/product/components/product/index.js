@@ -36,7 +36,7 @@ const columns = [
         </Tooltip>, alignHeader: "center", alignValue: "center", sortable: false
     }),
     new initColumn({
-        field: "box", label: <Tooltip title="Tồn trong kho">
+        field: "box", label: <Tooltip title="Tạm giữ">
             <FontAwesomeIcon icon={faArchive} style={{ color: 'orange', fontSize: 17 }} />
         </Tooltip>, alignHeader: "center", alignValue: "center", sortable: false
     }),
@@ -49,14 +49,6 @@ function ProductView() {
     const entities = useSelector(store => store[keyStore].product.entities)
     const [filterOptions, setFilterOptions] = useState(null);
 
-    const JsonParseString = (str) => {
-        try {
-            return JSON.parse(str)
-        } catch (error) {
-            return null
-        }
-    }
-
     useEffect(() => {
         dispatch(getProduct(search))
     }, [dispatch, search])
@@ -68,12 +60,15 @@ function ProductView() {
     const data = entities?.data?.map(item => ({
         id: item.id,
         name: item.name,
-        catename: JsonParseString(item.catename) ? JsonParseString(item.catename).join(', ') : <div></div>,
+        catename: item.catename,
         shortname: item.shortname,
         image: (<img style={{ height: 100, margin: '0 auto' }} src={`${item.image ? `${process.env.REACT_APP_BASE_URL}api/product/img/${item?.image}` : 'assets/images/etc/no-image-icon.png'}`} alt={item?.img} />),
         sku: item.sku,
         price: item.price ? parseInt(item.price).toLocaleString() : 0,
         inventory: item.inventory || '0',
+        run: item.shipping || '0',
+        box: item.holding || '0',
+        home: item.remain || '0',
         action: (
             <div className="flex flex-row space-x-4">
                 <CmsIconButton

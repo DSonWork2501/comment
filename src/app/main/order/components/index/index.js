@@ -62,7 +62,7 @@ const LayoutCustom = styled(Box)({
     }
 });
 
-export const DropMenu = ({ crName, data, handleClose, className, small }) => {
+export const DropMenu = ({ crName, data, handleClose, className, small, disabled }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const classes = useStyles();
     const handleClick = (event) => {
@@ -75,7 +75,7 @@ export const DropMenu = ({ crName, data, handleClose, className, small }) => {
 
     return (
         <div>
-            <Button aria-controls="dropdown-menu" className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="contained" aria-haspopup="true" onClick={handleClick}>
+            <Button aria-controls="dropdown-menu" disabled={disabled} className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="contained" aria-haspopup="true" onClick={handleClick}>
                 {crName}
                 {
                     Boolean(data?.length)

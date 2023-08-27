@@ -84,6 +84,11 @@ export const links = [
     },
 ];
 
+export const linksBill = [
+    { id: 1, name: "Tiền mặt", link: "/accounting/bill/1", icon: "star_rate" },
+    { id: 2, name: "Chuyển khoản", link: "/accounting/bill/2", icon: "star_rate" },
+]
+
 export const metaStatus = [
     {
         id: 0,
