@@ -621,17 +621,20 @@ function DetailBBBG() {
                                     ? <OrderTable entities={orders} loading={loading} setSearch={setSearch} />
                                     : type === '3'
                                         ? <DistrictTable entities={entities} loading={loading} setSearch={setSearch} />
-                                        : <MapLocation open={type === '4'} entities={{
-                                            ...entities,
-                                            data: entities?.data?.length ? entities.data.map(val => ({
-                                                ...val,
-                                                customeraddress: val.address,
-                                                customerward: val.ward,
-                                                customerdistrict: val.district,
-                                                customercity: val.city
-                                            }))
-                                                : []
-                                        }} loading={loading} setSearch={setSearch} />
+                                        : <MapLocation
+                                            backURl='/collection'
+                                            open={type === '4'}
+                                            entities={{
+                                                ...entities,
+                                                data: entities?.data?.length ? entities.data.map(val => ({
+                                                    ...val,
+                                                    customeraddress: val.address,
+                                                    customerward: val.ward,
+                                                    customerdistrict: val.district,
+                                                    customercity: val.city
+                                                }))
+                                                    : []
+                                            }} loading={loading} setSearch={setSearch} />
                         }
 
                     </div>

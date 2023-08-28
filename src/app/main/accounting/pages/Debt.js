@@ -300,11 +300,11 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
     </>
 }
 
-const addDays = (date, numberDate) => {
-    const newDate = new Date(date);
-    newDate.setDate(newDate.getDate() + numberDate);
-    return newDate
-};
+// const addDays = (date, numberDate) => {
+//     const newDate = new Date(date);
+//     newDate.setDate(newDate.getDate() + numberDate);
+//     return newDate
+// };
 
 const minusDays = (date, numberDate) => {
     const newDate = new Date(date);

@@ -328,7 +328,7 @@ const MapLocation = ({ open, entities }) => {
                     width: 70,
                     textAlign: 'center'
                 }}>
-                    <div className='bg-white p-8 cursor-pointer rounded-4 shadow-4' onClick={() => History.push(window.location.pathname.replace('/4/', '/3/'))}>
+                    <div className='bg-white p-8 cursor-pointer rounded-4 shadow-4' onClick={() => History.push(window.location.pathname.replace('/4/', '/2/'))}>
                         Trở về
                     </div>
                 </div>

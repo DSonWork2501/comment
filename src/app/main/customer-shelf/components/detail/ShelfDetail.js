@@ -78,6 +78,7 @@ export const ProductPopup = ({ setTab, handleChooseUniqueID }) => {
     }, [dispatch, search])
 
     const handleClickSku = (event, value) => {
+        console.log(value);
         setChosenSku(value);
     }
 
