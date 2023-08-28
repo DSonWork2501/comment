@@ -190,6 +190,17 @@ export const product = {
             return thunkAPI.rejectWithValue(error)
         }
     }),
+    addRecommend: createAsyncThunk(`${appName}/${moduleName}/addRecommend`, async (entity, thunkAPI) => {
+        try {
+            const response = await connect.live.product.addRecommend(entity);
+            thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thành công !' }))
+            const data = await response.data;
+            return data
+        } catch (error) {
+            thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+            return thunkAPI.rejectWithValue(error)
+        }
+    }),
     other: {
         removeProperties: createAsyncThunk(`${appName}/${moduleName}/other/removeProperties`, async (entity, thunkAPI) => {
             try {

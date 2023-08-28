@@ -3,7 +3,7 @@ import { CmsCardedPage, CmsTableBasic, CmsLabel, CmsIconButton, CmsTab, CmsFormi
 import { Box, Button, Chip, Icon, TableCell, TableRow, styled } from '@material-ui/core';
 import { alertInformation, initColumn } from '@widgets/functions';
 import withReducer from 'app/store/withReducer';
-import reducer, { accounting } from '../store';
+import reducer, { accounting, setReduxState } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 import FuseLoading from '@fuse/core/FuseLoading';
 import { keyStore, links } from '../common';
@@ -230,25 +230,49 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
 
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
-        new initColumn({ field: "status3", label: `Hóa đơn`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "name", label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "status", label: `Người lập phiếu`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "billingid", label: `Hóa đơn`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "createdate", label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "usercreate", label: `Người lập phiếu`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
         new initColumn({ field: "status1", label: `Hạn thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "statu2", label: `Khách hàng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "statu4", label: `Tiền hàng`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "status5", label: `Chiết khấu`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "statu6", label: `Tổng thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "statu6", label: `Đã thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "statu6", label: `Còn nợ`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
+        new initColumn({ field: "incomevalue", label: `Tiền hàng`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "incomevalue1", label: `Chiết khấu`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "incomevalue2", label: `Tổng thanh toán`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "statu7", label: `Đã thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "statu8", label: `Còn nợ`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "type", label: `Loại thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
     const data = entities && entities.data && entities.data.map((item, index) => ({
         ...item,
         original: item,
+        type: (item.type === 1 ? 'Tiền mặt' : 'Chuyển khoản'),
+        customer: (
+            <div>
+                <div>
+                    {item?.cusname}
+                </div>
+                <div>
+                    {item?.email}
+                </div>
+            </div>
+        ),
+        incomevalue: (
+            item?.incomevalue ? item.incomevalue.toLocaleString('en-US') : '0'
+        ),
+        incomevalue1: (
+            '0'
+        ),
+        incomevalue2: (
+            item?.incomevalue ? item.incomevalue.toLocaleString('en-US') : '0'
+        ),
         STT: (
             <React.Fragment>
                 <CmsLabel content={`${(index + 1)}`} />
             </React.Fragment>
+        ),
+        createdate: (
+            item?.createdate ? format(new Date(item.createdate), 'dd-MM-yyyy') : null
         ),
         status: (
             <React.Fragment>
@@ -316,31 +340,28 @@ const returnSearch = (type) => {
 
 }
 
-function Meta() {
+function Meta(type) {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].loading);
     const entities = useSelector(store => store[keyStore].incomes);
     const summary = useSelector(store => store[keyStore].summary);
     const searchDefault = useSelector(store => store[keyStore].search);
-    const params = useParams(), type = (params.type);
     const [search, setSearch] = useState({ ...searchDefault, ...returnSearch(type) });
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
     const [pass, setPass] = useState(false);
 
-    if (!type) {
-        History.push('/accounting/debts/2')
-    }
+
 
     const getListTable = useCallback((search) => {
         if (summary && pass) {
             let filter = { ...search };
-            dispatch(accounting.income.getList({ ...filter }));
+            dispatch(accounting.income.getList({ ...filter, status: 1 }));
         }
     }, [dispatch, summary, pass])
 
     useEffect(() => {
-        if (summary)
+        if (summary && type) {
             setSearch(prev => {
                 let filter = { ...prev };
                 if (type === '2') {
@@ -360,6 +381,8 @@ function Meta() {
                 setPass(true)
                 return { ...filter, type }
             })
+        }
+
     }, [type, summary])
 
     useEffect(() => {
@@ -377,6 +400,14 @@ function Meta() {
             setDetail(null);
     }, [openDialog])
 
+    useEffect(() => {
+        return () => {
+            dispatch(setReduxState({
+                summary: null,
+                incomes: null
+            }))
+        }
+    }, [])
 
     const handleCloseDialog = () => {
         setOpenDialog('');
@@ -470,4 +501,15 @@ function Meta() {
     );
 }
 
-export default withReducer(keyStore, reducer)(Meta);
+const CheckTab = () => {
+    const params = useParams(), type = (params.type);
+
+    if (!type) {
+        History.push('/accounting/debts/2')
+        return null
+    } else {
+        return <Meta type={type} />
+    }
+}
+
+export default withReducer(keyStore, reducer)(CheckTab);
