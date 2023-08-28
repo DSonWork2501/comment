@@ -35,7 +35,7 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, listCheckTemp, set
     const handleClickSku = (event, value) => {
         console.log('value', value)
         setView(View.uniqueIdList.id)
-        setChosenSku({ ...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.image, sku: value?.sku, uniqueid: null, price: JSON.parse(value?.price || 0) })
+        setChosenSku({ ...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.image, sku: value?.sku, uniqueid: null, price: parseInt(value?.price) || 0 })
         // formik.setFieldValue(`${prefix}.item`, { ...get(formik.values, `${prefix}.item`), name: value?.name, img: value?.img, sku: value?.sku, uniqueid: null })
     }
 

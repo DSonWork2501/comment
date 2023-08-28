@@ -12,6 +12,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import History from '@history';
 import { useParams } from 'react-router';
 import { useFormik } from 'formik';
+import { format } from 'date-fns';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -26,13 +27,14 @@ const LayoutCustom = styled(Box)({
 
 const initialValues = {
     name: '',
-    status: null
+    fromDate: null,
+    toDate: null,
 };
 
 const Filter = ({ onSearch, search, namePage }) => {
 
     const formik = useFormik({
-        initialValues,
+        initialValues: search,
         onSubmit: handleSubmit
     })
     const { setFieldValue } = formik;
@@ -42,9 +44,7 @@ const Filter = ({ onSearch, search, namePage }) => {
             for (const key in initialValues) {
                 if (search[key] !== initialValues[key]) {
                     let value = search[key];
-                    if (key === 'status') {
-                        value = JSON.stringify(search[key])
-                    }
+
                     setFieldValue(key, value);
                 }
             }
@@ -53,8 +53,6 @@ const Filter = ({ onSearch, search, namePage }) => {
 
     function handleSubmit(value) {
         let values = { ...value };
-        if (values.status)
-            values.status = parseInt(values.status);
         onSearch(values);
     }
 
@@ -302,28 +300,71 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
     </>
 }
 
+// const addDays = (date, numberDate) => {
+//     const newDate = new Date(date);
+//     newDate.setDate(newDate.getDate() + numberDate);
+//     return newDate
+// };
+
+const minusDays = (date, numberDate) => {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() - numberDate);
+    return newDate
+};
+
+const returnSearch = (type) => {
+
+}
+
 function Meta() {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].loading);
-    const entities = useSelector(store => store[keyStore].entities);
+    const entities = useSelector(store => store[keyStore].incomes);
+    const summary = useSelector(store => store[keyStore].summary);
     const searchDefault = useSelector(store => store[keyStore].search);
     const params = useParams(), type = (params.type);
-    const [search, setSearch] = useState(searchDefault);
+    const [search, setSearch] = useState({ ...searchDefault, ...returnSearch(type) });
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
+    const [pass, setPass] = useState(false);
 
     if (!type) {
-        History.push('/accounting/debts/1')
+        History.push('/accounting/debts/2')
     }
 
     const getListTable = useCallback((search) => {
-        if (type === 1) {
-            dispatch(accounting.meta.getList({ ...search, type }));
-        } else {
-            dispatch(accounting.income.getList({ ...search }));
-            dispatch(accounting.income.getSummary({ ...search }));
+        if (summary && pass) {
+            let filter = { ...search };
+            dispatch(accounting.income.getList({ ...filter }));
         }
-    }, [dispatch, type])
+    }, [dispatch, summary, pass])
+
+    useEffect(() => {
+        if (summary)
+            setSearch(prev => {
+                let filter = { ...prev };
+                if (type === '2') {
+                    filter.fromDate = format(minusDays(new Date(), -summary?.diff), 'yyyy-MM-dd');
+                    filter.toDate = format(new Date(), 'yyyy-MM-dd');
+                }
+
+                if (type === '3') {
+                    filter.fromDate = format(minusDays(new Date(), -summary?.diff), 'yyyy-MM-dd');
+                    filter.toDate = format(minusDays(new Date(), 1), 'yyyy-MM-dd');
+                }
+
+                if (type === '4') {
+                    filter.fromDate = format(new Date(), 'yyyy-MM-dd');
+                    filter.toDate = format(new Date(), 'yyyy-MM-dd');
+                }
+                setPass(true)
+                return { ...filter, type }
+            })
+    }, [type, summary])
+
+    useEffect(() => {
+        dispatch(accounting.income.getSummary());
+    }, [dispatch])
 
     const searchString = JSON.stringify(search);
     useEffect(() => {
@@ -396,14 +437,14 @@ function Meta() {
                 title={'Quản lý thanh toán'}
                 toolbar={
                     <>
-                        <CmsTab data={links} value={0} isLink={true} onChange={(e, value) => {
-                            History.push(links.find(e => e.id === value)?.link)
+                        <CmsTab data={links(summary)} value={0} isLink={true} onChange={(e, value) => {
+                            History.push(links(summary).find(e => e.id === value)?.link)
                         }} />
                     </>
                 }
                 moreToolbar={
                     <>
-                        <Filter />
+                        <Filter search={search} />
                     </>
                 }
                 content={

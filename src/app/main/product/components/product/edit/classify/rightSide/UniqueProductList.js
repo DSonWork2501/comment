@@ -88,12 +88,12 @@ function UniqueProductListComponent({ sku, onClickView, skuItem, onClickChooseUn
     const data = entities || []
     return (
         <div className="w-full h-full">
-            <div className="w-full flex flex-row-reverse">
+            <div className="w-full flex flex-row-reverse mb-4">
                 <CmsButton startIcon="arrow_back" label="quay về danh sách sku" onClick={() => onClickView()} />
             </div>
             <CmsLoading loading={loading} />
             {data.length > 0 ?
-                <div className="w-full">
+                <div className="w-full space-y-4">
                     {data.map((item, index) => (
                         <DetailUniqueProductComponent
                             item={item}
