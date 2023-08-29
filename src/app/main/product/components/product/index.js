@@ -14,7 +14,7 @@ import { getList as getCategory } from "../../store/categorySlice";
 import History from "@history";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArchive, faHome, faTruck } from "@fortawesome/free-solid-svg-icons";
-import { Tooltip } from "@material-ui/core";
+import { Chip, Tooltip } from "@material-ui/core";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { DropMenu } from "app/main/order/components/index";
 
@@ -56,6 +56,7 @@ function ProductView() {
         new initColumn({ field: "catename", label: "Danh Mục", alignHeader: "center", alignValue: "left", sortable: false }),
         new initColumn({ field: "name", label: "Tên S/P", alignHeader: "center", alignValue: "left", sortable: false }),
         new initColumn({ field: "shortname", label: "Tên Ngắn", alignHeader: "left", alignValue: "left", sortable: false }),
+        new initColumn({ field: "recommend", label: "SP gợi ý", alignHeader: "center", alignValue: "center", sortable: false }),
         new initColumn({ field: "image", label: "Hình Ảnh", alignHeader: "center", alignValue: "center", sortable: false }),
         new initColumn({ field: "price", label: "Giá", alignHeader: "center", alignValue: "center", sortable: false }),
         new initColumn({ field: "inventory", label: "Tồn", alignHeader: "center", alignValue: "center", sortable: false }),
@@ -88,10 +89,10 @@ function ProductView() {
                         ? setSelects(value => value.filter(e => e !== item.sku))
                         : setSelects(value => [...value, item.sku])
                 }}
-                disabled={Boolean(item?.recommend)}
                 name="select"
             />
         ),
+        recommend: (item?.recommend ? <Chip label="Có" className="bg-green text-white" />:<Chip label="Không" className="bg-red text-white" />),
         id: item.id,
         name: item.name,
         catename: item.catename,
@@ -200,7 +201,26 @@ function ProductView() {
                                             confirm: async () => {
                                                 try {
                                                     const resultAction = await dispatch(product.addRecommend(
-                                                        selects.map(val => ({ sku: val }))
+                                                        selects.map(val => ({ sku: val, recommend: 1 }))
+                                                    ));
+                                                    unwrapResult(resultAction);
+                                                    dispatch(getProduct(search));
+                                                    setSelects([]);
+                                                } catch (error) {
+                                                } finally {
+                                                }
+                                            },
+                                        });
+                                    }
+
+                                    if (value?.id === 2) {
+                                        alertInformation({
+                                            text: `Xác nhận thao tác`,
+                                            data: {},
+                                            confirm: async () => {
+                                                try {
+                                                    const resultAction = await dispatch(product.addRecommend(
+                                                        selects.map(val => ({ sku: val, recommend: 0 }))
                                                     ));
                                                     unwrapResult(resultAction);
                                                     dispatch(getProduct(search));
@@ -218,7 +238,8 @@ function ProductView() {
                                 className={`min-w-128 mr-8`}
                                 data={
                                     [
-                                        { id: 1, name: 'Thêm sản phẩm gợi ý' }
+                                        { id: 1, name: 'Thêm sản phẩm gợi ý' },
+                                        { id: 2, name: 'Bỏ sản phẩm gợi ý' }
                                     ]
                                 } />
                         }

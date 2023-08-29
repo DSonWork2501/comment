@@ -1,5 +1,5 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup";
-import { CmsButton, CmsCheckboxGroup, CmsFormikAutocomplete, CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2, CmsTinyMceEditor } from "@widgets/components";
+import { CmsButton, CmsCheckboxGroup, CmsFormikAutocomplete, CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/components";
 import React, { useEffect } from "react";
 import MutipleImagePathLink from "../../common/MultipleImagePathLink";
 import noImage from '@widgets/images/noImage.jpg';

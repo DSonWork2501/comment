@@ -407,7 +407,7 @@ function Meta(type) {
                 incomes: null
             }))
         }
-    }, [])
+    }, [dispatch])
 
     const handleCloseDialog = () => {
         setOpenDialog('');
