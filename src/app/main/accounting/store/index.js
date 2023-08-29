@@ -31,6 +31,16 @@ export const accounting = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        confirm: createAsyncThunk(`${appName}/${moduleName}/income/confirm`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.income.confirm(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
         getList: createAsyncThunk(`${appName}/${moduleName}/income/getList`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.accounting.income.getList(params);

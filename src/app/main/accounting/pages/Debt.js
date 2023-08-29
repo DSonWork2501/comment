@@ -231,77 +231,104 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
         new initColumn({ field: "billingid", label: `Hóa đơn`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "createdate", label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "createdate", style: { width: 100 }, label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "usercreate", label: `Người lập phiếu`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "status1", label: `Hạn thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "incomevalue", label: `Tiền hàng`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "incomevalue1", label: `Chiết khấu`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "incomevalue2", label: `Tổng thanh toán`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
-        new initColumn({ field: "statu7", label: `Đã thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "statu8", label: `Còn nợ`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
-        new initColumn({ field: "type", label: `Loại thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "type", style: { width: 150 }, label: `Loại thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
     ]
 
-    const data = entities && entities.data && entities.data.map((item, index) => ({
-        ...item,
-        original: item,
-        type: (item.type === 1 ? 'Tiền mặt' : 'Chuyển khoản'),
-        customer: (
-            <div>
+    const data = entities && entities.data && entities.data.map((item, index) => {
+        const value = JSON.parse(item.incomes);
+        console.log(value);
+        return ({
+            ...item,
+            original: item,
+            type: (item.type === 1 ? 'Tiền mặt' : 'Chuyển khoản'),
+            customer: (
                 <div>
-                    {item?.cusname}
+                    <div>
+                        {item?.cusname}
+                    </div>
+                    <div>
+                        {item?.email}
+                    </div>
+                    <div>
+                        {item?.address ? item?.address + ', ' : ''} {item?.ward ? item?.ward + ', ' : ''}  {item?.district ? item?.district + ', ' : ''} {item?.city || ''}
+                    </div>
                 </div>
-                <div>
-                    {item?.email}
+            ),
+            incomevalue: (
+                item?.incomevalue ? item.incomevalue.toLocaleString('en-US') : '0'
+            ),
+            incomevalue1: (
+                '0'
+            ),
+            incomevalue2: (
+                <div style={{ width: 400 }}>
+                    {value.map((val, i) => {
+                        return <div className='flex justify-between border-b' key={i}>
+                            <div>
+                                Order ID:  {val.orderid}
+                            </div>
+                            <div>
+                                {
+                                    val?.incomevalue ? val.incomevalue.toLocaleString('en-US') : '0'
+                                }
+                            </div>
+                        </div>
+                    })}
+                    <div className='flex justify-between ' >
+                        <div>
+                            <b>
+                                Tổng tiền:
+                            </b>
+                        </div>
+                        <div>
+                            {
+                                item?.incomevalue ? item.incomevalue.toLocaleString('en-US') : '0'
+                            }
+                        </div>
+                    </div>
                 </div>
-            </div>
-        ),
-        incomevalue: (
-            item?.incomevalue ? item.incomevalue.toLocaleString('en-US') : '0'
-        ),
-        incomevalue1: (
-            '0'
-        ),
-        incomevalue2: (
-            item?.incomevalue ? item.incomevalue.toLocaleString('en-US') : '0'
-        ),
-        STT: (
-            <React.Fragment>
-                <CmsLabel content={`${(index + 1)}`} />
-            </React.Fragment>
-        ),
-        createdate: (
-            item?.createdate ? format(new Date(item.createdate), 'dd-MM-yyyy') : null
-        ),
-        status: (
-            <React.Fragment>
-                {
-                    item.status === 0
-                    &&
-                    <Chip label="Tắt" color='secondary' />
-                }
+            ),
+            STT: (
+                <React.Fragment>
+                    <CmsLabel content={`${(index + 1)}`} />
+                </React.Fragment>
+            ),
+            createdate: (
+                item?.createdate ? format(new Date(item.createdate), 'dd-MM-yyyy') : null
+            ),
+            status: (
+                <React.Fragment>
+                    {
+                        item.status === 0
+                        &&
+                        <Chip label="Tắt" color='secondary' />
+                    }
 
-                {
-                    item.status === 1
-                    &&
-                    <Chip label="Hoạt động" color='primary' />
-                }
-            </React.Fragment>
-        ),
-        action: (
-            <CmsIconButton
-                tooltip="Cập nhật tiền"
-                delay={50}
-                icon="attach_money"
-                className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
-                onClick={() => {
-                    setDetail(item);
-                    setOpenDialog('money');
-                }}
-            />
-        )
-    }))
+                    {
+                        item.status === 1
+                        &&
+                        <Chip label="Hoạt động" color='primary' />
+                    }
+                </React.Fragment>
+            ),
+            action: (
+                <CmsIconButton
+                    tooltip="Xác nhận tiền"
+                    delay={50}
+                    icon="receipt"
+                    className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
+                    onClick={() => {
+                        setDetail(item);
+                        setOpenDialog('money');
+                    }}
+                />
+            )
+        })
+    })
 
     if (!data) {
         return <FuseLoading />
@@ -340,7 +367,7 @@ const returnSearch = (type) => {
 
 }
 
-function Meta(type) {
+function Meta({ type }) {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].loading);
     const entities = useSelector(store => store[keyStore].incomes);
@@ -350,7 +377,6 @@ function Meta(type) {
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
     const [pass, setPass] = useState(false);
-
 
 
     const getListTable = useCallback((search) => {
@@ -379,6 +405,8 @@ function Meta(type) {
                     filter.toDate = format(new Date(), 'yyyy-MM-dd');
                 }
                 setPass(true)
+                console.log(filter);
+
                 return { ...filter, type }
             })
         }
@@ -414,18 +442,22 @@ function Meta(type) {
     }
 
     const handleSubmit = async (values, form) => {
+        const value = JSON.parse(detail.incomes),
+        data=value.map(val=>({
+            "id": val.id,
+            "orderid": val.orderid,
+            "billingid": val.billingid,
+            "status": 2,
+            "note": values.note,
+        }))
+
         alertInformation({
             text: `Xác nhận thao tác`,
             data: { values, form },
             confirm: async () => {
                 try {
-                    const resultAction = values?.id
-                        ? await dispatch(accounting.meta.update({ value: [values], type }))
-                        : await dispatch(accounting.meta.create({ value: [values], type }));
+                    const resultAction = await dispatch(accounting.income.confirm(data));
                     unwrapResult(resultAction);
-                    if (!values?.id) {
-                        form.resetForm();
-                    }
                     setOpenDialog('');
                     getListTable(search);
                 } catch (error) {
@@ -457,7 +489,7 @@ function Meta(type) {
                     open={openDialog === 'money'}
                     handleClose={handleCloseDialog}
                     handleSubmit={handleSubmit}
-                    title={'Cập nhật tiền'}
+                    title={'Xác nhận đã nhận tiền'}
                     detail={detail}
                 />
             }
