@@ -290,7 +290,16 @@ const accountingSlice = createSlice({
                     }
                 }
             }
-        }
+        },
+
+        setReduxState: {
+            reducer: (state, { payload }) => {
+                return {
+                    ...state,
+                    ...payload
+                }
+            }
+        },
     },
     extraReducers: {
         [accounting.meta.getList.pending]: state => ({
@@ -483,6 +492,6 @@ const accountingSlice = createSlice({
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setPosition1, setPosition2, resetContractDetail, setContractDetail, resetIncome, resetForm } = accountingSlice.actions;
+export const { setSelected, setSearch, resetSearch, setPosition1, setPosition2, resetContractDetail, setContractDetail, resetIncome, resetForm, setReduxState } = accountingSlice.actions;
 
 export default accountingSlice.reducer;

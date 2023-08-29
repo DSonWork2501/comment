@@ -1,5 +1,5 @@
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup";
-import { CmsButton, CmsCheckboxGroup, CmsFormikAutocomplete, CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2, CmsTinyMceEditor } from "@widgets/components";
+import { CmsButton, CmsCheckboxGroup, CmsFormikAutocomplete, CmsFormikRadioGroup, CmsFormikTextField, CmsImageBox2 } from "@widgets/components";
 import React, { useEffect } from "react";
 import MutipleImagePathLink from "../../common/MultipleImagePathLink";
 import noImage from '@widgets/images/noImage.jpg';
@@ -102,7 +102,7 @@ function BasicInfo({ formik, SaveData, options, handleFresh }) {
                     setOption={(option) => option?.name || ''}
                     valueIsId />
 
-                {/* <CmsFormikTextField size="small" multiline={true} formik={formik} name="description" label="Mô tả" /> */}
+                <CmsFormikTextField size="small" multiline={true} formik={formik} name="description" label="Mô tả" />
 
                 {/* <CmsFormikTextField size="small" formik={formik} name="unit" label="đơn vị" />
                 <CmsFormikTextField size="small" formik={formik} name="classify" label="phân loại" /> */}
@@ -330,7 +330,7 @@ function BasicInfo({ formik, SaveData, options, handleFresh }) {
 
                 </BoxCustom>
 
-                <BoxCustom
+                {/* <BoxCustom
                     className="p-16 py-20 mt-25 border-1 rounded-4 black-label">
                     <InputLabel
                         className='custom-label'>
@@ -339,7 +339,7 @@ function BasicInfo({ formik, SaveData, options, handleFresh }) {
                     <CmsTinyMceEditor
                         value={formik.values['description']}
                         onChange={(event) => { formik.setFieldValue('description', event.target.getContent()) }} />
-                </BoxCustom>
+                </BoxCustom> */}
             </div>
         </FuseAnimateGroup>
     )

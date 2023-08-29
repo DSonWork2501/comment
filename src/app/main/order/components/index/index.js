@@ -62,7 +62,7 @@ const LayoutCustom = styled(Box)({
     }
 });
 
-export const DropMenu = ({ crName, data, handleClose, className, small, disabled }) => {
+export const DropMenu = ({ crName, data, handleClose, className, small, disabled, pcBtn }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const classes = useStyles();
     const handleClick = (event) => {
@@ -75,14 +75,27 @@ export const DropMenu = ({ crName, data, handleClose, className, small, disabled
 
     return (
         <div>
-            <Button aria-controls="dropdown-menu" disabled={disabled} className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="contained" aria-haspopup="true" onClick={handleClick}>
-                {crName}
-                {
-                    Boolean(data?.length)
-                    &&
-                    <ArrowDropDown />
-                }
-            </Button>
+            {
+                pcBtn
+                    ? <CmsButton
+                        label={crName}
+                        endIcon="arrow_drop_down"
+                        disabled={disabled}
+                        className={className}
+                        aria-haspopup="true"
+                        color="primary"
+                        onClick={handleClick} />
+
+                    : <Button aria-controls="dropdown-menu" disabled={disabled} className={className} size="small" style={{ textTransform: 'initial' }} color="primary" variant="contained" aria-haspopup="true" onClick={handleClick}>
+                        {crName}
+                        {
+                            Boolean(data?.length)
+                            &&
+                            <ArrowDropDown />
+                        }
+                    </Button>
+            }
+
             {
                 Boolean(data?.length)
                 &&
@@ -153,6 +166,7 @@ function OrderView() {
         7: summary?.van_chuyen ? summary?.van_chuyen?.toLocaleString('en-US') : 0,
     }
     const [selects, setSelects] = useState([]);
+
 
     const columns = [
         new initColumn({
