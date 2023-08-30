@@ -297,11 +297,11 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
                                 Tổng tiền:
                             </b>
                         </div>
-                        <div>
+                        <b className='text-green'>
                             {
                                 item?.incomevalue ? item.incomevalue.toLocaleString('en-US') : '0'
                             }
-                        </div>
+                        </b>
                     </div>
                 </div>
             ),
