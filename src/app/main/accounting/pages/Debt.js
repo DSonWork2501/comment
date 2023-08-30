@@ -13,6 +13,7 @@ import History from '@history';
 import { useParams } from 'react-router';
 import { useFormik } from 'formik';
 import { format } from 'date-fns';
+import ViewModelsDialog from '../components/ViewModelsDialog';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -247,8 +248,10 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
         new initColumn({ field: "createdate", style: { width: 100 }, label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "usercreate", label: `Người lập phiếu`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
         new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "incomevalue2", label: `Tổng thanh toán`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "incomevalue2", style: { width: 150 }, label: `Tổng thanh toán`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "diff", style: { width: 150 }, label: `Số ngày quá nợ`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "type", style: { width: 150 }, label: `Loại thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
     ]
 
     const data = entities && entities.data && entities.data.map((item, index) => {
@@ -256,6 +259,7 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
         console.log(value);
         return ({
             ...item,
+            diff: -item.diff,
             original: item,
             type: (item.type === 1 ? 'Tiền mặt' : 'Chuyển khoản'),
             customer: (
@@ -278,32 +282,11 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
                 '0'
             ),
             incomevalue2: (
-                <div style={{ width: 400 }}>
-                    {value.map((val, i) => {
-                        return <div className='flex justify-between border-b' key={i}>
-                            <div>
-                                Order ID:  {val.orderid}
-                            </div>
-                            <div>
-                                {
-                                    val?.incomevalue ? val.incomevalue.toLocaleString('en-US') : '0'
-                                }
-                            </div>
-                        </div>
-                    })}
-                    <div className='flex justify-between ' >
-                        <div>
-                            <b>
-                                Tổng tiền:
-                            </b>
-                        </div>
-                        <b className='text-green'>
-                            {
-                                item?.incomevalue ? item.incomevalue.toLocaleString('en-US') : '0'
-                            }
-                        </b>
-                    </div>
-                </div>
+                <b className='text-green'>
+                    {
+                        item?.incomevalue ? item.incomevalue.toLocaleString('en-US') : '0'
+                    }
+                </b>
             ),
             STT: (
                 <React.Fragment>
@@ -316,20 +299,31 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
             status: (
                 <React.Fragment>
                     {
-                        item.status === 0
+                        item.status === 1
                         &&
-                        <Chip label="Tắt" color='secondary' />
+                        <Chip label="Chưa thanh toán" className='bg-red-500 text-white' />
                     }
 
                     {
-                        item.status === 1
+                        item.status === 2
                         &&
-                        <Chip label="Hoạt động" color='primary' />
+                        <Chip label="Đã thanh toán" className='bg-green-500 text-white' />
                     }
                 </React.Fragment>
             ),
             action: (
-                <div className='flex space-x-4'>
+                <div className='flex space-x-8'>
+                    <CmsIconButton
+                        tooltip="Chi tiết"
+                        delay={50}
+                        icon="visibility"
+                        className="bg-green-500 text-white shadow-3  hover:bg-green-900"
+                        onClick={() => {
+                            setDetail(item);
+                            setOpenDialog('detail');
+                        }}
+                    />
+
                     <CmsIconButton
                         tooltip="Xác nhận tiền"
                         delay={50}
@@ -340,6 +334,7 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
                             setOpenDialog('money');
                         }}
                     />
+
                     {
                         item?.type === 2
                         &&
@@ -527,6 +522,17 @@ function Meta({ type }) {
                     handleClose={handleCloseDialog}
                     handleSubmit={handleSubmit}
                     title={'Xác nhận đã nhận tiền'}
+                    detail={detail}
+                />
+            }
+
+            {
+                openDialog === 'detail'
+                &&
+                <ViewModelsDialog
+                    open={openDialog === 'detail'}
+                    handleClose={handleCloseDialog}
+                    title={'Chi tiết phiếu thu'}
                     detail={detail}
                 />
             }
