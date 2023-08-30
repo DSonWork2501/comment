@@ -151,6 +151,9 @@ export default {
                 insert: entity => axios.post(`${baseurl}/income/insert-income`, entity),
                 getList: (params) => axios.get(`${baseurl}/income/get-incomes`, { params }),
                 getSummary: (params) => axios.get(`${baseurl}/income/income-summary`, { params }),
+                confirm: entity => axios.put(`${baseurl}/income/confirm-income`, entity),
+                getListCustomerDebt: (params) => axios.get(`${baseurl}/income/get-incomes-debt`, { params }),
+                drop: entity => axios.put(`${baseurl}/income/drop-income`, entity),
             },
             bill: {
                 getList: (params) => axios.get(`${baseurl}/order/get-billing`, { params }),

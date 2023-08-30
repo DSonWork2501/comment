@@ -31,7 +31,7 @@ export const modelUpdate = (field = initModel) => {
 }
 
 export const links = (summary) => [
-    // { id: 1, name: "Công nợ khách hàng", link: "/accounting/debts/1", icon: "star_rate" },
+     { id: 1, name: "Công nợ khách hàng", link: "/accounting/debts/1", icon: "star_rate" },
     {
         id: 2, name: "Hạn thanh toán", link: "/accounting/debts/2", icon: "star_rate", otherComp: <div style={{
             position: 'relative',

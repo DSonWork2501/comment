@@ -21,6 +21,16 @@ export const accounting = {
 
     },
     income: {
+        drop: createAsyncThunk(`${appName}/${moduleName}/income/drop`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.income.drop(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
         insert: createAsyncThunk(`${appName}/${moduleName}/income/insert`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.accounting.income.insert(params);
@@ -31,9 +41,28 @@ export const accounting = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        confirm: createAsyncThunk(`${appName}/${moduleName}/income/confirm`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.income.confirm(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
         getList: createAsyncThunk(`${appName}/${moduleName}/income/getList`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.accounting.income.getList(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        getListCustomerDebt: createAsyncThunk(`${appName}/${moduleName}/income/getListCustomerDebt`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.income.getListCustomerDebt(params);
                 return response.data
             } catch (error) {
                 thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
@@ -189,7 +218,8 @@ const accountingSlice = createSlice({
         collectionBill: null,
         collectionOrder: null,
         incomes: null,
-        summary: null
+        summary: null,
+        customerDebt: null
     },
     reducers: {
         /**
@@ -489,6 +519,31 @@ const accountingSlice = createSlice({
                 error: null
             }
         },
+
+        [accounting.income.getListCustomerDebt.pending]: state => ({
+            ...state,
+            loading: true,
+            customerDebt: {
+                data: []
+            },
+            error: null
+        }),
+        [accounting.income.getListCustomerDebt.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                customerDebt: payload,
+                error: null
+            }
+        },
+        [accounting.income.getListCustomerDebt.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            customerDebt: {
+                data: []
+            },
+            error: error
+        }),
     }
 });
 
