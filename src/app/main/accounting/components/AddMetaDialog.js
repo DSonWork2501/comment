@@ -1,12 +1,7 @@
 import React, { useEffect } from 'react';
-import { CmsDialog, CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikTextField } from '@widgets/components';
+import { CmsDialog, CmsFormikTextField } from '@widgets/components';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { get } from 'lodash';
-import CmsFormikUploadFile from '@widgets/components/cms-formik/CmsFormikUploadFile';
-import { Button, FormHelperText } from '@material-ui/core';
-import { GetApp } from '@material-ui/icons';
-import Connect, { baseurl } from '@connect/@connect';
 
 const defaultForm = {
     id: 0,
