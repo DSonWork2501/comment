@@ -18,6 +18,8 @@ import routes from './fuse-configs/routesConfig';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import store from './store';
 import { Suspense } from 'react';
+import {fetchToken} from './../firebase.js'
+
 
 const Delivery = React.lazy(() => import('./main/delivery'));
 const EmployDelivery = React.lazy(() => import('./main/delivery/EmployDelivery'));
@@ -33,6 +35,7 @@ const jss = create({
 const generateClassName = createGenerateClassName();
 
 const App = () => {
+	fetchToken();
 	return (
 		<>
 			<AppContext.Provider
