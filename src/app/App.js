@@ -18,7 +18,7 @@ import routes from './fuse-configs/routesConfig';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import store from './store';
 import { Suspense } from 'react';
-import {fetchToken,onMessageListener} from './../firebase.js'
+import {fetchToken} from './../firebase.js'
 
 
 const Delivery = React.lazy(() => import('./main/delivery'));
