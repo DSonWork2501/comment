@@ -11,6 +11,10 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectToolbarTheme } from 'app/store/fuse/settingsSlice';
 import FullScreenToggle from '../../shared-components/FullScreenToggle';
+import QuickPanelToggleButton from 'app/fuse-layouts/shared-components/quickPanel/QuickPanelToggleButton';
+import { Box, IconButton } from '@material-ui/core';
+import { AccountCircle } from '@material-ui/icons';
+import Notification from 'app/main/notification';
 //import LanguageSwitcher from '../../shared-components/LanguageSwitcher';
 
 const useStyles = makeStyles(theme => ({
@@ -20,8 +24,14 @@ const useStyles = makeStyles(theme => ({
 function ToolbarLayout1(props) {
 	const config = useSelector(({ fuse }) => fuse.settings.current.layout.config);
 	const toolbarTheme = useSelector(selectToolbarTheme);
+	const [anchorEl, setAnchorEl] = React.useState(null);
+	const isMenuOpen = Boolean(anchorEl);
 
 	const classes = useStyles(props);
+
+	const handleProfileMenuOpen = (event) => {
+		setAnchorEl(event.currentTarget);
+	};
 
 	return (
 		<ThemeProvider theme={toolbarTheme}>
@@ -51,8 +61,7 @@ function ToolbarLayout1(props) {
 						<FullScreenToggle />
 
 						<FuseSearch />
-
-						{/* <QuickPanelToggleButton /> */}
+						<Notification/>
 					</div>
 
 					{config.navbar.display && config.navbar.position === 'right' && (
