@@ -7,6 +7,7 @@ import {
     CmsFormikDateTimePicker,
     CmsCheckbox,
     CmsTab,
+    CmsButton,
 } from '@widgets/components';
 import { Box, Button, Chip, Icon, styled } from '@material-ui/core';
 import { alertInformation, initColumn } from '@widgets/functions';
@@ -22,6 +23,8 @@ import AddUserDialog from '../components/AddUserDialog';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useParams } from 'react-router';
 import History from '@history/@history';
+import { getList as getCustomers } from "app/main/customer/store/customerSlice";
+import AddBillDialog from '../components/AddBillDialog';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -239,21 +242,27 @@ const TableDebt = ({ entities, setSearch, loading, setDetail, setOpenDialog, sel
 }
 
 function Meta() {
+    const params = useParams(), type = params.type;
+    if (!type)
+        History.push('/accounting/bill/1')
+    return <Meta2 type={type} />
+}
+
+function Meta2({ type }) {
     const dispatch = useDispatch();
     const loading = useSelector(store => store[keyStore].loading);
     const entities = useSelector(store => store[keyStore].entities);
     const searchDefault = useSelector(store => store[keyStore].search);
+    const customers = useSelector(store => store[keyStore].customers) || [];
     const [search, setSearch] = useState(searchDefault);
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
     const [selects, setSelects] = useState([]);
-    const params = useParams(), type = params.type;
-    console.log(detail);
-    if (!type)
-        History.push('/accounting/bill/1')
+    console.log(detail)
 
     const getListTable = useCallback((search) => {
-        dispatch(accounting.bill.getList({ ...search, type }));
+        if (type)
+            dispatch(accounting.bill.getList({ ...search, type }));
     }, [dispatch, type])
 
     const searchString = JSON.stringify(search);
@@ -267,6 +276,9 @@ function Meta() {
             setDetail(null);
     }, [openDialog])
 
+    useEffect(() => {
+        dispatch(getCustomers())
+    }, [dispatch])
 
     const handleCloseDialog = () => {
         setOpenDialog('');
@@ -294,6 +306,24 @@ function Meta() {
         });
     }
 
+    const handleSubmitBill = async (values, form) => {
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: { values, form },
+            confirm: async () => {
+                try {
+                    const resultAction = await dispatch(accounting.bill.insert(values));
+                    unwrapResult(resultAction);
+                    setOpenDialog('');
+                    getListTable(search);
+                } catch (error) {
+                } finally {
+                    form.setSubmitting(false)
+                }
+            },
+            close: () => form.setSubmitting(false)
+        });
+    }
 
     return (
         <LayoutCustom>
@@ -307,6 +337,18 @@ function Meta() {
                     onSave={handleSubmit}
                     handleClose={handleCloseDialog} />
             }
+
+            {
+                openDialog === 'addBill'
+                &&
+                <AddBillDialog
+                    title='Kết toán bill'
+                    options={{ customers }}
+                    open={openDialog === 'addBill'}
+                    onSave={handleSubmitBill}
+                    handleClose={handleCloseDialog} />
+            }
+
             <CmsCardedPage
                 classNameHeader="min-h-72 h-72 sm:h-128 sm:min-h-128"
                 icon="whatshot"
@@ -367,6 +409,17 @@ function Meta() {
                 }
                 content={
                     <TableDebt entities={entities} setSearch={setSearch} loading={loading} setDetail={setDetail} setOpenDialog={setOpenDialog} selects={selects} setSelects={setSelects} />
+                }
+                rightHeaderButton={
+                    <div>
+                        <CmsButton
+                            label={"Kết toán bill"}
+                            onClick={() => {
+                                setOpenDialog('addBill');
+                            }}
+                            className="mx-2"
+                            startIcon="add" />
+                    </div>
                 }
             />
         </LayoutCustom>

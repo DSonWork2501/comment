@@ -45,7 +45,7 @@ export default {
             delete: entity => axios.put(`${baseurl}/product/delete-product`, entity),
             uploadImage: (entity) => axios.post(`${baseurl}/product/upload-image`, entity, { headers: { 'Content-Type': 'multipart/form-data' } }),
             getHistoryPrice: params => axios.get(`${baseurl}/product/get-history-price`, { params }),
-            addRecommend:entity => axios.put(`${baseurl}/product/recommend-product`, entity),
+            addRecommend: entity => axios.put(`${baseurl}/product/recommend-product`, entity),
             price: {
                 insert: entity => axios.post(`${baseurl}/product/insert-price`, entity),
             },
@@ -160,6 +160,7 @@ export default {
                 createCollect: entity => axios.post(`${baseurl}/order/collection-insert`, entity),
                 getCollect: (params) => axios.get(`${baseurl}/order/get-collection-group`, { params }),
                 update: entity => axios.put(`${baseurl}/order/collection-update/${entity.typeItem}`, entity.data),
+                insert: entity => axios.post(`${baseurl}/order/billing-manual/${entity.cusID}`),
                 getCollectBill: (params) => axios.get(`${baseurl}/order/get-collection-cms`, {
                     params,
                     headers: {

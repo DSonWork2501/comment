@@ -3,6 +3,7 @@ import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 import { getErrorMessage } from '@widgets/functions/GetErrorMessage';
 import { order } from 'app/main/order/store/orderSlice';
+import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 
 const appName = "App";
 const moduleName = "accounting";
@@ -151,10 +152,21 @@ export const accounting = {
                 const data = await response.data;
                 return data
             } catch (error) {
-                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        insert: createAsyncThunk(`${appName}/${moduleName}/bill/insert`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.accounting.bill.insert(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        })
     },
     meta: {
         getList: createAsyncThunk(`${appName}/${moduleName}/accounting/meta/getList`, async (params, thunkAPI) => {
@@ -544,6 +556,14 @@ const accountingSlice = createSlice({
             },
             error: error
         }),
+
+
+        [getCustomers.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                customers: payload?.data,
+            }
+        },
     }
 });
 
