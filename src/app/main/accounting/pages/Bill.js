@@ -342,7 +342,7 @@ function Meta2({ type }) {
                 openDialog === 'addBill'
                 &&
                 <AddBillDialog
-                    title='Kết toán bill'
+                    title='Kết toán thủ công'
                     options={{ customers }}
                     open={openDialog === 'addBill'}
                     onSave={handleSubmitBill}
@@ -413,7 +413,7 @@ function Meta2({ type }) {
                 rightHeaderButton={
                     <div>
                         <CmsButton
-                            label={"Kết toán bill"}
+                            label={"Kết toán thủ công"}
                             onClick={() => {
                                 setOpenDialog('addBill');
                             }}

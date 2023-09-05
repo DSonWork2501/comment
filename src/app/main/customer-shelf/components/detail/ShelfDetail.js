@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 import clsx from "clsx"
 import noImage from '@widgets/images/noImage.jpg';
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
-import { Link, makeStyles } from "@material-ui/core"
+import { Chip, Link, makeStyles } from "@material-ui/core"
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup/FuseAnimateGroup"
 import { getListHS } from "app/main/product/store/productSlice"
 import ProductSearch from "app/main/product/components/product/edit/classify/rightSide/ProductSearch"
@@ -305,15 +305,24 @@ function DetailShelfProductContent({ data, index, classes, setTab, handleChooseU
                 <div className="w-1/5 self-center">
                     <img src={img} alt="image_detail" className="object-cover h-92" />
                 </div>
-                <div className="w-full self-center space-y-16">
+                <div className="w-full self-center space-y-8">
                     <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min' }} info={{ content: value?.uniqueid || '-' }} />
                     <LabelInfo key={`imei_ord-${index}-labelInfo`} label={{ content: 'imei đơn hàng', className: 'min-w-min' }} info={{ content: value?.imei_ord || '-' }} />
 
                 </div>
-                <div className="w-full self-center space-y-16">
+                <div className="w-full self-center space-y-8">
                     <LabelInfo key={`name-${index}-labelInfo`} label={{ content: 'tên', className: 'min-w-min' }} info={{ content: value?.name || '-' }} />
                     {/* <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min' }} info={{ content: value?.color || '-' }} /> */}
                     <LabelInfo key={`sku-${index}-labelInfo`} label={{ content: 'sku', className: 'min-w-min' }} info={{ content: value?.sku || '-' }} />
+
+                    {
+                        typeof value?.status === 'number'
+                            ? (
+                                value.status === 1 ? <div><b>Trạng thái:</b> <span className="text-green">Chưa uống</span></div>
+                                    : value.status === 2 ? <div><b>Trạng thái:</b> <span className="text-orange">Đã uống</span></div> : null
+                            )
+                            : null
+                    }
                 </div>
                 <div className="w-1/5 self-center space-y-2 text-center">
                     <img alt={`qrcord_${index}`} src={value.qrcode ? `data:image/png;base64, ${value.qrcode}` : noImage} className="" />
