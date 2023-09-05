@@ -378,11 +378,11 @@ function OrderView() {
                     if (item.status === 6)
                         hide = true;
 
-                    if (item.status === 5 && val.status === 3)
-                        hide = false;
+                    if (item.status === 5)
+                        hide = true;
 
-                    if (item.status === 3 && val.status === 4)
-                        hide = false;
+                    if (item.status === 3)
+                        hide = true;
 
                     return { ...val, hide }
                 }).filter(val => !val.hide)}
