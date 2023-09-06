@@ -20,6 +20,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
     const [stackIndex, setStackIndex] = useState(0)
     const [slotIndex, setSlotIndex] = useState('')
     const currentShelf = useSelector(store => store[keyStore].product.entity?.data)
+    console.log(currentShelf);
     const listTemp = useMemo(() => {
         if (currentShelf && currentShelf?.detail?.length) {
             return currentShelf.detail.filter((val, i) => i !== modalIndex).map(val => ({ ...val, id: val.uniqueid }))

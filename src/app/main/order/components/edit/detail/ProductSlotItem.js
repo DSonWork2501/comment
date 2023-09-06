@@ -39,7 +39,7 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
                     <CmsRadioGroup
                         vertical={false}
                         size="small"
-                        className="w-full m-0"
+                        className="w-full m-0 px-8"
                         value={type}
                         onChange={(event) => handleChangeProductType(event)}
                         label="Loại"

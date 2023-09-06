@@ -28,9 +28,9 @@ function DetailShelfContent({ value, img, index, handleClickBread, classes, Hand
         <div onClick={handleClickBread}>
             <Tooltip title={<CmsLabel content={'Click vào để hiển thị thông tin chi tiết !'} className="text-14" />}>
                 <div key={`div-0-detail-${index}`}
-                    className={clsx("border-1 border-collapse rounded-2 w-full grid justify-items-center space-y-8 hover:shadow-4", classes.shelf)}
+                    className={clsx("border-1 border-collapse rounded-2 w-full grid justify-items-center space-y-8 hover:shadow-4 p-8", classes.shelf)}
                 >
-                    <img src={img || noImage} alt="image_detail" className="w-44" />
+                    <img src={img || noImage} alt="image_detail" className="w-52" />
                     <div className="grid justify-items-start px-4">
                         <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min text-10' }} info={{ content: value?.uniqueid || '-', className: 'text-10' }} />
                         <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min text-10' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0, className: 'text-10' }} />
@@ -66,8 +66,8 @@ function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
             key={`div-0-detai-${index}`}
             className={clsx("w-full shadow-2 hover:shadow-4 p-4 self-center space-y-8", classes.shelf)}
         >
-            <div className="h-64 text-center m-auto">
-                <img src={img} alt="image_detail" className="object-center w-full h-full" />
+            <div className="h-92 text-center m-auto">
+                <img src={img} alt="image_detail" className="object-center h-full m-auto" />
             </div>
             <Tooltip title={<TooltipProduct value={value} index={index} />}>
                 <div className="w-full flex flex-row items-center">
@@ -259,17 +259,19 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, hand
     return (
         <div className="w-full space-y-8">
             {breadValue === 'danh_sach_tu' &&
-                <div className="w-full grid grid-cols-3 gap-4 place-items-start">
+                <div className="w-full flex flex-wrap -mx-4">
                     {data?.map((item, index) =>
-                    (<DetailShelfContent
-                        img={img}
-                        value={item}
-                        index={index}
-                        key={`DetailShelf-${index}`}
-                        HandleAddData={HandleAddData}
-                        handleClickBread={() => handleClickBread('chi_tiet_san_pham', item)}
-                        classes={classes}
-                    />))}
+                    (<div className="px-4">
+                        <DetailShelfContent
+                            img={img}
+                            value={item}
+                            index={index}
+                            key={`DetailShelf-${index}`}
+                            HandleAddData={HandleAddData}
+                            handleClickBread={() => handleClickBread('chi_tiet_san_pham', item)}
+                            classes={classes}
+                        />
+                    </div>))}
                 </div>}
             {breadValue === 'chi_tiet_san_pham' &&
                 <div className="w-full space-y-8">
