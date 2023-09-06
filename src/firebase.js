@@ -13,11 +13,14 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app)
-export const fetchToken = (setTokenFound, setFcmToken) => {
-    console.log(1232);
 
-    return getToken(messaging, { vapidKey: 'SrT72CGwoavpDbLb_Wg7ygSNZ-NXf6zeXK4jvZ2Z5RM' }).then((currentToken) => {
-        console.log(currentToken);
+export const fetchToken = (setTokenFound, setFcmToken) => {
+    return getToken(messaging, { vapidKey: 'BL9-Yj-o8tAVC8rl__bP0fZ4QmGGNNB5qBpKWc_NKJcmnjGXiflvQ4Fqle649JMMBlTCqHXbh55oBpWVevhtd_Y' }).then((currentToken) => {
+        if (currentToken) {
+            console.log(currentToken);
+            setTokenFound && setTokenFound(true);
+            setFcmToken && setFcmToken(currentToken);
+        }
     }).catch(err => {
         console.log(err);
     })

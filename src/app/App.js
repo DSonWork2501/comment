@@ -18,7 +18,7 @@ import routes from './fuse-configs/routesConfig';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import store from './store';
 import { Suspense } from 'react';
-import {fetchToken} from './../firebase.js'
+import { fetchToken, onMessageListener } from './../firebase.js'
 
 
 const Delivery = React.lazy(() => import('./main/delivery'));
@@ -36,6 +36,9 @@ const generateClassName = createGenerateClassName();
 
 const App = () => {
 	fetchToken();
+	onMessageListener().then(payload => {
+		console.log(payload);
+	}).catch(err => console.log(err))
 	return (
 		<>
 			<AppContext.Provider
