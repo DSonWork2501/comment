@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyAiLuOZTGJsd2jIXwheA9KipO9i0EVgTLg",
@@ -12,7 +13,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app)
+const messaging = getMessaging(app);
+export const db = getFirestore(app);
 
 export const fetchToken = (setTokenFound, setFcmToken) => {
     return getToken(messaging, { vapidKey: 'BL9-Yj-o8tAVC8rl__bP0fZ4QmGGNNB5qBpKWc_NKJcmnjGXiflvQ4Fqle649JMMBlTCqHXbh55oBpWVevhtd_Y' }).then((currentToken) => {

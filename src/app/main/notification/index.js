@@ -13,6 +13,13 @@ import {
     Paper,
 } from "@material-ui/core";
 import { Notifications } from '@material-ui/icons';
+import { useEffect } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from 'firebase';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { showMessage } from 'app/store/fuse/messageSlice';
+import { useRef } from 'react';
 // import {Waypoint} from "react-waypoint";
 
 const useStyles = makeStyles((theme) => ({
@@ -73,26 +80,41 @@ const items = [
 ];
 
 function Notification({
-    label = '',
-    icon,
-    iconMessage,
-    data = [],
     countUnread = 0,
-    unreadMap = {},
     loadingFetchData = false,
-    onReadAll,
-    onScrollEnd,
-    onRead
 }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [numberUnread, setNumberUnread] = useState(null);
+    const pageFresh = useRef(true);
     const classes = useStyles();
+    const dispatch = useDispatch();
+
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
-
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(collection(db, 'Notification'), (snapshot) => {
+            const data = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            console.log(data);
+            if (pageFresh.current) {
+                pageFresh.current = false;
+                return;
+            }
+            setNumberUnread(prev => prev ? prev + 1 : 1);
+            dispatch(showMessage({ variant: "success", message: 'Có một thông báo mới' }))
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, [dispatch]);
 
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
@@ -114,24 +136,29 @@ function Notification({
                     color="error">
                     <Notifications />
                 </Badge>
-                <div style={{
-                    position: 'absolute',
-                    top: 1,
-                    left: -8,
-                    background: 'rgb(170 0 10)',
-                    color: 'white',
-                    fontSize: 13,
-                    height: 24,
-                    width: 24,
-                    textAlign: 'center',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0px 1px 3px 1px #000000ad'
-                }}>
-                    10
-                </div>
+                {
+                    Boolean(numberUnread)
+                    &&
+                    <div style={{
+                        position: 'absolute',
+                        top: 1,
+                        left: -8,
+                        background: 'rgb(170 0 10)',
+                        color: 'white',
+                        fontSize: 13,
+                        height: 24,
+                        width: 24,
+                        textAlign: 'center',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0px 1px 3px 1px #000000ad'
+                    }}>
+                        {numberUnread}
+                    </div>
+                }
+
             </IconButton>
             <Popover
                 id={id}
