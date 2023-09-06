@@ -1,85 +1,91 @@
-import React, {Fragment} from 'react';
+import React from 'react';
 import {
     Badge,
     Box,
-    Button,
     Divider,
     IconButton,
     LinearProgress,
     ListItem,
-    ListItemIcon,
-    ListItemText,
     Popover,
     Typography,
-    List
+    List,
+    makeStyles,
+    Paper,
 } from "@material-ui/core";
 import { Notifications } from '@material-ui/icons';
 // import {Waypoint} from "react-waypoint";
 
-const fieldCheck = [
-    {
-        title: 'Order',
-        prop: 'order_id',
-        redirect: '/ecommerce/orders/edit',
+const useStyles = makeStyles((theme) => ({
+    popover: {
+        overflow: 'visible',
+        marginTop: theme.spacing(1.5),
+        width: '350px',
+        //filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+        boxShadow: 'none',
+        padding: '0px 8px',
+        '& .MuiAvatar-root': {
+            width: 32,
+            height: 32,
+            marginLeft: -0.5,
+            marginRight: theme.spacing(1),
+        },
+        '&:before': {
+            content: '""',
+            display: 'block',
+            position: 'absolute',
+            top: 0,
+            right: theme.spacing(2),
+            width: 10,
+            height: 10,
+            backgroundColor: theme.palette.background.paper,
+            transform: 'translateY(-50%) rotate(45deg)',
+            zIndex: 0,
+        },
+        '& ul>div': {
+            padding: '0 8px',
+            borderBottom: 'none',
+            marginBottom: 8
+        },
+        '& ul span': {
+            fontSize: '13px'
+        },
+        '& .number-unread': {
+            position: 'absolute',
+            top: 1,
+            left: 0,
+            background: 'cadetblue',
+            color: 'white',
+            fontSize: 13,
+            height: 20,
+            width: 20,
+            textAlign: 'center',
+            borderRadius: '50%',
+            lineHeight: '20px'
+        }
     },
-    {
-        title: 'Support Case',
-        prop: 'support_case_id',
-        redirect: '/ecommerce/support-case/dialog-case'
-    },
-    {
-        title: 'Task',
-        prop: 'task_id',
-        redirect: '/ecommerce/tasks/detail',
-        permission: 'TASK_TAB',
-        redirect_2: '/ecommerce/task-support/detail',
-    },
-    {
-        title: 'Customer',
-        prop: 'target_id',
-        redirect: '/ecommerce/customers/edit',
-        permission: 'CUSTOMER_READ',
-        redirect_2: '/ecommerce/customer-support/edit',
-    }
+}));
+
+const items = [
+    { id: 1, text: 'Unread Item 1', unread: true },
+    { id: 2, text: 'Read Item 2', unread: false },
+    { id: 3, text: 'Unread Item 3', unread: true },
+    { id: 4, text: 'Read Item 4', unread: false },
 ];
 
- const getTags = (notification) => {
-     const listTags = [];
-
-     fieldCheck.forEach(field => {
-         if (notification[field.prop]) {
-             const id = notification[field.prop]
-             listTags.push({
-                 ...field,
-                 title: field.title + ' ' + id,
-                 redirect: field.redirect,
-                 id
-             })
-         }
-     })
-
-     return listTags;
- }
-
-const notiBtnStyle = {
-    padding: '3px 4px!important',
-    fontSize: '0.6rem!important'
-};
-
 function Notification({
-      label = '',
-      icon,
-      iconMessage,
-      data = [],
-      countUnread = 0,
-      unreadMap = {},
-      loadingFetchData = false,
-      onReadAll,
-      onScrollEnd,
-      onRead
-    }) {
+    label = '',
+    icon,
+    iconMessage,
+    data = [],
+    countUnread = 0,
+    unreadMap = {},
+    loadingFetchData = false,
+    onReadAll,
+    onScrollEnd,
+    onRead
+}) {
     const [anchorEl, setAnchorEl] = React.useState(null);
-
+    const classes = useStyles();
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -98,43 +104,40 @@ function Notification({
                 aria-label="show 17 new notifications"
                 color="inherit"
                 onClick={handleClick}
+                style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    boxShadow: '0px 1px 3px 1px rgba(0, 0, 0, 0.2)'
+                }}
             >
-                <Badge badgeContent={countUnread} color="error">
-                    <Notifications/>
+                <Badge
+                    badgeContent={countUnread}
+                    color="error">
+                    <Notifications />
                 </Badge>
+                <div style={{
+                    position: 'absolute',
+                    top: 1,
+                    left: -8,
+                    background: 'rgb(170 0 10)',
+                    color: 'white',
+                    fontSize: 13,
+                    height: 24,
+                    width: 24,
+                    textAlign: 'center',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0px 1px 3px 1px #000000ad'
+                }}>
+                    10
+                </div>
             </IconButton>
             <Popover
                 id={id}
                 open={open}
                 anchorEl={anchorEl}
                 onClose={handleClose}
-                PaperProps={{
-                    elevation: 0,
-                    sx: {
-                        overflow: 'visible',
-                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                        mt: 1.5,
-                        width: '350px',
-                        '& .MuiAvatar-root': {
-                            width: 32,
-                            height: 32,
-                            ml: -0.5,
-                            mr: 1,
-                        },
-                        '&:before': {
-                            content: '""',
-                            display: 'block',
-                            position: 'absolute',
-                            top: 0,
-                            right: 18,
-                            width: 10,
-                            height: 10,
-                            bgcolor: 'background.paper',
-                            transform: 'translateY(-50%) rotate(45deg)',
-                            zIndex: 0,
-                        },
-                    },
-                }}
                 anchorOrigin={{
                     vertical: 'bottom',
                     horizontal: 'right',
@@ -144,26 +147,25 @@ function Notification({
                     horizontal: 'right',
                 }}
             >
-                <Box sx={{p: 2, pb: 0, position: 'relative'}}>
+                <Paper className={classes.popover}>
                     <Typography
-                        variant={'h6'}
-                        textAlign={'center'}>
-                        {label}
-                    </Typography>
-                    <Typography
-                        fontSize={'0.8rem'}
-                        textAlign={'center'}>
-                        ({countUnread} unread)
+                        style={{
+                            fontSize: '20px',
+                            fontWeight: 700
+                        }}
+                        variant={'h1'}>
+                        Thông báo
                     </Typography>
                     <Box
                         display={'flex'}
                         justifyContent={'flex-end'}>
-                        <Button
-                            size={'small'}
-                            variant={'text'}
-                            type={'button'}
-                            onClick={() => onReadAll && onReadAll()}
-                        >Read all</Button>
+                        <span
+                            style={{
+                                fontSize: '13px'
+                            }}
+                            className='underline text-blue-400 cursor-pointer'>
+                            Xem tất cả
+                        </span>
                     </Box>
                     <Box position={'absolute'}
                         bottom={0}
@@ -171,8 +173,60 @@ function Notification({
                         width={1}>
                         {loadingFetchData && <LinearProgress />}
                     </Box>
-                </Box>
-                <Divider/>
+                    <List>
+                        {items.map((item) => (
+                            <ListItem
+                                key={item.id}
+                                button
+                                divider
+                                className='flex justify-between items-center'
+                            >
+                                <div
+                                    style={{
+                                        width: 'calc(100% - 20px)'
+                                    }}
+                                >
+                                    <span className='font-bold mr-2'>
+                                        Trương công mạnh
+                                    </span>
+                                    <span style={{ color: 'gray' }}>
+                                        đã tạo 1 đơn hàng
+                                    </span>
+                                    <div className={`${item.unread ? 'text-blue-400' : 'text-gray-500'}`} style={{ lineHeight: 1 }}>
+                                        <span style={{ fontSize: '11px' }}>
+                                            1 giờ trước
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {item.unread ? (
+                                    <span
+                                        style={{
+                                            background: 'rgb(24 118 242)',
+                                            height: 10,
+                                            width: 10,
+                                            borderRadius: '50%'
+                                        }}
+                                    >
+
+                                    </span>
+                                ) : (
+                                    <span
+                                        style={{
+                                            height: 10,
+                                            width: 10,
+                                            borderRadius: '50%'
+                                        }}
+                                    >
+
+                                    </span>
+                                )
+                                }
+                            </ListItem>
+                        ))}
+                    </List>
+                </Paper>
+                <Divider />
                 {/* <List sx={{ width: '100%', height: '400px', bgcolor: 'background.paper', borderRadius: '5px', px: 2, overflow: 'auto' }}>
                     {data.map((notification, index) => (
                         <Fragment key={notification.id}>
