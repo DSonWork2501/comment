@@ -75,7 +75,7 @@ const CheckIndex = (type, stack, slot, stack_index, slot_index) => {
     }
 }
 
-function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_id, stack_index, slotIndex, stackIndex, classes, isCanFix, productID, handleCheckBox, setListCheckTemp, listCheckTemp, isShow }) {
+function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_id, stack_index, slotIndex, stackIndex, classes, isCanFix, productID, handleCheckBox, setListCheckTemp, listCheckTemp, isShow, view }) {
 
     const handleChildClick = (e, stack_index, index) => {
         e.stopPropagation()
@@ -90,7 +90,7 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_id,
             //className={clsx("w-4/5 flex flex-row focus:shadow-outline cursor-pointer pl-6 justify-between  bg-green-300 hover:bg-green-500 text-white rounded-12", CheckIndex('slot', stackIndex, slotIndex, stack_index, index) && classes.chosen)}
             >
                 {
-                    !isCanFix
+                    (!isCanFix && view !== 'order')
                     &&
                     <div className="close-card">
                         <CmsIconButton icon="close" onClick={() => HandleDeleteSlot(stack_index, index)} size="small" tooltip={'xóa slot'} className="text-red hover:shadow-2 border-red-500" key={`${index}_delete_slot`} />
@@ -184,7 +184,7 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_id,
     ))
 }
 
-function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix, productID, label, handleCheckBox, detailCheck, listCheckTemp, setListCheckTemp }) {
+function LeftSideContent({ view, data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix, productID, label, handleCheckBox, detailCheck, listCheckTemp, setListCheckTemp }) {
     const classes = useStyles();
     const isShow = useSelector(store => store[keyStore]?.product?.isOpenViewSelectProduct);
 
@@ -244,7 +244,7 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 </div> */}
                             </div>
                             {
-                                !isCanFix
+                                (!isCanFix && view !== 'order')
                                 &&
                                 <div className="close-stack">
                                     <CmsIconButton icon="close" onClick={() => HandleDeleteStack(index)} size="small" tooltip={'xóa stack'} className="text-red " key={`${index}_delete_stack`} />
@@ -268,9 +268,10 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                                 listCheckTemp={listCheckTemp}
                                 setListCheckTemp={setListCheckTemp}
                                 isShow={isShow}
+                                view={view}
                             />
                             {
-                                !isCanFix
+                                (!isCanFix && view !== 'order')
                                 &&
                                 <div className="w-full text-center m-0">
                                     <CmsButton size="small" startIcon="add" label="Slot" className="bg-yellow-700 hover:bg-yellow-900" onClick={() => HandleAddSlot(index)} />
@@ -280,7 +281,7 @@ function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClick
                     </div>
                 ))}
                 {
-                    !isCanFix
+                    (!isCanFix && view !== 'order')
                     &&
                     <div className="w-full text-center m-0">
                         <CmsButton size="small" startIcon="add" label="stack" className="bg-orange-700 hover:bg-orange-900" onClick={() => HandleAddStack()} />

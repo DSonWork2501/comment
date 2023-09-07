@@ -16,7 +16,7 @@ import { useMemo } from "react"
 import { Button } from "@material-ui/core"
 
 
-function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalIndex }) {
+function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalIndex, view }) {
     const [prefix, setPrefix] = useState('[0]')
     const [stackIndex, setStackIndex] = useState(0)
     const [slotIndex, setSlotIndex] = useState('')
@@ -126,51 +126,55 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                                 />
                             }
                         </div>
-                        <div className="w-4/5 px-8 border-l">
-                            <div className="flex flex-wrap -mx-8">
-                                <div className="px-8 w-88">
-                                    <CmsTextField
-                                        label="Số ngăn"
-                                        name="totalPredict"
-                                        size="small"
-                                        value={custom.first}
-                                        onChange={(e) => setCustom(prev => ({ ...prev, first: e.target.value }))}
-                                        isNumberFormat={true} />
-                                </div>
-                                <div className="px-8 w-88">
-                                    <CmsTextField
-                                        label="Slot/ngăn"
-                                        name="totalPredict"
-                                        size="small"
-                                        value={custom.second}
-                                        onChange={(e) => setCustom(prev => ({ ...prev, second: e.target.value }))}
-                                        isNumberFormat={true} />
-                                </div>
-                                <div className="px-8">
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        style={{
-                                            textTransform: 'inherit',
-                                            fontWeight: 400
-                                        }}
-                                        disabled={custom.first === 0 || custom.second === 0}
-                                        onClick={() => {
-                                            let data = [];
-                                            for (let index = 1; index <= custom.first; index++) {
-                                                data.push(initDetailModel({ name: `Ngăn ${index}` }))
-                                                for (let indexJ = 1; indexJ <= custom.second; indexJ++) {
-                                                    data[index - 1].slots.push(initDetailModelSlot({ name: `Vị trí ${index}.${indexJ}` }))
+                        {
+                            view !== 'order'
+                            &&
+                            <div className="w-4/5 px-8 border-l">
+                                <div className="flex flex-wrap -mx-8">
+                                    <div className="px-8 w-88">
+                                        <CmsTextField
+                                            label="Số ngăn"
+                                            name="totalPredict"
+                                            size="small"
+                                            value={custom.first}
+                                            onChange={(e) => setCustom(prev => ({ ...prev, first: e.target.value }))}
+                                            isNumberFormat={true} />
+                                    </div>
+                                    <div className="px-8 w-88">
+                                        <CmsTextField
+                                            label="Slot/ngăn"
+                                            name="totalPredict"
+                                            size="small"
+                                            value={custom.second}
+                                            onChange={(e) => setCustom(prev => ({ ...prev, second: e.target.value }))}
+                                            isNumberFormat={true} />
+                                    </div>
+                                    <div className="px-8">
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            style={{
+                                                textTransform: 'inherit',
+                                                fontWeight: 400
+                                            }}
+                                            disabled={custom.first === 0 || custom.second === 0}
+                                            onClick={() => {
+                                                let data = [];
+                                                for (let index = 1; index <= custom.first; index++) {
+                                                    data.push(initDetailModel({ name: `Ngăn ${index}` }))
+                                                    for (let indexJ = 1; indexJ <= custom.second; indexJ++) {
+                                                        data[index - 1].slots.push(initDetailModelSlot({ name: `Vị trí ${index}.${indexJ}` }))
+                                                    }
                                                 }
-                                            }
-                                            formik_shelf.setValues(data)
-                                        }}
-                                    >
-                                        Custom tủ
-                                    </Button>
+                                                formik_shelf.setValues(data)
+                                            }}
+                                        >
+                                            Custom tủ
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 </>
 
@@ -197,6 +201,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                             slotIndex={slotIndex}
                             listCheckTemp={listCheckTemp}
                             setListCheckTemp={setListCheckTemp}
+                            view={view}
                         />
                     </div>
                 </FuseAnimate>
