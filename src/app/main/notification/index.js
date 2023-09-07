@@ -25,7 +25,7 @@ import reducer, { notify } from './store';
 import withReducer from 'app/store/withReducer';
 import { useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGift } from '@fortawesome/free-solid-svg-icons';
+import { faGift, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { alertInformation } from '@widgets/functions';
 // import {Waypoint} from "react-waypoint";
@@ -327,11 +327,18 @@ function Notification({
                                 button
                                 divider
                                 className='flex justify-between items-center rounded-4'
-                                onClick={() => handleRead([{ id: item.id }])}
+                                onClick={() => {
+                                    handleRead([{ id: item.id }]);
+
+                                }}
                             >
                                 <div style={{ width: 40 }}>
                                     <div className='rounded-full bg-grey-300 flex items-center justify-center' style={{ height: 40, width: 40 }} >
-                                        <FontAwesomeIcon className='text-pink-300' icon={faGift} />
+                                        {
+                                            item?.cmsref === 'order'
+                                                ? <FontAwesomeIcon className='text-pink-300' icon={faGift} />
+                                                : <FontAwesomeIcon className='text-green-300' icon={faReceipt} />
+                                        }
                                     </div>
                                 </div>
                                 <div
