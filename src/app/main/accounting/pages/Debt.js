@@ -418,23 +418,23 @@ function Meta({ type }) {
             setSearch(prev => {
                 let filter = { ...prev };
                 if (type === '1') {
-                    filter.fromDate = format(minusDays(new Date(), 30), 'yyyy-MM-dd HH:mm');
-                    filter.toDate = format(new Date(), 'yyyy-MM-dd HH:mm');
+                    filter.fromDate = format(minusDays(new Date(), 30), 'yyyy-MM-dd 00:00:00');
+                    filter.toDate = format(new Date(), 'yyyy-MM-dd HH:mm:00');
                 }
 
                 if (type === '2') {
-                    filter.fromDate = format(minusDays(new Date(), -summary?.diff), 'yyyy-MM-dd HH:mm');
-                    filter.toDate = format(new Date(), 'yyyy-MM-dd HH:mm');
+                    filter.fromDate = format(minusDays(new Date(), -summary?.diff), 'yyyy-MM-dd 00:00:00');
+                    filter.toDate = format(new Date(), 'yyyy-MM-dd HH:mm:00');
                 }
 
                 if (type === '3') {
-                    filter.fromDate = format(minusDays(new Date(), -summary?.diff), 'yyyy-MM-dd HH:mm');
-                    filter.toDate = format(minusDays(new Date(), 1), 'yyyy-MM-dd HH:mm');
+                    filter.fromDate = format(minusDays(new Date(), -summary?.diff), 'yyyy-MM-dd 00:00:00');
+                    filter.toDate = format(minusDays(new Date(), 1), 'yyyy-MM-dd HH:mm:00');
                 }
 
                 if (type === '4') {
-                    filter.fromDate = format(new Date(), 'yyyy-MM-dd HH:mm');
-                    filter.toDate = format(new Date(), 'yyyy-MM-dd HH:mm');
+                    filter.fromDate = format(new Date(), 'yyyy-MM-dd 00:00:00');
+                    filter.toDate = format(new Date(), 'yyyy-MM-dd HH:mm:00');
                 }
                 setPass(true)
                 console.log(filter);
