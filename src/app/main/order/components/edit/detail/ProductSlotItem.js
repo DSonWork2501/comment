@@ -44,7 +44,7 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
                         onChange={(event) => handleChangeProductType(event)}
                         label="Loại"
                         name="type"
-                        data={Object.values(ProductType).map(x => ({ ...x, disabled: disabledHs }))}
+                        data={Object.values(ProductType).map(x => ({ ...x, disabled: x.id === '0' }))}
                     />
                     {/* {type === ProductType[3].id &&
                         <CmsSelect

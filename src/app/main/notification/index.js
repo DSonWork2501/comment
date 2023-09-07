@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
     Badge,
     Box,
@@ -14,12 +14,20 @@ import {
 } from "@material-ui/core";
 import { Notifications } from '@material-ui/icons';
 import { useEffect } from 'react';
-import { collection, onSnapshot } from 'firebase/firestore';
-import { db } from 'firebase';
+import { database } from 'firebase';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showMessage } from 'app/store/fuse/messageSlice';
+import { ref, onValue, off } from 'firebase/database';
 import { useRef } from 'react';
+import { getTimeAgo, keyStore } from './common';
+import reducer, { notify } from './store';
+import withReducer from 'app/store/withReducer';
+import { useCallback } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGift } from '@fortawesome/free-solid-svg-icons';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { alertInformation } from '@widgets/functions';
 // import {Waypoint} from "react-waypoint";
 
 const useStyles = makeStyles((theme) => ({
@@ -49,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
             zIndex: 0,
         },
         '& ul>div': {
-            padding: '0 8px',
+            padding: '2px 8px',
             borderBottom: 'none',
             marginBottom: 8
         },
@@ -68,26 +76,63 @@ const useStyles = makeStyles((theme) => ({
             textAlign: 'center',
             borderRadius: '50%',
             lineHeight: '20px'
+        },
+        '& .cus': {
+            fontSize: '13px',
+            color: 'gray',
+            overflow: 'hidden', /* Hide any overflow content */
+            textOverflow: 'ellipsis', /* Add ellipsis (...) for text that overflows */
+            height: 35
+        },
+        '& .cus-info': {
+            fontWeight: 700,
+            color: 'black'
+        },
+        '& .title': {
+            fontWeight: 700,
+            fontSize: '13px'
         }
     },
 }));
 
-const items = [
-    { id: 1, text: 'Unread Item 1', unread: true },
-    { id: 2, text: 'Read Item 2', unread: false },
-    { id: 3, text: 'Unread Item 3', unread: true },
-    { id: 4, text: 'Read Item 4', unread: false },
-];
+const TimeRender = ({ time }) => {
+    const [state, setState] = useState(0);
+
+    useEffect(() => {
+        // Initialize the interval and store its ID
+        const intervalId = setInterval(() => {
+            setState(prev => prev + 1);
+        }, 60000);
+
+        // Cleanup function to clear the interval when the component unmounts
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [])
+
+    console.log(state);
+
+    return getTimeAgo(new Date(), new Date(time));
+}
 
 function Notification({
     countUnread = 0,
     loadingFetchData = false,
 }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [numberUnread, setNumberUnread] = useState(null);
+    const entities = useSelector(store => store[keyStore].entities?.data);
     const pageFresh = useRef(true);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const numberUnread = useMemo(() => {
+        let count = 0;
+        if (entities?.length)
+            entities.forEach(element => {
+                if (element?.status === 1)
+                    count = count + 1;
+            });
+        return count;
+    }, [entities])
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -96,25 +141,60 @@ function Notification({
         setAnchorEl(null);
     };
 
+    const getList = useCallback((search) => {
+        dispatch(notify.getList(search));
+    }, [dispatch]);
+
     useEffect(() => {
-        const unsubscribe = onSnapshot(collection(db, 'Notification'), (snapshot) => {
-            const data = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
-            console.log(data);
+        getList();
+    }, [getList])
+
+    useEffect(() => {
+        // const unsubscribe = onSnapshot(collection(db, 'Notification'), (snapshot) => {
+        //     const data = snapshot.docs.map((doc) => ({
+        //         id: doc.id,
+        //         ...doc.data(),
+        //     }));
+        //     console.log(data);
+        //     if (pageFresh.current) {
+        //         pageFresh.current = false;
+        //         return;
+        //     }
+        //     setNumberUnread(prev => prev ? prev + 1 : 1);
+        //     dispatch(showMessage({ variant: "success", message: 'Có một thông báo mới' }))
+        // });
+
+        // return () => {
+        //     unsubscribe();
+        // };
+
+        const databaseRef = ref(database, 'cms');
+
+        // Attach an event listener to watch for changes
+        const onDataChange = (snapshot) => {
+            const newData = snapshot.val();
             if (pageFresh.current) {
                 pageFresh.current = false;
                 return;
             }
-            setNumberUnread(prev => prev ? prev + 1 : 1);
+            console.log(newData);
             dispatch(showMessage({ variant: "success", message: 'Có một thông báo mới' }))
-        });
-
-        return () => {
-            unsubscribe();
+            getList();
         };
-    }, [dispatch]);
+
+        onValue(databaseRef, onDataChange);
+
+        // Cleanup by detaching the listener when the component unmounts
+        return () => {
+            off(databaseRef, onDataChange);
+        };
+    }, [dispatch, getList]);
+
+    const handleRead = async (values) => {
+        const resultAction = await dispatch(notify.read(values))
+        unwrapResult(resultAction);
+        getList();
+    }
 
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
@@ -183,17 +263,57 @@ function Notification({
                         variant={'h1'}>
                         Thông báo
                     </Typography>
-                    <Box
-                        display={'flex'}
-                        justifyContent={'flex-end'}>
-                        <span
-                            style={{
-                                fontSize: '13px'
-                            }}
-                            className='underline text-blue-400 cursor-pointer'>
-                            Xem tất cả
-                        </span>
-                    </Box>
+                    {
+                        Boolean(entities?.length)
+                        &&
+                        <Box
+                            display={'flex'}
+                            justifyContent={'flex-end'}>
+                            <span
+                                style={{
+                                    fontSize: '13px'
+                                }}
+                                onClick={() => {
+                                    alertInformation({
+                                        text: `Xác nhận thao tác`,
+                                        data: {},
+                                        confirm: async () => {
+                                            try {
+                                                const resultAction = await dispatch(notify.deleteAll())
+                                                unwrapResult(resultAction);
+                                                getList();
+                                            } catch (error) { } finally {
+                                            }
+                                        },
+                                    });
+                                }}
+                                className='underline text-red-400 cursor-pointer mr-8'>
+                                Xóa hết
+                            </span>
+                            <span
+                                style={{
+                                    fontSize: '13px'
+                                }}
+                                onClick={() => {
+                                    alertInformation({
+                                        text: `Xác nhận thao tác`,
+                                        data: {},
+                                        confirm: async () => {
+                                            try {
+                                                const resultAction = await dispatch(notify.read(entities.map(val => ({ id: val.id }))))
+                                                unwrapResult(resultAction);
+                                                getList();
+                                            } catch (error) { } finally {
+                                            }
+                                        },
+                                    });
+                                }}
+                                className='underline text-blue-400 cursor-pointer'>
+                                Đọc tất cả
+                            </span>
+                        </Box>
+                    }
+
                     <Box position={'absolute'}
                         bottom={0}
                         left={0}
@@ -201,32 +321,37 @@ function Notification({
                         {loadingFetchData && <LinearProgress />}
                     </Box>
                     <List>
-                        {items.map((item) => (
+                        {Boolean(entities?.length) && entities.map((item) => (
                             <ListItem
                                 key={item.id}
                                 button
                                 divider
-                                className='flex justify-between items-center'
+                                className='flex justify-between items-center rounded-4'
+                                onClick={() => handleRead([{ id: item.id }])}
                             >
+                                <div style={{ width: 40 }}>
+                                    <div className='rounded-full bg-grey-300 flex items-center justify-center' style={{ height: 40, width: 40 }} >
+                                        <FontAwesomeIcon className='text-pink-300' icon={faGift} />
+                                    </div>
+                                </div>
                                 <div
                                     style={{
-                                        width: 'calc(100% - 20px)'
+                                        width: 'calc(100% - 60px)'
                                     }}
                                 >
-                                    <span className='font-bold mr-2'>
-                                        Trương công mạnh
-                                    </span>
-                                    <span style={{ color: 'gray' }}>
-                                        đã tạo 1 đơn hàng
-                                    </span>
-                                    <div className={`${item.unread ? 'text-blue-400' : 'text-gray-500'}`} style={{ lineHeight: 1 }}>
+                                    <div className={`${item.status === 1 ? 'text-blue-400' : 'text-gray-500'} title`}>
+                                        {item.title}
+                                    </div>
+                                    <div dangerouslySetInnerHTML={{ __html: item.body }} />
+                                    <div className={`${item.status === 1 ? 'text-blue-400' : 'text-gray-500'}`} style={{ lineHeight: 1 }}>
                                         <span style={{ fontSize: '11px' }}>
-                                            1 giờ trước
+                                            <TimeRender time={item.datecreate} />
+                                            {/* 1 giờ trước */}
                                         </span>
                                     </div>
                                 </div>
 
-                                {item.unread ? (
+                                {item.status === 1 ? (
                                     <span
                                         style={{
                                             background: 'rgb(24 118 242)',
@@ -317,4 +442,4 @@ function Notification({
     );
 }
 
-export default Notification;
+export default withReducer(keyStore, reducer)(Notification);

@@ -60,7 +60,7 @@ function TooltipProduct({ value, index }) {
 function DetailShelfProductContent({ data, index, classes, HandleAddData }) {
     //const quantity = 1;
     const value = data?.item || null
-    const img = value.img ? `${baseurl}${value.img}` : noImage
+    const img = value?.img ? `${baseurl}${value.img}` : noImage
     return (
         <div
             key={`div-0-detai-${index}`}
