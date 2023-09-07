@@ -177,8 +177,7 @@ function Notification({
                 pageFresh.current = false;
                 return;
             }
-            console.log(newData);
-            dispatch(showMessage({ variant: "success", message: 'Có một thông báo mới' }))
+            dispatch(showMessage({ variant: "success", message: newData.titile, style: { background: newData.color }, icon: 'notifications' }))
             getList();
         };
 
@@ -321,7 +320,7 @@ function Notification({
                         {loadingFetchData && <LinearProgress />}
                     </Box>
                     <List>
-                        {Boolean(entities?.length) && entities.map((item) => (
+                        {Boolean(entities?.length) ? entities.map((item) => (
                             <ListItem
                                 key={item.id}
                                 button
@@ -382,7 +381,15 @@ function Notification({
                                 )
                                 }
                             </ListItem>
-                        ))}
+                        )) : <ListItem
+                            button
+                            divider
+                            className='flex justify-between items-center rounded-4'
+                        >
+                            <div style={{ fontSize: 13 }}>
+                                Không có thông báo mới!
+                            </div>
+                        </ListItem>}
                     </List>
                 </Paper>
                 <Divider />

@@ -62,9 +62,10 @@ function FuseMessage(props) {
 		>
 			<SnackbarContent
 				className={clsx(classes[options.variant])}
+				style={options.style}
 				message={
 					<div className="flex items-center">
-						{variantIcon[options.variant] && <Icon color="inherit">{variantIcon[options.variant]}</Icon>}
+						{variantIcon[options.variant] && <Icon color="inherit">{options.icon || variantIcon[options.variant]}</Icon>}
 						<Typography className="mx-8">{options.message}</Typography>
 					</div>
 				}
