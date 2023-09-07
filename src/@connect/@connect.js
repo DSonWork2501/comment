@@ -176,6 +176,11 @@ export default {
                 getCollectOrderPhone: entity => axios.post(`${baseurl}/order/get-collection-detail`, entity),
                 getCollectBillPhone: entity => axios.post(`${baseurl}/order/get-collection`, entity),
             }
+        },
+        notification: {
+            getList: (params) => axios.get(`${baseurl}/notification/get-notification`, { params }),
+            read: entity => axios.put(`${baseurl}/notification/read-notification`, entity),
+            deleteAll: entity => axios.put(`${baseurl}/notification/remove-all-notification`, entity),
         }
     },
 }

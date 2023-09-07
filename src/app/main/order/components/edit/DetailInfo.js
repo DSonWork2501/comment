@@ -78,7 +78,7 @@ export default function DetailProductContent({ formik }) {
     const isContract = parseInt(ProductType[3].type['1'].id) === hs;
     const handleSelectItem = (value) => {
         setSelected(value);
-        if (value.ishs === 1)
+        if (value?.ishs === 1)
             setShowTb(false);
     }
 

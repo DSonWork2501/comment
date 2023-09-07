@@ -1,4 +1,4 @@
-import { CmsDialog, CmsLabel, CmsSelect } from "@widgets/components"
+import { CmsDialog, CmsLabel, CmsSelect, CmsTextField } from "@widgets/components"
 import { useFormik } from "formik"
 import { CheckStringIsJson } from "@widgets/functions/Common"
 import React from "react"
@@ -13,13 +13,14 @@ import * as Yup from 'yup'
 import { useSelector } from "react-redux"
 import { keyStore } from "app/main/product/common"
 import { useMemo } from "react"
+import { Button } from "@material-ui/core"
 
 
 function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalIndex }) {
     const [prefix, setPrefix] = useState('[0]')
     const [stackIndex, setStackIndex] = useState(0)
     const [slotIndex, setSlotIndex] = useState('')
-    const currentShelf = useSelector(store => store[keyStore].product.entity?.data)
+    const currentShelf = useSelector(store => store[keyStore]?.product?.entity?.data || store?.orders?.product?.searchDetailEntities)
     const listTemp = useMemo(() => {
         if (currentShelf && currentShelf?.detail?.length) {
             return currentShelf.detail.filter((val, i) => i !== modalIndex).map(val => ({ ...val, id: val.uniqueid }))
@@ -28,6 +29,10 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
     }, [currentShelf, modalIndex])
     const [model, setModel] = useState(null);
     const [listCheckTemp, setListCheckTemp] = useState({});
+    const [custom, setCustom] = useState({
+        first: 0,
+        second: 0
+    });
 
     const formik_shelf = useFormik({
         initialValues: data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })],
@@ -92,33 +97,81 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                         <CmsLabel content={'Tích chọn thông tin tủ, thông tin chi tiết sẽ hiển thị tương ứng'} className="" />
 
                     </div>
-                    {
-                        Boolean(listTemp?.length)
-                        &&
-                        <div className="w-1/5">
-                            <CmsSelect
-                                data={listTemp}
-                                size="small"
-                                setOptionLabel={(option) => option.subname}
-                                value={model}
-                                onChange={(e) => {
-                                    try {
-                                        setModel(e.target.value)
-                                        let temp = JSON.parse(listTemp.find(val => val.id === e.target.value).model);
-                                        temp = temp.map(val => ({
-                                            ...val,
-                                            slots: val.slots.map(va => ({ ...va, item: null }))
-                                        }))
-                                        formik_shelf.setValues(temp)
-                                    } catch (error) {
 
-                                    }
-                                }}
-                                label="Model có sẵn"
-                            />
+                    <div className="flex flex-wrap -mx-8">
+                        <div className="w-1/5 px-8">
+                            {
+                                Boolean(listTemp?.length)
+                                &&
+                                <CmsSelect
+                                    data={listTemp}
+                                    size="small"
+                                    setOptionLabel={(option) => option.subname}
+                                    value={model}
+                                    onChange={(e) => {
+                                        try {
+                                            setModel(e.target.value)
+                                            let temp = JSON.parse(listTemp.find(val => val.id === e.target.value).model);
+                                            console.log(temp);
+                                            temp = temp.map(val => ({
+                                                ...val,
+                                                slots: val.slots.map(va => ({ ...va, item: null }))
+                                            }))
+                                            formik_shelf.setValues(temp)
+                                        } catch (error) {
+
+                                        }
+                                    }}
+                                    label="Model có sẵn"
+                                />
+                            }
                         </div>
-                    }
-
+                        <div className="w-4/5 px-8 border-l">
+                            <div className="flex flex-wrap -mx-8">
+                                <div className="px-8 w-88">
+                                    <CmsTextField
+                                        label="Số ngăn"
+                                        name="totalPredict"
+                                        size="small"
+                                        value={custom.first}
+                                        onChange={(e) => setCustom(prev => ({ ...prev, first: e.target.value }))}
+                                        isNumberFormat={true} />
+                                </div>
+                                <div className="px-8 w-88">
+                                    <CmsTextField
+                                        label="Slot/ngăn"
+                                        name="totalPredict"
+                                        size="small"
+                                        value={custom.second}
+                                        onChange={(e) => setCustom(prev => ({ ...prev, second: e.target.value }))}
+                                        isNumberFormat={true} />
+                                </div>
+                                <div className="px-8">
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        style={{
+                                            textTransform: 'inherit',
+                                            fontWeight: 400
+                                        }}
+                                        disabled={custom.first === 0 || custom.second === 0}
+                                        onClick={() => {
+                                            let data = [];
+                                            for (let index = 1; index <= custom.first; index++) {
+                                                data.push(initDetailModel({ name: `Ngăn ${index}` }))
+                                                for (let indexJ = 1; indexJ <= custom.second; indexJ++) {
+                                                    data[index - 1].slots.push(initDetailModelSlot({ name: `Vị trí ${index}.${indexJ}` }))
+                                                }
+                                            }
+                                            formik_shelf.setValues(data)
+                                        }}
+                                    >
+                                        Custom tủ
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </>
 
             }

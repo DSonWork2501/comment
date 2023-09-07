@@ -39,12 +39,12 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
                     <CmsRadioGroup
                         vertical={false}
                         size="small"
-                        className="w-full m-0"
+                        className="w-full m-0 px-8"
                         value={type}
                         onChange={(event) => handleChangeProductType(event)}
                         label="Loại"
                         name="type"
-                        data={Object.values(ProductType).map(x => ({ ...x, disabled: disabledHs }))}
+                        data={Object.values(ProductType).map(x => ({ ...x, disabled: x.id === '0' }))}
                     />
                     {/* {type === ProductType[3].id &&
                         <CmsSelect

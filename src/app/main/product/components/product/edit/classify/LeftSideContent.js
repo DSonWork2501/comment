@@ -186,7 +186,7 @@ function SlotContent({ data = [], HandleClickDetail, HandleDeleteSlot, stack_id,
 
 function LeftSideContent({ data = [], HandleAddStack, HandleAddSlot, HandleClickDetail, HandleDeleteStack, HandleDeleteSlot, stackIndex, slotIndex, isCanFix, productID, label, handleCheckBox, detailCheck, listCheckTemp, setListCheckTemp }) {
     const classes = useStyles();
-    const isShow = useSelector(store => store[keyStore].product?.isOpenViewSelectProduct);
+    const isShow = useSelector(store => store[keyStore]?.product?.isOpenViewSelectProduct);
 
     return (
         <BoxCustom label={label || 'Thông tin tủ'}>
