@@ -214,6 +214,7 @@ const OpenDialog = ({ model, handleClose }) => {
                 open={true}
                 handleClose={HandleCloseShelfModal}
                 data_shelf={JSON.stringify(model)}
+                view='order'
             />
         }
 
