@@ -258,7 +258,7 @@ function Meta2({ type }) {
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
     const [selects, setSelects] = useState([]);
-    console.log(detail)
+     console.log(detail)
 
     const getListTable = useCallback((search) => {
         if (type)

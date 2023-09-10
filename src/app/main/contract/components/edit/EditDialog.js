@@ -180,7 +180,7 @@ export const Frame = React.memo(({ iframeKey, fileName, arrayForm, signature }) 
         data.append('enpoint', 'tempfile');
         handleReadFile(fileL, async (file) => {
             try {
-                console.log(arrayFormString);
+                // console.log(arrayFormString);
 
                 const fileName = 'fileTemp.docx';
                 const fileWithMetadata = new Blob([file], { type: file.type });
@@ -420,7 +420,7 @@ function EditDialogComponent({ open, handleClose, handleSave, item = null, isShi
                     const name2 = Date.now() + '.docx';
                     const fileWithMetadata2 = new Blob([file], { type: file.type });
                     fileWithMetadata2.name = name2;
-                    console.log(fileWithMetadata2);
+                    // console.log(fileWithMetadata2);
                     data2.append('files', fileWithMetadata2, name2);
                     await Connect.live.uploadFile.insert(data2);
                     formik.setFieldValue('file', name2);

@@ -258,7 +258,7 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
 
     const data = entities && entities.data && entities.data.map((item, index) => {
         const value = JSON.parse(item.incomes);
-        console.log(value);
+        // console.log(value);
         return ({
             ...item,
             diff: -item.diff,
@@ -453,7 +453,7 @@ function Meta({ type }) {
                     filter.toDate = format(new Date(), 'yyyy-MM-dd HH:mm:00');
                 }
                 setPass(true)
-                console.log(filter);
+                // console.log(filter);
 
                 return { ...filter, type }
             })

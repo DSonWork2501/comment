@@ -7,7 +7,7 @@ import { CmsAlert } from "@widgets/components"
 
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
-export default function CreateDetailProduct({ formik, handleSelectItem }) {
+export default function CreateDetailProduct({ formik, handleSelectItem,handleSelectItemInList }) {
     const formik_item = useFormik({
         initialValues: InitProductOrder(),
         keepDirtyOnReinitialize: true,
@@ -27,7 +27,7 @@ export default function CreateDetailProduct({ formik, handleSelectItem }) {
             if (item.price) itemAdd = { ...itemAdd, price: item.price }
             if (item.name) itemAdd = { ...itemAdd, name: item.name }
             if (item.img) itemAdd = { ...itemAdd, image: `${baseurl}${item.img}`, img: item.img }
-            // console.log('itemAdd', itemAdd)
+            // // console.log('itemAdd', itemAdd)
             var array = null
             if (productorder.filter(x => x.uniqueid === itemAdd.uniqueid).length > 0) {
                 array = [...productorder].map(x => ({ ...x, quantity: x.uniqueid === itemAdd.uniqueid ? x.quantity + itemAdd.quantity : x.quantity }))
@@ -37,8 +37,8 @@ export default function CreateDetailProduct({ formik, handleSelectItem }) {
             formik.setFieldValue('productorder', array)
         }
     }
-    // console.log('formik_item', formik_item)
+    // // console.log('formik_item', formik_item)
     return (
-        <ProductSlotSKUItem formik_entity={formik} formik={formik_item} keyStore={keyStore} HandleAddData={HandleAddData} handleSelectItem={handleSelectItem} />
+        <ProductSlotSKUItem formik_entity={formik} formik={formik_item} keyStore={keyStore} HandleAddData={HandleAddData} handleSelectItem={handleSelectItem} handleSelectItemInList={handleSelectItemInList} />
     )
 }

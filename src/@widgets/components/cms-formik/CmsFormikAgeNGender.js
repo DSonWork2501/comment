@@ -89,7 +89,7 @@ function CmsFormikAgeNGender(props){
             age: Yup.string().nullable(false).required("Độ tuổi không được bỏ trống")
         })
     })
-    // console.log('formikAgeNGender', formikAgeNGender)
+    // // console.log('formikAgeNGender', formikAgeNGender)
     
     return (
         <div className={clsx(classes.formGroup, className, error && "border-red")}>

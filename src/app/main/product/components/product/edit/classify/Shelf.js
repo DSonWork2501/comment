@@ -112,7 +112,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                                         try {
                                             setModel(e.target.value)
                                             let temp = JSON.parse(listTemp.find(val => val.id === e.target.value).model);
-                                            console.log(temp);
+                                            // console.log(temp);
                                             temp = temp.map(val => ({
                                                 ...val,
                                                 slots: val.slots.map(va => ({ ...va, item: null }))
@@ -129,7 +129,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                         {
                             view !== 'order'
                             &&
-                            <div className="w-4/5 px-8 border-l">
+                            <div className="w-3/5 px-8 border-l">
                                 <div className="flex flex-wrap -mx-8">
                                     <div className="px-8 w-88">
                                         <CmsTextField
@@ -175,6 +175,31 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                                 </div>
                             </div>
                         }
+                        <div className="w-1/5 px-8 border-l">
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                style={{
+                                    textTransform: 'inherit',
+                                    fontWeight: 400
+                                }}
+                                onClick={() => {
+                                    formik_shelf.setValues(prev => {
+                                        return prev.map(val => {
+                                            return {
+                                                ...val, slots: val.slots.map(va => {
+                                                    let slot = { ...va };
+                                                    delete slot.item;
+                                                    return slot
+                                                })
+                                            };
+                                        })
+                                    })
+                                }}
+                            >
+                                Bỏ hết rượu
+                            </Button>
+                        </div>
                     </div>
                 </>
 

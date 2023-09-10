@@ -10,7 +10,7 @@ import { initColumn } from '@widgets/functions'
  * @returns str
  */
 // const RemoveSpaceInStr = (arrStr, separateChar) => {
-//   console.log('arrStr.split(separateChar).map(i => i.trim()).join(separateChar)', arrStr.split(separateChar).map(i => i.trim()).join(separateChar))
+//   // console.log('arrStr.split(separateChar).map(i => i.trim()).join(separateChar)', arrStr.split(separateChar).map(i => i.trim()).join(separateChar))
 //   return arrStr.split(separateChar).map(i => i.trim()).join(separateChar)
 // }
 

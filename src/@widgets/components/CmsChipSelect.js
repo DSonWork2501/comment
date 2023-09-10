@@ -31,7 +31,7 @@ function CmsChipSelect(props) {
         let arr = []
         value.forEach(item => {
             if(item.value){
-                console.log(item.value);
+                // console.log(item.value);
                 let itemArr = item.value.split(charSplit)
                 if(itemArr.length > 1)
                     itemArr.forEach(x => {

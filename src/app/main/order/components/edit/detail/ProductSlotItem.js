@@ -10,6 +10,8 @@ import { ProductType } from "app/main/product/model/product/homeSubscription"
 import { OrderContext } from "app/main/order/context/OrderContext"
 import { useState } from "react"
 import { Tooltip } from "@material-ui/core"
+import { useRef } from "react"
+import { useCallback } from "react"
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
@@ -61,7 +63,7 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
     )
 }
 
-export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, HandleAddData, handleSelectItem }) {
+export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, HandleAddData, handleSelectItem, handleSelectItemInList }) {
     const key = window.location.pathname.split('/')[1] === 'order' ? 'orders' : keyStore;
     const { hs, setHs } = React.useContext(OrderContext) || null
     const dispatch = useDispatch()
@@ -70,13 +72,10 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
     const detail_entities = useSelector(store => store[key].product.searchDetailEntities)?.detail
     const detail_loading = useSelector(store => store[key].product.searchDetailLoading)
     const item_product = formik.values || null
-    const sku = item_product ? item_product?.sku : null
+    const product = formik_entity.values || null
+    const sku = item_product?.sku ? (item_product.sku) : (product?.productorder?.length ? product.productorder[0].sku : null)
     const [timer, setTimer] = useState()
-
-    useEffect(() => {
-        dispatch(getListHS({ HomeSubscription: parseInt(hs) }))
-    }, [dispatch, hs])
-
+    const check = useRef(true);
     useEffect(() => {
         dispatch(searchDetail({ sku: sku }))
     }, [dispatch, sku])
@@ -91,11 +90,12 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
 
     const detail_data = useMemo(() => detail_entities || [], [detail_entities])
 
-    const onChangeSku = (event, value) => {
+    const { setValues } = formik;
+    const onChangeSku = useCallback((event, value) => {
         handleSelectItem(value);
 
         if (value) {
-            formik.setValues((prev) => ({
+            setValues((prev) => ({
                 ...prev,
                 sku: value.sku,
                 name: value.name,
@@ -107,7 +107,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                 ishs: value.ishs
             }))
         } else {
-            formik.setValues((prev) => ({
+            setValues((prev) => ({
                 ...prev,
                 sku: '',
                 name: '',
@@ -119,7 +119,8 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                 ishs: 0
             }))
         }
-    }
+    }, [handleSelectItem, setValues])
+
     const handleChangeHs = (event) => {
         const value = event.target.value
         setHs(value)
@@ -129,6 +130,11 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
             formik_entity.setFieldValue('privatedescription', '')
         }
     }
+
+    const { setFieldValue } = formik_entity;
+    useEffect(() => {
+        setFieldValue('privatedescription', parseInt(hs) === parseInt(ProductType[3].type['1'].id) ? 'home_subscription' : '')
+    }, [setFieldValue, hs])
 
     const onInputChange = (event, value, name) => {
         if (event) {
@@ -140,10 +146,29 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
         }
     }
 
-    const values = formik_entity?.values
-    console.log('item_product_selected', item)
-    console.log('product_data', product_data)
+    const values = formik_entity?.values, { productorder, id } = values, stringProduct = JSON.stringify(productorder);
     const disabledHs = useMemo(() => values?.productorder?.length > 0 ? true : false, [values])
+
+    useEffect(() => {
+        if (check.current) {
+            if (id && stringProduct) {
+                let product = JSON.parse(stringProduct)[0];
+                dispatch(getListHS({ search: product.sku, homeSubscription: hs, PageNumber: 1, rowsPage: 100 })).then(val => {
+                    const { payload } = val, { result, data } = payload;
+                    if (result) {
+                        onChangeSku(data[0]);
+                    }
+                })
+                check.current = false;
+            }
+        }
+    }, [id, dispatch, stringProduct, handleSelectItem, values, onChangeSku, hs])
+
+    useEffect(() => {
+        if (!id)
+            dispatch(getListHS({ HomeSubscription: parseInt(hs) }))
+    }, [dispatch, hs, id])
+
     return (
         <div className="w-full space-y-16">
             <FilterHS
@@ -184,6 +209,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                         HandleAddData={HandleAddData}
                         img={formik?.values?.image || ''}
                         hs={hs}
+                        formik={formik}
                     />
                 </>
                 )

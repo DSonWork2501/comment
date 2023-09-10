@@ -1,14 +1,18 @@
-import React, { useMemo } from "react";
-import { CmsBoxLine, CmsFormikAutocomplete, CmsFormikDateTimePicker, CmsFormikTextField, } from "@widgets/components";
-import { useSelector } from "react-redux";
+import React, { useEffect, useMemo } from "react";
+import { CmsBoxLine, CmsFormikAutocomplete, CmsFormikTextField } from "@widgets/components";
+import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import LocationContent from "./basic/LocationContent";
-import { orderAllowTest, orderPaymentMethod, orderType } from "../../model";
+import { order } from "../../store/orderSlice";
 
 export default function BasicInfoContent({ formik }) {
-
+    const dispatch = useDispatch();
     const cusEntity = useSelector(store => store[keyStore].customer.entities)
+    const payments = useSelector(store => store[keyStore].order.payments?.data) || []
     const cusData = useMemo(() => cusEntity?.data?.map(x => ({ ...x, id: x.id, name: `id: ${x.id || '-'}, tên: ${x.name || '-'}, email: ${x.email || '-'}`, cusName: x.name })) || [], [cusEntity])
+    useEffect(() => {
+        dispatch(order.other.getPayment())
+    }, [dispatch])
 
     const HandleChangeCusId = (value) => {
         if (value) {
@@ -80,12 +84,21 @@ export default function BasicInfoContent({ formik }) {
                     <CmsFormikTextField size="small" required={false} formik={formik} name="paymentcode" label="Mã thanh toán" />
                     <CmsFormikTextField size="small" required={false} formik={formik} name="paymentgateway" label="Cổng thanh toán" /> */}
                     <CmsFormikAutocomplete
-                        data={Object.values(orderPaymentMethod)}
+                        data={payments}
                         size="small"
                         required={false}
                         formik={formik}
                         name="paymentmethod"
-                        label="Phương thức thanh toán" />
+                        autocompleteProps={{
+                            getOptionLabel: (option) => option?.paymentname || '',
+                            ChipProps: {
+                                size: 'small'
+                            },
+                            size: 'small',
+                        }}
+                        setOption={(option) => option?.paymentname || ''}
+                        label="Phương thức thanh toán"
+                        valueIsId="paymentmethod" />
                     <CmsFormikTextField
                         size="small"
                         required={false}

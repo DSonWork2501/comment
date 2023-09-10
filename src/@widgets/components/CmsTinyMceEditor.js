@@ -9,7 +9,7 @@ function CmsTinyMceEditor (props) {
     const {value, onChange} = props
     const editorRef = useRef(null);
     const handleChange = (e) => {
-        // console.log('Content was updated:', e.target.getContent());
+        // // console.log('Content was updated:', e.target.getContent());
         onChange && onChange(e)
     }
     return (

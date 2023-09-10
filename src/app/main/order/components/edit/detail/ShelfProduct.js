@@ -1,13 +1,14 @@
 import { Tooltip, makeStyles } from "@material-ui/core"
 import { CmsButton, CmsIconButton, CmsLabel } from "@widgets/components"
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
-import React from "react"
+import React, { useEffect } from "react"
 import { useCallback } from "react"
 import { useState } from "react"
 import noImage from '@widgets/images/noImage.jpg';
 import clsx from "clsx"
 import ShelfContent from "app/main/product/components/product/edit/classify/Shelf"
 import { returnModelPr } from "app/main/product/components/product/edit/ClassifyInfo"
+import { useRef } from "react"
 
 export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
@@ -229,13 +230,33 @@ const OpenDialog = ({ model, handleClose }) => {
 
 }
 
-function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, handleSelectItem }) {
+function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, handleSelectItem, formik }) {
     const classes = useStyles();
     const [breadValue, setBreadValue] = useState('danh_sach_tu');
     const [model, setModel] = useState([]);
     const [item, setItem] = useState(null);
+    const values = formik?.values;
+    const check = useRef(true);
+
+    useEffect(() => {
+        setBreadValue('danh_sach_tu')
+        setModel([])
+    }, [img])
+
+    useEffect(() => {
+        if (check.current) {
+            const productorder = values?.productorder[0]
+            if (productorder && values?.id) {
+                setBreadValue('chi_tiet_san_pham')
+                setModel(productorder.model)
+                setItem(productorder)
+                check.current = false
+            }
+        }
+    }, [values])
 
     const handleClickBread = useCallback((name, item) => {
+        console.log(name, item);
         switch (name) {
             case 'danh_sach_tu':
                 setBreadValue(name)

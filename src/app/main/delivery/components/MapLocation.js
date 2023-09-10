@@ -64,7 +64,7 @@ function Map({ listLocation, entities, setUserLocations }) {
         }
         return []
     }, [entities, origin])
-    console.log(reEntitiesList);
+    // console.log(reEntitiesList);
     const calculateAndDisplayDirections = (origin, destination) => {
         if (origin && destination) {
             const directionsService = new window.google.maps.DirectionsService();
@@ -154,7 +154,7 @@ function Map({ listLocation, entities, setUserLocations }) {
             ? "https://cdn-icons-png.flaticon.com/128/7274/7274660.png"
             : "https://cdn-icons-png.flaticon.com/128/3967/3967503.png"
     }
-    console.log(directions?.length && directions[0]);
+    // console.log(directions?.length && directions[0]);
     return (
         <GoogleMap
             defaultZoom={11}

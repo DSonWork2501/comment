@@ -155,7 +155,7 @@ function Notification({
         //         id: doc.id,
         //         ...doc.data(),
         //     }));
-        //     console.log(data);
+        //     // console.log(data);
         //     if (pageFresh.current) {
         //         pageFresh.current = false;
         //         return;

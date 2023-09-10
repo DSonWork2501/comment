@@ -72,7 +72,7 @@ function EditCateContent({ id, open, handleClose, handleSave }) {
             formik.setFieldValue('image', result.data.message);
         }
     }
-    console.log(formik);
+    // console.log(formik);
     return (
         <CmsDialog
             title={`${formik?.values?.id === 0 ? 'Thêm mới thể loại' : 'Cập nhật thể loại'}`}

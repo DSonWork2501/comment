@@ -47,8 +47,8 @@ function DetailProduct({ value, index, HandleAddData, img }) {
     )
 }
 
-function LisProductContent({ data, HandleAddData, img, hs, handleCloseDialog, handleSelectItem }) {
-
+function LisProductContent({ data, HandleAddData, img, hs, handleCloseDialog, handleSelectItem, formik }) {
+    console.log(img);
     return (
         <FuseAnimate animation="transition.expandIn" delay={500}>
             <div>
@@ -73,6 +73,7 @@ function LisProductContent({ data, HandleAddData, img, hs, handleCloseDialog, ha
                             img={img}
                             HandleAddData={HandleAddData}
                             data={data}
+                            formik={formik}
                         />
                     </div>
                 }

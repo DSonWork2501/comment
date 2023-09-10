@@ -215,7 +215,7 @@ function FormEdit() {
                     formik.setSubmitting(true);
                     try {
                         const value = { ...values, orderid: values.orderID }
-                        console.log(value);
+                         console.log(value);
                         //const resultAction = await dispatch(order.shipper.insert(value))
                         //unwrapResult(resultAction);
 
@@ -316,7 +316,7 @@ function FormEdit() {
 
     useEffect(() => {
         if (ID !== '0' && current?.id !== parseInt(ID) && checkFirst) {
-            console.log(ID);
+            // console.log(ID);
             setCheckFirst(false);
             setTimeout(() => {
                 setFieldValue('orderID', parseInt(ID))

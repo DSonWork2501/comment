@@ -69,7 +69,7 @@ export const updateOrderStatus = createAsyncThunk(`${appName}/${moduleName}/stat
         //thunkAPI.dispatch(getList(search))
         return data
     } catch (error) {
-        // console.log('error', error)
+        // // console.log('error', error)
         // thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
         return error
     }
@@ -111,6 +111,16 @@ export const order = {
         }),
     },
     other: {
+        getPayment: createAsyncThunk(`${appName}/${moduleName}/order/other/getPayment`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.order.other.getPayment(params);
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
         getUserDelivery: createAsyncThunk(`${appName}/${moduleName}/order/other/getUserDelivery`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.order.other.getUserDelivery(params);
@@ -589,7 +599,14 @@ const orderSlice = createSlice({
                 error: null
             }
         },
-
+        [order.other.getPayment.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                payments: payload,
+                error: null
+            }
+        },
     }
 });
 
