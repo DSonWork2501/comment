@@ -256,7 +256,6 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, hand
     }, [values])
 
     const handleClickBread = useCallback((name, item) => {
-        console.log(name, item);
         switch (name) {
             case 'danh_sach_tu':
                 setBreadValue(name)
@@ -307,9 +306,14 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, hand
                                 onClick={() => handleClickBread('danh_sach_tu')}
                             />
                         </div>
-                        <OpenDialog
-                            handleClose={handleClose}
-                            model={model} />
+                        {
+                            !Boolean(values?.id)
+                            &&
+                            <OpenDialog
+                                handleClose={handleClose}
+                                model={model} />
+                        }
+
                     </div>
                     <div className="max-h-384 overflow-y-auto flex flex-wrap justify-between -mx-8">
                         {model?.map((item, index) =>

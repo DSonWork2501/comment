@@ -1,4 +1,4 @@
-import { CmsDialog, CmsLabel, CmsSelect, CmsTextField } from "@widgets/components"
+import { CmsButtonProgress, CmsDialog, CmsLabel, CmsSelect, CmsTextField } from "@widgets/components"
 import { useFormik } from "formik"
 import { CheckStringIsJson } from "@widgets/functions/Common"
 import React from "react"
@@ -89,13 +89,23 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
     return (
         <CmsDialog
             className="w-full h-full"
-            title={"Thông tin tủ hàng"}
+            title={<div className="flex space-x-8">
+                <div>Thông tin tủ hàng</div>
+                {
+                    data_shelf && data_shelf !== "[]" && <CmsButtonProgress
+                        startIcon="refresh"
+                        label="Làm mới"
+                        className="bg-grey-500 text-white hover:bg-grey-900"
+                        onClick={() => {
+                            formik_shelf.setValues(data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })]);
+                        }} />
+                }
+            </div>}
             text={
                 <>
                     <div className={'w-full flex flex-row space-x-8'}>
                         <CmsLabel content={'Hướng dẫn:'} className="text-green-500" />
                         <CmsLabel content={'Tích chọn thông tin tủ, thông tin chi tiết sẽ hiển thị tương ứng'} className="" />
-
                     </div>
 
                     <div className="flex flex-wrap -mx-8">
