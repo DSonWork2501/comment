@@ -78,7 +78,7 @@ function CmsSliderRuler(props) {
     setItem(value / one_percent)
   }, [value, one_percent])
 
-  // console.log(array)
+  // // console.log(array)
   const handleChange = (event, newValue) => {
     setItem(newValue)
   }

@@ -167,6 +167,8 @@ function OrderView() {
     }
     const [selects, setSelects] = useState([]);
 
+    if (!status)
+        History.push('/order/100')
 
     const columns = [
         new initColumn({
@@ -215,7 +217,7 @@ function OrderView() {
             dispatch(order.other.getSummary())
         }
 
-    }, [dispatch,])
+    }, [dispatch])
 
     useEffect(() => {
         getListTable(search, status);

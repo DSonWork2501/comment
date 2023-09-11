@@ -147,7 +147,7 @@ function ProductView() {
         setFilterOptions(value)
     };
 
-    // console.log('filterOptions', filterOptions)
+    // // console.log('filterOptions', filterOptions)
 
     return (
         <CmsCardedPage

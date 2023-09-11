@@ -22,12 +22,12 @@ export const database = getDatabase(app);
 export const fetchToken = (setTokenFound, setFcmToken) => {
     return getToken(messaging, { vapidKey: 'BL9-Yj-o8tAVC8rl__bP0fZ4QmGGNNB5qBpKWc_NKJcmnjGXiflvQ4Fqle649JMMBlTCqHXbh55oBpWVevhtd_Y' }).then((currentToken) => {
         if (currentToken) {
-            console.log(currentToken);
+            // console.log(currentToken);
             setTokenFound && setTokenFound(true);
             setFcmToken && setFcmToken(currentToken);
         }
     }).catch(err => {
-        console.log(err);
+        // console.log(err);
     })
 }
 

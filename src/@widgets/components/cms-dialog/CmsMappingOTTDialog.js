@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useState } from 'react';
 import { useEffect } from 'react';
 function CmsMappingOTTDialog(props) {
-    // console.log('props', props)
+    // // console.log('props', props)
     const dispatch = useDispatch()
     const { open, handleClose, title, text, search, setSearch, loading, selected, columns, saveProps,
         entities, setSelected, pagination, getDataFunc, entity, isMultiple, multipleChecked, isSearch } = props;

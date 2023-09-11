@@ -100,6 +100,7 @@ export default {
                 getUserDelivery: params => axios.get(`${baseurl}/customer/get-user-info`, { params }),
                 getVehicles: params => axios.get(`${baseurl}/customer/get-vehicles`, { params }),
                 checkOpt: entity => axios.post(`${baseurl}/order/check-otp`, entity),
+                getPayment: params => axios.get(`${baseurl}/order/get-payment-method`, { params }),
             },
             shipper: {
                 insert: entity => axios.post(`${baseurl}/order/shipping-insert${entity[0]?.deliveryid ? '?exist=1' : ''}`, entity),

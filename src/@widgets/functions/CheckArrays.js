@@ -38,7 +38,7 @@ const CheckDuplicate = (valueArray) => {
     return Object.values(result).filter(item => item.length > 1).map(item => item[0])
 }
 const SortObjectArray = (array, name) => {
-    // console.log('ararry', array)
+    // // console.log('ararry', array)
     return (!Array.isArray(array) || array.length === 0) ? [] : array.sort((a,b) => (a[name] > b[name]) ? 1 : ((b[name] > a[name]) ? -1 : 0))
 }
 export default {

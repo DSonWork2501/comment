@@ -68,7 +68,7 @@ function MutipleImagePathLink({ formik, CheckError }) {
 //         formik.setValues([...formik.values.filter((x, index) => index !== index_item)])
 //     }
 
-//     // console.log('formik', formik.values)
+//     // // console.log('formik', formik.values)
 
 //     const data = [...formik.values?.map((x, index) => ({
 //         stt: index + 1,

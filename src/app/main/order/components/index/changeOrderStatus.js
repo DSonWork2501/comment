@@ -15,7 +15,7 @@ function ChangeOderStatusContent({ entity, handleClose, open, handleSave }) {
         enableReinitialize: true,
         onSubmit: handleSaveData,
     })
-    console.log('formik', formik.values)
+    // console.log('formik', formik.values)
     return (
         <CmsDialog
             title={`Chuyển trạng thái đơn hàng ID: ${entity?.id || ''}`}

@@ -211,7 +211,7 @@ export const ConvertTimeFormatToSeconds = (timeString) => {
     if(!timeString) return 0
     const arr = timeString.split(":");
     const seconds = arr[0] * 3600 + arr[1] * 60 + (+arr[2]);
-    console.log('seconds', seconds)
+    // console.log('seconds', seconds)
     return seconds;
 }
 

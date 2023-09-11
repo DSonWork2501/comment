@@ -55,7 +55,7 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
                     value={value.id}
                     onChange={e => {
                         let check = selects.includes(value.currentIndex);
-                        console.log(check);
+                        // console.log(check);
                         check
                             ? setSelects(val => val.filter(e => e !== value.currentIndex))
                             : setSelects(val => [...val, value.currentIndex])
@@ -104,7 +104,7 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
     }
 
     const handleDownloadAll = (data, selects) => {
-        console.log(data, selects, '123');
+        // console.log(data, selects, '123');
         let listQR = "";
         for (let index = 0; index < data?.length; index++) {
             const item = data[index];

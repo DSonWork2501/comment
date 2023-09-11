@@ -312,7 +312,7 @@ function FormEdit() {
 
     const HandleClickDetail = (event, stack_index, slot_index) => {
         var data = !isNaN(parseInt(slot_index)) ? `[${stack_index}].slots[${slot_index}]` : `[${stack_index}]`
-        console.log(data);
+        // console.log(data);
         setPrefix(data)
         if (!isNaN(parseInt(slot_index)) && get(reList, data))
             setFieldValue('productID', get(reList, data)?.item.id)
@@ -385,7 +385,7 @@ function FormEdit() {
 
     useEffect(() => {
         if (ID !== '0' && current?.id !== parseInt(ID) && checkFirst) {
-            console.log(ID);
+            // console.log(ID);
             setCheckFirst(false);
             setTimeout(() => {
                 setFieldValue('orderID', parseInt(ID))

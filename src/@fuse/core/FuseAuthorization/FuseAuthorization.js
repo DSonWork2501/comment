@@ -50,7 +50,7 @@ class FuseAuthorization extends Component {
 		User is guest
 		Redirect to Login Page
 		*/
-		console.log('redirectUrl', redirectUrl)
+		// console.log('redirectUrl', redirectUrl)
 		/*
 	User is member
 	User must be on unAuthorized page or just logged in

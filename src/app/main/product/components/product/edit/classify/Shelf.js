@@ -1,4 +1,4 @@
-import { CmsDialog, CmsLabel, CmsSelect, CmsTextField } from "@widgets/components"
+import { CmsButtonProgress, CmsDialog, CmsLabel, CmsSelect, CmsTextField } from "@widgets/components"
 import { useFormik } from "formik"
 import { CheckStringIsJson } from "@widgets/functions/Common"
 import React from "react"
@@ -89,13 +89,23 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
     return (
         <CmsDialog
             className="w-full h-full"
-            title={"Thông tin tủ hàng"}
+            title={<div className="flex space-x-8">
+                <div>Thông tin tủ hàng</div>
+                {
+                    data_shelf && data_shelf !== "[]" && <CmsButtonProgress
+                        startIcon="refresh"
+                        label="Làm mới"
+                        className="bg-grey-500 text-white hover:bg-grey-900"
+                        onClick={() => {
+                            formik_shelf.setValues(data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })]);
+                        }} />
+                }
+            </div>}
             text={
                 <>
                     <div className={'w-full flex flex-row space-x-8'}>
                         <CmsLabel content={'Hướng dẫn:'} className="text-green-500" />
                         <CmsLabel content={'Tích chọn thông tin tủ, thông tin chi tiết sẽ hiển thị tương ứng'} className="" />
-
                     </div>
 
                     <div className="flex flex-wrap -mx-8">
@@ -112,7 +122,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                                         try {
                                             setModel(e.target.value)
                                             let temp = JSON.parse(listTemp.find(val => val.id === e.target.value).model);
-                                            console.log(temp);
+                                            // console.log(temp);
                                             temp = temp.map(val => ({
                                                 ...val,
                                                 slots: val.slots.map(va => ({ ...va, item: null }))
@@ -129,7 +139,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                         {
                             view !== 'order'
                             &&
-                            <div className="w-4/5 px-8 border-l">
+                            <div className="w-3/5 px-8 border-l">
                                 <div className="flex flex-wrap -mx-8">
                                     <div className="px-8 w-88">
                                         <CmsTextField
@@ -175,6 +185,31 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                                 </div>
                             </div>
                         }
+                        <div className="w-1/5 px-8 border-l">
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                style={{
+                                    textTransform: 'inherit',
+                                    fontWeight: 400
+                                }}
+                                onClick={() => {
+                                    formik_shelf.setValues(prev => {
+                                        return prev.map(val => {
+                                            return {
+                                                ...val, slots: val.slots.map(va => {
+                                                    let slot = { ...va };
+                                                    delete slot.item;
+                                                    return slot
+                                                })
+                                            };
+                                        })
+                                    })
+                                }}
+                            >
+                                Bỏ hết rượu
+                            </Button>
+                        </div>
                     </div>
                 </>
 

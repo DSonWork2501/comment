@@ -54,7 +54,7 @@ function EditOrderContent() {
     }
 
     const formik = useFormik({
-        initialValues: entity,
+        initialValues: { ...entity, customercity: entity?.cityid || null, customerdistrict: entity?.districtid || null, customerward: entity?.wardid || null },
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
         onSubmit: handleSaveData,
@@ -64,7 +64,7 @@ function EditOrderContent() {
             customername: Yup.string().typeError("Tên khách hàng không được bỏ trống !").required("Tên khách hàng không được bỏ trống !"),
         })
     })
-
+    // console.log(formik);
     function handleChangeTab(event, value) {
         setTabValue(value);
     }
@@ -80,7 +80,7 @@ function EditOrderContent() {
         }
     }, [productorder, setValue])
 
-    console.log('formik', formik.values)
+    // console.log('formik', formik.values)
     return (
         <CmsCardedPage
             title={orderId === '0' ? `Thêm mới đơn hàng` : `Cập nhật đơn hàng (Mã ID: ${orderId})`}
@@ -114,7 +114,7 @@ function EditOrderContent() {
                     </div>
                     <div className="flex items-center justify-end space-x-8">
                         {
-                            (Boolean(cusId))
+                            (Boolean(cusId) && orderId === '0')
                             &&
                             <CmsButtonProgress label="Lưu" onClick={formik.handleSubmit} loading={loading} />
                         }

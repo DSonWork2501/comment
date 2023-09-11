@@ -120,7 +120,7 @@ export default function DetailProductContent({ formik }) {
         <div className="flex flex-row p-20 pb-40 space-x-8">
             <div className="w-4/12 space-y-16">
                 <CmsBoxLine label={'Tìm kiếm sản phẩm'}>
-                    <CreateDetailProduct formik={formik} handleSelectItem={handleSelectItem} />
+                    <CreateDetailProduct formik={formik} handleSelectItem={handleSelectItem} handleSelectItemInList={handleSelectItemInList} />
                 </CmsBoxLine>
             </div>
             <div className="w-8/12 space-y-8">
@@ -149,6 +149,7 @@ export default function DetailProductContent({ formik }) {
                     data={detail_entities}
                     img={selected?.image || ''}
                     hs={hs}
+                    formik={formik}
                 />
             </div>
         </div>

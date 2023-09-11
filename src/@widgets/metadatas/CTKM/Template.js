@@ -555,7 +555,7 @@ export const SoccerTemplate = (entity) => {
     var arr = [];
     // const time = new Date();
     // var hours = time.getHours(); 
-    // console.log(hours);
+    // // console.log(hours);
     // if(parseInt(hours) > 12){
       if(screen.width < 999){ // Mobile
         for (var i=0; i<1; i++){
@@ -577,9 +577,9 @@ export const SoccerTemplate = (entity) => {
     var flightId = arr[0];
   
     function change() {
-      console.log(flightId);
+      // console.log(flightId);
       if(flightId==flight_id_1_pc || flightId==flight_id_1_mb){ //Desktop Oxy
-        // console.log('oxy');
+        // // console.log('oxy');
         document.getElementById('container').style.backgroundImage = "url("+bg_1_pc+")";
         document.getElementById('button').style.marginTop = '20px';
         if(flightId==flight_id_1_mb){ //Mobile Oxy
@@ -587,7 +587,7 @@ export const SoccerTemplate = (entity) => {
           document.getElementById('button').style.marginTop = '40px';
         }
       } else { //Shopee
-        // console.log('shopee');
+        // // console.log('shopee');
         document.getElementById('container').style.backgroundImage = "url("+bg_2_pc+")";
         document.getElementById('button').style.marginTop = '20px';
         if(flightId==flight_id_2_mb){

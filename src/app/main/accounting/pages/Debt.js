@@ -245,10 +245,12 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
     const columns = [
         new initColumn({ field: "STT", label: "STT", style: { width: 50 }, sortable: false }),
         new initColumn({ field: "billingid", label: `Hóa đơn`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
-        new initColumn({ field: "createdate", style: { width: 100 }, label: `Ngày tạo`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        new initColumn({ field: "createdate", style: { width: 100 }, label: `Ngày lập HĐ`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
+        //new initColumn({ field: "createdate2", style: { width: 100 }, label: `Ngày tạo phiếu thu`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "usercreate", label: `Người lập phiếu`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
         new initColumn({ field: "customer", label: `Khách hàng`, alignHeader: "center", alignValue: "left", visible: true, sortable: false }),
         new initColumn({ field: "incomevalue2", style: { width: 150 }, label: `Tổng thanh toán`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
+        new initColumn({ field: "incomevalue3", style: { width: 150 }, label: `Tổng hóa đơn`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "diff", style: { width: 150 }, label: `Số ngày quá nợ`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
         new initColumn({ field: "type", style: { width: 150 }, label: `Loại thanh toán`, alignHeader: "center", alignValue: "center", visible: true, sortable: false }),
         new initColumn({ field: "status", label: `Trạng thái`, alignHeader: "center", alignValue: "right", visible: true, sortable: false }),
@@ -256,12 +258,22 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
 
     const data = entities && entities.data && entities.data.map((item, index) => {
         const value = JSON.parse(item.incomes);
-        console.log(value);
+        // console.log(value);
         return ({
             ...item,
             diff: -item.diff,
             original: item,
             type: (item.type === 1 ? 'Tiền mặt' : 'Chuyển khoản'),
+            usercreate: (
+                <div>
+                    <div>
+                        {item?.usercreate}
+                    </div>
+                    <div>
+                        Ngày tạo PT: {item?.billdate ? format(new Date(item.billdate), 'dd-MM-yyyy') : null}
+                    </div>
+                </div>
+            ),
             customer: (
                 <div>
                     <div>
@@ -288,6 +300,9 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
                     }
                 </b>
             ),
+            incomevalue3: (
+                value?.length
+            ),
             STT: (
                 <React.Fragment>
                     <CmsLabel content={`${(index + 1)}`} />
@@ -296,6 +311,7 @@ const TableDebtOther = ({ entities, setSearch, loading, setDetail, setOpenDialog
             createdate: (
                 item?.createdate ? format(new Date(item.createdate), 'dd-MM-yyyy') : null
             ),
+
             status: (
                 <React.Fragment>
                     {
@@ -437,7 +453,7 @@ function Meta({ type }) {
                     filter.toDate = format(new Date(), 'yyyy-MM-dd HH:mm:00');
                 }
                 setPass(true)
-                console.log(filter);
+                // console.log(filter);
 
                 return { ...filter, type }
             })
