@@ -9,7 +9,7 @@ const ProductConfig = {
 		{
 			path: '/meta',
 			exact: true,
-			component: React.lazy(() => import('./page/index'))
+			component: React.lazy(() => import('.'))
 		},
 		{
 			path: '/meta/user-delivery',
