@@ -48,7 +48,6 @@ function DetailProduct({ value, index, HandleAddData, img }) {
 }
 
 function LisProductContent({ data, HandleAddData, img, hs, handleCloseDialog, handleSelectItem, formik }) {
-    console.log(img);
     return (
         <FuseAnimate animation="transition.expandIn" delay={500}>
             <div>
@@ -65,7 +64,7 @@ function LisProductContent({ data, HandleAddData, img, hs, handleCloseDialog, ha
                             />))}
                         </div>
                     </CmsBoxLine>}
-                {hs === parseInt(HomeSubscription[1].id) &&
+                {(hs === parseInt(HomeSubscription[1].id)|| hs === 3) &&
                     <div className="w-full">
                         <ShelfProductContent
                             handleSelectItem={handleSelectItem}
@@ -74,6 +73,7 @@ function LisProductContent({ data, HandleAddData, img, hs, handleCloseDialog, ha
                             HandleAddData={HandleAddData}
                             data={data}
                             formik={formik}
+                            hs={hs}
                         />
                     </div>
                 }

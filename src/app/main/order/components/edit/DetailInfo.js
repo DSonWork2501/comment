@@ -75,7 +75,7 @@ export default function DetailProductContent({ formik }) {
             <CmsButton label="xóa" className="bg-red-500 hover:bg-red-700 hover:shadow-2" onClick={() => HandleDelete(index)} />
         </div>
     }))
-    const isContract = parseInt(ProductType[3].type['1'].id) === hs;
+    const isContract = parseInt(ProductType[3].type['1'].id) === hs || hs === 3;
     const handleSelectItem = (value) => {
         setSelected(value);
         if (value?.ishs === 1)

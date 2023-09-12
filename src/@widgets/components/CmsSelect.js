@@ -13,10 +13,10 @@ import * as PropTypes from 'prop-types';
  */
 function CmsSelect(props) {
     const {
-        data, 
-        startText, 
-        endText, 
-        startNode, 
+        data,
+        startText,
+        endText,
+        startNode,
         endNode,
         disabled,
         readOnly,
@@ -24,12 +24,12 @@ function CmsSelect(props) {
         label,
         setOptionLabel,
         keyValue,
+        menuClass,
         ...otherProps
     } = props;
 
     return (
         <TextField
-            {...otherProps}
             label={required ? `${label ? label + '*' : ''} ` : label}
             select
             variant="outlined"
@@ -48,9 +48,10 @@ function CmsSelect(props) {
                 disabled: disabled,
                 readOnly: readOnly
             }}
+            {...otherProps}
         >
             {data.map((item, index) => (
-                <MenuItem key={index} value={item[keyValue ? keyValue : 'id']} disabled={item.disabled}>
+                <MenuItem key={index} value={item[keyValue ? keyValue : 'id']} disabled={item.disabled} className={menuClass}>
                     {setOptionLabel ?
                         setOptionLabel(item)
                         : item.name

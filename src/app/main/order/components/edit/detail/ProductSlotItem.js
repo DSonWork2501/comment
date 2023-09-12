@@ -1,5 +1,5 @@
 import { CmsAutocomplete, CmsLabel, CmsLoadingOverlay, CmsRadioGroup } from "@widgets/components"
-import { getListHS, searchDetail } from "app/main/product/store/productSlice"
+import { getListHS, searchDetail, setStateRedux } from "app/main/product/store/productSlice"
 // import { get } from "lodash"
 import React, { useMemo } from "react"
 import { useEffect } from "react"
@@ -16,22 +16,32 @@ export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 
 function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
     const [type, setType] = useState(0)
+    const dispatch = useDispatch();
     // const [isHs, setIsHs] = useState(null)
     useEffect(() => {
-        setType(Object.keys(ProductType[3]?.type).map(x => (parseInt(x))).includes(parseInt(hs)) ? ProductType[3].id : ProductType[0].id)
-        Object.keys(ProductType[3].type).map(x => (parseInt(x))).includes(parseInt(hs))
-        // && setIsHs(parseInt(hs))
+        if (hs === 3) {
+            setType('4');
+        } else {
+            setType(Object.keys(ProductType[3]?.type).map(x => (parseInt(x))).includes(parseInt(hs)) ? ProductType[3].id : ProductType[0].id)
+            Object.keys(ProductType[3].type).map(x => (parseInt(x))).includes(parseInt(hs))
+        }
     }, [hs])
 
     const handleChangeProductType = (value) => {
         setType(value)
-        if (value === ProductType[0].id) {
-            setHs(parseInt(value))
-            setPrivate('')
-        } else {
-            setHs(parseInt(ProductType[3]?.type['1'].id))
+        if (value === '4') {
+            setHs(3)
             setPrivate('home_subscription')
+        } else {
+            if (value === ProductType[0].id) {
+                setHs(parseInt(value))
+                setPrivate('')
+            } else {
+                setHs(parseInt(ProductType[3]?.type['1'].id))
+                setPrivate('home_subscription')
+            }
         }
+
     }
 
     return (
@@ -43,10 +53,13 @@ function FilterHS({ hs, handleChangeHs, setHs, disabledHs, setPrivate }) {
                         size="small"
                         className="w-full m-0 px-8"
                         value={type}
-                        onChange={(event) => handleChangeProductType(event)}
+                        onChange={(event) => {
+                            dispatch(setStateRedux({ searchDetailEntities: null }))
+                            handleChangeProductType(event)
+                        }}
                         label="Loại"
                         name="type"
-                        data={Object.values(ProductType).map(x => ({ ...x, disabled: x.id === '0' }))}
+                        data={[...Object.values(ProductType).map(x => ({ ...x, disabled: x.id === '0' })), { id: '4', name: 'Ngoài tastycounter' }]}
                     />
                     {/* {type === ProductType[3].id &&
                         <CmsSelect
@@ -200,7 +213,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                 />
             </div>
 
-            {(formik?.values?.sku && Array.isArray(detail_data) && formik?.values?.ishs !== 1)
+            {(formik?.values?.sku && Array.isArray(detail_data) && formik?.values?.ishs !== 1 && hs !== 3)
                 &&
                 (<>
                     <CmsLoadingOverlay loading={detail_loading} />

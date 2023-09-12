@@ -277,6 +277,19 @@ const orderSlice = createSlice({
                 }
             },
         },
+
+        // removeDetailSearchProduct: {
+        //     reducer: (state, { payload }) => {
+        //         const updatedProduct = { ...state.orders };
+        //         //delete updatedProduct.searchDetailEntities;
+        //         console.log(updatedProduct);
+        //         // Return a new state object with the updated product
+        //         return {
+        //             ...state,
+        //             product: updatedProduct,
+        //         };
+        //     },
+        // },
     },
     extraReducers: {
         /**

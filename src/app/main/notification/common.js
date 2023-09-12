@@ -19,3 +19,18 @@ export function getTimeAgo(currentDate, receivedDate) {
         return 'Vừa tạo';
     }
 }
+
+export const types = [
+    {
+        name: 'Tất cả',
+        id: 1
+    },
+    {
+        name: 'Đơn hàng',
+        id: 2
+    },
+    {
+        name: 'Khác',
+        id: 3
+    },
+]

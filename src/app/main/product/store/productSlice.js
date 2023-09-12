@@ -33,6 +33,17 @@ export const getListHS = createAsyncThunk(`${appName}/${moduleName}/getListHS`, 
         return error
     }
 });
+
+export const getListHSPopup = createAsyncThunk(`${appName}/${moduleName}/getListHSPopup`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getList(params);
+        const data = await response.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
 /**
  * @description lấy danh sách product
  */
@@ -283,6 +294,7 @@ const productSlice = createSlice({
         unit: [],
         brands: [],
         cates: [],
+        productPopup: null
     },
     reducers: {
         /**
@@ -468,6 +480,26 @@ const productSlice = createSlice({
             hsLoading: false,
             error: error
         }),
+
+        [getListHSPopup.pending]: state => ({
+            ...state,
+            hsLoading: true,
+            error: null
+        }),
+        [getListHSPopup.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                hsLoading: false,
+                productPopup: payload,
+                error: null
+            }
+        },
+        [getListHSPopup.rejected]: (state, { error }) => ({
+            ...state,
+            hsLoading: false,
+            error: error
+        }),
+        
         /**
          * @description uploadImage
          */

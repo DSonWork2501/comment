@@ -2,7 +2,7 @@
 import React, { useState } from "react"
 import { useDispatch } from "react-redux"
 import { get } from "lodash";
-import { getListHS } from "app/main/product/store/productSlice"
+import { getListHS, getListHSPopup } from "app/main/product/store/productSlice"
 import { useEffect } from "react";
 import ProductSearch from "./ProductSearch";
 import ProductSearchList from "./ProductSearchList";
@@ -29,7 +29,7 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, listCheckTemp, set
 
 
     useEffect(() => {
-        dispatch(getListHS(search))
+        dispatch(getListHSPopup(search))
     }, [dispatch, search])
 
     const handleClickSku = (event, value) => {
