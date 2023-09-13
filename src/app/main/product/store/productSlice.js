@@ -74,6 +74,17 @@ export const searchDetail = createAsyncThunk(`${appName}/${moduleName}/searchDet
     }
 });
 
+export const searchDetailPrOrder = createAsyncThunk(`${appName}/${moduleName}/searchDetailPrOrder`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getDetail(params);
+        const data = await response.data.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
+
 /**
  * @description thêm sản phẩm
  */
@@ -280,6 +291,7 @@ const productSlice = createSlice({
         hsEntities: null,
         searchDetailEntities: null,
         searchDetailLoading: false,
+        searchDetailOrderEntities: null,
         entity: null,
         error: null,
         selected: null,
@@ -459,6 +471,25 @@ const productSlice = createSlice({
             searchDetailLoading: false,
             error: error
         }),
+
+        [searchDetailPrOrder.pending]: state => ({
+            ...state,
+            searchDetailLoading: true,
+            error: null
+        }),
+        [searchDetailPrOrder.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                searchDetailLoading: false,
+                searchDetailOrderEntities: payload,
+                error: null
+            }
+        },
+        [searchDetailPrOrder.rejected]: (state, { error }) => ({
+            ...state,
+            searchDetailLoading: false,
+            error: error
+        }),
         /**
          * @description getListHS
          */
@@ -499,7 +530,7 @@ const productSlice = createSlice({
             hsLoading: false,
             error: error
         }),
-        
+
         /**
          * @description uploadImage
          */

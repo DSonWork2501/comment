@@ -52,8 +52,8 @@ export const insertOrder = createAsyncThunk(`${appName}/${moduleName}/insertOrde
         return data
 
     } catch (error) {
-        // thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
-        return error
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return (thunkAPI.rejectWithValue(error))
     }
 });
 

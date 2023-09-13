@@ -59,7 +59,7 @@ function EditOrderContent() {
     }
 
     const formik = useFormik({
-        initialValues: { ...entity, customercity: entity?.cityid || null, customerdistrict: entity?.districtid || null, customerward: entity?.wardid || null },
+        initialValues: { ...entity, customercity: entity?.cityid || null, customerdistrict: entity?.districtid || null, customerward: entity?.wardid || null, orderType: 1 },
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
         onSubmit: handleSaveData,

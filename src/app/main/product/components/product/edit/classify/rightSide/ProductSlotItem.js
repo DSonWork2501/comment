@@ -2,7 +2,7 @@
 import React, { useState } from "react"
 import { useDispatch } from "react-redux"
 import { get } from "lodash";
-import { getListHS, getListHSPopup } from "app/main/product/store/productSlice"
+import { getListHSPopup } from "app/main/product/store/productSlice"
 import { useEffect } from "react";
 import ProductSearch from "./ProductSearch";
 import ProductSearchList from "./ProductSearchList";

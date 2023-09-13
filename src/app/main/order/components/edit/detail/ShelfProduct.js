@@ -197,7 +197,7 @@ function DetailModelContent({ value, classes, HandleAddData }) {
     )
 }
 
-const OpenDialog = ({ model, handleClose, hs }) => {
+const OpenDialog = ({ model, handleClose, orderType }) => {
     const [openDialog, setOpenDialog] = useState("");
 
     const HandleCloseShelfModal = (value) => {
@@ -215,7 +215,7 @@ const OpenDialog = ({ model, handleClose, hs }) => {
                 open={true}
                 handleClose={HandleCloseShelfModal}
                 data_shelf={JSON.stringify(model)}
-                view={hs === 3 ? null : 'order'}
+                view={orderType === 2 ? null : 'order'}
             />
         }
 
@@ -237,6 +237,15 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, hand
     const [item, setItem] = useState(null);
     const values = formik?.values;
     const check = useRef(true);
+    const { orderType } = values;
+
+    useEffect(() => {
+        return () => {
+            setBreadValue('danh_sach_tu')
+            setModel([])
+        }
+    }, [])
+
     useEffect(() => {
         setBreadValue('danh_sach_tu')
         setModel([])
@@ -310,7 +319,7 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, hand
                             &&
                             <OpenDialog
                                 handleClose={handleClose}
-                                hs={hs}
+                                orderType={orderType}
                                 model={model} />
                         }
 

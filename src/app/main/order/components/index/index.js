@@ -20,7 +20,7 @@ import { Box, Button, Menu, MenuItem, Tooltip, makeStyles, styled } from "@mater
 import PackageDialog from "./PackageDialog";
 import { getShelf, getWine } from "app/main/customer-shelf/store/customerShelfSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { product, setStateRedux } from "app/main/product/store/productSlice";
+import { product } from "app/main/product/store/productSlice";
 import { useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilePen, faFilter, faMoneyBill, faPen, faTruck } from "@fortawesome/free-solid-svg-icons";

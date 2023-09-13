@@ -47,10 +47,9 @@ export default function DetailProductContent({ formik }) {
     const { productorder, moneytotal } = formik.values
     const { hs } = React.useContext(OrderContext) || null;
     const [showTb, setShowTb] = useState(true);
-    const detail_entities = useSelector(store => store[keyStore].product.searchDetailEntities)?.detail || [];
-    const product_entities = useSelector(store => store[keyStore].product.searchDetailEntities);
+    const detail_entities = useSelector(store => store[keyStore].product.searchDetailOrderEntities)?.detail || [];
+    const product_entities = useSelector(store => store[keyStore].product.searchDetailOrderEntities);
     const [selected, setSelected] = useState(null);
-
 
     const HandleDelete = (index_item) => {
         formik.setFieldValue('productorder', productorder.filter((x, index) => index !== index_item))
@@ -120,7 +119,7 @@ export default function DetailProductContent({ formik }) {
         <div className="flex flex-row p-20 pb-40 space-x-8">
             <div className="w-4/12 space-y-16">
                 <CmsBoxLine label={'Tìm kiếm sản phẩm'}>
-                    <CreateDetailProduct formik={formik} handleSelectItem={handleSelectItem} handleSelectItemInList={handleSelectItemInList} />
+                    <CreateDetailProduct formik={formik} handleSelectItem={handleSelectItem} handleSelectItemInList={handleSelectItemInList} handleChangeType={() => setSelected(null)} />
                 </CmsBoxLine>
             </div>
             <div className="w-8/12 space-y-8">
