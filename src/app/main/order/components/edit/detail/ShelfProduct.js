@@ -197,7 +197,7 @@ function DetailModelContent({ value, classes, HandleAddData }) {
     )
 }
 
-const OpenDialog = ({ model, handleClose }) => {
+const OpenDialog = ({ model, handleClose, orderType }) => {
     const [openDialog, setOpenDialog] = useState("");
 
     const HandleCloseShelfModal = (value) => {
@@ -215,7 +215,7 @@ const OpenDialog = ({ model, handleClose }) => {
                 open={true}
                 handleClose={HandleCloseShelfModal}
                 data_shelf={JSON.stringify(model)}
-                view='order'
+                view={orderType === 2 ? null : 'order'}
             />
         }
 
@@ -230,13 +230,21 @@ const OpenDialog = ({ model, handleClose }) => {
 
 }
 
-function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, handleSelectItem, formik }) {
+function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, handleSelectItem, formik, hs }) {
     const classes = useStyles();
     const [breadValue, setBreadValue] = useState('danh_sach_tu');
     const [model, setModel] = useState([]);
     const [item, setItem] = useState(null);
     const values = formik?.values;
     const check = useRef(true);
+    const { orderType } = values;
+
+    useEffect(() => {
+        return () => {
+            setBreadValue('danh_sach_tu')
+            setModel([])
+        }
+    }, [])
 
     useEffect(() => {
         setBreadValue('danh_sach_tu')
@@ -244,7 +252,7 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, hand
     }, [img])
 
     useEffect(() => {
-        if (check.current) {
+        if (check.current && values?.id) {
             const productorder = values?.productorder[0]
             if (productorder && values?.id) {
                 setBreadValue('chi_tiet_san_pham')
@@ -311,6 +319,7 @@ function ShelfProductContent({ img, HandleAddData, data, handleCloseDialog, hand
                             &&
                             <OpenDialog
                                 handleClose={handleClose}
+                                orderType={orderType}
                                 model={model} />
                         }
 

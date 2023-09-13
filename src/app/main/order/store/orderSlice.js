@@ -52,8 +52,8 @@ export const insertOrder = createAsyncThunk(`${appName}/${moduleName}/insertOrde
         return data
 
     } catch (error) {
-        // thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
-        return error
+        thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+        return (thunkAPI.rejectWithValue(error))
     }
 });
 
@@ -277,6 +277,19 @@ const orderSlice = createSlice({
                 }
             },
         },
+
+        // removeDetailSearchProduct: {
+        //     reducer: (state, { payload }) => {
+        //         const updatedProduct = { ...state.orders };
+        //         //delete updatedProduct.searchDetailEntities;
+        //         console.log(updatedProduct);
+        //         // Return a new state object with the updated product
+        //         return {
+        //             ...state,
+        //             product: updatedProduct,
+        //         };
+        //     },
+        // },
     },
     extraReducers: {
         /**

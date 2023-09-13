@@ -20,7 +20,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
     const [prefix, setPrefix] = useState('[0]')
     const [stackIndex, setStackIndex] = useState(0)
     const [slotIndex, setSlotIndex] = useState('')
-    const currentShelf = useSelector(store => store[keyStore]?.product?.entity?.data || store?.orders?.product?.searchDetailEntities)
+    const currentShelf = useSelector(store => store[keyStore]?.product?.entity?.data || store?.orders?.product?.searchDetailOrderEntities)
     const listTemp = useMemo(() => {
         if (currentShelf && currentShelf?.detail?.length) {
             return currentShelf.detail.filter((val, i) => i !== modalIndex).map(val => ({ ...val, id: val.uniqueid }))
@@ -139,7 +139,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                         {
                             view !== 'order'
                             &&
-                            <div className="w-3/5 px-8 border-l">
+                            <div className="px-8 border-l">
                                 <div className="flex flex-wrap -mx-8">
                                     <div className="px-8 w-88">
                                         <CmsTextField
@@ -185,7 +185,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
                                 </div>
                             </div>
                         }
-                        <div className="w-1/5 px-8 border-l">
+                        <div className="px-8 border-l">
                             <Button
                                 variant="contained"
                                 color="secondary"

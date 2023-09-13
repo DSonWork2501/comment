@@ -20,6 +20,9 @@ import { insertOrder } from "app/main/order/store/orderSlice";
 import { customModal } from "../../model/modal";
 import { OrderContext } from "../../context/OrderContext";
 import { HomeSubscription } from "app/main/product/model/product/homeSubscription";
+import { unwrapResult } from "@reduxjs/toolkit";
+import History from "@history";
+import { setStateRedux } from "app/main/product/store/productSlice";
 
 const TabType = {
     'thongtin': { id: 'thongtin', name: 'Thông tin đơn hàng' },
@@ -47,14 +50,16 @@ function EditOrderContent() {
         alertInformation({
             text: 'Bạn có muốn lưu thông tin ?',
             data: values,
-            confirm: (item) => {
-                dispatch(insertOrder(customModal(item)))
+            confirm: async (item) => {
+                const resultAction = await dispatch(insertOrder(customModal(item)));
+                unwrapResult(resultAction);
+                History.push('/order')
             }
         })
     }
 
     const formik = useFormik({
-        initialValues: { ...entity, customercity: entity?.cityid || null, customerdistrict: entity?.districtid || null, customerward: entity?.wardid || null },
+        initialValues: { ...entity, customercity: entity?.cityid || null, customerdistrict: entity?.districtid || null, customerward: entity?.wardid || null, orderType: 1 },
         keepDirtyOnReinitialize: true,
         enableReinitialize: true,
         onSubmit: handleSaveData,
@@ -67,6 +72,7 @@ function EditOrderContent() {
     // console.log(formik);
     function handleChangeTab(event, value) {
         setTabValue(value);
+        dispatch(setStateRedux({ searchDetailEntities: null }))
     }
     const setValue = formik.setFieldValue
     const productorder = formik?.values?.productorder

@@ -33,6 +33,17 @@ export const getListHS = createAsyncThunk(`${appName}/${moduleName}/getListHS`, 
         return error
     }
 });
+
+export const getListHSPopup = createAsyncThunk(`${appName}/${moduleName}/getListHSPopup`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getList(params);
+        const data = await response.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
 /**
  * @description lấy danh sách product
  */
@@ -53,6 +64,17 @@ export const getDetail = createAsyncThunk(`${appName}/${moduleName}/getDetail`, 
  * @description lấy danh sách product
  */
 export const searchDetail = createAsyncThunk(`${appName}/${moduleName}/searchDetail`, async (params, thunkAPI) => {
+    try {
+        const response = await connect.live.product.getDetail(params);
+        const data = await response.data.data;
+        return data
+    } catch (error) {
+        thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+        return error
+    }
+});
+
+export const searchDetailPrOrder = createAsyncThunk(`${appName}/${moduleName}/searchDetailPrOrder`, async (params, thunkAPI) => {
     try {
         const response = await connect.live.product.getDetail(params);
         const data = await response.data.data;
@@ -269,6 +291,7 @@ const productSlice = createSlice({
         hsEntities: null,
         searchDetailEntities: null,
         searchDetailLoading: false,
+        searchDetailOrderEntities: null,
         entity: null,
         error: null,
         selected: null,
@@ -283,6 +306,7 @@ const productSlice = createSlice({
         unit: [],
         brands: [],
         cates: [],
+        productPopup: null
     },
     reducers: {
         /**
@@ -447,6 +471,25 @@ const productSlice = createSlice({
             searchDetailLoading: false,
             error: error
         }),
+
+        [searchDetailPrOrder.pending]: state => ({
+            ...state,
+            searchDetailLoading: true,
+            error: null
+        }),
+        [searchDetailPrOrder.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                searchDetailLoading: false,
+                searchDetailOrderEntities: payload,
+                error: null
+            }
+        },
+        [searchDetailPrOrder.rejected]: (state, { error }) => ({
+            ...state,
+            searchDetailLoading: false,
+            error: error
+        }),
         /**
          * @description getListHS
          */
@@ -468,6 +511,26 @@ const productSlice = createSlice({
             hsLoading: false,
             error: error
         }),
+
+        [getListHSPopup.pending]: state => ({
+            ...state,
+            hsLoading: true,
+            error: null
+        }),
+        [getListHSPopup.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                hsLoading: false,
+                productPopup: payload,
+                error: null
+            }
+        },
+        [getListHSPopup.rejected]: (state, { error }) => ({
+            ...state,
+            hsLoading: false,
+            error: error
+        }),
+
         /**
          * @description uploadImage
          */

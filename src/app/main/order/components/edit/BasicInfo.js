@@ -9,7 +9,7 @@ export default function BasicInfoContent({ formik }) {
     const dispatch = useDispatch();
     const cusEntity = useSelector(store => store[keyStore].customer.entities)
     const payments = useSelector(store => store[keyStore].order.payments?.data) || []
-    const cusData = useMemo(() => cusEntity?.data?.map(x => ({ ...x, id: x.id, name: `id: ${x.id || '-'}, tên: ${x.name || '-'}, email: ${x.email || '-'}`, cusName: x.name })) || [], [cusEntity])
+    const cusData = useMemo(() => cusEntity?.data?.map(x => ({ ...x, id: x.id, name: `${x.phone ? x.phone + ', ' : ''}  ${x.name ? x.name + ', ' : ''} ${x.email ? x.email + ', ' : ''}`, cusName: x.name })) || [], [cusEntity])
     useEffect(() => {
         dispatch(order.other.getPayment())
     }, [dispatch])
@@ -40,8 +40,9 @@ export default function BasicInfoContent({ formik }) {
                                     valueIsId
                                     formik={formik}
                                     name="customerid"
-                                    label="Mã khách hàng" />
+                                    label="Khách hàng" />
                                 <CmsFormikTextField
+                                    disabled
                                     size="small"
                                     required={false}
                                     formik={formik}
@@ -50,12 +51,14 @@ export default function BasicInfoContent({ formik }) {
                             </div>
                             <div className="w-full space-y-8">
                                 <CmsFormikTextField
+                                    disabled
                                     size="small"
                                     required={false}
                                     formik={formik}
                                     name="customermoblie"
                                     label="Điện thoại" />
                                 <CmsFormikTextField
+                                    disabled
                                     size="small"
                                     required={false}
                                     formik={formik}

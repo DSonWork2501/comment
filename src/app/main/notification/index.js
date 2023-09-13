@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { showMessage } from 'app/store/fuse/messageSlice';
 import { ref, onValue, off } from 'firebase/database';
 import { useRef } from 'react';
-import { getTimeAgo, keyStore } from './common';
+import { getTimeAgo, keyStore, types } from './common';
 import reducer, { notify } from './store';
 import withReducer from 'app/store/withReducer';
 import { useCallback } from 'react';
@@ -28,6 +28,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGift, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { alertInformation } from '@widgets/functions';
+import { CmsSelect } from '@widgets/components';
 // import {Waypoint} from "react-waypoint";
 
 const useStyles = makeStyles((theme) => ({
@@ -91,6 +92,13 @@ const useStyles = makeStyles((theme) => ({
         '& .title': {
             fontWeight: 700,
             fontSize: '13px'
+        },
+        '& .select-type >div': {
+            fontSize: '13px'
+        },
+        '& .select-type >div>div': {
+            paddingBottom: 0,
+            backgroundColor: 'transparent !important'
         }
     },
 }));
@@ -120,10 +128,26 @@ function Notification({
     loadingFetchData = false,
 }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const entities = useSelector(store => store[keyStore].entities?.data);
+    const rawEntities = useSelector(store => store[keyStore].entities?.data);
+    const [type, setType] = useState(1);
     const pageFresh = useRef(true);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const entities = useMemo(() => {
+        let data = [];
+        if (rawEntities?.length) {
+            data = rawEntities.filter(val => {
+                if (type === 2 && val.cmsref === 'order')
+                    return true
+                if (type === 3 && val.cmsref !== 'order')
+                    return true
+                if (type === 1)
+                    return true
+                return false
+            })
+        }
+        return data;
+    }, [rawEntities, type])
     const numberUnread = useMemo(() => {
         let count = 0;
         if (entities?.length)
@@ -257,61 +281,81 @@ function Notification({
                     <Typography
                         style={{
                             fontSize: '20px',
-                            fontWeight: 700
+                            fontWeight: 700,
+                            marginBottom: 10
                         }}
                         variant={'h1'}>
                         Thông báo
                     </Typography>
-                    {
-                        Boolean(entities?.length)
-                        &&
-                        <Box
-                            display={'flex'}
-                            justifyContent={'flex-end'}>
-                            <span
-                                style={{
-                                    fontSize: '13px'
-                                }}
-                                onClick={() => {
-                                    alertInformation({
-                                        text: `Xác nhận thao tác`,
-                                        data: {},
-                                        confirm: async () => {
-                                            try {
-                                                const resultAction = await dispatch(notify.deleteAll())
-                                                unwrapResult(resultAction);
-                                                getList();
-                                            } catch (error) { } finally {
-                                            }
-                                        },
-                                    });
-                                }}
-                                className='underline text-red-400 cursor-pointer mr-8'>
-                                Xóa hết
-                            </span>
-                            <span
-                                style={{
-                                    fontSize: '13px'
-                                }}
-                                onClick={() => {
-                                    alertInformation({
-                                        text: `Xác nhận thao tác`,
-                                        data: {},
-                                        confirm: async () => {
-                                            try {
-                                                const resultAction = await dispatch(notify.read(entities.map(val => ({ id: val.id }))))
-                                                unwrapResult(resultAction);
-                                                getList();
-                                            } catch (error) { } finally {
-                                            }
-                                        },
-                                    });
-                                }}
-                                className='underline text-blue-400 cursor-pointer'>
-                                Đọc tất cả
-                            </span>
-                        </Box>
-                    }
+
+                    <div className='flex justify-between items-center'>
+                        <div>
+                            <CmsSelect
+                                label=""
+                                name="status"
+                                value={type}
+                                data={types}
+                                onChange={event => { setType(event.target.value) }}
+                                size="small"
+                                className='w-72 select-type'
+                                variant="standard"
+                                menuClass="pt-0 pb-0 text-13"
+                            />
+                        </div>
+                        <div>
+                            {
+                                Boolean(entities?.length)
+                                &&
+                                <Box
+                                    display={'flex'}
+                                    justifyContent={'flex-end'}>
+                                    <span
+                                        style={{
+                                            fontSize: '13px'
+                                        }}
+                                        onClick={() => {
+                                            alertInformation({
+                                                text: `Xác nhận thao tác`,
+                                                data: {},
+                                                confirm: async () => {
+                                                    try {
+                                                        const resultAction = await dispatch(notify.deleteAll())
+                                                        unwrapResult(resultAction);
+                                                        getList();
+                                                    } catch (error) { } finally {
+                                                    }
+                                                },
+                                            });
+                                        }}
+                                        className='underline text-red-400 cursor-pointer mr-8'>
+                                        Xóa hết
+                                    </span>
+                                    <span
+                                        style={{
+                                            fontSize: '13px'
+                                        }}
+                                        onClick={() => {
+                                            alertInformation({
+                                                text: `Xác nhận thao tác`,
+                                                data: {},
+                                                confirm: async () => {
+                                                    try {
+                                                        const resultAction = await dispatch(notify.read(entities.map(val => ({ id: val.id }))))
+                                                        unwrapResult(resultAction);
+                                                        getList();
+                                                    } catch (error) { } finally {
+                                                    }
+                                                },
+                                            });
+                                        }}
+                                        className='underline text-blue-400 cursor-pointer'>
+                                        Đọc tất cả
+                                    </span>
+                                </Box>
+                            }
+                        </div>
+                    </div>
+
 
                     <Box position={'absolute'}
                         bottom={0}
@@ -384,7 +428,7 @@ function Notification({
                         )) : <ListItem
                             button
                             divider
-                            className='flex justify-between items-center rounded-4'
+                            className='flex justify-center items-center rounded-4'
                         >
                             <div style={{ fontSize: 13 }}>
                                 Không có thông báo mới!

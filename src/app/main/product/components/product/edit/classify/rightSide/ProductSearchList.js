@@ -41,7 +41,7 @@ function ProductSearchListComponent({ keyStore, onClickSku, setSearch }) {
     const key = window.location.pathname.split('/')[1] === 'order' ? 'orders' : keyStore;
 
     const loading = useSelector(store => turnStorePath(key, store).hsLoading);
-    const entities = useSelector(store => turnStorePath(key, store).hsEntities);
+    const entities = useSelector(store => turnStorePath(key, store).productPopup);
 
     const columns = [
         new initColumn({ field: "sku", label: "SKU", alignHeader: "left", alignValue: "left", sortable: false }),
