@@ -1,15 +1,10 @@
 import React, { useEffect } from 'react';
-import { CmsDialog, CmsFormikTextField } from '@widgets/components';
+import { CmsDialog, CmsFormikAutocomplete, CmsFormikTextField } from '@widgets/components';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 const defaultForm = {
-    id:0,
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    type: 0,
+    DATA1: "",
 }
 
 const fillDefaultForm = (def, detail, setId = true) => {
@@ -27,7 +22,7 @@ const fillDefaultForm = (def, detail, setId = true) => {
     return newDef;
 }
 
-function AddUserDialog({ type, detail, handleSubmit, handleClose, open, title = 'Thêm thuộc tính' }) {
+function AddBlackDialog({ type, detail, handleSubmit, handleClose, open, title = 'Thêm thuộc tính' }) {
 
     const handleSave = (values) => {
         const value = { ...values };
@@ -41,10 +36,7 @@ function AddUserDialog({ type, detail, handleSubmit, handleClose, open, title = 
         enableReinitialize: true,
         onSubmit: handleSave,
         validationSchema: Yup.object({
-            name: Yup.string().required("Vui lòng nhập tên"),
-            email: Yup.string().required("Vui lòng nhập email"),
-            phone: Yup.string().required("Vui lòng SĐT").typeError("Vui lòng SĐT"),
-            password: Yup.string().required("Vui lòng nhập mật khẩu"),
+            DATA1: Yup.string().required("Vui lòng nhập lý do"),
         })
     })
 
@@ -66,32 +58,15 @@ function AddUserDialog({ type, detail, handleSubmit, handleClose, open, title = 
                 open={open}
             >
                 <CmsFormikTextField
-                    label="Tên tài khoản"
-                    name="name"
-                    size="small"
+                    label="Lý do"
+                    name="DATA1"
                     className="my-8"
-                    formik={formik} />
-                <CmsFormikTextField
-                    label="Email"
-                    name="email"
-                    size="small"
-                    className="my-8"
-                    formik={formik} />
-                <CmsFormikTextField
-                    label="Số điện thoại"
-                    name="phone"
-                    size="small"
-                    className="my-8"
-                    formik={formik} />
-                <CmsFormikTextField
-                    label="Mật khẩu"
-                    name="password"
-                    size="small"
-                    className="my-8"
+                    multiline={true}
+                    rows={4}
                     formik={formik} />
             </CmsDialog>
         </React.Fragment>
     )
 }
 
-export default React.memo(AddUserDialog);
+export default React.memo(AddBlackDialog);
