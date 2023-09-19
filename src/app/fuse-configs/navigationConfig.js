@@ -84,6 +84,14 @@ const navigationConfig = [
 				icon: 'account_circle',
 				url: '/account',
 			},
+			{
+				id: 'nvi-manager-manage',
+				title: 'Quản lý khách hàng',
+				translate: 'CUS_MANAGE',
+				type: 'item',
+				icon: 'account_circle',
+				url: '/customer-manage',
+			},
 		],
 	},
 	{
