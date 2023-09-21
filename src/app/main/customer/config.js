@@ -21,6 +21,11 @@ const ProductConfig = {
 			exact: true,
 			component: React.lazy(() => import('./components/customer/CustomerManage'))
 		},
+		{
+			path: '/customer/:id/overview',
+			exact: true,
+			component: React.lazy(() => import('./components/customer/CustomerOverview'))
+		},
 	]
 };
 
