@@ -49,9 +49,15 @@ function CmsDialog(props) {
             className={className}
         >
             {
-                loading &&  <LinearProgress />
+                loading && <LinearProgress />
             }
-            <DialogTitle className={titleClass} id="form-dialog-title">{title}</DialogTitle>
+
+            {
+                title
+                &&
+                <DialogTitle className={titleClass} id="form-dialog-title">{title}</DialogTitle>
+            }
+
             {!isForm ? <>
                 <DialogContent className={contentClass}>
                     {isString(text)

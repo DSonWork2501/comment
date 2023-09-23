@@ -19,7 +19,8 @@ const locale = {
 	'ACCOUNTING':'Quản lý thanh toán',
 	'ACCOUNTING_DEBT':'Công nợ',
 	'ACCOUNTING_BILL':'Billing',
-	'ACCOUNTING_COLLECTION':'Quản lý phiếu thu'
+	'ACCOUNTING_COLLECTION':'Quản lý phiếu thu',
+	'CUS_MANAGE':'Quản lý khách hàng'
 };
 
 export default locale;
