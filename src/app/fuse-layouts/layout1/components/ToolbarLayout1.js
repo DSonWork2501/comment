@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { selectToolbarTheme } from 'app/store/fuse/settingsSlice';
 import FullScreenToggle from '../../shared-components/FullScreenToggle';
 import Notification from 'app/main/notification';
+import Comment from 'app/main/comment';
 //import LanguageSwitcher from '../../shared-components/LanguageSwitcher';
 
 const useStyles = makeStyles(theme => ({
@@ -49,6 +50,8 @@ function ToolbarLayout1(props) {
 					<div className="flex items-center px-16">
 						{/* <LanguageSwitcher /> */}
 						<Notification />
+
+						<Comment />
 
 						<FullScreenToggle />
 
