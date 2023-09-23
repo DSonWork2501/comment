@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CmsDialog, CmsFormikAutocomplete, CmsFormikTextField } from '@widgets/components';
+import { CmsDialog, CmsFormikTextField } from '@widgets/components';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 

@@ -17,9 +17,9 @@ import clsx from "clsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAddressCard, faEnvelope, faUserLock, faUserMinus, faUserPlus, faVenusMars } from "@fortawesome/free-solid-svg-icons";
 import AddUserDialog from "./edit/AddUserDialog";
-import { unwrapResult } from "@reduxjs/toolkit";
 import AddBlackDialog from "./edit/AddBlackDialog";
 import OverviewDialog from "./edit/OverviewDialog";
+import History from "@history";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", style: { width: 50 }, sortable: false }),
@@ -96,7 +96,7 @@ function CategoryView() {
                 <CmsIconButton
                     tooltip="Gán nhân viên phụ trách"
                     delay={50}
-                    icon={<FontAwesomeIcon icon={faUserPlus} style={{ height: 18, width: 18 }} />}
+                    icon={<FontAwesomeIcon icon={faUserPlus} style={{ height: 18, width: 18, marginBottom: 7 }} />}
                     className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
                     onClick={() => {
                         setDetail(item);
@@ -106,7 +106,7 @@ function CategoryView() {
                 <CmsIconButton
                     tooltip="Xóa nhân viên phụ trách"
                     delay={50}
-                    icon={<FontAwesomeIcon icon={faUserMinus} style={{ height: 18, width: 18 }} />}
+                    icon={<FontAwesomeIcon icon={faUserMinus} style={{ height: 18, width: 18, marginBottom: 7 }} />}
                     className="bg-red-500 text-white shadow-3  hover:bg-red-900"
                     onClick={() => {
                         alertInformation({
@@ -121,7 +121,7 @@ function CategoryView() {
                 <CmsIconButton
                     tooltip="Thêm vào danh sách không liên hệ"
                     delay={50}
-                    icon={<FontAwesomeIcon icon={faUserLock} style={{ height: 18, width: 18 }} />}
+                    icon={<FontAwesomeIcon icon={faUserLock} style={{ height: 18, width: 18, marginBottom: 7 }} />}
                     className="bg-orange-500 text-white shadow-3  hover:bg-orange-900"
                     onClick={() => {
                         setDetail(item);
@@ -131,11 +131,10 @@ function CategoryView() {
                 <CmsIconButton
                     tooltip="Hồ sơ khách hàng"
                     delay={50}
-                    icon={<FontAwesomeIcon icon={faAddressCard} style={{ height: 18, width: 18 }} />}
+                    icon={<FontAwesomeIcon icon={faAddressCard} style={{ height: 18, width: 18, marginBottom: 7 }} />}
                     className="bg-green-500 text-white shadow-3  hover:bg-green-900"
                     onClick={() => {
-                        setDetail(item);
-                        setOpen('profile')
+                        History.push('/customer-manage/1/overview/1')
                     }} />
 
             </div>
@@ -214,8 +213,7 @@ function CategoryView() {
             }
 
             <CmsCardedPage
-                title={'Danh sách sản phẩm'}
-                subTitle={'Quản lý thông tin sản phẩm'}
+                title={'Danh sách khách hàng'}
                 icon="whatshot"
                 // leftBottomHeader={leftBottomHeader}
                 rightHeaderButton={

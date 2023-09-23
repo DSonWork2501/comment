@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CmsDialog, CmsFormikAutocomplete, CmsFormikTextField, CmsTab } from '@widgets/components';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Button, InputAdornment, TextField } from '@material-ui/core';
-import { Search } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
 
 const initialValues = {
     reason: ''

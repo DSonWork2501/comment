@@ -22,7 +22,7 @@ const ProductConfig = {
 			component: React.lazy(() => import('./components/customer/CustomerManage'))
 		},
 		{
-			path: '/customer/:id/overview',
+			path: '/customer-manage/:id/overview/:type',
 			exact: true,
 			component: React.lazy(() => import('./components/customer/CustomerOverview'))
 		},
