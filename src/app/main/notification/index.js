@@ -169,9 +169,10 @@ function Notification({
         dispatch(notify.getList(search));
     }, [dispatch]);
 
-    useEffect(() => {
-        getList();
-    }, [getList])
+    // useEffect(() => {
+    //     // getList();
+    //     // console.log(123);
+    // }, [getList])
 
     useEffect(() => {
         // const unsubscribe = onSnapshot(collection(db, 'Notification'), (snapshot) => {
