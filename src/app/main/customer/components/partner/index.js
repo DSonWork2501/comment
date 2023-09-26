@@ -1,5 +1,5 @@
 import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
-import { initColumn } from "@widgets/functions";
+import { alertInformation, initColumn } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
 import React from "react";
@@ -11,38 +11,89 @@ import { keyStore } from "../../common";
 import reducer from "../../store";
 import { getList as getAccount, resetSearch, setSearch } from "../../store/accountSlice";
 import AddDialog from "./AddDialog";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { partner } from "../../store/partnerSlice";
+import { useCallback } from "react";
+import { Chip } from "@material-ui/core";
+import AddCusDialog from "./AddCusDialog";
+import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "email", label: "Email", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "password", label: "Mật Khẩu", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "secret", label: "Secret", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "status", label: "Trạng Thái", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "name", label: "Tên đối tác", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "phone", label: "Sđt", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "recipient", label: "Người đại diện", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "recipientphone", label: "Sđt(Người đại diện)", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "address", label: "Địa chỉ", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "orders", label: "Tổng đơn", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "total", label: "Tổng tiền", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "status", label: "Trạng thái", alignHeader: "center", alignValue: "center", sortable: false }),
 ]
 
 function ProductView() {
     const dispatch = useDispatch()
-    const search = useSelector(store => store[keyStore].account.search);
-    const loading = useSelector(store => store[keyStore].account.loading);
-    const entities = useSelector(store => store[keyStore].account.entities);
+    const search = useSelector(store => store[keyStore].partner.search);
+    const loading = useSelector(store => store[keyStore].partner.loading);
+    const entities = useSelector(store => store[keyStore].partner.entities);
+    const customers = useSelector(store => store[keyStore].customer.entities?.data) || [];
     const [detail, setDetail] = useState(null);
     const [openDialog, setOpenDialog] = useState("");
 
     const [filterOptions, setFilterOptions] = useState(null);
 
+    const getListTable = useCallback((search) => {
+        dispatch(partner.getList(search));
+    }, [dispatch])
+
     useEffect(() => {
-        dispatch(getAccount(search))
-    }, [dispatch, search])
+        getListTable(search);
+    }, [search, getListTable, dispatch])
+
+    useEffect(() => {
+        dispatch(getCustomers())
+    }, [])
 
     const data = useMemo(() => entities?.data?.map(item => ({
+        ...item,
         id: item.id,
-        email: item.email,
-        password: item.password,
-        secret: item.secret,
-        status: item.status,
+        address: ((item?.address ? `${item?.address} ,` : '') + (item?.wardname ? `${item?.wardname} ,` : '') + (item?.districtname ? `${item?.districtname} ,` : '') + (item?.provincename ? `${item?.provincename}` : '')),
+        status: (
+            item?.status
+                ? <Chip label="Hoạt động" className="bg-green-500 text-white" />
+                : <Chip label="Đã ngừng" className="bg-red-500 text-white" />
+        ),
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
-                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" />
+                <CmsIconButton
+                    tooltip="Thêm người vào"
+                    delay={50}
+                    icon="add"
+                    className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
+                    onClick={() => {
+                        setDetail(item);
+                        setOpenDialog('user');
+                    }}
+                />
+                <CmsIconButton
+                    tooltip="Chỉnh sửa thông tin"
+                    delay={50}
+                    icon="edit"
+                    className="bg-orange-900 text-white shadow-3  hover:bg-blue-900"
+                    onClick={() => {
+                        setDetail({ ...item, isEdit: 1 });
+                        setOpenDialog('add');
+                    }}
+                />
+                <CmsIconButton
+                    tooltip="Chỉnh sửa địa chỉ"
+                    delay={50}
+                    icon="edit"
+                    className="bg-orange-500 text-white shadow-3  hover:bg-orange-900"
+                    onClick={() => {
+                        setDetail({ ...item, isEdit: 2 });
+                        setOpenDialog('add');
+                    }}
+                />
             </div>
         ) || []
     })), [entities])
@@ -63,7 +114,7 @@ function ProductView() {
             data: { values, form },
             confirm: async () => {
                 try {
-                    const resultAction = await dispatch(legal.ticket.complete(values));
+                    const resultAction = await dispatch(partner.create(values));
                     unwrapResult(resultAction);
                     if (!values?.id) {
                         form.resetForm();
@@ -84,12 +135,24 @@ function ProductView() {
         <>
             {openDialog === 'add'
                 && <AddDialog
-                    title='Thêm mới đối tác'
+                    title={detail ? 'Chỉnh sửa đối tác' : 'Thêm mới đối tác'}
                     detail={detail}
                     open={openDialog === 'add'}
                     onSave={handleComplete}
                     handleClose={handleCloseDialog}
                 />}
+
+            {openDialog === 'user'
+                && <AddCusDialog
+                    title={'Thêm người vào đối tác'}
+                    detail={detail}
+                    options={{ customers }}
+                    open={openDialog === 'user'}
+                    onSave={handleComplete}
+                    handleClose={handleCloseDialog}
+                />}
+
+
             <CmsCardedPage
                 title={'Quản lý đối tác'}
                 icon="whatshot"

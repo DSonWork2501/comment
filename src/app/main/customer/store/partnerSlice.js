@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
+import { getErrorMessage } from '@widgets/functions';
 
 
 const appName = "customers";
 const moduleName = "partner";
 
-const partner = {
+export const partner = {
     getList: createAsyncThunk(`${appName}/${moduleName}/partner/getList`, async (params, thunkAPI) => {
         try {
             const response = await connect.live.partner.getList(params);
@@ -116,12 +117,12 @@ const partnerSlice = createSlice({
         /**
          * @description getEditors
          */
-        [getList.pending]: state => ({
+        [partner.getList.pending]: state => ({
             ...state,
             loading: true,
             error: null
         }),
-        [getList.fulfilled]: (state, { payload }) => {
+        [partner.getList.fulfilled]: (state, { payload }) => {
             return {
                 ...state,
                 loading: false,
@@ -129,7 +130,7 @@ const partnerSlice = createSlice({
                 error: null
             }
         },
-        [getList.rejected]: (state, { error }) => ({
+        [partner.getList.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

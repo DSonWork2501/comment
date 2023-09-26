@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { CmsBoxLine, CmsFormikAutocomplete, CmsFormikTextField } from "@widgets/components";
+import { CmsBoxLine, CmsFormikAutocomplete, CmsFormikCheckbox, CmsFormikTextField } from "@widgets/components";
 import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import LocationContent from "./basic/LocationContent";
@@ -28,9 +28,16 @@ export default function BasicInfoContent({ formik }) {
 
     return (
         <div className="w-full space-y-16 p-20 pb-40">
-            <div className="w-full flex flex-row space-x-8">
+            <div className="w-full flex flex-wrap flex-row">
                 <div className="w-full">
                     <CmsBoxLine label={'Thông tin khách hàng'}>
+                        <div>
+                            <CmsFormikCheckbox
+                                formik={formik}
+                                name="contractValid"
+                                label='Là đối tác'
+                            />
+                        </div>
                         <div className="w-full flex flex-row space-x-8">
                             <div className="w-full space-y-8">
                                 <CmsFormikAutocomplete
@@ -68,7 +75,9 @@ export default function BasicInfoContent({ formik }) {
                         </div>
                     </CmsBoxLine>
                 </div>
-                <LocationContent formik={formik} />
+                <div className="w-full mt-16">
+                    <LocationContent formik={formik} />
+                </div>
             </div>
             <CmsBoxLine label={'Thông tin khác'}>
                 <div className="w-full space-y-8">

@@ -182,6 +182,12 @@ export default {
             getList: (params) => axios.get(`${baseurl}/notification/get-notification`, { params }),
             read: entity => axios.put(`${baseurl}/notification/read-notification`, entity),
             deleteAll: entity => axios.put(`${baseurl}/notification/remove-all-notification`, entity),
+        },
+        partner: {
+            getList: (params) => axios.get(`${baseurl}/customer/get-partner`, { params }),
+            create: (data) => axios.post(`${baseurl}/customer/insert-partner`, data),
+            update: (entity) => axios.put(`${baseurl}/customer/update-partner`, entity),
+            delete: (entity) => axios.put(`${baseurl}/customer/delete-partner`, entity),
         }
     },
 }

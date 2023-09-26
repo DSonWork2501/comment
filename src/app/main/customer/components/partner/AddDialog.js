@@ -153,45 +153,53 @@ function AddDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc t
                 loading={formik.isSubmitting}
                 size='md'
             >
-                <BoxCustom
-                    className="p-8 mt-25 border-1 rounded-4 black-label h-full" >
-                    <InputLabel
-                        className='custom-label'>
-                        Thông tin đối tác
-                    </InputLabel>
-                    <CmsFormikTextField
-                        label="Email"
-                        name="email"
-                        className="my-4"
-                        size="small"
-                        formik={formik} />
-                    <CmsFormikTextField
-                        label="Tên đối tác"
-                        name="name"
-                        size="small"
-                        className="my-4"
-                        formik={formik} />
-                    <CmsFormikTextField
-                        label="Số điện thoại"
-                        name="phone"
-                        size="small"
-                        className="my-4"
-                        formik={formik} />
-                    <CmsFormikTextField
-                        label="Người phụ trách"
-                        name="recipient"
-                        size="small"
-                        className="my-4"
-                        formik={formik} />
-                    <CmsFormikTextField
-                        label="Số điện thoại người phụ trách"
-                        name="recipientphone"
-                        size="small"
-                        className="my-4"
-                        formik={formik} />
-                </BoxCustom>
+                {
+                    (!detail || detail?.isEdit === 1)
+                    &&
+                    <BoxCustom
+                        className="p-8 mt-25 border-1 rounded-4 black-label h-full" >
+                        <InputLabel
+                            className='custom-label'>
+                            Thông tin đối tác
+                        </InputLabel>
+                        <CmsFormikTextField
+                            label="Email"
+                            name="email"
+                            className="my-4"
+                            size="small"
+                            formik={formik} />
+                        <CmsFormikTextField
+                            label="Tên đối tác"
+                            name="name"
+                            size="small"
+                            className="my-4"
+                            formik={formik} />
+                        <CmsFormikTextField
+                            label="Số điện thoại"
+                            name="phone"
+                            size="small"
+                            className="my-4"
+                            formik={formik} />
+                        <CmsFormikTextField
+                            label="Người phụ trách"
+                            name="recipient"
+                            size="small"
+                            className="my-4"
+                            formik={formik} />
+                        <CmsFormikTextField
+                            label="Số điện thoại người phụ trách"
+                            name="recipientphone"
+                            size="small"
+                            className="my-4"
+                            formik={formik} />
+                    </BoxCustom>
+                }
 
-                <LocationContent formik={formik} />
+                {
+                    (!detail || detail?.isEdit === 2)
+                    &&
+                    <LocationContent formik={formik} />
+                }
             </CmsDialog>
         </React.Fragment>
     )
