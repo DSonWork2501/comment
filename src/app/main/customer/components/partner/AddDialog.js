@@ -1,12 +1,8 @@
 import React, { useEffect } from 'react';
-import { CmsDialog, CmsFormikDateTimePicker, CmsFormikTextField } from '@widgets/components';
-import { useFormik } from 'formik'
-import * as Yup from 'yup'
-import CmsFormikUploadFile from '@widgets/components/cms-formik/CmsFormikUploadFile';
-import Connect from '@connect/@connect';
-import { get } from 'lodash';
-import { Box, Button, FormHelperText, InputLabel, styled } from '@material-ui/core';
-import { GetApp } from '@material-ui/icons';
+import { CmsDialog, CmsFormikTextField } from '@widgets/components';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { Box, InputLabel, styled } from '@material-ui/core';
 import LocationContent from 'app/main/order/components/edit/basic/LocationContent';
 
 const BoxCustom = styled(Box)({
@@ -54,7 +50,12 @@ const initialValues = {
     "ward": 0,
     "district": 0,
     "province": 0,
-    "recipientphone": ""
+    "recipientphone": "",
+    aid: 0,
+    customercity: 0,
+    customerdistrict: 0,
+    customerward: 0,
+    customeraddress:""
 }
 
 const fillDefaultForm = (def, detail, setId = true) => {
@@ -89,7 +90,7 @@ function AddDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc t
             value.ward = value.customerward;
 
         if (formik)
-            onSave(value, formik);
+            onSave({ ...value, isEdit: detail?.isEdit }, formik);
     }
 
     const formik = useFormik({
@@ -109,37 +110,6 @@ function AddDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc t
     useEffect(() => {
         setValues(detail ? fillDefaultForm(initialValues, detail) : initialValues);
     }, [detail, setValues])
-
-    async function upLoadFile(file, { setLoading, resetFile, form }, name) {
-        if (file?.length) {
-            const data = new FormData();
-
-            data.append('file', file[0]);
-            setLoading(true);
-            formik.setSubmitting(true);
-
-            try {
-                const result = await Connect.live.upload.fileS3(data);
-                console.log(name, 'oke');
-                formik.setFieldValue(name, result?.data?.data?.path);
-            } catch (error) { }
-            finally {
-                setLoading(false);
-                formik.setSubmitting(false);
-            }
-        }
-    }
-
-    const selectedFile = async (filePath) => {
-        const file = await Connect.live.upload.getFileS3({ documentName: filePath });
-        const url = window.URL.createObjectURL(new Blob([file.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', file.config.params.documentName.split('/').pop()); //or any other extension
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    }
 
     return (
         <React.Fragment>

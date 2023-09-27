@@ -1,15 +1,12 @@
-import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
+import { CmsButton, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
 import { alertInformation, initColumn } from "@widgets/functions";
-import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import reducer from "../../store";
-import { getList as getAccount, resetSearch, setSearch } from "../../store/accountSlice";
 import AddDialog from "./AddDialog";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { partner } from "../../store/partnerSlice";
@@ -40,8 +37,6 @@ function ProductView() {
     const [detail, setDetail] = useState(null);
     const [openDialog, setOpenDialog] = useState("");
 
-    const [filterOptions, setFilterOptions] = useState(null);
-
     const getListTable = useCallback((search) => {
         dispatch(partner.getList(search));
     }, [dispatch])
@@ -52,7 +47,7 @@ function ProductView() {
 
     useEffect(() => {
         dispatch(getCustomers())
-    }, [])
+    }, [dispatch])
 
     const data = useMemo(() => entities?.data?.map(item => ({
         ...item,
@@ -87,7 +82,7 @@ function ProductView() {
                     tooltip="Chỉnh sửa thông tin"
                     delay={50}
                     icon="edit"
-                    className="bg-orange-900 text-white shadow-3  hover:bg-blue-900"
+                    className="bg-orange-900 text-white shadow-3  hover:bg-orange-900"
                     onClick={() => {
                         setDetail({ ...item, isEdit: 1 });
                         setOpenDialog('add');
@@ -99,7 +94,7 @@ function ProductView() {
                     icon="edit"
                     className="bg-orange-500 text-white shadow-3  hover:bg-orange-900"
                     onClick={() => {
-                        setDetail({ ...item, isEdit: 2 });
+                        setDetail({ ...item, isEdit: 2, customercity: item.province, customerdistrict: item.district, customerward: item.ward, customeraddress: item.address });
                         setOpenDialog('add');
                     }}
                 />
@@ -107,23 +102,18 @@ function ProductView() {
         ) || []
     })), [entities])
 
-    const handleFilterType = (event, value) => {
-        setFilterOptions(value)
-    };
-
     const handleCloseDialog = () => {
         setOpenDialog('');
         setDetail(null);
     }
 
-
-    const handleComplete = async (values, form) => {
+    const callApiAs = async (values, form, path) => {
         alertInformation({
             text: `Xác nhận thao tác`,
             data: { values, form },
             confirm: async () => {
                 try {
-                    const resultAction = await dispatch(partner.create(values));
+                    const resultAction = await dispatch(path);
                     unwrapResult(resultAction);
                     if (!values?.id) {
                         form.resetForm();
@@ -137,6 +127,18 @@ function ProductView() {
             },
             close: () => form.setSubmitting(false)
         });
+    }
+
+    const handleComplete = (values, form) => {
+        if (values.id) {
+            callApiAs(values, form, partner.update(values));
+        } else {
+            callApiAs(values, form, partner.create(values));
+        }
+    }
+
+    const handleSaveMember = (values, form) => {
+        callApiAs(values, form, partner.member.update([values]));
     }
     // console.log('filterOptions', filterOptions)
 
@@ -157,7 +159,7 @@ function ProductView() {
                     detail={detail}
                     options={{ customers }}
                     open={openDialog === 'user'}
-                    onSave={handleComplete}
+                    onSave={handleSaveMember}
                     handleClose={handleCloseDialog}
                 />}
 

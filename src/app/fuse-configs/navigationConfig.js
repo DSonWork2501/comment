@@ -92,6 +92,14 @@ const navigationConfig = [
 				icon: 'account_circle',
 				url: '/customer-manage',
 			},
+			{
+				id: 'nvi-manager-partner',
+				title: 'Quản lý đối tác',
+				translate: 'PARTNER_MANAGE',
+				type: 'item',
+				icon: 'account_circle',
+				url: '/partner',
+			},
 		],
 	},
 	{

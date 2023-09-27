@@ -1,15 +1,11 @@
-import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
+import { CmsButton, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
 import { alertInformation, initColumn } from "@widgets/functions";
-import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import reducer from "../../store";
-import { getList as getAccount, resetSearch, setSearch } from "../../store/accountSlice";
 import AddDialog from "./AddDialog";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { partner } from "../../store/partnerSlice";
@@ -22,13 +18,13 @@ import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "name", label: "Tên đối tác", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "name", label: "Tên thành viên", alignHeader: "center", alignValue: "left", sortable: false }),
     new initColumn({ field: "phone", label: "Sđt", alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "recipient", label: "Người đại diện", alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "recipientphone", label: "Sđt(Người đại diện)", alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "address", label: "Địa chỉ", alignHeader: "center", alignValue: "left", sortable: false }),
-    new initColumn({ field: "orders", label: "Tổng đơn", alignHeader: "center", alignValue: "left", sortable: false }),
-    new initColumn({ field: "total", label: "Tổng tiền", alignHeader: "center", alignValue: "left", sortable: false }),
+    new initColumn({ field: "partnername", label: "Đối tác", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "totalorder", label: "Tổng đơn", alignHeader: "right", alignValue: "right", sortable: false }),
+    new initColumn({ field: "totalvalue", label: "Tổng tiền", alignHeader: "right", alignValue: "right", sortable: false }),
+    new initColumn({ field: "rolename", label: "Loại thành viên", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "description", label: "Ghi chú", alignHeader: "center", alignValue: "left", sortable: false }),
     new initColumn({ field: "status", label: "Trạng thái", alignHeader: "center", alignValue: "center", sortable: false }),
 ]
 
@@ -36,30 +32,33 @@ function ProductView() {
     const dispatch = useDispatch()
     const search = useSelector(store => store[keyStore].partner.search);
     const loading = useSelector(store => store[keyStore].partner.loading);
-    const entities = useSelector(store => store[keyStore].partner.entities);
+    const entities = useSelector(store => store[keyStore].partner.members);
     const customers = useSelector(store => store[keyStore].customer.entities?.data) || [];
     const [detail, setDetail] = useState(null);
     const [openDialog, setOpenDialog] = useState("");
     const params = useParams(), id = params.id;
 
-    const [filterOptions, setFilterOptions] = useState(null);
 
     const getListTable = useCallback((search) => {
-        dispatch(partner.member.getList(search));
-    }, [dispatch])
+        if (id) {
+            dispatch(partner.member.getList({ ...search, partnerID: id }));
+            dispatch(partner.getList({ partnerId: id }))
+        }
+    }, [dispatch, id])
 
     useEffect(() => {
-        if (id)
-            getListTable({ ...search, partnerID: id });
-    }, [search, getListTable, dispatch, id])
+        getListTable({ ...search });
+    }, [search, getListTable, dispatch,])
 
     useEffect(() => {
         dispatch(getCustomers())
-    }, [])
+    }, [dispatch])
 
-    const data = useMemo(() => entities?.data?.map(item => ({
+    const data = entities?.data?.map(item => ({
         ...item,
         id: item.id,
+        totalorder: ((item?.totalorder) ? item.totalorder.toLocaleString('en-US') : '0'),
+        totalvalue: ((item?.totalvalue) ? item.totalvalue.toLocaleString('en-US') : '0'),
         address: ((item?.address ? `${item?.address} ,` : '') + (item?.wardname ? `${item?.wardname} ,` : '') + (item?.districtname ? `${item?.districtname} ,` : '') + (item?.provincename ? `${item?.provincename}` : '')),
         status: (
             item?.status
@@ -69,52 +68,29 @@ function ProductView() {
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
                 <CmsIconButton
-                    tooltip="Thêm người vào"
+                    tooltip="Xóa"
                     delay={50}
-                    icon="add"
-                    className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
+                    icon="delete"
+                    className="bg-red-500 text-white shadow-3  hover:bg-red-900"
                     onClick={() => {
-                        setDetail({ partnerid: item.id });
-                        setOpenDialog('user');
-                    }}
-                />
-                <CmsIconButton
-                    tooltip="Danh dách khách hàng"
-                    delay={50}
-                    icon="list"
-                    className="bg-green-500 text-white shadow-3  hover:bg-green-900"
-                    onClick={() => {
-                        setDetail({ partnerid: item.id });
-                        setOpenDialog('user');
-                    }}
-                />
-                <CmsIconButton
-                    tooltip="Chỉnh sửa thông tin"
-                    delay={50}
-                    icon="edit"
-                    className="bg-orange-900 text-white shadow-3  hover:bg-blue-900"
-                    onClick={() => {
-                        setDetail({ ...item, isEdit: 1 });
-                        setOpenDialog('add');
-                    }}
-                />
-                <CmsIconButton
-                    tooltip="Chỉnh sửa địa chỉ"
-                    delay={50}
-                    icon="edit"
-                    className="bg-orange-500 text-white shadow-3  hover:bg-orange-900"
-                    onClick={() => {
-                        setDetail({ ...item, isEdit: 2 });
-                        setOpenDialog('add');
+                        alertInformation({
+                            text: `Xác nhận thao tác`,
+                            data: {},
+                            confirm: async () => {
+                                try {
+                                    const resultAction = await dispatch(partner.member.update([{ id: item.id, partnerid: 0 }]));
+                                    unwrapResult(resultAction);
+                                    getListTable(search);
+                                } catch (error) { }
+                                finally {
+                                }
+                            },
+                        })
                     }}
                 />
             </div>
         ) || []
-    })), [entities])
-
-    const handleFilterType = (event, value) => {
-        setFilterOptions(value)
-    };
+    }))
 
     const handleCloseDialog = () => {
         setOpenDialog('');

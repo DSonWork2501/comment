@@ -186,13 +186,17 @@ export default {
         partner: {
             getList: (params) => axios.get(`${baseurl}/customer/get-partner`, { params }),
             create: (data) => axios.post(`${baseurl}/customer/insert-partner`, data),
-            update: (entity) => axios.put(`${baseurl}/customer/update-partner`, entity),
+            update: (entity) => {
+                if (entity.isEdit === 1)
+                    return axios.put(`${baseurl}/customer/update-partner`, entity)
+                return axios.put(`${baseurl}/customer/update-address`, [{ ...entity, default: 1, id: entity.aid }])
+            },
             delete: (entity) => axios.put(`${baseurl}/customer/delete-partner`, entity),
-            member:{
+            member: {
                 getList: (params) => axios.get(`${baseurl}/customer/get-member/${params.partnerID}`, { params }),
                 //create: (data, type) => axios.post(`${baseurl}/product/insert-unity`, data),
                 update: (entity, type) => axios.put(`${baseurl}/customer/member-partner`, entity),
-               // delete: (entity, type) => axios.put(`${baseurl}/product/delete-unity?type=${type}`, entity),
+                // delete: (entity, type) => axios.put(`${baseurl}/product/delete-unity?type=${type}`, entity),
             }
         }
     },

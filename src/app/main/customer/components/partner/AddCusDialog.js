@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import { CmsDialog, CmsFormikAutocomplete } from '@widgets/components';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { order } from 'app/main/order/store/orderSlice';
-import { useDispatch } from 'react-redux';
 
 const initialValues = {
     id: null,
@@ -28,7 +26,6 @@ const fillDefaultForm = (def, detail, setId = true) => {
 
 function AddCusDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc tính', options }) {
     const { customers } = options;
-    const dispatch = useDispatch();
 
     const handleSave = (values) => {
         if (formik)
@@ -89,14 +86,14 @@ function AddCusDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộ
                         className="my-8"
                         name="roleid"
                         formik={formik}
-                        label={`Quyền`}
+                        label={`Loại`}
                         data={[
                             {
-                                name: '1',
+                                name: 'Vip',
                                 id: 1
                             },
                             {
-                                name: '2',
+                                name: 'Normal',
                                 id: 2
                             }
                         ]}
