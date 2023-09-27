@@ -189,7 +189,9 @@ export default {
             update: (entity) => {
                 if (entity.isEdit === 1)
                     return axios.put(`${baseurl}/customer/update-partner`, entity)
-                return axios.put(`${baseurl}/customer/update-address`, [{ ...entity, default: 1, id: entity.aid }])
+                if (entity.aid)
+                    return axios.put(`${baseurl}/customer/update-address`, [{ ...entity, default: 1, id: entity.aid }])
+                return axios.post(`${baseurl}/customer/insert-address`, [{ ...entity, default: 1 }])
             },
             delete: (entity) => axios.put(`${baseurl}/customer/delete-partner`, entity),
             member: {
