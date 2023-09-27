@@ -188,6 +188,12 @@ export default {
             create: (data) => axios.post(`${baseurl}/customer/insert-partner`, data),
             update: (entity) => axios.put(`${baseurl}/customer/update-partner`, entity),
             delete: (entity) => axios.put(`${baseurl}/customer/delete-partner`, entity),
+            member:{
+                getList: (params) => axios.get(`${baseurl}/customer/get-member/${params.partnerID}`, { params }),
+                //create: (data, type) => axios.post(`${baseurl}/product/insert-unity`, data),
+                update: (entity, type) => axios.put(`${baseurl}/customer/member-partner`, entity),
+               // delete: (entity, type) => axios.put(`${baseurl}/product/delete-unity?type=${type}`, entity),
+            }
         }
     },
 }

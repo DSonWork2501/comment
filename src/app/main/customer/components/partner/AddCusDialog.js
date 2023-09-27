@@ -6,8 +6,9 @@ import { order } from 'app/main/order/store/orderSlice';
 import { useDispatch } from 'react-redux';
 
 const initialValues = {
-    id: 0,
-    cusID: "",
+    id: null,
+    partnerid: null,
+    roleid: null
 }
 
 const fillDefaultForm = (def, detail, setId = true) => {
@@ -40,7 +41,8 @@ function AddCusDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộ
         enableReinitialize: true,
         onSubmit: handleSave,
         validationSchema: Yup.object({
-            cusID: Yup.number().nullable().required('Chọn khách hàng'),
+            id: Yup.number().nullable().required('Chọn khách hàng'),
+            roleid: Yup.number().nullable().required('Chọn quyền'),
         })
     })
 
@@ -62,24 +64,53 @@ function AddCusDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộ
                 size='sm'
                 loading={formik.isSubmitting}
             >
-                <CmsFormikAutocomplete
-                    className="my-8"
-                    name="cusID"
-                    formik={formik}
-                    label={`Chọn khách hàng`}
-                    data={customers}
-                    size="small"
-                    autocompleteProps={{
-                        getOptionLabel: (option) => option?.email,
-                        ChipProps: {
-                            size: 'small'
-                        },
-                        size: 'small',
-                    }}
-                    setOption={(option) => option?.email}
-                    onChangeValue={(value) => {
-                    }}
-                    valueIsId />
+                <div className='py-8'>
+                    <CmsFormikAutocomplete
+                        name="id"
+                        formik={formik}
+                        label={`Chọn khách hàng`}
+                        data={customers}
+                        size="small"
+                        autocompleteProps={{
+                            getOptionLabel: (option) => option?.email,
+                            ChipProps: {
+                                size: 'small'
+                            },
+                            size: 'small',
+                        }}
+                        setOption={(option) => option?.email}
+                        onChangeValue={(value) => {
+                        }}
+                        valueIsId />
+                </div>
+
+                <div className='py-8'>
+                    <CmsFormikAutocomplete
+                        className="my-8"
+                        name="roleid"
+                        formik={formik}
+                        label={`Quyền`}
+                        data={[
+                            {
+                                name: '1',
+                                id: 1
+                            },
+                            {
+                                name: '2',
+                                id: 2
+                            }
+                        ]}
+                        size="small"
+                        autocompleteProps={{
+                            getOptionLabel: (option) => option?.name,
+                            ChipProps: {
+                                size: 'small'
+                            },
+                            size: 'small',
+                        }}
+                        setOption={(option) => option?.name}
+                        valueIsId />
+                </div>
             </CmsDialog>
         </React.Fragment>
     )

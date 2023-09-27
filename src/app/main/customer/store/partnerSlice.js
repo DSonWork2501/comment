@@ -47,6 +47,27 @@ export const partner = {
             return (thunkAPI.rejectWithValue(error))
         }
     }),
+    member:{
+        getList: createAsyncThunk(`${appName}/${moduleName}/partner/member/getList`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.partner.member.getList(params);
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+        update: createAsyncThunk(`${appName}/${moduleName}/partner/member/update`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.partner.member.update(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: "Thành công!" }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
+    }
 }
 
 const initSearchState = {
@@ -64,6 +85,7 @@ const partnerSlice = createSlice({
         selected: null,
         response: null,
         search: initSearchState,
+        members:null
     },
     reducers: {
         /**
@@ -131,6 +153,25 @@ const partnerSlice = createSlice({
             }
         },
         [partner.getList.rejected]: (state, { error }) => ({
+            ...state,
+            loading: false,
+            error: error
+        }),
+
+        [partner.member.getList.pending]: state => ({
+            ...state,
+            loading: true,
+            error: null
+        }),
+        [partner.member.getList.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                members: payload,
+                error: null
+            }
+        },
+        [partner.member.getList.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             error: error

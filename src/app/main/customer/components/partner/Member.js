@@ -17,7 +17,8 @@ import { useCallback } from "react";
 import { Chip } from "@material-ui/core";
 import AddCusDialog from "./AddCusDialog";
 import { getList as getCustomers } from "app/main/customer/store/customerSlice";
-import { Link } from "react-router-dom/cjs/react-router-dom";
+import { useParams } from "react-router";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -39,16 +40,18 @@ function ProductView() {
     const customers = useSelector(store => store[keyStore].customer.entities?.data) || [];
     const [detail, setDetail] = useState(null);
     const [openDialog, setOpenDialog] = useState("");
+    const params = useParams(), id = params.id;
 
     const [filterOptions, setFilterOptions] = useState(null);
 
     const getListTable = useCallback((search) => {
-        dispatch(partner.getList(search));
+        dispatch(partner.member.getList(search));
     }, [dispatch])
 
     useEffect(() => {
-        getListTable(search);
-    }, [search, getListTable, dispatch])
+        if (id)
+            getListTable({ ...search, partnerID: id });
+    }, [search, getListTable, dispatch, id])
 
     useEffect(() => {
         dispatch(getCustomers())
@@ -76,12 +79,14 @@ function ProductView() {
                     }}
                 />
                 <CmsIconButton
-                    tooltip="Danh dách thành viên"
+                    tooltip="Danh dách khách hàng"
                     delay={50}
                     icon="list"
                     className="bg-green-500 text-white shadow-3  hover:bg-green-900"
-                    component={Link}
-                    to={`/partner/${item.id}`}
+                    onClick={() => {
+                        setDetail({ partnerid: item.id });
+                        setOpenDialog('user');
+                    }}
                 />
                 <CmsIconButton
                     tooltip="Chỉnh sửa thông tin"
@@ -163,19 +168,17 @@ function ProductView() {
 
 
             <CmsCardedPage
-                title={'Quản lý đối tác'}
+                title={'Quản lý thành viên đối tác'}
                 icon="whatshot"
                 // leftBottomHeader={leftBottomHeader}
                 rightHeaderButton={
-                    <div>
-                        <CmsButton
-                            onClick={() => {
-                                setOpenDialog('add');
-                            }}
-                            className="bg-orange-700 text-white hover:bg-orange-900"
-                            label="Thêm mới"
-                            startIcon="add" />
-                    </div>
+                    <CmsButton label={`Trở về`}
+                        variant="text"
+                        color="default"
+                        component={Link}
+                        to={'/partner'}
+                        className="mx-2"
+                        startIcon="arrow_back" />
                 }
                 content={
                     <CmsTableBasic
