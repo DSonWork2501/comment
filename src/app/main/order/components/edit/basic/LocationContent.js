@@ -20,7 +20,6 @@ export default function LocationContent({ formik }) {
     // const [districtIdNhanh, setDistrictIdNhanh] = useState(null)
 
     const { values, setFieldValue } = formik, { customercity, customerdistrict, customerward } = values;
-
     useEffect(() => {
         dispatch(getCity({}))
     }, [dispatch])

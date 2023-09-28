@@ -182,6 +182,24 @@ export default {
             getList: (params) => axios.get(`${baseurl}/notification/get-notification`, { params }),
             read: entity => axios.put(`${baseurl}/notification/read-notification`, entity),
             deleteAll: entity => axios.put(`${baseurl}/notification/remove-all-notification`, entity),
+        },
+        partner: {
+            getList: (params) => axios.get(`${baseurl}/customer/get-partner`, { params }),
+            create: (data) => axios.post(`${baseurl}/customer/insert-partner`, data),
+            update: (entity) => {
+                if (entity.isEdit === 1)
+                    return axios.put(`${baseurl}/customer/update-partner`, entity)
+                if (entity.aid)
+                    return axios.put(`${baseurl}/customer/update-address`, [{ ...entity, default: 1, id: entity.aid, phone: entity.recipientphone }])
+                return axios.post(`${baseurl}/customer/insert-address`, [{ ...entity, default: 1, phone: entity.recipientphone }])
+            },
+            delete: (entity) => axios.put(`${baseurl}/customer/delete-partner`, entity),
+            member: {
+                getList: (params) => axios.get(`${baseurl}/customer/get-member/${params.partnerID}`, { params }),
+                //create: (data, type) => axios.post(`${baseurl}/product/insert-unity`, data),
+                update: (entity, type) => axios.put(`${baseurl}/customer/member-partner`, entity),
+                // delete: (entity, type) => axios.put(`${baseurl}/product/delete-unity?type=${type}`, entity),
+            }
         }
     },
 }
