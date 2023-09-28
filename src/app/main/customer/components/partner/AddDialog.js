@@ -55,7 +55,7 @@ const initialValues = {
     customercity: 0,
     customerdistrict: 0,
     customerward: 0,
-    customeraddress:""
+    customeraddress: ""
 }
 
 const fillDefaultForm = (def, detail, setId = true) => {
@@ -150,25 +150,29 @@ function AddDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc t
                             size="small"
                             className="my-4"
                             formik={formik} />
-                        <CmsFormikTextField
-                            label="Người phụ trách"
-                            name="recipient"
-                            size="small"
-                            className="my-4"
-                            formik={formik} />
-                        <CmsFormikTextField
-                            label="Số điện thoại người phụ trách"
-                            name="recipientphone"
-                            size="small"
-                            className="my-4"
-                            formik={formik} />
                     </BoxCustom>
                 }
 
                 {
                     (!detail || detail?.isEdit === 2)
                     &&
-                    <LocationContent formik={formik} />
+                    <>
+                        <div className='mb-8'>
+                            <CmsFormikTextField
+                                label="Người phụ trách"
+                                name="recipient"
+                                size="small"
+                                className="my-4"
+                                formik={formik} />
+                            <CmsFormikTextField
+                                label="Số điện thoại người phụ trách"
+                                name="recipientphone"
+                                size="small"
+                                className="my-4"
+                                formik={formik} />
+                        </div>
+                        <LocationContent formik={formik} />
+                    </>
                 }
             </CmsDialog>
         </React.Fragment>
