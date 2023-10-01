@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function DetailShelfContent({ value, img, index, handleClickBread, classes, HandleAddData }) {
+    console.log(value);
     return (
         <div onClick={handleClickBread}>
             <Tooltip title={<CmsLabel content={'Click vào để hiển thị thông tin chi tiết !'} className="text-14" />}>
@@ -33,6 +34,7 @@ function DetailShelfContent({ value, img, index, handleClickBread, classes, Hand
                 >
                     <img src={img || noImage} alt="image_detail" className="w-52" />
                     <div className="grid justify-items-start px-4">
+                        <LabelInfo key={`name-${index}-labelInfo`} label={{ content: 'Tên', className: 'min-w-min text-10' }} info={{ content: value?.subname || '-', className: 'text-10' }} />
                         <LabelInfo key={`uniqueid-${index}-labelInfo`} label={{ content: 'mã', className: 'min-w-min text-10' }} info={{ content: value?.uniqueid || '-', className: 'text-10' }} />
                         <LabelInfo key={`price-${index}-labelInfo`} label={{ content: 'giá', className: 'min-w-min text-10' }} info={{ content: !isNaN(parseInt(value?.price)) ? value?.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : 0, className: 'text-10' }} />
                         <LabelInfo key={`color-${index}-labelInfo`} label={{ content: 'màu', className: 'min-w-min text-10' }} info={{ content: value?.color || '-', className: 'text-10' }} />
