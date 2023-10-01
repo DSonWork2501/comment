@@ -15,6 +15,9 @@ import { Chip } from "@material-ui/core";
 import AddCusDialog from "./AddCusDialog";
 import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 import { Link } from "react-router-dom/cjs/react-router-dom";
+import AddManyCusDialog from "./AddManyCusDialog";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -61,13 +64,23 @@ function ProductView() {
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
                 <CmsIconButton
-                    tooltip="Thêm người vào"
+                    tooltip="Thêm thành viên"
                     delay={50}
                     icon="add"
                     className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
                     onClick={() => {
                         setDetail({ partnerid: item.id });
                         setOpenDialog('user');
+                    }}
+                />
+                <CmsIconButton
+                    tooltip="Thêm thành viên qua email"
+                    delay={50}
+                    icon={<FontAwesomeIcon icon={faUserPlus} fontSize={22} className="mb-4" />}
+                    className="bg-blue-900 text-white shadow-3  hover:bg-blue-900"
+                    onClick={() => {
+                        setDetail({ partnerid: item.id });
+                        setOpenDialog('users');
                     }}
                 />
                 <CmsIconButton
@@ -163,6 +176,14 @@ function ProductView() {
                     handleClose={handleCloseDialog}
                 />}
 
+            {openDialog === 'users'
+                && <AddManyCusDialog
+                    title={'Thêm người vào đối tác qua email'}
+                    detail={detail}
+                    open={openDialog === 'users'}
+                    onSave={handleComplete}
+                    handleClose={handleCloseDialog}
+                />}
 
             <CmsCardedPage
                 title={'Quản lý đối tác'}

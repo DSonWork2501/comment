@@ -10,13 +10,13 @@ function CmsFormikCheckbox(props){
     }
     return (
         <CmsCheckbox
-            {...otherProps}
             name={name}
             checked={formik.values[name] === '1' || (!isNaN(parseInt(formik.values[name])) && parseInt(formik.values[name]) === 1) ? true : false }
             onChange={value => formik.setFieldValue(name, ouputValue(value) )}
             onBlur={() => formik.setFieldTouched(name, true)}
             // error={formik.touched[name] && Boolean(formik.errors[name])}
             disabled={disabled}
+            {...otherProps}
         />
     )
 }

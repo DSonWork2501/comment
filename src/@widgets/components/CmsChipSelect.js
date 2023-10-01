@@ -1,25 +1,27 @@
 import React from 'react'
 import * as PropTypes from 'prop-types';
 import FuseChipSelect from '@fuse/core/FuseChipSelect'
+import { uniq } from 'lodash';
 
 /**
  * 
  * @description Component ChipSelect
  */
 function CmsChipSelect(props) {
-    const { 
-        label, 
-        name, 
-        value, 
-        onChange, 
-        onBlur, 
-        className, 
-        placeholder, 
-        error, 
+    const {
+        label,
+        name,
+        value,
+        onChange,
+        onBlur,
+        className,
+        placeholder,
+        error,
         helperText,
         required,
         charSplit,
         disabled,
+        validateFc,
         variant
     } = props;
     let textFieldProps = {}
@@ -30,25 +32,28 @@ function CmsChipSelect(props) {
     const handleChange = value => {
         let arr = []
         value.forEach(item => {
-            if(item.value){
-                // console.log(item.value);
+            if (item.value) {
                 let itemArr = item.value.split(charSplit)
-                if(itemArr.length > 1)
+                if (itemArr.length > 1)
                     itemArr.forEach(x => {
-                        arr.push({value: x ? x.trim() : x, label: x ? x.trim() : x})
+                        if ((validateFc ? validateFc(x) : true))
+                            arr.push({ value: x ? x.trim() : x, label: x ? x.trim() : x })
                     });
-                else{
-                    arr.push(item)
+                else {
+                    if ((validateFc ? validateFc(item.label) : true))
+                        arr.push(item)
                 }
             }
         });
-        onChange(arr.map(item=>item.value))
+
+        arr = arr.map(item => item.value);
+        onChange(uniq(arr))
     }
 
     return (
         <FuseChipSelect
             className={className}
-            value={value.map(item=>({value: item, label: item}))}
+            value={value.map(item => ({ value: item, label: item }))}
             onChange={handleChange}
             onBlur={onBlur}
             placeholder={placeholder}
@@ -60,7 +65,7 @@ function CmsChipSelect(props) {
                 InputLabelProps: {
                     shrink: true
                 },
-                
+
             }}
             disabled={disabled}
             isMulti

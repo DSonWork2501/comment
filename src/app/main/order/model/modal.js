@@ -92,7 +92,7 @@ export const customModal = (item) => {
     return {
         "order": {
             "depotid": item.depotid,
-            "type": item.type ? item.type + '' : '0',
+            "type": item.typeB ?  'Business' : '',
             "customerid": item.customerid,
             "customername": item.customername,
             "customermoblie": item.customermoblie,

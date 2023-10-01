@@ -15,6 +15,7 @@ import AddCusDialog from "./AddCusDialog";
 import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
+import AddManyCusDialog from "./AddManyCusDialog";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -138,6 +139,16 @@ function ProductView() {
                     detail={detail}
                     options={{ customers }}
                     open={openDialog === 'user'}
+                    onSave={handleComplete}
+                    handleClose={handleCloseDialog}
+                />}
+
+            {openDialog === 'users'
+                && <AddManyCusDialog
+                    title={'Thêm người vào đối tác qua email'}
+                    detail={detail}
+                    options={{ customers }}
+                    open={openDialog === 'users'}
                     onSave={handleComplete}
                     handleClose={handleCloseDialog}
                 />}
