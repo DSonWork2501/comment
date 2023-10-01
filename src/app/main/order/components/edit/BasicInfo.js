@@ -13,7 +13,7 @@ export default function BasicInfoContent({ formik }) {
     const partnerEntity = useSelector(store => store[keyStore].order.partner);
     const payments = useSelector(store => store[keyStore].order.payments?.data) || [];
     const cusDataRaw = useMemo(() => cusEntity?.data?.map(x => ({ ...x, id: x.id, name: `${x.phone ? x.phone + ', ' : ''}  ${x.name ? x.name + ', ' : ''} ${x.email ? x.email + ', ' : ''}`, cusName: x.name })) || [], [cusEntity])
-    const partnerDataRaw = useMemo(() => partnerEntity?.data?.map(x => ({ ...x, id: x.id, name: `${x.phone ? x.phone + ', ' : ''}  ${x.name ? x.name + ', ' : ''} ${x.email ? x.email + ', ' : ''}`, cusName: x.name })) || [], [partnerEntity])
+    const partnerDataRaw = useMemo(() => partnerEntity?.data?.map(x => ({ ...x, id: x.id, name: `${x.recipientphone ? x.recipientphone + ', ' : ''}  ${x.name ? x.name + ', ' : ''} ${x.email ? x.email + ', ' : ''}`, cusName: x.name, phone: x.recipientphone })) || [], [partnerEntity])
 
     const { setValues, values } = formik, { typeB } = values;
 

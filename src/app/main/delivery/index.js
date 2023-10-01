@@ -517,7 +517,7 @@ const Delivery = () => {
                                             Tạm tính
                                         </td>
                                         <td className='text-right'>
-                                            {totalPr?.money}đ
+                                            {(totalPr?.money || 0).toLocaleString('en-US')}đ
                                         </td>
                                     </tr>
                                     {/* <tr style={{ verticalAlign: 'baseline' }}>
@@ -553,7 +553,7 @@ const Delivery = () => {
                                         </td>
                                         <td className='text-right'>
                                             <b>
-                                                {totalPr?.money}đ
+                                                {(totalPr?.money || 0).toLocaleString('en-US')}đ
                                             </b>
                                         </td>
                                     </tr>
