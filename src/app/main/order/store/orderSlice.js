@@ -4,6 +4,7 @@ import { showMessage } from 'app/store/fuse/messageSlice'
 import { InitOrderModal } from '../model/modal';
 import { getWine, getShelf } from 'app/main/customer-shelf/store/customerShelfSlice';
 import { getErrorMessage } from '@widgets/functions';
+import { partner } from 'app/main/customer/store/partnerSlice';
 // import { getErrorMessage } from '@widgets/functions';
 
 
@@ -617,6 +618,15 @@ const orderSlice = createSlice({
                 ...state,
                 loading: false,
                 payments: payload,
+                error: null
+            }
+        },
+
+        [partner.getList.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                loading: false,
+                partner: payload,
                 error: null
             }
         },

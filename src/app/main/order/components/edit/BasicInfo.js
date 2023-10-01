@@ -4,15 +4,35 @@ import { useDispatch, useSelector } from "react-redux";
 import { keyStore } from "../../common";
 import LocationContent from "./basic/LocationContent";
 import { order } from "../../store/orderSlice";
+import { getList as getCustomers } from "app/main/customer/store/customerSlice";
+import { partner } from "app/main/customer/store/partnerSlice";
 
 export default function BasicInfoContent({ formik }) {
     const dispatch = useDispatch();
-    const cusEntity = useSelector(store => store[keyStore].customer.entities)
-    const payments = useSelector(store => store[keyStore].order.payments?.data) || []
-    const cusData = useMemo(() => cusEntity?.data?.map(x => ({ ...x, id: x.id, name: `${x.phone ? x.phone + ', ' : ''}  ${x.name ? x.name + ', ' : ''} ${x.email ? x.email + ', ' : ''}`, cusName: x.name })) || [], [cusEntity])
+    const cusEntity = useSelector(store => store[keyStore].customer.entities);
+    const partnerEntity = useSelector(store => store[keyStore].order.partner);
+    const payments = useSelector(store => store[keyStore].order.payments?.data) || [];
+    const cusDataRaw = useMemo(() => cusEntity?.data?.map(x => ({ ...x, id: x.id, name: `${x.phone ? x.phone + ', ' : ''}  ${x.name ? x.name + ', ' : ''} ${x.email ? x.email + ', ' : ''}`, cusName: x.name })) || [], [cusEntity])
+    const partnerDataRaw = useMemo(() => partnerEntity?.data?.map(x => ({ ...x, id: x.id, name: `${x.phone ? x.phone + ', ' : ''}  ${x.name ? x.name + ', ' : ''} ${x.email ? x.email + ', ' : ''}`, cusName: x.name })) || [], [partnerEntity])
+
+    const { setValues, values } = formik, { typeB } = values;
+
     useEffect(() => {
         dispatch(order.other.getPayment())
     }, [dispatch])
+    useEffect(() => {
+        if (typeB === 1) {
+            dispatch(partner.getList({
+                pageNumber: 1,
+                rowsPage: 1000,
+            }))
+        } else {
+            dispatch(getCustomers({
+                pageNumber: 1,
+                rowsPage: 1000,
+            }))
+        }
+    }, [typeB, dispatch])
 
     const HandleChangeCusId = (value) => {
         if (value) {
@@ -22,9 +42,16 @@ export default function BasicInfoContent({ formik }) {
                 customermoblie: value.phone,
                 customeremail: value.email
             }
-            formik.setValues({ ...formik.values, ...itemValue })
+
+            let local = {};
+            if (typeB === 1) {
+                local = { customercity: value.province, customerdistrict: value.district, customerward: value.ward, customeraddress: value.address }
+            }
+            formik.setValues({ ...formik.values, ...itemValue, ...local })
         }
     }
+
+
 
     return (
         <div className="w-full space-y-16 p-20 pb-40">
@@ -34,8 +61,24 @@ export default function BasicInfoContent({ formik }) {
                         <div>
                             <CmsFormikCheckbox
                                 formik={formik}
-                                name="contractValid"
+                                name="typeB"
                                 label='Là đối tác'
+                                onChange={(e) => {
+                                    setValues(prev => (
+                                        {
+                                            ...prev,
+                                            customerid: null,
+                                            customername: '',
+                                            customermoblie: '',
+                                            customeremail: '',
+                                            customercity: null,
+                                            customerdistrict: null,
+                                            customerward: null,
+                                            customeraddress: null,
+                                            typeB: e.target.checked ? 1 : 0
+                                        }
+                                    ))
+                                }}
                             />
                         </div>
                         <div className="w-full flex flex-row space-x-8">
@@ -43,7 +86,7 @@ export default function BasicInfoContent({ formik }) {
                                 <CmsFormikAutocomplete
                                     onChangeValue={HandleChangeCusId}
                                     size="small"
-                                    data={cusData}
+                                    data={typeB === 1 ? partnerDataRaw : cusDataRaw}
                                     valueIsId
                                     formik={formik}
                                     name="customerid"
