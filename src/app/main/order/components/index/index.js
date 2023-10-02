@@ -23,7 +23,7 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import { product } from "app/main/product/store/productSlice";
 import { useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilePen, faFilter, faMoneyBill, faPen, faTruck } from "@fortawesome/free-solid-svg-icons";
+import { faBuilding, faFilePen, faFilter, faMoneyBill, faPen, faTruck } from "@fortawesome/free-solid-svg-icons";
 import { format } from "date-fns";
 import { ArrowDropDown } from "@material-ui/icons";
 import ConfirmationDialog from "./ConfirmationDialog";
@@ -332,9 +332,14 @@ function OrderView() {
                     item.phone
                 }
             </div>
-            <div>
+            <div className="flex">
                 {
                     item.cusname
+                }
+                {
+                    item.type==='Business'
+                    ?<div className="text-green font-600 ml-2"> - <FontAwesomeIcon icon={faBuilding} /> Business</div>
+                    :''
                 }
             </div>
             <div>
