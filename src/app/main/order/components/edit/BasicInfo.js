@@ -18,7 +18,7 @@ export default function BasicInfoContent({ formik }) {
     const { setValues, values } = formik, { typeB } = values;
 
     useEffect(() => {
-        dispatch(order.other.getPayment())
+        dispatch(order.other.getPayment({ status: 1 }))
     }, [dispatch])
     useEffect(() => {
         if (typeB === 1) {

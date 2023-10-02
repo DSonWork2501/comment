@@ -48,7 +48,27 @@ const EditRowContent = ({ index, formik, handleSaveData, handleCancelSetIndex, i
                 },
                 then: Yup.number().nullable().required("Nhập sức chứa").min(1, "Nhập sức chứa").typeError("Nhập sức chứa")
             }),
-            subname: Yup.string().nullable().required("Nhập tên sản phẩm")
+            subname: Yup.string().nullable().required("Nhập tên sản phẩm"),
+            price: Yup.number().when('$ishs', {
+                is: (value) => {
+                    return ishs === 2
+                },
+                then: Yup.number().nullable().required('Nhập giá').min(1,'Nhập giá'),
+            }),
+
+            retailprice: Yup.number().when('$ishs', {
+                is: (value) => {
+                    return ishs === 2
+                },
+                then: Yup.number().nullable().required('Nhập giá').min(1,'Nhập giá'),
+            }),
+
+            wholesaleprice: Yup.number().when('$ishs', {
+                is: (value) => {
+                    return ishs === 2
+                },
+                then: Yup.number().nullable().required('Nhập giá').min(1,'Nhập giá'),
+            }),
         })
     })
 
