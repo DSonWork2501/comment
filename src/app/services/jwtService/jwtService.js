@@ -19,13 +19,18 @@ class JwtService extends FuseUtils.EventEmitter {
 				return new Promise((resolve, reject) => {
 					// if you ever get an unauthorized response, logout the user
 					// if (err.response && err.response.status && err.response.status === 401 && err.config && !err.config.__isRetryRequest) {
+					const originalConfig = err.config;
 
-					if (err.response && err.response.status && err.response.status === 401) {
+					if (err.response && err.response.status && err.response.status === 401 && !originalConfig._retry) {
+						originalConfig._retry = true;
 						let accessToken = this.getAccessToken()
 						let refreshToken = this.getRefreshToken()
 						if (accessToken && refreshToken) {
-
-							this.handleRefreshToken().catch(error => {
+							console.log(accessToken);
+							this.handleRefreshToken().then(() => {
+								originalConfig.headers.Authorization = `Bearer ${this.getAccessToken()}`;
+								return axios(originalConfig);
+							}).then(res => resolve(res)).catch(error => {
 								this.setSession(null)
 								reject()
 							})
@@ -34,9 +39,10 @@ class JwtService extends FuseUtils.EventEmitter {
 							this.emit('onAutoLogout', 'Đăng nhập thất bại!')
 							resolve()
 						}
+					} else {
+						this.emit("handleError", err);
+						reject(err)
 					}
-					this.emit("handleError", err);
-					reject(err)
 					// throw err
 				});
 			}
