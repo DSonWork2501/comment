@@ -337,9 +337,9 @@ function OrderView() {
                     item.cusname
                 }
                 {
-                    item.type==='Business'
-                    ?<div className="text-green font-600 ml-2"> - <FontAwesomeIcon icon={faBuilding} /> Business</div>
-                    :''
+                    item.type === 'Business'
+                        ? <div className="text-green font-600 ml-2"> - <FontAwesomeIcon icon={faBuilding} /> Business</div>
+                        : ''
                 }
             </div>
             <div>
@@ -606,6 +606,17 @@ function OrderView() {
                         <CmsButton color="primary" label="Tạo đơn hàng" startIcon="add" onClick={() => History.push(`/order/edit/0/0`)} />
                     </div>
                 }
+                moreToolbar={
+                    filterOptions === 2
+                        ? <FilterOptionView
+                            filterOptions={1}
+                            search={search}
+                            setFilterOptions={setFilterOptions}
+                            resetSearch={() => dispatch(resetSearch())}
+                            setSearch={(value) => dispatch(setSearch(value))}
+                        />
+                        : null
+                }
                 content={
                     <>
                         <CmsTableBasic
@@ -616,17 +627,7 @@ function OrderView() {
                             setSearch={(value) => dispatch(setSearch({ ...search, ...value }))}
                             columns={columns}
                             loading={loading}
-                            filterOptions={
-                                <FilterOptionView
-                                    filterOptions={1}
-                                    search={search}
-                                    setFilterOptions={setFilterOptions}
-                                    resetSearch={() => dispatch(resetSearch())}
-                                    setSearch={(value) => dispatch(setSearch(value))}
-                                />
-                            }
                             showBorder
-                            openFilterOptions={Boolean(filterOptions)}
                             pagination={reEntities?.pagination}
                             isClearHoverBg
                             removeSelect
