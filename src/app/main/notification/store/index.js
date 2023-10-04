@@ -9,10 +9,13 @@ const moduleName = "notify";
 
 export const notify = {
     getList: createAsyncThunk(`${appName}/${moduleName}/notification/getList`, async (params, thunkAPI) => {
+        console.log('vào');
         try {
             const response = await connect.live.notification.getList(params);
+            console.log(response);
             return response.data
         } catch (error) {
+            console.log('Lỗi');
             thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
             return (thunkAPI.rejectWithValue(error))
         }
