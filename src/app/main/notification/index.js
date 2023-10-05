@@ -29,6 +29,8 @@ import { faGift, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { alertInformation } from '@widgets/functions';
 import { CmsSelect } from '@widgets/components';
+import History from '@history';
+import Connect from '@connect';
 // import {Waypoint} from "react-waypoint";
 
 const useStyles = makeStyles((theme) => ({
@@ -214,9 +216,21 @@ function Notification({
         };
     }, [dispatch, getList]);
 
-    const handleRead = async (values) => {
+    const handleRead = async (values, refid, cmsref) => {
         const resultAction = await dispatch(notify.read(values))
         unwrapResult(resultAction);
+        if (cmsref === 'order')
+            History.push(`/order/100?orderId=${refid}`)
+        if (cmsref === 'billing') {
+            Connect.live.accounting.bill.getList({ id: refid }).then(res => {
+                const { data } = res, value = data?.data?.length ? data.data[0] : null;
+                if (value) {
+                    History.push(`/accounting/bill/${value.type}?id=${refid}`)
+                } else {
+                    History.push(`/accounting/bill/1`)
+                }
+            })
+        }
         getList();
     }
 
@@ -372,8 +386,7 @@ function Notification({
                                 divider
                                 className='flex justify-between items-center rounded-4'
                                 onClick={() => {
-                                    handleRead([{ id: item.id }]);
-
+                                    handleRead([{ id: item.id }], item.refid, item.cmsref);
                                 }}
                             >
                                 <div style={{ width: 40 }}>

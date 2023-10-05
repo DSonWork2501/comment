@@ -21,10 +21,11 @@ import { format } from 'date-fns';
 import { DropMenu } from 'app/main/order/components/index';
 import AddUserDialog from '../components/AddUserDialog';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import History from '@history/@history';
 import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 import AddBillDialog from '../components/AddBillDialog';
+import { useUpdateEffect } from '@fuse/hooks';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -38,8 +39,9 @@ const LayoutCustom = styled(Box)({
 });
 
 const initialValues = {
-    name: '',
-    status: null
+    id: null,
+    fromDate: null,
+    toDate: null,
 };
 
 const Filter = ({ onSearch, search, namePage }) => {
@@ -53,13 +55,10 @@ const Filter = ({ onSearch, search, namePage }) => {
     useEffect(() => {
         if (search) {
             for (const key in initialValues) {
-                if (search[key] !== initialValues[key]) {
+                //if (search[key] !== initialValues[key]) {
                     let value = search[key];
-                    if (key === 'status') {
-                        value = JSON.stringify(search[key])
-                    }
                     setFieldValue(key, value);
-                }
+                //}
             }
         }
     }, [search, setFieldValue])
@@ -72,6 +71,13 @@ const Filter = ({ onSearch, search, namePage }) => {
     }
 
     return <form onSubmit={formik.handleSubmit} className="flex items-center justify-items-start  w-full space-x-8 px-8" >
+        <CmsFormikTextField
+            label={`ID`}
+            name="id"
+            className="my-8 w-400"
+            size="small"
+            clearBlur
+            formik={formik} />
         <CmsFormikTextField
             label={`Khách hàng`}
             name="name"
@@ -250,26 +256,31 @@ function Meta() {
 
 function Meta2({ type }) {
     const dispatch = useDispatch();
+    const location = useLocation();
+    const paramsURL = new URLSearchParams(location.search),
+        id = paramsURL.get('id');
     const loading = useSelector(store => store[keyStore].loading);
     const entities = useSelector(store => store[keyStore].entities);
     const searchDefault = useSelector(store => store[keyStore].search);
     const customers = useSelector(store => store[keyStore].customers) || [];
-    const [search, setSearch] = useState(searchDefault);
+    const [search, setSearch] = useState({ ...searchDefault });
     const [openDialog, setOpenDialog] = useState('');
     const [detail, setDetail] = useState(null);
     const [selects, setSelects] = useState([]);
-     console.log(detail)
 
+    console.log(detail);
     const getListTable = useCallback((search) => {
         if (type)
             dispatch(accounting.bill.getList({ ...search, type }));
     }, [dispatch, type])
 
-    const searchString = JSON.stringify(search);
     useEffect(() => {
-        let search = JSON.parse(searchString);
+        setSearch(prev => ({ ...prev, id: id || null }))
+    }, [id])
+
+    useUpdateEffect(() => {
         getListTable(search);
-    }, [searchString, getListTable, dispatch])
+    }, [search, getListTable, dispatch])
 
     useEffect(() => {
         if (openDialog === '')
@@ -403,7 +414,7 @@ function Meta2({ type }) {
                                         }
                                     ].filter(val => val.show)
                                 } />
-                            <Filter />
+                            <Filter search={search} onSearch={(params) => setSearch(prev => ({ ...prev, ...params }))} />
                         </div>
                     </div>
                 }
