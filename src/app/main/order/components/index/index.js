@@ -15,7 +15,7 @@ import { orderStatus } from "../../model/status";
 import OrderDetailContent from "./orderDetail";
 import ChangeOderStatusContent from "./changeOrderStatus";
 import History from "@history";
-import { useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import { Box, Button, Menu, MenuItem, Tooltip, makeStyles, styled } from "@material-ui/core";
 import PackageDialog from "./PackageDialog";
 import { getShelf, getWine } from "app/main/customer-shelf/store/customerShelfSlice";
@@ -127,8 +127,17 @@ export const DropMenu = ({ crName, data, handleClose, className, small, disabled
 }
 
 function OrderView() {
-    const dispatch = useDispatch()
-    const search = useSelector(store => store[keyStore].order.search)
+    const dispatch = useDispatch();
+    const location = useLocation();
+    const paramsURL = new URLSearchParams(location.search),
+        orderId = paramsURL.get('orderId');
+    const searchRaw = useSelector(store => store[keyStore].order.search)
+    const search = useMemo(() => {
+        let S = { ...searchRaw };
+        if (orderId)
+            S.orderId = orderId;
+        return S;
+    }, [searchRaw, orderId])
     const loading = useSelector(store => store[keyStore].order.loading)
     const entities = useSelector(store => store[keyStore].order.entities)
     const classes = useStyles();
@@ -152,6 +161,7 @@ function OrderView() {
     const [openDialog, setOpenDialog] = useState("");
     const [detail, setDetail] = useState(null);
     const [item, setItem] = useState(null);
+
     const totalValues = {
         0: summary?.da_huy ? summary?.da_huy?.toLocaleString('en-US') : 0,
         6: summary?.da_dong_goi ? summary?.da_dong_goi?.toLocaleString('en-US') : 0,
@@ -337,9 +347,9 @@ function OrderView() {
                     item.cusname
                 }
                 {
-                    item.type==='Business'
-                    ?<div className="text-green font-600 ml-2"> - <FontAwesomeIcon icon={faBuilding} /> Business</div>
-                    :''
+                    item.type === 'Business'
+                        ? <div className="text-green font-600 ml-2"> - <FontAwesomeIcon icon={faBuilding} /> Business</div>
+                        : ''
                 }
             </div>
             <div>
@@ -606,6 +616,17 @@ function OrderView() {
                         <CmsButton color="primary" label="Tạo đơn hàng" startIcon="add" onClick={() => History.push(`/order/edit/0/0`)} />
                     </div>
                 }
+                moreToolbar={
+                    filterOptions === 2
+                        ? <FilterOptionView
+                            filterOptions={1}
+                            search={search}
+                            setFilterOptions={setFilterOptions}
+                            resetSearch={() => dispatch(resetSearch())}
+                            setSearch={(value) => dispatch(setSearch(value))}
+                        />
+                        : null
+                }
                 content={
                     <>
                         <CmsTableBasic
@@ -616,17 +637,7 @@ function OrderView() {
                             setSearch={(value) => dispatch(setSearch({ ...search, ...value }))}
                             columns={columns}
                             loading={loading}
-                            filterOptions={
-                                <FilterOptionView
-                                    filterOptions={1}
-                                    search={search}
-                                    setFilterOptions={setFilterOptions}
-                                    resetSearch={() => dispatch(resetSearch())}
-                                    setSearch={(value) => dispatch(setSearch(value))}
-                                />
-                            }
                             showBorder
-                            openFilterOptions={Boolean(filterOptions)}
                             pagination={reEntities?.pagination}
                             isClearHoverBg
                             removeSelect
