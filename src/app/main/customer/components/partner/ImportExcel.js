@@ -225,7 +225,7 @@ function ImportExcel(props) {
 
   return (
     <CmsCardedPage
-      title={"Import kênh"}
+      title={"Import thành viên"}
       icon="whatshot"
       rightBottomHeader={selectedAction}
       content={
