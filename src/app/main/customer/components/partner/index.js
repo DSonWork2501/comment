@@ -84,6 +84,15 @@ function ProductView() {
                     }}
                 />
                 <CmsIconButton
+                    tooltip="Thêm thành viên qua excel"
+                    delay={50}
+                    icon={<FontAwesomeIcon icon={faUserPlus} fontSize={22} className="mb-4" />}
+                    className="bg-pink-900 text-white shadow-3  hover:bg-pink-900"
+                    onClick={() => {
+                        window.open(`/partner/${item.id}/import`, '_blank')
+                    }}
+                />
+                <CmsIconButton
                     tooltip="Danh dách thành viên"
                     delay={50}
                     icon="list"
@@ -153,6 +162,19 @@ function ProductView() {
     const handleSaveMember = (values, form) => {
         callApiAs(values, form, partner.member.update([values]));
     }
+
+    const handleSentInvite = (values, form) => {
+        let data = {
+            value: values.email.map(val => ({
+                email: val,
+                phone: '',
+                name: ''
+            })),
+            partnerid: values.partnerid
+        };
+
+        callApiAs(data, form, partner.member.invite(data));
+    }
     // console.log('filterOptions', filterOptions)
 
     return (
@@ -181,7 +203,7 @@ function ProductView() {
                     title={'Thêm người vào đối tác qua email'}
                     detail={detail}
                     open={openDialog === 'users'}
-                    onSave={handleComplete}
+                    onSave={handleSentInvite}
                     handleClose={handleCloseDialog}
                 />}
 

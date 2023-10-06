@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
-import { CmsDialog, CmsFormikAutocomplete, CmsFormikChipSelect } from '@widgets/components';
+import { CmsDialog, CmsFormikChipSelect } from '@widgets/components';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 const initialValues = {
     id: null,
     partnerid: null,
-    roleid: null
+    email: []
+    //roleid: null
 }
 
 const fillDefaultForm = (def, detail, setId = true) => {
@@ -36,7 +37,7 @@ function AddManyCusDialog({ handleClose, detail, onSave, open, title = 'Thêm th
         enableReinitialize: true,
         onSubmit: handleSave,
         validationSchema: Yup.object({
-            id: Yup.number().nullable().required('Chọn khách hàng'),
+            //id: Yup.number().nullable().required('Chọn khách hàng'),
             email: Yup.array().nullable().required('Nhập email khách hàng').min(1, "Nhập email khách hàng"),
         })
     })
@@ -59,7 +60,7 @@ function AddManyCusDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                 size='sm'
                 loading={formik.isSubmitting}
             >
-                <div className='py-8'>
+                <div className='py-8 mb-52'>
                     <CmsFormikChipSelect
                         label="Email"
                         name="email"
@@ -67,14 +68,13 @@ function AddManyCusDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                         className="my-8"
                         placeholder="Nhập email"
                         validateFc={(option) => {
-                            console.log(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(option), option);
                             return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(option);
                         }}
                         size="small"
                         formik={formik} />
                 </div>
 
-                <div className='py-8'>
+                {/* <div className='py-8'>
                     <CmsFormikAutocomplete
                         className="my-8"
                         name="roleid"
@@ -100,7 +100,7 @@ function AddManyCusDialog({ handleClose, detail, onSave, open, title = 'Thêm th
                         }}
                         setOption={(option) => option?.name}
                         valueIsId />
-                </div>
+                </div> */}
             </CmsDialog>
         </React.Fragment>
     )

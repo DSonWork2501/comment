@@ -31,5 +31,6 @@ export default {
     dateMonthYear: 'dateMonthYear',
     float: "float",
     dateTimeOther: 'dateTimeOther',
-    dateTimeOrDate: "dateTimeOrDate"
+    dateTimeOrDate: "dateTimeOrDate",
+    email:'email'
 }

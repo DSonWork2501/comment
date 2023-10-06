@@ -36,6 +36,11 @@ const ProductConfig = {
 			exact: true,
 			component: React.lazy(() => import('./components/partner/Member'))
 		},
+		{
+			path: '/partner/:id/import',
+			exact: true,
+			component: React.lazy(() => import('./components/partner/ImportExcel'))
+		},
 	]
 };
 
