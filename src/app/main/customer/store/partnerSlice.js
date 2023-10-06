@@ -67,6 +67,16 @@ export const partner = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        invite: createAsyncThunk(`${appName}/${moduleName}/partner/member/invite`, async (params, thunkAPI) => {
+            try {
+                const response = await connect.live.partner.member.invite(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: "Thành công!" }))
+                return response.data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
     }
 }
 

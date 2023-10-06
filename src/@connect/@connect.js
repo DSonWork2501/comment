@@ -194,6 +194,7 @@ export default {
                 getList: (params) => axios.get(`${baseurl}/customer/get-member/${params.partnerID}`, { params }),
                 //create: (data, type) => axios.post(`${baseurl}/product/insert-unity`, data),
                 update: (entity, type) => axios.put(`${baseurl}/customer/member-partner`, entity),
+                invite: (data) => axios.post(`${baseurl}/customer/member-invitation/${data.partnerid}`, data.value),
                 // delete: (entity, type) => axios.put(`${baseurl}/product/delete-unity?type=${type}`, entity),
             }
         }

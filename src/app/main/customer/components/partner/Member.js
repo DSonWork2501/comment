@@ -1,4 +1,4 @@
-import { CmsButton, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
+import { CmsButton, CmsButtonProgress, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
 import { alertInformation, initColumn } from "@widgets/functions";
 import withReducer from "app/store/withReducer";
 import React, { useEffect } from "react";
@@ -159,13 +159,21 @@ function ProductView() {
                 icon="whatshot"
                 // leftBottomHeader={leftBottomHeader}
                 rightHeaderButton={
-                    <CmsButton label={`Trở về`}
-                        variant="text"
-                        color="default"
-                        component={Link}
-                        to={'/partner'}
-                        className="mx-2"
-                        startIcon="arrow_back" />
+                    <div className="flex">
+                        <CmsButton label={`Trở về`}
+                            variant="text"
+                            color="default"
+                            component={Link}
+                            to={'/partner'}
+                            className="mx-2"
+                            startIcon="arrow_back" />
+                        <CmsButtonProgress
+                            component={Link}
+                            to={`/partner/${id}/import`}
+                            label={"Thêm thành viên bằng excel"}
+                            className="mx-2"
+                            startIcon="add" />
+                    </div>
                 }
                 content={
                     <CmsTableBasic

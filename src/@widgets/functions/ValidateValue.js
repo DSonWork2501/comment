@@ -16,6 +16,9 @@ const CheckValidate = (item, data) => {
     if (!item.isNull && !item.value)
         return "Giá trị rỗng !"
     switch (item.dataType) {
+        case dataType.email:
+            return RegexPattern.email.test(item.value) ? "" : `Vui lòng nhập đúng email`
+
         case dataType.includeList:
             return item.list.includes(item.value) > 0 ? "" : `Vui lòng nhập đúng một trong số định dạng (${item.list.join('|')})`
         /**
@@ -64,7 +67,7 @@ const CheckValidate = (item, data) => {
         /**
          * @description define : yyyy-MM-dd HH:MM:SS
          */
-         case dataType.dateTimeOther: {
+        case dataType.dateTimeOther: {
             if (item.isNull && !item.value)
                 return ""
             return RegexPattern.dateTimeOther.test(item.value) ? "" : "Sai định ngày giờ (format: yyyy-MM-dd HH:MM:SS) VD: 2021-12-31 23:59:59 !"
