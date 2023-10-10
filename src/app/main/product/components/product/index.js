@@ -17,6 +17,7 @@ import { faArchive, faHome, faTruck } from "@fortawesome/free-solid-svg-icons";
 import { Chip, Tooltip } from "@material-ui/core";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { DropMenu } from "app/main/order/components/index";
+import SearchDialog from "./edit/SearchDialog";
 
 function ProductView() {
     const dispatch = useDispatch()
@@ -25,6 +26,7 @@ function ProductView() {
     const entities = useSelector(store => store[keyStore].product.entities)
     const [filterOptions, setFilterOptions] = useState(null);
     const [selects, setSelects] = useState([]);
+    const [openDialog, setOpenDialog] = useState("search");
 
     useEffect(() => {
         dispatch(getProduct(search))
@@ -92,7 +94,7 @@ function ProductView() {
                 name="select"
             />
         ),
-        recommend: (item?.recommend ? <Chip label="Có" className="bg-green text-white" />:<Chip label="Không" className="bg-red text-white" />),
+        recommend: (item?.recommend ? <Chip label="Có" className="bg-green text-white" /> : <Chip label="Không" className="bg-red text-white" />),
         id: item.id,
         name: item.name,
         catename: item.catename,
@@ -147,112 +149,151 @@ function ProductView() {
         setFilterOptions(value)
     };
 
-    // // console.log('filterOptions', filterOptions)
+    const handleCloseDialog = () => {
+        setOpenDialog('')
+    }
+
+    const handleSubmit = async (values, form) => {
+        // alertInformation({
+        //     text: `Xác nhận thao tác`,
+        //     data: { values, form },
+        //     confirm: async () => {
+        //         try {
+        //             const resultAction = values?.id
+        //                 ? await dispatch(legal.customer.update([values]))
+        //                 : await dispatch(legal.customer.create([values]));
+        //             unwrapResult(resultAction);
+        //             if (!values?.id) {
+        //                 form.resetForm();
+        //             }
+        //             setOpenDialog('');
+        //             getListTable(search);
+        //         } catch (error) {
+        //         } finally {
+        //             form.setSubmitting(false)
+        //         }
+        //     },
+        //     close: () => form.setSubmitting(false)
+        // });
+    }
 
     return (
-        <CmsCardedPage
-            title={'Danh sách sản phẩm'}
-            subTitle={'Quản lý thông tin sản phẩm'}
-            icon="whatshot"
-            // leftBottomHeader={leftBottomHeader}
-            rightHeaderButton={
-                <div>
-                </div>
-            }
-            content={
-                <CmsTableBasic
-                    className="w-full h-full"
-                    isServerSide={true}
-                    data={data}
-                    search={search}
-                    columns={columns}
-                    loading={loading}
-                    setSearch={(value) => dispatch(setSearch({ ...search, ...value }))}
-                    filterOptions={
-                        <FilterOptionView
-                            filterOptions={filterOptions}
-                            search={search}
-                            setFilterOptions={setFilterOptions}
-                            resetSearch={() => dispatch(resetSearch())}
-                            setSearch={(value) => dispatch(setSearch({ ...value, pageNumber: 1 }))}
-                        />
-                    }
-                    selectedList={selects}
-                    openFilterOptions={Boolean(filterOptions)}
-                    pagination={entities?.pagination}
+        <>
+            {
+                openDialog === 'search'
+                &&
+                <SearchDialog
+                    open={openDialog === 'search'}
+                    handleClose={handleCloseDialog}
+                    handleSubmit={handleSubmit}
+                    title={`Tìm kiếm`}
                 />
             }
-            toolbar={
-                <div className="w-full flex items-center justify-between px-12">
-                    <div className="flex items-center justify-items-start">
-                        <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType)} />
+
+            <CmsCardedPage
+                title={'Danh sách sản phẩm'}
+                subTitle={'Quản lý thông tin sản phẩm'}
+                icon="whatshot"
+                // leftBottomHeader={leftBottomHeader}
+                rightHeaderButton={
+                    <div>
                     </div>
-                    <div className="flex items-center justify-end">
-                        {
-                            Boolean(selects?.length)
-                            &&
-                            <DropMenu
-                                crName={`Lựa chọn`}
-                                handleClose={(value, setAnchorEl) => {
-                                    if (value?.id === 1) {
-                                        alertInformation({
-                                            text: `Xác nhận thao tác`,
-                                            data: {},
-                                            confirm: async () => {
-                                                try {
-                                                    const resultAction = await dispatch(product.addRecommend(
-                                                        selects.map(val => ({ sku: val, recommend: 1 }))
-                                                    ));
-                                                    unwrapResult(resultAction);
-                                                    dispatch(getProduct(search));
-                                                    setSelects([]);
-                                                } catch (error) {
-                                                } finally {
-                                                }
-                                            },
-                                        });
-                                    }
-
-                                    if (value?.id === 2) {
-                                        alertInformation({
-                                            text: `Xác nhận thao tác`,
-                                            data: {},
-                                            confirm: async () => {
-                                                try {
-                                                    const resultAction = await dispatch(product.addRecommend(
-                                                        selects.map(val => ({ sku: val, recommend: 0 }))
-                                                    ));
-                                                    unwrapResult(resultAction);
-                                                    dispatch(getProduct(search));
-                                                    setSelects([]);
-                                                } catch (error) {
-                                                } finally {
-                                                }
-                                            },
-                                        });
-                                    }
-
-                                    setAnchorEl(null)
-                                }}
-                                pcBtn
-                                className={`min-w-128 mr-8`}
-                                data={
-                                    [
-                                        { id: 1, name: 'Thêm sản phẩm gợi ý' },
-                                        { id: 2, name: 'Bỏ sản phẩm gợi ý' }
-                                    ]
-                                } />
+                }
+                content={
+                    <CmsTableBasic
+                        className="w-full h-full"
+                        isServerSide={true}
+                        data={data}
+                        search={search}
+                        columns={columns}
+                        loading={loading}
+                        setSearch={(value) => dispatch(setSearch({ ...search, ...value }))}
+                        filterOptions={
+                            <FilterOptionView
+                                filterOptions={filterOptions}
+                                search={search}
+                                setFilterOptions={setFilterOptions}
+                                resetSearch={() => dispatch(resetSearch())}
+                                setSearch={(value) => dispatch(setSearch({ ...value, pageNumber: 1 }))}
+                            />
                         }
-                        <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" onClick={() => History.push(`/product/0`)} />
-                        {/* <CmsMenu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} data={[
+                        selectedList={selects}
+                        openFilterOptions={Boolean(filterOptions)}
+                        pagination={entities?.pagination}
+                    />
+                }
+                toolbar={
+                    <div className="w-full flex items-center justify-between px-12">
+                        <div className="flex items-center justify-items-start">
+                            <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType)} />
+                        </div>
+                        <div className="flex items-center justify-end">
+                            {
+                                Boolean(selects?.length)
+                                &&
+                                <DropMenu
+                                    crName={`Lựa chọn`}
+                                    handleClose={(value, setAnchorEl) => {
+                                        if (value?.id === 1) {
+                                            alertInformation({
+                                                text: `Xác nhận thao tác`,
+                                                data: {},
+                                                confirm: async () => {
+                                                    try {
+                                                        const resultAction = await dispatch(product.addRecommend(
+                                                            selects.map(val => ({ sku: val, recommend: 1 }))
+                                                        ));
+                                                        unwrapResult(resultAction);
+                                                        dispatch(getProduct(search));
+                                                        setSelects([]);
+                                                    } catch (error) {
+                                                    } finally {
+                                                    }
+                                                },
+                                            });
+                                        }
+
+                                        if (value?.id === 2) {
+                                            alertInformation({
+                                                text: `Xác nhận thao tác`,
+                                                data: {},
+                                                confirm: async () => {
+                                                    try {
+                                                        const resultAction = await dispatch(product.addRecommend(
+                                                            selects.map(val => ({ sku: val, recommend: 0 }))
+                                                        ));
+                                                        unwrapResult(resultAction);
+                                                        dispatch(getProduct(search));
+                                                        setSelects([]);
+                                                    } catch (error) {
+                                                    } finally {
+                                                    }
+                                                },
+                                            });
+                                        }
+
+                                        setAnchorEl(null)
+                                    }}
+                                    pcBtn
+                                    className={`min-w-128 mr-8`}
+                                    data={
+                                        [
+                                            { id: 1, name: 'Thêm sản phẩm gợi ý' },
+                                            { id: 2, name: 'Bỏ sản phẩm gợi ý' }
+                                        ]
+                                    } />
+                            }
+                            <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" onClick={() => History.push(`/product/0`)} />
+                            {/* <CmsMenu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} data={[
                             { id: 1, name: "Xuất Excel", icon: "upgrade", tooltip: "Chỉ hỗ trợ export 5000 chương trình", onClick: () => dispatch(exportExcel({ ...search, Limit: 5000 })) },
                             { id: 2, name: "Tải Lại", icon: "cached", onClick: () => dispatch(getEditors({ Page: 1, Limit: 10 })) },
                             { id: 2, name: "Trợ Giúp", icon: "help_outline" },
                         ]} /> */}
+                        </div>
                     </div>
-                </div>
-            }
-        />
+                }
+            />
+        </>
     )
 }
 
