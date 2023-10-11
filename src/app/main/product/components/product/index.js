@@ -18,15 +18,18 @@ import { Chip, Tooltip } from "@material-ui/core";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { DropMenu } from "app/main/order/components/index";
 import SearchDialog from "./edit/SearchDialog";
+import { productMeta } from "app/main/product-meta/store";
 
 function ProductView() {
     const dispatch = useDispatch()
     const search = useSelector(store => store[keyStore].product.search)
     const loading = useSelector(store => store[keyStore].product.loading)
     const entities = useSelector(store => store[keyStore].product.entities)
+    const brands = useSelector(store => store[keyStore].product.brands)
+    const certification = useSelector(store => store[keyStore].product.certification)
     const [filterOptions, setFilterOptions] = useState(null);
     const [selects, setSelects] = useState([]);
-    const [openDialog, setOpenDialog] = useState("search");
+    const [openDialog, setOpenDialog] = useState("");
 
     useEffect(() => {
         dispatch(getProduct(search))
@@ -34,6 +37,11 @@ function ProductView() {
 
     useEffect(() => {
         dispatch(getCategory())
+        dispatch(productMeta.meta.getList({ type: 1, status: 1 }));
+        dispatch(productMeta.meta.getList({ type: 2, status: 1 }));
+        //dispatch(productMeta.meta.getList({ type: 4 }));
+        //dispatch(productMeta.meta.getList({ type: 3 }));
+        //dispatch(productMeta.meta.getList({ type: 5 }));
     }, [dispatch])
 
     const columns = [
@@ -146,7 +154,11 @@ function ProductView() {
     }));
 
     const handleFilterType = (event, value) => {
-        setFilterOptions(value)
+        if (value === 2) {
+            setOpenDialog('search');
+        } else {
+            setFilterOptions(value)
+        }
     };
 
     const handleCloseDialog = () => {
@@ -154,6 +166,8 @@ function ProductView() {
     }
 
     const handleSubmit = async (values, form) => {
+        dispatch(setSearch({ ...search, ...values }));
+        form.setSubmitting(false)
         // alertInformation({
         //     text: `Xác nhận thao tác`,
         //     data: { values, form },
@@ -186,7 +200,9 @@ function ProductView() {
                     open={openDialog === 'search'}
                     handleClose={handleCloseDialog}
                     handleSubmit={handleSubmit}
-                    title={`Tìm kiếm`}
+                    title={`Tìm kiếm sản phẩm`}
+                    search={search}
+                    options={{ brands, certification }}
                 />
             }
 

@@ -26,18 +26,18 @@ class JwtService extends FuseUtils.EventEmitter {
 						let accessToken = this.getAccessToken()
 						let refreshToken = this.getRefreshToken()
 						if (accessToken && refreshToken) {
-							console.log(accessToken);
 							this.handleRefreshToken().then(() => {
 								originalConfig.headers.Authorization = `Bearer ${this.getAccessToken()}`;
 								return axios(originalConfig);
 							}).then(res => resolve(res)).catch(error => {
 								this.setSession(null)
+								this.emit('onAutoLogout', 'Hết hạn đăng nhập!')
 								reject()
 							})
 						} else {
 							this.setSession(null)
 							this.emit('onAutoLogout', 'Đăng nhập thất bại!')
-							resolve()
+							reject()
 						}
 					} else {
 						this.emit("handleError", err);
@@ -147,7 +147,7 @@ class JwtService extends FuseUtils.EventEmitter {
 	handleRefreshToken = () => {
 		return new Promise((resolve, reject) => {
 			let token = this.getAccessToken()
-			let refreshToken = this.getRefreshToken()
+			let refreshToken = this.getRefreshToken();
 			let email = this.getUser()
 			connect.live.identity.refreshToken(token, refreshToken)
 				.then(response => {
