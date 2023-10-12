@@ -14,20 +14,20 @@ import { initColumn } from '@widgets/functions'
 //   return arrStr.split(separateChar).map(i => i.trim()).join(separateChar)
 // }
 
-export const initExcelModel = array => {
+export const initExcelModel = (array, position) => {
   array = array.map(item => item && item.trim())
   return {
-    stt: new initValidateExcel({ dataType: ValidateField.number, isNull: false, error: null, value: array[0], position: 1 }),
-    name: new initValidateExcel({ dataType: ValidateField.string, isNull: false, error: null, value: array[1], position: 2 }),
-    phone: new initValidateExcel({ dataType: ValidateField.string, isNull: false, error: null, value: array[2], position: 3 }),
-    email: new initValidateExcel({ dataType: ValidateField.email, isNull: false, error: null, value: array[3], position: 4 }),
+    //stt: new initValidateExcel({ dataType: ValidateField.number, isNull: false, error: null, value: array[0], position: 1 }),
+    name: new initValidateExcel({ dataType: ValidateField.string, isNull: false, error: null, value: array[position[0]], position: 1 }),
+    phone: new initValidateExcel({ dataType: ValidateField.string, isNull: false, error: null, value: array[position[1]], position: 2 }),
+    email: new initValidateExcel({ dataType: ValidateField.email, isNull: false, error: null, value: array[position[2]], position: 3 }),
   }
 }
 
-const cols = {
+export const cols = {
   error: { name: "", isVisible: true, hideOption: true },
-  stt: { name: "STT", isVisible: true, hideOption: false },
-  name: { name: "Tên", isVisible: true, hideOption: false },
+  //stt: { name: "STT", isVisible: true, hideOption: false },
+  name: { name: "Tên thành viên", isVisible: true, hideOption: false },
   phone: { name: "Số điện thoại", isVisible: true, hideOption: false },
   email: { name: "Email", isVisible: true, hideOption: false },
 }

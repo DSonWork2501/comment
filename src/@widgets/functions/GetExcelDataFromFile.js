@@ -25,7 +25,7 @@ export const GetExcelDataFromFile = (files, dateNFFormat = null, numberHeadRow) 
             let header = Array.isArray(data) && data.length > 0 ? data.filter((item, index) => item.filter(i => i).length > 0)[0].filter(i => i).length : 0
             /* Update state */
             let arrayLength = numberHeadRow || header;
-            resolve(data.filter(item => item[0] !== null).filter((item, index) => index !== 0).map(x => {
+            resolve(data.filter(item => item[0] !== null).map(x => {
                 let result = []
                 for (let index = 0; index < arrayLength; index++) {
                     result.push(x[index])
