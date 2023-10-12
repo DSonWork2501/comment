@@ -14,8 +14,8 @@ import withReducer from 'app/store/withReducer';
 import reducer from "../../store";
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { ValidateValue, GetExcelDataFromFile, initColumn } from '@widgets/functions';
-import { initHeaderModel, initExcelModel, initImportModel } from './dataExcel';
+import { ValidateValue, GetExcelDataFromFile } from '@widgets/functions';
+import { initHeaderModel, initExcelModel, initImportModel, cols } from './dataExcel';
 import FileProperties from '@widgets/metadatas/FileProperties';
 import { alertInformation } from '@widgets/functions/AlertInformation';
 import connect from '@connect';
@@ -23,12 +23,13 @@ import { showMessage } from 'app/store/fuse/messageSlice';
 import { Icon, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { keyStore } from '../../common';
 import { useParams } from 'react-router';
-
-const columnNeed = [
-  "Tên thành viên",
-  "Số điện thoại",
-  "Email"
-];
+console.log(Object.values(cols));
+const columnNeed = Object.values(cols).filter(val => val.name).map(val => val.name);
+//  [
+//   "Tên thành viên",
+//   "Số điện thoại",
+//   "Email"
+// ];
 
 function ImportExcel(props) {
   const dispatch = useDispatch();
@@ -44,10 +45,9 @@ function ImportExcel(props) {
   const [data, setData] = useState([]);
   const [value, setValue] = useState({});
   const [remove, setRemove] = useState([]);
-  const [sentData, setSentData] = useState([]);
   const [show, setShow] = useState(1);
   const params = useParams(), id = params.id;
-
+  console.log(cError);
   /**
    * @description index thao tác của người dùng
    */
@@ -55,10 +55,6 @@ function ImportExcel(props) {
     start: 'start',
     importExcel: 'importExcel',
     saveData: 'saveData'
-  }
-
-  const SuKien = {
-    importExcel: 4
   }
 
   /**
@@ -141,13 +137,7 @@ function ImportExcel(props) {
     // check validate total row
     let value = await GetExcelDataFromFile(file, null, null);
     setData(value);
-
-  }
-
-  const HandleRefresh = () => {
-    setDataDisplay([])
-    setOpen(true)
-    setOperatedStep(listStep.start)
+    setShow(1);
   }
 
   const saveData = async (data) => {
@@ -202,9 +192,13 @@ function ImportExcel(props) {
       return;
     }
     const remain = data.filter((val, index) => !remove.includes(index))
+
+    if (!Boolean(remain?.length)) {
+      CmsAlert.fire('', 'Không có data để import!', 'error')
+      return;
+    }
     //.map(val => val.filter((v, i) => Object.values(value).includes(i)));
     //.map((v, i) => ({ ...v, positionValue: Object.values(value).indexOf(i) }))
-    console.log(value);
     setValidatedDataArray(ValidateValue(remain.map(item => (initExcelModel(item, value)))).filter(item => Object.values(item).filter(i => i.error).length === 0))
     setValidatedData(ValidateValue(remain.map(item => (initExcelModel(item, value)))))
     let checkError = 0;
