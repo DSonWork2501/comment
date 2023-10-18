@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 import clsx from "clsx"
 import noImage from '@widgets/images/noImage.jpg';
 import { LabelInfo } from "@widgets/components/common/LabelInfo"
-import {  Link, makeStyles } from "@material-ui/core"
+import { Link, makeStyles } from "@material-ui/core"
 import FuseAnimateGroup from "@fuse/core/FuseAnimateGroup/FuseAnimateGroup"
 import { getListHS } from "app/main/product/store/productSlice"
 import ProductSearch from "app/main/product/components/product/edit/classify/rightSide/ProductSearch"
@@ -293,9 +293,9 @@ function DetailShelfProductContent({ data, index, classes, setTab, handleChooseU
 
             printWindow.onload = function () {
                 printWindow.print();
-                printWindow.onafterprint = function () {
+                setTimeout(function () {
                     printWindow.close();
-                };
+                }, 1000);
             };
         };
     }
