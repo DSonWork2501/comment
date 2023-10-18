@@ -96,9 +96,9 @@ function ListProductDialog({ data, open, handleClose, loading, handleSave }) {
 
             printWindow.onload = function () {
                 printWindow.print();
-                printWindow.onafterprint = function () {
-                    printWindow.close();
-                };
+                setTimeout(function () {
+        printWindow.close();
+    }, 1000);
             };
         };
     }
