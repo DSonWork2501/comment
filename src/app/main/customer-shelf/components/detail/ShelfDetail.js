@@ -164,7 +164,9 @@ function ShelfDetailContent({ open, handleClose, detail }) {
 
         printWindow.onload = function () {
             printWindow.print();
-            printWindow.close();
+            printWindow.onafterprint = function () {
+                printWindow.close();
+            };
         };
         //};
     }
@@ -291,7 +293,9 @@ function DetailShelfProductContent({ data, index, classes, setTab, handleChooseU
 
             printWindow.onload = function () {
                 printWindow.print();
-                printWindow.close();
+                printWindow.onafterprint = function () {
+                    printWindow.close();
+                };
             };
         };
     }
