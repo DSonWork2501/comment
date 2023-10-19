@@ -26,6 +26,8 @@ import History from '@history/@history';
 import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 import AddBillDialog from '../components/AddBillDialog';
 import { useUpdateEffect } from '@fuse/hooks';
+import Connect from '@connect';
+import PayooDialog from '../components/PayooDialog';
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -56,8 +58,8 @@ const Filter = ({ onSearch, search, namePage }) => {
         if (search) {
             for (const key in initialValues) {
                 //if (search[key] !== initialValues[key]) {
-                    let value = search[key];
-                    setFieldValue(key, value);
+                let value = search[key];
+                setFieldValue(key, value);
                 //}
             }
         }
@@ -350,6 +352,15 @@ function Meta2({ type }) {
             }
 
             {
+                <PayooDialog
+                    title='Thanh toán'
+                    detail={detail}
+                    open={openDialog === 'payoo'}
+                    handleClose={handleCloseDialog}
+                />
+            }
+
+            {
                 openDialog === 'addBill'
                 &&
                 <AddBillDialog
@@ -397,6 +408,38 @@ function Meta2({ type }) {
                                                 }
                                             },
                                         });
+
+                                    if (value?.id === 3) {
+                                        const crItem = entities.data.find(val => val.id === selects[0])
+                                            , data = {
+                                                "shopBackUrl": "",
+                                                "orderNo": crItem.id,
+                                                "orderCashAmount": crItem.moneytotal,
+                                                "startShippingDate": "",
+                                                "shippingDays": 0,
+                                                "orderDescription": "",
+                                                "notifyUrl": "",
+                                                "validityTime": "",
+                                                "customerName": crItem.cusname,
+                                                "customerPhone": "0363341099",
+                                                "customerAddress": "HCM",
+                                                "customerEmail": "t.c.manh1997@gmail.com",
+                                                "customerCity": "HCM",
+                                                "paymentExpireDate": "",
+                                            }
+                                        const body = document.body;
+                                        body.style.pointerEvents = 'none';
+                                        body.style.cursor = 'wait';
+                                        console.log(body);
+                                        Connect.live.payoo.create(data).then(val => {
+                                            setDetail({ ...crItem, url: val.data.data.paymenturl })
+                                            setOpenDialog("payoo")
+                                        }).finally(()=>{
+                                            body.style.pointerEvents = '';
+                                            body.style.cursor = '';
+                                        })
+                                    };
+
                                     setAnchorEl(null)
                                 }}
                                 className={`min-w-128`}
@@ -411,6 +454,12 @@ function Meta2({ type }) {
                                             id: 2,
                                             name: 'Tạo công nợ',
                                             show: type === '2'
+                                        },
+                                        {
+                                            id: 3,
+                                            name: 'Thanh toán payyoo',
+                                            show: true
+                                            //show: type === '2'
                                         }
                                     ].filter(val => val.show)
                                 } />

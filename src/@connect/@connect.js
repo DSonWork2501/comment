@@ -197,6 +197,10 @@ export default {
                 invite: (data) => axios.post(`${baseurl}/customer/member-invitation/${data.partnerid}`, data.value),
                 // delete: (entity, type) => axios.put(`${baseurl}/product/delete-unity?type=${type}`, entity),
             }
+        },
+        payoo: {
+            create: (data) => axios.post(`${baseurl}/payoo/create-transaction`, data),
+            getList: (params) => axios.get(`${baseurl}/payoo/transaction/${params.id}`, params),
         }
     },
 }
