@@ -140,9 +140,9 @@ const SelectDetail = ({ prefix, detail }) => {
     </>
 }
 
-const generateQRCodeBase64 = async (data) => {
+export const generateQRCodeBase64 = async (data, option = {}) => {
     try {
-        const canvas = await QRCode.toCanvas(data);
+        const canvas = await QRCode.toCanvas(data, option);
         const dataURL = canvas.toDataURL();
         const base64 = dataURL.replace(/^data:image\/(png|jpg);base64,/, '');
         return base64;
@@ -502,7 +502,7 @@ function FormEdit() {
             {openDialog === 'printQr' &&
                 <ListProductDialog
                     handleClose={() => setOpenDialog('')}
-                    data={Boolean(current.parentid) ? listWine :[{
+                    data={Boolean(current.parentid) ? listWine : [{
                         "id": current.productorders[0].id,
                         "img": current.productorders[0].image,
                         "sku": current.productorders[0].uniqueid,
