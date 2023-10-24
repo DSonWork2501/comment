@@ -4,7 +4,7 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 const defaultForm = {
-    id:0,
+    id: 0,
     name: "",
     email: "",
     phone: "",
@@ -65,12 +65,17 @@ function AddUserDialog({ type, detail, handleSubmit, handleClose, open, title = 
                 loading={formik.isSubmitting}
                 open={open}
             >
-                <CmsFormikTextField
-                    label="Tên tài khoản"
-                    name="name"
-                    size="small"
-                    className="my-8"
-                    formik={formik} />
+                {
+                    !Boolean(detail?.email)
+                    &&
+                    <CmsFormikTextField
+                        label="Tên tài khoản"
+                        name="name"
+                        size="small"
+                        className="my-8"
+                        formik={formik} />
+                }
+
                 <CmsFormikTextField
                     label="Email"
                     name="email"
@@ -83,12 +88,17 @@ function AddUserDialog({ type, detail, handleSubmit, handleClose, open, title = 
                     size="small"
                     className="my-8"
                     formik={formik} />
-                <CmsFormikTextField
-                    label="Mật khẩu"
-                    name="password"
-                    size="small"
-                    className="my-8"
-                    formik={formik} />
+                {
+                    !Boolean(detail?.email)
+                    &&
+                    <CmsFormikTextField
+                        label="Mật khẩu"
+                        name="password"
+                        size="small"
+                        className="my-8"
+                        formik={formik} />
+                }
+
             </CmsDialog>
         </React.Fragment>
     )

@@ -18,8 +18,8 @@ import AddUserDialog from "./AddUserDialog";
 
 const columns = [
     new initColumn({ field: "email", label: "Email", alignHeader: "center", alignValue: "left", sortable: false }),
-    new initColumn({ field: "password", label: "Mật Khẩu", alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "secret", label: "Secret", alignHeader: "center", alignValue: "center", sortable: false }),
+    // new initColumn({ field: "password", label: "Mật Khẩu", alignHeader: "center", alignValue: "center", sortable: false }),
+    // new initColumn({ field: "secret", label: "Secret", alignHeader: "center", alignValue: "center", sortable: false }),
     new initColumn({ field: "status", label: "Trạng Thái", alignHeader: "center", alignValue: "center", sortable: false }),
 ]
 
@@ -44,7 +44,14 @@ function ProductView() {
         status: item.status ? <Chip size="small" label={'Hoạt động'} color="primary" /> : <Chip size="small" label={'Đã ngừng'} color="default" />,
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
-                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" />
+                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => {
+                    setOpenDialog('user');
+                    setDetail(item);
+                }} />
+                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => {
+                    setOpenDialog('user');
+                    setDetail(item);
+                }} />
             </div>
         ) || []
     })), [entities])
