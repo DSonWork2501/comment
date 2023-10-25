@@ -4,13 +4,10 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 
 const defaultForm = {
-    id: 0,
-    name: "",
     email: "",
-    phone: "",
-    password: "",
-    type: 0,
-    secret:""
+    newPassword: "",
+    oldPassword: "",
+    otp: "",
 }
 
 const fillDefaultForm = (def, detail, setId = true) => {
@@ -28,7 +25,7 @@ const fillDefaultForm = (def, detail, setId = true) => {
     return newDef;
 }
 
-function AddUserDialog({ type, detail, handleSubmit, handleClose, open, title = 'Thêm thuộc tính' }) {
+function ChangePasswordDialog({ type, detail, handleSubmit, handleClose, open, title = 'Thêm thuộc tính' }) {
 
     const handleSave = (values) => {
         const value = { ...values };
@@ -42,19 +39,8 @@ function AddUserDialog({ type, detail, handleSubmit, handleClose, open, title = 
         enableReinitialize: true,
         onSubmit: handleSave,
         validationSchema: Yup.object({
-            name: Yup.string().nullable().when('secret', {
-                is: (value) => !Boolean(value),
-                then: Yup.string().required("Vui lòng nhập tên")
-            }),
-            //name: Yup.string().required("Vui lòng nhập tên"),
             email: Yup.string().required("Vui lòng nhập email"),
-            phone: Yup.string().required("Vui lòng SĐT").typeError("Vui lòng SĐT"),
-
-            password: Yup.string().nullable().when('secret', {
-                is: (value) => !Boolean(value),
-                then: Yup.string().required("Vui lòng nhập mật khẩu")
-            }),
-            //password: Yup.string().required("Vui lòng nhập mật khẩu"),
+            newPassword: Yup.string().required("Vui lòng nhập mật khẩu"),
         })
     })
 
@@ -75,17 +61,6 @@ function AddUserDialog({ type, detail, handleSubmit, handleClose, open, title = 
                 loading={formik.isSubmitting}
                 open={open}
             >
-                {
-                    !Boolean(detail?.email)
-                    &&
-                    <CmsFormikTextField
-                        label="Tên tài khoản"
-                        name="name"
-                        size="small"
-                        className="my-8"
-                        formik={formik} />
-                }
-
                 <CmsFormikTextField
                     label="Email"
                     name="email"
@@ -93,25 +68,26 @@ function AddUserDialog({ type, detail, handleSubmit, handleClose, open, title = 
                     className="my-8"
                     formik={formik} />
                 <CmsFormikTextField
-                    label="Số điện thoại"
-                    name="phone"
+                    label="Mật khẩu cũ"
+                    name="oldPassword"
                     size="small"
                     className="my-8"
                     formik={formik} />
-                {
-                    !Boolean(detail?.email)
-                    &&
-                    <CmsFormikTextField
-                        label="Mật khẩu"
-                        name="password"
-                        size="small"
-                        className="my-8"
-                        formik={formik} />
-                }
-
+                <CmsFormikTextField
+                    label="Mật khẩu mới"
+                    name="newPassword"
+                    size="small"
+                    className="my-8"
+                    formik={formik} />
+                <CmsFormikTextField
+                    label="Otp"
+                    name="otp"
+                    size="small"
+                    className="my-8"
+                    formik={formik} />
             </CmsDialog>
         </React.Fragment>
     )
 }
 
-export default React.memo(AddUserDialog);
+export default React.memo(ChangePasswordDialog);

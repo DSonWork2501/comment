@@ -7,6 +7,11 @@ import Formsy from 'formsy-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { submitLogin } from 'app/auth/store/loginSlice';
+import { Link } from '@material-ui/core';
+import ResetPasswordDialog from 'app/main/customer/components/account/ResetPasswordDialog';
+import { alertInformation } from '@widgets/functions';
+import Connect from '@connect';
+import { showMessage } from 'app/store/fuse/messageSlice';
 
 function JwtLdapLoginTab(props) {
 	const dispatch = useDispatch();
@@ -14,6 +19,7 @@ function JwtLdapLoginTab(props) {
 
 	const [isFormValid, setIsFormValid] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
+	const [openDialog, setOpenDialog] = useState('');
 
 	const formRef = useRef(null);
 
@@ -38,8 +44,42 @@ function JwtLdapLoginTab(props) {
 		dispatch(submitLogin(model));
 	}
 
+	const handleCloseDialog = () => {
+		setOpenDialog('')
+	}
+
 	return (
 		<div className="w-full">
+			{
+				openDialog === "password"
+				&&
+				<ResetPasswordDialog
+					open={openDialog === 'password'}
+					handleClose={handleCloseDialog}
+					handleSubmit={async (values, form) => {
+						alertInformation({
+							text: `Xác nhận thao tác`,
+							data: { values, form },
+							confirm: async () => {
+								try {
+									await Connect.live.identity.confirmForgotPass(values);
+									await Connect.live.identity.updateForgotPass(values);
+									setTimeout(() => {
+										dispatch(showMessage({ variant: "success", message: 'Thành công' }))
+									}, 100);
+									setOpenDialog('');
+								} catch (error) {
+								} finally {
+									form.setSubmitting(false)
+								}
+							},
+							close: () => form.setSubmitting(false)
+						});
+					}}
+					title={`Quên mật khẩu`}
+				/>
+			}
+
 			<Formsy
 				onValidSubmit={handleSubmit}
 				onValid={enableButton}
@@ -90,7 +130,7 @@ function JwtLdapLoginTab(props) {
 						)
 					}}
 					variant="outlined"
-					// required
+				// required
 				/>
 
 				<TextFieldFormsy
@@ -120,6 +160,11 @@ function JwtLdapLoginTab(props) {
 				>
 					Login
 				</Button>
+				<div className='text-right text-13 mt-4'>
+					<Link className='cursor-pointer' onClick={() => setOpenDialog('password')}>
+						Quên mật khẩu?
+					</Link>
+				</div>
 			</Formsy>
 		</div>
 	);
