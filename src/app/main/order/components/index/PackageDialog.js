@@ -291,9 +291,9 @@ function DetailShelfProductContent({ data, index, classes, setTab, handleChooseU
 
             printWindow.onload = function () {
                 printWindow.print();
-                printWindow.onafterprint = function () {
+                setTimeout(function () {
                     printWindow.close();
-                };
+                }, 1000);
             };
         };
     }

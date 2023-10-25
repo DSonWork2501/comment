@@ -25,6 +25,7 @@ const Delivery = React.lazy(() => import('./main/delivery'));
 const EmployDelivery = React.lazy(() => import('./main/delivery/EmployDelivery'));
 const EmployCollection = React.lazy(() => import('./main/collection/EmployCollection'));
 const Collection = React.lazy(() => import('./main/collection'));
+const Payyoo = React.lazy(() => import('./main/payoo'));
 
 const jss = create({
 	...jssPreset(),
@@ -37,8 +38,8 @@ const generateClassName = createGenerateClassName();
 const App = () => {
 	fetchToken();
 	onMessageListener().then(payload => {
-		 console.log(payload);
-	}).catch(err =>  console.log(err))
+		console.log(payload);
+	}).catch(err => console.log(err))
 	return (
 		<>
 			<AppContext.Provider
@@ -68,6 +69,11 @@ const App = () => {
 								<Route path="/employ-delivery/:type/:session">
 									<Suspense fallback={null}>
 										<EmployDelivery />
+									</Suspense>
+								</Route>
+								<Route path="/payoo/transaction/:code">
+									<Suspense fallback={null}>
+										<Payyoo />
 									</Suspense>
 								</Route>
 								<Route path="/*">

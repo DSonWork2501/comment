@@ -23,7 +23,7 @@ function CmsFormikTextField(props) {
         <CmsTextField
             {...otherProps}
             name={name}
-            value={props?.isNumber ? (value ? JSON.stringify(parseInt(value)) : 0) : (value || "")}
+            value={props?.isNumber ? (value ? JSON.stringify(parseInt(value)) : 0) : (value === 0 ? 0 : (value || ""))}
             onChange={(event) => {
                 setValue((trimLeft && event.target.value) ? event.target.value.trimLeft() : event.target.value);
                 onChange && onChange(event, name);

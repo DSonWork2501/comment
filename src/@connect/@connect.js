@@ -21,6 +21,9 @@ export default {
              * @description refreshToken
              */
             refreshToken: (token, refreshToken) => axios.post(`${baseurl}/identity/refresh-login`, { token, refreshToken }),
+            forgotPass: (data) => axios.post(`${baseurl}/customer/forgot-password`, { data }),
+            confirmForgotPass: (data) => axios.post(`${baseurl}/customer/confirm-forgot-password`, { data }),
+            updateForgotPass: (data) => axios.post(`${baseurl}/customer/update-forgot-password`, { data }),
         },
         product: {
             /**
@@ -197,6 +200,10 @@ export default {
                 invite: (data) => axios.post(`${baseurl}/customer/member-invitation/${data.partnerid}`, data.value),
                 // delete: (entity, type) => axios.put(`${baseurl}/product/delete-unity?type=${type}`, entity),
             }
+        },
+        payoo: {
+            create: (data) => axios.post(`${baseurl}/payoo/create-transaction`, data),
+            getList: (params) => axios.get(`${baseurl}/payoo/transaction/${params.id}`, params),
         }
     },
 }

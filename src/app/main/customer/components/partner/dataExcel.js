@@ -24,7 +24,7 @@ export const initExcelModel = (array, position) => {
   }
 }
 
-const cols = {
+export const cols = {
   error: { name: "", isVisible: true, hideOption: true },
   //stt: { name: "STT", isVisible: true, hideOption: false },
   name: { name: "Tên thành viên", isVisible: true, hideOption: false },

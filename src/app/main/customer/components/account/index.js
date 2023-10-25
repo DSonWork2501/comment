@@ -1,8 +1,8 @@
+import React from 'react';
 import { CmsButton, CmsButtonGroup, CmsCardedPage, CmsIconButton, CmsTableBasic } from "@widgets/components";
-import { initColumn } from "@widgets/functions";
+import { alertInformation, initColumn } from "@widgets/functions";
 import { FilterOptions } from "@widgets/metadatas";
 import withReducer from "app/store/withReducer";
-import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useMemo } from "react";
@@ -11,13 +11,16 @@ import { keyStore } from "../../common";
 import FilterOptionView from "./filterOptionView";
 import reducer from "../../store";
 import { getList as getAccount, resetSearch, setSearch } from "../../store/accountSlice";
+import { Chip } from "@material-ui/core";
+import { insertUser, updateUser } from "../../store/customerSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+import AddUserDialog from "./AddUserDialog";
 
 const columns = [
-    new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
-    new initColumn({ field: "email", label: "Email", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "password", label: "Mật Khẩu", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "secret", label: "Secret", alignHeader: "left", alignValue: "left", sortable: false }),
-    new initColumn({ field: "status", label: "Trạng Thái", alignHeader: "left", alignValue: "left", sortable: false }),
+    new initColumn({ field: "email", label: "Email", alignHeader: "center", alignValue: "left", sortable: false }),
+    // new initColumn({ field: "password", label: "Mật Khẩu", alignHeader: "center", alignValue: "center", sortable: false }),
+    // new initColumn({ field: "secret", label: "Secret", alignHeader: "center", alignValue: "center", sortable: false }),
+    new initColumn({ field: "status", label: "Trạng Thái", alignHeader: "center", alignValue: "center", sortable: false }),
 ]
 
 function ProductView() {
@@ -26,6 +29,8 @@ function ProductView() {
     const loading = useSelector(store => store[keyStore].account.loading)
     const entities = useSelector(store => store[keyStore].account.entities)
     const [filterOptions, setFilterOptions] = useState(null);
+    const [openDialog, setOpenDialog] = useState("");
+    const [detail, setDetail] = useState(null);
 
     useEffect(() => {
         dispatch(getAccount(search))
@@ -36,10 +41,17 @@ function ProductView() {
         email: item.email,
         password: item.password,
         secret: item.secret,
-        status: item.status,
+        status: item.status ? <Chip size="small" label={'Hoạt động'} color="primary" /> : <Chip size="small" label={'Đã ngừng'} color="default" />,
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
-                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" />
+                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => {
+                    setOpenDialog('user');
+                    setDetail(item);
+                }} />
+                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => {
+                    setOpenDialog('user');
+                    setDetail(item);
+                }} />
             </div>
         ) || []
     })), [entities])
@@ -48,55 +60,96 @@ function ProductView() {
         setFilterOptions(value)
     };
 
-    // console.log('filterOptions', filterOptions)
+    const handleCloseDialog = () => {
+        setOpenDialog("");
+        setDetail(null);
+    }
+
+    const handleSubmit = async (values, form) => {
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data: { values, form },
+            confirm: async () => {
+                try {
+                    const resultAction = values?.id
+                        ? await dispatch(updateUser(values))
+                        : await dispatch(insertUser(values))
+                    unwrapResult(resultAction);
+                    if (!values?.id) {
+                        form.resetForm();
+                    }
+                    setOpenDialog('');
+                    dispatch(getAccount(search))
+                } catch (error) {
+                } finally {
+                    form.setSubmitting(false)
+                }
+            },
+            close: () => form.setSubmitting(false)
+        });
+    }
 
     return (
-        <CmsCardedPage
-            title={'Danh sách sản phẩm'}
-            subTitle={'Quản lý thông tin sản phẩm'}
-            icon="whatshot"
-            // leftBottomHeader={leftBottomHeader}
-            rightHeaderButton={
-                <div>
-
-                </div>
-            }
-            content={
-                <CmsTableBasic
-                    className="w-full h-full"
-                    isServerSide={true}
-                    data={data}
-                    search={search}
-                    columns={columns}
-                    loading={loading}
-                    filterOptions={
-                        <FilterOptionView
-                            filterOptions={filterOptions}
-                            search={search}
-                            setFilterOptions={setFilterOptions}
-                            resetSearch={() => dispatch(resetSearch())}
-                            setSearch={(value) => dispatch(setSearch(value))}
-                        />
-                    }
-                    openFilterOptions={Boolean(filterOptions)}
+        <>
+            {
+                openDialog === 'user'
+                &&
+                <AddUserDialog
+                    open={openDialog === 'user'}
+                    handleClose={handleCloseDialog}
+                    handleSubmit={handleSubmit}
+                    detail={detail}
+                    title={`${detail ? 'Chỉnh sửa tài khoản' : 'Thêm mới tài khoản'}`}
                 />
             }
-            toolbar={
-                <div className="w-full flex items-center justify-between px-12">
-                    <div className="flex items-center justify-items-start">
-                    <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType).filter(x=>x.id === FilterOptions.FilterType.basic.id)} />
+            <CmsCardedPage
+                title={'Quản lý tài khoản'}
+                icon="whatshot"
+                // leftBottomHeader={leftBottomHeader}
+                rightHeaderButton={
+                    <div>
+
                     </div>
-                    <div className="flex items-center justify-end">
-                        <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" />
-                        {/* <CmsMenu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} data={[
+                }
+                content={
+                    <CmsTableBasic
+                        className="w-full h-full"
+                        isServerSide={true}
+                        data={data}
+                        search={search}
+                        columns={columns}
+                        loading={loading}
+                        setSearch={(value) => dispatch(setSearch(value))}
+                        isPagination={false}
+                        filterOptions={
+                            <FilterOptionView
+                                filterOptions={filterOptions}
+                                search={search}
+                                setFilterOptions={setFilterOptions}
+                                resetSearch={() => dispatch(resetSearch())}
+                                setSearch={(value) => dispatch(setSearch({ ...value, pageNumber: 1 }))}
+                            />
+                        }
+                        openFilterOptions={Boolean(filterOptions)}
+                    />
+                }
+                toolbar={
+                    <div className="w-full flex items-center justify-between px-12">
+                        <div className="flex items-center justify-items-start">
+                            <CmsButtonGroup size="small" value={filterOptions} onChange={handleFilterType} data={Object.values(FilterOptions.FilterType).filter(x => x.id === FilterOptions.FilterType.basic.id)} />
+                        </div>
+                        <div className="flex items-center justify-end">
+                            <CmsButton className="bg-orange-700 text-white hover:bg-orange-900" label="Thêm mới" startIcon="add" onClick={() => setOpenDialog('user')} />
+                            {/* <CmsMenu anchorEl={anchorEl} onClose={() => setAnchorEl(null)} data={[
                             { id: 1, name: "Xuất Excel", icon: "upgrade", tooltip: "Chỉ hỗ trợ export 5000 chương trình", onClick: () => dispatch(exportExcel({ ...search, Limit: 5000 })) },
                             { id: 2, name: "Tải Lại", icon: "cached", onClick: () => dispatch(getEditors({ Page: 1, Limit: 10 })) },
                             { id: 2, name: "Trợ Giúp", icon: "help_outline" },
                         ]} /> */}
+                        </div>
                     </div>
-                </div>
-            }
-        />
+                }
+            />
+        </>
     )
 }
 
