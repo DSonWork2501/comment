@@ -15,11 +15,15 @@ import { Chip } from "@material-ui/core";
 import { insertUser, updateUser } from "../../store/customerSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import AddUserDialog from "./AddUserDialog";
+import Connect from '@connect';
+import ResetPasswordDialog from './ResetPasswordDialog';
+import { showMessage } from 'app/store/fuse/messageSlice';
+import ChangePasswordDialog from './ChangePasswordDialog';
 
 const columns = [
     new initColumn({ field: "email", label: "Email", alignHeader: "center", alignValue: "left", sortable: false }),
-    new initColumn({ field: "password", label: "Mật Khẩu", alignHeader: "center", alignValue: "center", sortable: false }),
-    new initColumn({ field: "secret", label: "Secret", alignHeader: "center", alignValue: "center", sortable: false }),
+    // new initColumn({ field: "password", label: "Mật Khẩu", alignHeader: "center", alignValue: "center", sortable: false }),
+    // new initColumn({ field: "secret", label: "Secret", alignHeader: "center", alignValue: "center", sortable: false }),
     new initColumn({ field: "status", label: "Trạng Thái", alignHeader: "center", alignValue: "center", sortable: false }),
 ]
 
@@ -28,6 +32,8 @@ function ProductView() {
     const search = useSelector(store => store[keyStore].account.search)
     const loading = useSelector(store => store[keyStore].account.loading)
     const entities = useSelector(store => store[keyStore].account.entities)
+    const user = useSelector(store => store.auth.user.user)
+
     const [filterOptions, setFilterOptions] = useState(null);
     const [openDialog, setOpenDialog] = useState("");
     const [detail, setDetail] = useState(null);
@@ -44,10 +50,33 @@ function ProductView() {
         status: item.status ? <Chip size="small" label={'Hoạt động'} color="primary" /> : <Chip size="small" label={'Đã ngừng'} color="default" />,
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
-                <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" />
+                {/* <CmsIconButton icon="edit" className="bg-green-500 hover:bg-green-700 hover:shadow-2 text-white" onClick={() => {
+                    setOpenDialog('user');
+                    setDetail(item);
+                }} /> */}
+                <CmsIconButton
+                    icon="vpn_key"
+                    tooltip={'Quên mật khẩu'}
+                    className="bg-blue-500 hover:bg-blue-700 hover:shadow-2 text-white" onClick={(e) => {
+                        setOpenDialog('password');
+                        setDetail({ ...item });
+                    }} />
+
+                {
+                    user === item?.email
+                    &&
+                    <CmsIconButton
+                        icon="vpn_key"
+                        tooltip={'Đổi mật khẩu'}
+                        className="bg-orange-500 hover:bg-orange-700 hover:shadow-2 text-white" onClick={(e) => {
+                            setOpenDialog('changePassword');
+                            setDetail({ ...item });
+                        }} />
+                }
+
             </div>
         ) || []
-    })), [entities])
+    })), [entities, user])
 
     const handleFilterType = (event, value) => {
         setFilterOptions(value)
@@ -64,11 +93,11 @@ function ProductView() {
             data: { values, form },
             confirm: async () => {
                 try {
-                    const resultAction = values?.id
+                    const resultAction = values?.secret
                         ? await dispatch(updateUser(values))
                         : await dispatch(insertUser(values))
                     unwrapResult(resultAction);
-                    if (!values?.id) {
+                    if (!values?.secret) {
                         form.resetForm();
                     }
                     setOpenDialog('');
@@ -95,6 +124,70 @@ function ProductView() {
                     title={`${detail ? 'Chỉnh sửa tài khoản' : 'Thêm mới tài khoản'}`}
                 />
             }
+
+            {
+                openDialog === "password"
+                &&
+                <ResetPasswordDialog
+                    open={openDialog === 'password'}
+                    handleClose={handleCloseDialog}
+                    handleSubmit={async (values, form) => {
+                        alertInformation({
+                            text: `Xác nhận thao tác`,
+                            data: { values, form },
+                            confirm: async () => {
+                                try {
+                                    await Connect.live.identity.confirmForgotPass(values);
+                                    await Connect.live.identity.updateForgotPass(values);
+                                    setTimeout(() => {
+                                        dispatch(showMessage({ variant: "success", message: 'Thành công' }))
+                                    }, 100);
+                                    setOpenDialog('');
+                                    dispatch(getAccount(search))
+                                } catch (error) {
+                                } finally {
+                                    form.setSubmitting(false)
+                                }
+                            },
+                            close: () => form.setSubmitting(false)
+                        });
+                    }}
+                    detail={detail}
+                    title={`Quên mật khẩu`}
+                />
+            }
+
+            {
+                openDialog === "changePassword"
+                &&
+                <ChangePasswordDialog
+                    open={openDialog === 'changePassword'}
+                    handleClose={handleCloseDialog}
+                    handleSubmit={async (values, form) => {
+                        alertInformation({
+                            text: `Xác nhận thao tác`,
+                            data: { values, form },
+                            confirm: async () => {
+                                try {
+                                    await Connect.live.identity.changePass(values);
+                                    setTimeout(() => {
+                                        dispatch(showMessage({ variant: "success", message: 'Thành công' }))
+                                    }, 100);
+                                    setOpenDialog('');
+                                    dispatch(getAccount(search))
+                                } catch (error) {
+                                } finally {
+                                    form.setSubmitting(false)
+                                }
+                            },
+                            close: () => form.setSubmitting(false)
+                        });
+                    }}
+                    detail={detail}
+                    title={`Đổi mật khẩu`}
+                />
+            }
+
             <CmsCardedPage
                 title={'Quản lý tài khoản'}
                 icon="whatshot"

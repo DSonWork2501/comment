@@ -36,8 +36,8 @@ const InfoProductDetail = React.memo(({ data, index, handleViewList, handleCheck
             printWindow.onload = function () {
                 printWindow.print();
                 setTimeout(function () {
-        printWindow.close();
-    }, 1000);
+                    printWindow.close();
+                }, 1000);
             };
         };
     }
