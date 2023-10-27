@@ -63,6 +63,13 @@ const form = [
         width: 50,
         height: 30
     },
+    {
+        id: 8,
+        name: 'Mẫu giấy cuộn 2 nhãn - Khổ 70x18mm',
+        wCount: 2,
+        width: 70,
+        height: 18
+    },
 ]
 
 function PrintDialog({ detail, options, handleClose, handleSubmit, open, title = 'Thêm thuộc tính' }) {
@@ -85,7 +92,7 @@ function PrintDialog({ detail, options, handleClose, handleSubmit, open, title =
         })
     })
 
-    const {  values } = formik, { type, left, top, isCode, isSku, isName } = values;
+    const { values } = formik, { type, left, top, isCode, isSku, isName } = values;
 
     const handleDownloadAll = async ({ data }) => {
         const valueType = form.find(val => val.id === type);
@@ -94,17 +101,24 @@ function PrintDialog({ detail, options, handleClose, handleSubmit, open, title =
             const item = data[index];
             const src = await generateQRCodeBase64(item.qrcodenonhash, { margin: 0 })
             if (item.qrcodenonhash) {
-                listQR = listQR + `<div>
+                listQR = listQR + `
+                    <div class="wrap">
                         <img src="data:image/png;base64,${src}" alt="QR Code">
-                        ${isCode === 1
-                        ? `<span style="position: relative;top: 4px;">${item.qrcodenonhash}</span> <br>`
-                        : ''}
-                        ${isSku === 1
-                        ? `<span style="position: relative;top: 4px;">${item.sku}</span>  <br>`
-                        : ''}
-                        ${isName === 1
-                        ? `<span style="position: relative;top: 4px;">${item.name}</span>  <br>`
-                        : ''}
+                        ${Boolean(isCode + isSku + isName > 0)
+                        ?
+                        `<div style="width:calc(100% - 50px);padding:0 2.5px;text-align:left">
+                            ${isCode === 1
+                            ? `<div style="margin-top:4px">${item.qrcodenonhash}</div>`
+                            : ''}
+                                            ${isSku === 1
+                            ? `<div style="margin-top:4px">${item.sku}</div> `
+                            : ''}
+                                            ${isName === 1
+                            ? `<div style="margin-top:4px">${item.name}</div> `
+                            : ''}
+                            </div>`
+                        : ''
+                    }
                     </div>`;
             }
         }
@@ -129,19 +143,21 @@ function PrintDialog({ detail, options, handleClose, handleSubmit, open, title =
                 font-size: 8px;
                 font-weight: 600;
             }
-            div {
+            .wrap {
                 width: ${100 / valueType?.wCount}%;
                 text-align:center;
-                height:100%;
-                page-break-after: always;
                 margin-top: ${top}mm;
                 margin-left: ${left}mm;
                 over-follow:hidden;
+                display:flex;
+                justify-content:center;
+                page-break-after: always;
             }
             img {
-                width: 40px; /* Set the image width to 100% */
-                height: 40px;
+                width: 48px; /* Set the image width to 100% */
+                height: 48px;
                 margin: auto;
+                margin-left:2px;
                 display: block; /* This helps remove any extra space below the image */
             }
             @media print {
@@ -200,18 +216,21 @@ function PrintDialog({ detail, options, handleClose, handleSubmit, open, title =
                         font-size: 8px;
                         font-weight: 600;
                     }
-                    div {
+                    .wrap {
                         width: ${100 / valueType?.wCount}%;
                         text-align:center;
                         margin-top: ${top}mm;
                         margin-left: ${left}mm;
                         over-follow:hidden;
+                        display:flex;
+                        justify-content:center;
                     }
                     img {
-                        width: 40px; /* Set the image width to 100% */
-                        height: 40px;
+                        width: 48px; /* Set the image width to 100% */
+                        height: 48px;
                         margin: auto;
                         display: block; /* This helps remove any extra space below the image */
+                        margin-left:2px;
                     }
                     @media print {
                         /* Clear default header and footer */
@@ -223,17 +242,23 @@ function PrintDialog({ detail, options, handleClose, handleSubmit, open, title =
                 </style>
                 </head>
                 <body>
-                    <div>
+                    <div class="wrap">
                         <img src="${qrImage.src}" alt="QR Code">
-                        ${isCode === 1
-                    ? `<span style="position: relative;top: 4px;">${qrcodenonhash}</span> <br>`
-                    : ''}
-                            ${isSku === 1
-                    ? `<span style="position: relative;top: 4px;">${sku}</span>  <br>`
-                    : ''}
-                            ${isName === 1
-                    ? `<span style="position: relative;top: 4px;">${name}</span>  <br>`
-                    : ''}
+                        ${Boolean(isCode + isSku + isName > 0)
+                    ?
+                    `<div style="width:calc(100% - 50px);padding:0 2.5px;text-align:left">
+                            ${isCode === 1
+                        ? `<div style="margin-top:4px">${qrcodenonhash}</div>`
+                        : ''}
+                                            ${isSku === 1
+                        ? `<div style="margin-top:4px">${sku}</div> `
+                        : ''}
+                                            ${isName === 1
+                        ? `<div style="margin-top:4px">${name}</div> `
+                        : ''}
+                            </div>`
+                    : ''
+                }
                     </div>
                 </body>
             </html>`);
