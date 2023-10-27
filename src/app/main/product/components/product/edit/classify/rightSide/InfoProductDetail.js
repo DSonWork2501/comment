@@ -9,6 +9,7 @@ const InfoProductDetail = React.memo(({ data, index, handleViewList, handleCheck
     const { uniqueid, sku, img, name, ispacked, qrcode } = data || {}
     const image = img ? `${baseurl}${img}` : noImage
 
+    
     const handleDownload = ({ qrcode, name, uniqueid }) => {
         // var a = document.createElement("a"); //Create <a>
         // a.href = `data:image/png;base64, ${qrcode}`; //Image Base64 Goes here
