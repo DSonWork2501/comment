@@ -10,16 +10,18 @@ import { get } from "lodash"
 import clsx from "clsx"
 import FuseAnimate from "@fuse/core/FuseAnimate"
 import * as Yup from 'yup'
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { keyStore } from "app/main/product/common"
 import { useMemo } from "react"
 import { Button } from "@material-ui/core"
+import { showMessage } from "app/store/fuse/messageSlice"
 
 
 function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalIndex, view }) {
     const [prefix, setPrefix] = useState('[0]')
     const [stackIndex, setStackIndex] = useState(0)
     const [slotIndex, setSlotIndex] = useState('')
+    const dispatch = useDispatch();
     const currentShelf = useSelector(store => store[keyStore]?.product?.entity?.data || store?.orders?.product?.searchDetailOrderEntities)
     const listTemp = useMemo(() => {
         if (currentShelf && currentShelf?.detail?.length) {
@@ -84,6 +86,34 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
     }
 
     const handleCloseModal = () => {
+        console.log(formik_shelf.values);
+        if (formik_shelf?.values?.length) {
+            let check = true;
+            for (let index = 0; index < formik_shelf.values.length; index++) {
+                const element = formik_shelf.values[index];
+                if (!Boolean(element.capacity)) {
+                    check = false;
+                    break;
+                }
+                if (element?.slots?.length)
+                    for (let i = 0; i < element.slots.length; i++) {
+                        const e = element.slots[i];
+                        if (!Boolean(e.capacity)) {
+                            check = false;
+                            break;
+                        }
+                    }
+            }
+
+            if (!check) {
+                setTimeout(() => {
+                    dispatch(showMessage({ variant: "error", message: 'Lỗi tủ cần nhập sức chứa' }))
+                }, 0);
+                return
+            }
+
+        }
+
         handleClose(formik_shelf.values)
     }
     return (
@@ -219,6 +249,8 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
             handleClose={handleCloseModal}
             handleSave={handleSave}
             isCloseDialogSubmit={false}
+            disableEscapeKeyDown
+            disableBackdropClick
             open={open}
             size="xl"
         >

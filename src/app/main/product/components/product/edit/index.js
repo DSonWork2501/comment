@@ -20,6 +20,7 @@ import { HomeSubscription } from "app/main/product/model/product/homeSubscriptio
 import { getOrigin } from "@widgets/store/filtersSlice"
 import { productMeta } from "app/main/product-meta/store"
 import CateInfo from "./CateInfo"
+import { showMessage } from "app/store/fuse/messageSlice"
 
 const TabType = {
     co_ban: { id: '1', name: 'Thông tin cơ bản' },
@@ -70,6 +71,27 @@ function EditProduct(props) {
         if (value?.certification && Array.isArray(value?.certification))
             value.certification = value.certification.join(',');
 
+        if (values?.detail?.length && values?.ishs === 1) {
+            let check = true;
+            for (let index = 0; index < values.detail.length; index++) {
+                const element = values.detail[index];
+
+                if (!Boolean(element.capacity)) {
+                    check = false;
+                    break;
+                }
+            }
+
+            if (!check) {
+                setTimeout(() => {
+                    dispatch(showMessage({ variant: "error", message: 'Lỗi tủ cần nhập sức chứa' }))
+                }, 0);
+                formik.setSubmitting(false)
+                return
+            }
+
+        }
+
         alertInformation({
             text: 'Bạn có muốn lưu thao tác',
             data: value,
@@ -107,7 +129,7 @@ function EditProduct(props) {
                 formik.setSubmitting(false)
 
             },
-            close:()=>{
+            close: () => {
                 formik.setSubmitting(false)
             }
         })

@@ -108,7 +108,7 @@ function ResetPasswordDialog({ type, detail, handleSubmit, handleClose, open, ti
                                 setBtnLoading(false);
                             })
                         }}>
-                            Gửi Opt đến email
+                            Gửi Otp đến email
                         </Link>
                     </div>
                 }
