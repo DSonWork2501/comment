@@ -17,7 +17,7 @@ import { getList as getCustomers } from "app/main/customer/store/customerSlice";
 import { Link } from "react-router-dom/cjs/react-router-dom";
 import AddManyCusDialog from "./AddManyCusDialog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCodeBranch, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 
 const columns = [
     new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
@@ -117,6 +117,16 @@ function ProductView() {
                     className="bg-orange-500 text-white shadow-3  hover:bg-orange-900"
                     onClick={() => {
                         setDetail({ ...item, isEdit: 2, customercity: item.province, customerdistrict: item.district, customerward: item.ward, customeraddress: item.address });
+                        setOpenDialog('add');
+                    }}
+                />
+                <CmsIconButton
+                    tooltip="Thêm mới chi nhánh"
+                    delay={50}
+                    icon={<FontAwesomeIcon icon={faCodeBranch} fontSize={22} className="mb-4" />}
+                    className="bg-orange-500 text-white shadow-3  hover:bg-orange-900"
+                    onClick={() => {
+                        setDetail({ ...item, isEdit: 2, isAddMore: 1, customercity: null, customerdistrict: null, customerward: null, customeraddress: '', recipient: '', recipientphone: '' });
                         setOpenDialog('add');
                     }}
                 />

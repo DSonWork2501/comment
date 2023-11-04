@@ -90,7 +90,7 @@ function AddDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc t
             value.ward = value.customerward;
 
         if (formik)
-            onSave({ ...value, isEdit: detail?.isEdit }, formik);
+            onSave({ ...value, isEdit: detail?.isEdit, isAddMore: detail?.isAddMore }, formik);
     }
 
     const formik = useFormik({

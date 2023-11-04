@@ -205,7 +205,8 @@ function FormEdit() {
                     currentIndex: `[${parent}].slots[${child}]`,
                     ispacked: e?.item?.ispacked,
                     qrcode: e?.item?.qrcode,
-                    qrcodenonhash: e?.item?.qrcodenonhash
+                    qrcodenonhash: e?.item?.qrcodenonhash,
+                    barcode: e?.item?.barcode
                 })
             });
         });
@@ -429,8 +430,14 @@ function FormEdit() {
 
     }, [step, openDialog])
 
-    const updateNumber = (num, key, name) => {
+    const updateNumber = (num, key_, name) => {
         setNumberReceive(prev => {
+            let key = key_,
+                sku = listWine.find(val => val.barcode === key)?.sku;
+
+            if (sku)
+                key = sku;
+
             if (!Boolean(uniqueList[key])) {
                 CmsAlert.fire({ heightAuto: false, text: 'Sản phẩm không tồn tại trong giỏ hàng !', icon: 'warning' })
                 playMusicW();
@@ -785,7 +792,7 @@ function FormEdit() {
                                                         if (e.key === 'Enter') {
                                                             setFieldValue('barcode', e.target.value)
 
-                                                            const value = e.target.value, pre = listWine.find(val => val.qrcodenonhash === qrCode)?.sku,
+                                                            const value = e.target.value, pre = listWine.find(val => val.qrcodenonhash === qrCode)?.barcode,
                                                                 crIndex = listWine.find(val => val.qrcodenonhash === qrCode)?.currentIndex;
                                                             if (value !== pre) {
                                                                 setPrefix('noProduct');
