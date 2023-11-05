@@ -236,6 +236,7 @@ function ProductView() {
                     <CmsTableBasic
                         className="w-full h-full"
                         isServerSide={true}
+                        isPagination={false}
                         data={data}
                         search={search}
                         columns={columns}
