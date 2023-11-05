@@ -42,6 +42,7 @@ const BoxCustom = styled(Box)({
 const initialValues = {
     "id": 0,
     "email": "",
+    recipientemail: "",
     "name": "",
     "phone": "",
     "img": "",
@@ -55,7 +56,8 @@ const initialValues = {
     customercity: 0,
     customerdistrict: 0,
     customerward: 0,
-    customeraddress: ""
+    customeraddress: "",
+    default: 0,
 }
 
 const fillDefaultForm = (def, detail, setId = true) => {
@@ -90,7 +92,7 @@ function AddDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc t
             value.ward = value.customerward;
 
         if (formik)
-            onSave({ ...value, isEdit: detail?.isEdit }, formik);
+            onSave({ ...value, isEdit: detail?.isEdit, isAddMore: detail?.isAddMore }, formik);
     }
 
     const formik = useFormik({
@@ -157,7 +159,7 @@ function AddDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc t
                     (!detail || detail?.isEdit === 2)
                     &&
                     <>
-                        <div className='mb-8'>
+                        <div className='mb-16'>
                             <CmsFormikTextField
                                 label="Người phụ trách"
                                 name="recipient"
@@ -167,6 +169,12 @@ function AddDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc t
                             <CmsFormikTextField
                                 label="Số điện thoại người phụ trách"
                                 name="recipientphone"
+                                size="small"
+                                className="my-4"
+                                formik={formik} />
+                            <CmsFormikTextField
+                                label="Email người phụ trách"
+                                name="recipientemail"
                                 size="small"
                                 className="my-4"
                                 formik={formik} />

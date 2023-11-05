@@ -41,7 +41,7 @@ const OPTDialog = ({ open, className, handleSave, handleClose, check, isOPT }) =
                     ? <>
                         <div className='mb-8 flex justify-between items-center'>
                             <b>
-                                Nhập OPT từ điện thoại
+                                Nhập OTP từ điện thoại
                             </b>
                             <div onClick={handleClose}>
                                 <FontAwesomeIcon icon={faCircleXmark} className='mr-2 text-18' />
@@ -144,7 +144,7 @@ const OPTDialog = ({ open, className, handleSave, handleClose, check, isOPT }) =
                             handleSave(value.replace(' ', ''), setLoading)
                         } else {
                             setTimeout(() => {
-                                dispatch(showMessage({ variant: "error", message: 'Nhập OPT' }))
+                                dispatch(showMessage({ variant: "error", message: 'Nhập OTP' }))
                             }, 0);
                         }
                     }}

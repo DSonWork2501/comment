@@ -47,7 +47,7 @@ export const partner = {
             return (thunkAPI.rejectWithValue(error))
         }
     }),
-    member:{
+    member: {
         getList: createAsyncThunk(`${appName}/${moduleName}/partner/member/getList`, async (params, thunkAPI) => {
             try {
                 const response = await connect.live.partner.member.getList(params);
@@ -95,7 +95,7 @@ const partnerSlice = createSlice({
         selected: null,
         response: null,
         search: initSearchState,
-        members:null
+        members: null
     },
     reducers: {
         /**
@@ -155,10 +155,20 @@ const partnerSlice = createSlice({
             error: null
         }),
         [partner.getList.fulfilled]: (state, { payload }) => {
+
             return {
                 ...state,
                 loading: false,
-                entities: payload,
+                entities: {
+                    ...payload, data: Boolean(payload?.data?.length) ? [...payload.data].sort((a, b) => {
+                        if (a.id !== b.id) {
+                            return b.id - a.id; // Sort by 'id' property
+                        } else {
+                            // If 'id' is the same, sort by 'default' property
+                            return a.default ? -1 : 1;
+                        }
+                    }) : []
+                },
                 error: null
             }
         },

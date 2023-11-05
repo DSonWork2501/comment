@@ -21,7 +21,7 @@ export default {
              * @description refreshToken
              */
             refreshToken: (token, refreshToken) => axios.post(`${baseurl}/identity/refresh-login`, { token, refreshToken }),
-            forgotPass: (data) => axios.post(`${baseurl}/customer/forgot-password`,data),
+            forgotPass: (data) => axios.post(`${baseurl}/customer/forgot-password`, data),
             confirmForgotPass: (data) => axios.post(`${baseurl}/customer/confirm-forgot-password`, data),
             updateForgotPass: (data) => axios.post(`${baseurl}/customer/update-forgot-password`, data),
             changePass: (data) => axios.post(`${baseurl}/customer/change-password`, data),
@@ -187,11 +187,12 @@ export default {
             getList: (params) => axios.get(`${baseurl}/customer/get-partner`, { params }),
             create: (data) => axios.post(`${baseurl}/customer/insert-partner`, data),
             update: (entity) => {
-                if (entity.isEdit === 1)
+
+                if (entity.isEdit === 1 && !Boolean(entity?.isAddMore))
                     return axios.put(`${baseurl}/customer/update-partner`, entity)
-                if (entity.aid)
-                    return axios.put(`${baseurl}/customer/update-address`, [{ ...entity, default: 1, id: entity.aid, phone: entity.recipientphone }])
-                return axios.post(`${baseurl}/customer/insert-address`, [{ ...entity, default: 1, phone: entity.recipientphone }])
+                if (entity.aid && !Boolean(entity?.isAddMore))
+                    return axios.put(`${baseurl}/customer/update-address`, [{ ...entity, id: entity.aid, phone: entity.recipientphone }])
+                return axios.post(`${baseurl}/customer/insert-address`, [{ ...entity, default: entity?.isAddMore ? 0 : 1, id: 0, phone: entity.recipientphone }])
             },
             delete: (entity) => axios.put(`${baseurl}/customer/delete-partner`, entity),
             member: {

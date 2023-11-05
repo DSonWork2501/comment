@@ -65,7 +65,7 @@ function RightSideContent({ formik, prefix, isCanSelect, handleCheck, listCheckT
                             isNumber
                             size="small"
                             name={`${prefix}.capacity`}
-                            label="dung tích"
+                            label="Sức chứa"
                             formik={formik} />
                         <CmsFormikTextField
                             disabled={isCanSelect}
