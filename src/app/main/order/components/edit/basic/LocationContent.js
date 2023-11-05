@@ -26,21 +26,21 @@ export default function LocationContent({ formik }) {
 
     useEffect(() => {
         if (customercity && cityData?.length) {
-            dispatch(getDistrict({ parentId: cityData.find(val => val.id === customercity).idnhanh }))
-            setFieldValue('cityname', cityData.find(val => val.id === customercity).name)
+            dispatch(getDistrict({ parentId: cityData.find(val => val.id === customercity)?.idnhanh }))
+            setFieldValue('cityname', cityData.find(val => val.id === customercity)?.name)
         }
     }, [dispatch, customercity, cityData, setFieldValue])
 
     useEffect(() => {
         if (customerdistrict && districtData?.length) {
-            dispatch(getWard({ parentId: districtData.find(val => val.id === customerdistrict).idnhanh }))
-            setFieldValue('districtname', districtData.find(val => val.id === customerdistrict).name)
+            dispatch(getWard({ parentId: districtData.find(val => val.id === customerdistrict)?.idnhanh }))
+            setFieldValue('districtname', districtData.find(val => val.id === customerdistrict)?.name)
         }
     }, [dispatch, customerdistrict, districtData, setFieldValue])
 
     useEffect(() => {
         if (customerward && wardData?.length)
-            setFieldValue('wardname', wardData.find(val => val.id === customerward).name)
+            setFieldValue('wardname', wardData.find(val => val.id === customerward)?.name)
     }, [setFieldValue, customerward, wardData])
 
     // const HandleChangeCity = (event, value) => {

@@ -191,7 +191,7 @@ export default {
                 if (entity.isEdit === 1 && !Boolean(entity?.isAddMore))
                     return axios.put(`${baseurl}/customer/update-partner`, entity)
                 if (entity.aid && !Boolean(entity?.isAddMore))
-                    return axios.put(`${baseurl}/customer/update-address`, [{ ...entity, default: 1, id: entity.aid, phone: entity.recipientphone }])
+                    return axios.put(`${baseurl}/customer/update-address`, [{ ...entity, id: entity.aid, phone: entity.recipientphone }])
                 return axios.post(`${baseurl}/customer/insert-address`, [{ ...entity, default: entity?.isAddMore ? 0 : 1, id: 0, phone: entity.recipientphone }])
             },
             delete: (entity) => axios.put(`${baseurl}/customer/delete-partner`, entity),

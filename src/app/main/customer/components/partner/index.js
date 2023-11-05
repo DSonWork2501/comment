@@ -20,7 +20,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCodeBranch, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 
 const columns = [
-    new initColumn({ field: "id", label: "ID", classHeader: "w-128", sortable: false }),
     new initColumn({ field: "name", label: "Tên đối tác", alignHeader: "center", alignValue: "left", sortable: false }),
     new initColumn({ field: "phone", label: "Sđt", alignHeader: "center", alignValue: "center", sortable: false }),
     new initColumn({ field: "recipient", label: "Người đại diện", alignHeader: "center", alignValue: "center", sortable: false }),
@@ -55,6 +54,8 @@ function ProductView() {
     const data = useMemo(() => entities?.data?.map(item => ({
         ...item,
         id: item.id,
+        name: (item?.default ? <div className="font-800">{item.name}</div> : <div></div>),
+        phone: (item?.default ? <div>{item.phone}</div> : <div></div>),
         address: ((item?.address ? `${item?.address} ,` : '') + (item?.wardname ? `${item?.wardname} ,` : '') + (item?.districtname ? `${item?.districtname} ,` : '') + (item?.provincename ? `${item?.provincename}` : '')),
         status: (
             item?.status
@@ -63,53 +64,70 @@ function ProductView() {
         ),
         action: (
             <div className="md:flex md:space-x-3 grid grid-rows-2 grid-flow-col gap-4">
-                <CmsIconButton
-                    tooltip="Thêm thành viên"
-                    delay={50}
-                    icon="add"
-                    className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
-                    onClick={() => {
-                        setDetail({ partnerid: item.id });
-                        setOpenDialog('user');
-                    }}
-                />
-                <CmsIconButton
-                    tooltip="Thêm thành viên qua email"
-                    delay={50}
-                    icon={<FontAwesomeIcon icon={faUserPlus} fontSize={22} className="mb-4" />}
-                    className="bg-blue-900 text-white shadow-3  hover:bg-blue-900"
-                    onClick={() => {
-                        setDetail({ partnerid: item.id });
-                        setOpenDialog('users');
-                    }}
-                />
-                <CmsIconButton
-                    tooltip="Thêm thành viên qua excel"
-                    delay={50}
-                    icon={<FontAwesomeIcon icon={faUserPlus} fontSize={22} className="mb-4" />}
-                    className="bg-pink-900 text-white shadow-3  hover:bg-pink-900"
-                    onClick={() => {
-                        window.open(`/partner/${item.id}/import`, '_blank')
-                    }}
-                />
-                <CmsIconButton
-                    tooltip="Danh dách thành viên"
-                    delay={50}
-                    icon="list"
-                    className="bg-green-500 text-white shadow-3  hover:bg-green-900"
-                    component={Link}
-                    to={`/partner/${item.id}`}
-                />
-                <CmsIconButton
-                    tooltip="Chỉnh sửa thông tin"
-                    delay={50}
-                    icon="edit"
-                    className="bg-orange-900 text-white shadow-3  hover:bg-orange-900"
-                    onClick={() => {
-                        setDetail({ ...item, isEdit: 1 });
-                        setOpenDialog('add');
-                    }}
-                />
+                {
+                    Boolean(item.default)
+                    &&
+                    <>
+                        <CmsIconButton
+                            tooltip="Thêm thành viên"
+                            delay={50}
+                            icon="add"
+                            className="bg-blue-500 text-white shadow-3  hover:bg-blue-900"
+                            onClick={() => {
+                                setDetail({ partnerid: item.id });
+                                setOpenDialog('user');
+                            }}
+                        />
+                        <CmsIconButton
+                            tooltip="Thêm thành viên qua email"
+                            delay={50}
+                            icon={<FontAwesomeIcon icon={faUserPlus} fontSize={22} className="mb-4" />}
+                            className="bg-blue-900 text-white shadow-3  hover:bg-blue-900"
+                            onClick={() => {
+                                setDetail({ partnerid: item.id });
+                                setOpenDialog('users');
+                            }}
+                        />
+                        <CmsIconButton
+                            tooltip="Thêm thành viên qua excel"
+                            delay={50}
+                            icon={<FontAwesomeIcon icon={faUserPlus} fontSize={22} className="mb-4" />}
+                            className="bg-pink-900 text-white shadow-3  hover:bg-pink-900"
+                            onClick={() => {
+                                window.open(`/partner/${item.id}/import`, '_blank')
+                            }}
+                        />
+                        <CmsIconButton
+                            tooltip="Danh dách thành viên"
+                            delay={50}
+                            icon="list"
+                            className="bg-green-500 text-white shadow-3  hover:bg-green-900"
+                            component={Link}
+                            to={`/partner/${item.id}`}
+                        />
+                        <CmsIconButton
+                            tooltip="Chỉnh sửa thông tin"
+                            delay={50}
+                            icon="edit"
+                            className="bg-orange-900 text-white shadow-3  hover:bg-orange-900"
+                            onClick={() => {
+                                setDetail({ ...item, isEdit: 1 });
+                                setOpenDialog('add');
+                            }}
+                        />
+                        <CmsIconButton
+                            tooltip="Thêm mới chi nhánh"
+                            delay={50}
+                            icon={<FontAwesomeIcon icon={faCodeBranch} fontSize={22} className="mb-4" />}
+                            className="bg-orange-500 text-white shadow-3  hover:bg-orange-900"
+                            onClick={() => {
+                                setDetail({ ...item, isEdit: 2, isAddMore: 1, customercity: null, customerdistrict: null, customerward: null, customeraddress: '', recipient: '', recipientphone: '', recipientemail: '' });
+                                setOpenDialog('add');
+                            }}
+                        />
+                    </>
+                }
+
                 <CmsIconButton
                     tooltip="Chỉnh sửa địa chỉ"
                     delay={50}
@@ -120,16 +138,7 @@ function ProductView() {
                         setOpenDialog('add');
                     }}
                 />
-                <CmsIconButton
-                    tooltip="Thêm mới chi nhánh"
-                    delay={50}
-                    icon={<FontAwesomeIcon icon={faCodeBranch} fontSize={22} className="mb-4" />}
-                    className="bg-orange-500 text-white shadow-3  hover:bg-orange-900"
-                    onClick={() => {
-                        setDetail({ ...item, isEdit: 2, isAddMore: 1, customercity: null, customerdistrict: null, customerward: null, customeraddress: '', recipient: '', recipientphone: '' });
-                        setOpenDialog('add');
-                    }}
-                />
+
             </div>
         ) || []
     })), [entities])

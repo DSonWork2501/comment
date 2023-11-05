@@ -42,7 +42,7 @@ const BoxCustom = styled(Box)({
 const initialValues = {
     "id": 0,
     "email": "",
-    recipientmail: "",
+    recipientemail: "",
     "name": "",
     "phone": "",
     "img": "",
@@ -56,7 +56,8 @@ const initialValues = {
     customercity: 0,
     customerdistrict: 0,
     customerward: 0,
-    customeraddress: ""
+    customeraddress: "",
+    default: 0,
 }
 
 const fillDefaultForm = (def, detail, setId = true) => {
@@ -173,7 +174,7 @@ function AddDialog({ handleClose, detail, onSave, open, title = 'Thêm thuộc t
                                 formik={formik} />
                             <CmsFormikTextField
                                 label="Email người phụ trách"
-                                name="recipientmail"
+                                name="recipientemail"
                                 size="small"
                                 className="my-4"
                                 formik={formik} />
