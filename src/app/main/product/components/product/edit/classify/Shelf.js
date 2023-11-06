@@ -116,6 +116,7 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
 
         handleClose(formik_shelf.values)
     }
+
     return (
         <CmsDialog
             className="w-full h-full"
