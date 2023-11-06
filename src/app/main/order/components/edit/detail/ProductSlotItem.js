@@ -1,4 +1,4 @@
-import { CmsAutocomplete, CmsLabel, CmsLoadingOverlay, CmsRadioGroup } from "@widgets/components"
+import { CmsAutocomplete, CmsFormikTextField, CmsLabel, CmsLoadingOverlay, CmsRadioGroup } from "@widgets/components"
 import { getListHS, searchDetailPrOrder, setStateRedux } from "app/main/product/store/productSlice"
 // import { get } from "lodash"
 import React, { useMemo } from "react"
@@ -188,6 +188,7 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
             dispatch(getListHS({ HomeSubscription: orderType === 1 ? parseInt(hs) : 3 }))
     }, [dispatch, hs, id, orderType])
 
+    console.log(formik_entity);
 
     return (
         <div className="w-full space-y-16">
@@ -231,6 +232,17 @@ export default function ProductSlotSKUItem({ formik_entity, formik, keyStore, Ha
                     }}
                 />
             </div>
+
+            {
+                orderType === 2
+                &&
+                <CmsFormikTextField
+                    label="Tên tủ khách"
+                    name="otherName"
+                    required={false}
+                    size="small"
+                    formik={formik_entity} />
+            }
 
             {(formik?.values?.sku && Array.isArray(detail_data) && formik?.values?.ishs !== 1 && orderType !== 2)
                 &&

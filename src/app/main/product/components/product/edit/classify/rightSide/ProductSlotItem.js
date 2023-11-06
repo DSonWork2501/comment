@@ -47,7 +47,7 @@ function ProductSlotItemComponent({ keyStore, formik, prefix, listCheckTemp, set
                     formik.setFieldValue(`${string}.item`, { ...get(formik.values, `${string}.item`), name: chosenSku?.name, img: chosenSku?.img, sku: chosenSku?.sku, uniqueid: uniqueid, temporaryprice: chosenSku.price, type: "wine" })
                 });
             });
-
+            setListCheckTemp({});
         } else {
             // console.log(listCheckTemp);
             // console.log(prefix);
