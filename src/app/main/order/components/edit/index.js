@@ -51,7 +51,12 @@ function EditOrderContent() {
             text: 'Bạn có muốn lưu thông tin ?',
             data: values,
             confirm: async (item) => {
-                const resultAction = await dispatch(insertOrder(customModal(item)));
+                let data = { ...item };
+
+                if (data?.otherName)
+                    data.productorder[0].name = data.otherName
+
+                const resultAction = await dispatch(insertOrder(customModal(data)));
                 unwrapResult(resultAction);
                 History.push('/order')
             }
