@@ -7,7 +7,13 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import * as PropTypes from 'prop-types'
 import CmsButtonProgress from './CmsButtonProgress';
-import { LinearProgress } from '@material-ui/core';
+import { LinearProgress, styled } from '@material-ui/core';
+
+const LayoutCustom = styled(Dialog)({
+    "&.style .MuiDialog-container>div": {
+        height: 'calc(100% - 64px)'
+    }
+});
 
 function CmsDialog(props) {
     const {
@@ -37,7 +43,7 @@ function CmsDialog(props) {
     const isString = myVar => (typeof myVar === 'string')
 
     return (
-        <Dialog
+        <LayoutCustom
             fullWidth
             maxWidth={size}
             open={open}
@@ -125,7 +131,7 @@ function CmsDialog(props) {
                     </DialogActions>
                 </form>
             }
-        </Dialog>
+        </LayoutCustom>
     );
 }
 

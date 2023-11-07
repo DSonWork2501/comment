@@ -193,7 +193,18 @@ export const order = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
-    }
+    },
+    cancel: createAsyncThunk(`${appName}/${moduleName}/order/cancel`, async (params, thunkAPI) => {
+        try {
+            const response = await connect.live.order.cancel(params);
+            thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+            const data = await response.data;
+            return data
+        } catch (error) {
+            thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+            return (thunkAPI.rejectWithValue(error))
+        }
+    }),
 }
 
 const initSearchState = {
