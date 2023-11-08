@@ -7,7 +7,7 @@ import { customerShelf, getShelf, getWine, setSearch } from "./store/customerShe
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
-import { initColumn } from "@widgets/functions";
+import { alertInformation, initColumn } from "@widgets/functions";
 import noImage from '@widgets/images/noImage.jpg';
 import GenFilterOptionContent from './components/index/GenFilterOption'
 import { LabelInfo } from "@widgets/components/common/LabelInfo";
@@ -16,6 +16,9 @@ import { CustomerProductType } from "./model/CustomerProductType";
 import { Link } from 'react-router-dom';
 import { useParams } from "react-router";
 import { Box, Chip, TableCell, TableRow, styled } from "@material-ui/core";
+import ReNameDialog from "./components/index/ReNameDialog";
+import { unwrapResult } from "@reduxjs/toolkit";
+import FuseLoading from "@fuse/core/FuseLoading";
 
 const LayoutCustom = styled(Box)({
     height: "100%",
@@ -66,13 +69,16 @@ function CustomerShelfContent() {
         entities?.data?.map((x, index) => ({
             ...x,
             info: <div className="w-full">
+                <LabelInfo label={{ content: 'ORDER' }} info={{ content: x.imei_ord }} />
                 <LabelInfo label={{ content: 'SKU' }} info={{ content: x.sku }} />
                 <LabelInfo label={{ content: 'Unique ID' }} info={{ content: x.uniqueid }} />
             </div>,
             isexpire: (
-                x.isexpire === 1 && <Chip label="Đang sử dụng" className="bg-green-400 text-white" />,
-                x.isexpire === 2 && <Chip label="Sắp hết hạn" className="bg-orange-400 text-white" />,
-                x.isexpire === 3 && <Chip label="Hết hạn" className="bg-red-400 text-white" />
+                <>
+                    {x.isexpire === 1 && <Chip label="Đang sử dụng" className="bg-green-400 text-white" />}
+                    {x.isexpire === 2 && <Chip label="Sắp hết hạn" className="bg-orange-400 text-white" />}
+                    {x.isexpire === 3 && <Chip label="Hết hạn" className="bg-red-400 text-white" />}
+                </>
             ),
             qrcode:
                 <div className="space-y-4 w-60">
@@ -83,6 +89,15 @@ function CustomerShelfContent() {
             action: <div className="flex space-x-3 ">
                 {x.type === "household" &&
                     <>
+                        <CmsIconButton
+                            tooltip="Đổi tên tủ"
+                            delay={50}
+                            icon="edit"
+                            className="bg-orange-500 text-white shadow-3  hover:bg-orange-900"
+                            onClick={() => {
+                                setOpen('editName')
+                                setDetail(x);
+                            }} />
                         <CmsIconButton
                             tooltip="Chi tiết"
                             delay={50}
@@ -115,6 +130,10 @@ function CustomerShelfContent() {
         CustomerProductType['wine'].id === search.Type && new initColumn({ field: "qrcode", label: "QRCode", alignHeader: "left", alignValue: "left", sortable: false }),
         new initColumn({ field: "image", style: { top: type === 1 ? 78 : 0 }, label: "Hình ảnh", alignHeader: "left", alignValue: "left", sortable: false }),
     ]
+
+    if (loading) {
+        return <FuseLoading />
+    }
 
     return (
         <LayoutCustom>
@@ -230,6 +249,29 @@ function CustomerShelfContent() {
                                 open={open === 'detail'}
                                 handleClose={() => setOpen('')}
                             />}
+                        {open === 'editName' &&
+                            <ReNameDialog
+                                title='Đối tên tủ'
+                                onSave={(value) => {
+                                    alertInformation({
+                                        text: `Xác nhận thao tác`,
+                                        data: { value },
+                                        confirm: async () => {
+                                            const resultAction = await dispatch(customerShelf.other.updateName([value]));
+                                            unwrapResult(resultAction);
+                                            setOpen('')
+                                            if (type)
+                                                dispatch(getShelf({ ...search, Type: Object.values(CustomerProductType).find(val => val.rawID === type)?.id }))
+                                            if (type === 1)
+                                                dispatch(customerShelf.other.getSummaryHousehold());
+                                            // handleCloseDialog();
+                                            // getListTable(search, status);
+                                        },
+                                    });
+                                }}
+                                detail={{ id: detail.id, name: detail.name }}
+                                open={true}
+                                handleClose={() => setOpen('')} />}
                     </>
                 }
                 toolbar={
