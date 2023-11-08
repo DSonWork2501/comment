@@ -34,6 +34,17 @@ export const getWine = createAsyncThunk(`${appName}/${moduleName}/getWine`, asyn
 
 export const customerShelf = {
     other: {
+        updateName: createAsyncThunk(`${appName}/${moduleName}/customerShelf/other/updateName`, async (params, thunkAPI) => {
+            try {
+                const response = await Connect.live.order.updateName(params);
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                const data = await response.data;
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
         reOrder: createAsyncThunk(`${appName}/${moduleName}/customerShelf/other/reOrder`, async (params, thunkAPI) => {
             try {
                 const response = await Connect.live.customer.other.reOrder(params);
