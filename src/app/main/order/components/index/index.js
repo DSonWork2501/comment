@@ -29,6 +29,7 @@ import { ArrowDropDown } from "@material-ui/icons";
 import ConfirmationDialog from "./ConfirmationDialog";
 import FuseLoading from "@fuse/core/FuseLoading/FuseLoading";
 import AddShipperDialog from "./AddShipperDialog";
+import CancelDialog from "./CancelDialog";
 
 const useStyles = makeStyles({
     hoverOpenBtn: {
@@ -176,8 +177,7 @@ function OrderView() {
         7: summary?.van_chuyen ? summary?.van_chuyen?.toLocaleString('en-US') : 0,
     }
     const [selects, setSelects] = useState([]);
-
-    if (!status)
+    if (!status && status !== 0)
         History.push('/order/100')
 
     const columns = [
@@ -401,6 +401,9 @@ function OrderView() {
                     if (item.status === 3)
                         hide = true;
 
+                    if (val.status === 0 && (item.status === 1 || item.status === 2 || item.status === 6))
+                        hide = false;
+
                     return { ...val, hide }
                 }).filter(val => !val.hide)}
 
@@ -408,7 +411,11 @@ function OrderView() {
                     if (value) {
                         if (value.status === 6) {
                             History.push(`/package/${item.id}`)
-                        } else {
+                        } else if (value.status === 0) {
+                            setOpenDialog('cancel');
+                            setDetail(item);
+                        }
+                        else {
                             alertInformation({
                                 text: `Xác nhận thao tác`,
                                 data: { value },
@@ -597,6 +604,29 @@ function OrderView() {
                     open={true}
                     handleClose={handleCloseDialog} />
             }
+
+            {
+                openDialog === 'cancel'
+                &&
+                <CancelDialog
+                    title='Hủy đơn hàng'
+                    onSave={(value) => {
+                        alertInformation({
+                            text: `Xác nhận hủy`,
+                            data: { value },
+                            confirm: async () => {
+                                const resultAction = await dispatch(order.cancel(value));
+                                unwrapResult(resultAction);
+                                handleCloseDialog();
+                                getListTable(search, status);
+                            },
+                        });
+                    }}
+                    detail={{ id: detail.id }}
+                    open={true}
+                    handleClose={handleCloseDialog} />
+            }
+
 
             {openDialog === 'shipper' && <AddShipperDialog
                 title='Thêm biên bản bàn giao'

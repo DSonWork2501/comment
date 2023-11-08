@@ -13,9 +13,14 @@ import * as Yup from 'yup'
 import { useDispatch, useSelector } from "react-redux"
 import { keyStore } from "app/main/product/common"
 import { useMemo } from "react"
-import { Button } from "@material-ui/core"
+import { Box, Button, styled } from "@material-ui/core"
 import { showMessage } from "app/store/fuse/messageSlice"
 
+const LayoutCustom = styled(Box)({
+    "& .MuiDialog-container>div": {
+        height: 'calc(100% - 64px)'
+    }
+});
 
 function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalIndex, view }) {
     const [prefix, setPrefix] = useState('[0]')
@@ -118,173 +123,175 @@ function ShelfContent({ data_shelf, open, handleClose, handleSave, index, modalI
     }
 
     return (
-        <CmsDialog
-            className="w-full h-full"
-            title={<div className="flex space-x-8">
-                <div>Thông tin tủ hàng</div>
-                {
-                    data_shelf && data_shelf !== "[]" && <CmsButtonProgress
-                        startIcon="refresh"
-                        label="Làm mới"
-                        className="bg-grey-500 text-white hover:bg-grey-900"
-                        onClick={() => {
-                            formik_shelf.setValues(data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })]);
-                        }} />
-                }
-            </div>}
-            text={
-                <>
-                    <div className={'w-full flex flex-row space-x-8'}>
-                        <CmsLabel content={'Hướng dẫn:'} className="text-green-500" />
-                        <CmsLabel content={'Tích chọn thông tin tủ, thông tin chi tiết sẽ hiển thị tương ứng'} className="" />
-                    </div>
-
-                    <div className="flex flex-wrap -mx-8">
-                        <div className="w-1/5 px-8">
-                            {
-                                Boolean(listTemp?.length)
-                                &&
-                                <CmsSelect
-                                    data={listTemp}
-                                    size="small"
-                                    setOptionLabel={(option) => option.subname}
-                                    value={model}
-                                    onChange={(e) => {
-                                        try {
-                                            setModel(e.target.value)
-                                            let temp = JSON.parse(listTemp.find(val => val.id === e.target.value).model);
-                                            // console.log(temp);
-                                            temp = temp.map(val => ({
-                                                ...val,
-                                                slots: val.slots.map(va => ({ ...va, item: null }))
-                                            }))
-                                            formik_shelf.setValues(temp)
-                                        } catch (error) {
-
-                                        }
-                                    }}
-                                    label="Model có sẵn"
-                                />
-                            }
+        <LayoutCustom>
+            <CmsDialog
+                className="w-full h-full style"
+                title={<div className="flex space-x-8">
+                    <div>Thông tin tủ hàng</div>
+                    {
+                        data_shelf && data_shelf !== "[]" && <CmsButtonProgress
+                            startIcon="refresh"
+                            label="Làm mới"
+                            className="bg-grey-500 text-white hover:bg-grey-900"
+                            onClick={() => {
+                                formik_shelf.setValues(data_shelf !== "[]" && CheckStringIsJson(data_shelf) ? JSON.parse(data_shelf) : [initDetailModel({ name: "Ngăn 1" })]);
+                            }} />
+                    }
+                </div>}
+                text={
+                    <>
+                        <div className={'w-full flex flex-row space-x-8'}>
+                            <CmsLabel content={'Hướng dẫn:'} className="text-green-500" />
+                            <CmsLabel content={'Tích chọn thông tin tủ, thông tin chi tiết sẽ hiển thị tương ứng'} className="" />
                         </div>
-                        {
-                            view !== 'order'
-                            &&
-                            <div className="px-8 border-l">
-                                <div className="flex flex-wrap -mx-8">
-                                    <div className="px-8 w-88">
-                                        <CmsTextField
-                                            label="Số ngăn"
-                                            name="totalPredict"
-                                            size="small"
-                                            value={custom.first}
-                                            onChange={(e) => setCustom(prev => ({ ...prev, first: e.target.value }))}
-                                            isNumberFormat={true} />
-                                    </div>
-                                    <div className="px-8 w-88">
-                                        <CmsTextField
-                                            label="Slot/ngăn"
-                                            name="totalPredict"
-                                            size="small"
-                                            value={custom.second}
-                                            onChange={(e) => setCustom(prev => ({ ...prev, second: e.target.value }))}
-                                            isNumberFormat={true} />
-                                    </div>
-                                    <div className="px-8">
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            style={{
-                                                textTransform: 'inherit',
-                                                fontWeight: 400
-                                            }}
-                                            disabled={custom.first === 0 || custom.second === 0}
-                                            onClick={() => {
-                                                let data = [];
-                                                for (let index = 1; index <= custom.first; index++) {
-                                                    data.push(initDetailModel({ name: `Ngăn ${index}` }))
-                                                    for (let indexJ = 1; indexJ <= custom.second; indexJ++) {
-                                                        data[index - 1].slots.push(initDetailModelSlot({ name: `Vị trí ${index}.${indexJ}` }))
+
+                        <div className="flex flex-wrap -mx-8">
+                            <div className="w-1/5 px-8">
+                                {
+                                    Boolean(listTemp?.length)
+                                    &&
+                                    <CmsSelect
+                                        data={listTemp}
+                                        size="small"
+                                        setOptionLabel={(option) => option.subname}
+                                        value={model}
+                                        onChange={(e) => {
+                                            try {
+                                                setModel(e.target.value)
+                                                let temp = JSON.parse(listTemp.find(val => val.id === e.target.value).model);
+                                                // console.log(temp);
+                                                temp = temp.map(val => ({
+                                                    ...val,
+                                                    slots: val.slots.map(va => ({ ...va, item: null }))
+                                                }))
+                                                formik_shelf.setValues(temp)
+                                            } catch (error) {
+
+                                            }
+                                        }}
+                                        label="Model có sẵn"
+                                    />
+                                }
+                            </div>
+                            {
+                                view !== 'order'
+                                &&
+                                <div className="px-8 border-l">
+                                    <div className="flex flex-wrap -mx-8">
+                                        <div className="px-8 w-88">
+                                            <CmsTextField
+                                                label="Số ngăn"
+                                                name="totalPredict"
+                                                size="small"
+                                                value={custom.first}
+                                                onChange={(e) => setCustom(prev => ({ ...prev, first: e.target.value }))}
+                                                isNumberFormat={true} />
+                                        </div>
+                                        <div className="px-8 w-88">
+                                            <CmsTextField
+                                                label="Slot/ngăn"
+                                                name="totalPredict"
+                                                size="small"
+                                                value={custom.second}
+                                                onChange={(e) => setCustom(prev => ({ ...prev, second: e.target.value }))}
+                                                isNumberFormat={true} />
+                                        </div>
+                                        <div className="px-8">
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                style={{
+                                                    textTransform: 'inherit',
+                                                    fontWeight: 400
+                                                }}
+                                                disabled={custom.first === 0 || custom.second === 0}
+                                                onClick={() => {
+                                                    let data = [];
+                                                    for (let index = 1; index <= custom.first; index++) {
+                                                        data.push(initDetailModel({ name: `Ngăn ${index}` }))
+                                                        for (let indexJ = 1; indexJ <= custom.second; indexJ++) {
+                                                            data[index - 1].slots.push(initDetailModelSlot({ name: `Vị trí ${index}.${indexJ}` }))
+                                                        }
                                                     }
-                                                }
-                                                formik_shelf.setValues(data)
-                                            }}
-                                        >
-                                            Custom tủ
-                                        </Button>
+                                                    formik_shelf.setValues(data)
+                                                }}
+                                            >
+                                                Custom tủ
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        }
-                        <div className="px-8 border-l">
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                style={{
-                                    textTransform: 'inherit',
-                                    fontWeight: 400
-                                }}
-                                onClick={() => {
-                                    formik_shelf.setValues(prev => {
-                                        return prev.map(val => {
-                                            return {
-                                                ...val, slots: val.slots.map(va => {
-                                                    let slot = { ...va };
-                                                    delete slot.item;
-                                                    return slot
-                                                })
-                                            };
+                            }
+                            <div className="px-8 border-l">
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    style={{
+                                        textTransform: 'inherit',
+                                        fontWeight: 400
+                                    }}
+                                    onClick={() => {
+                                        formik_shelf.setValues(prev => {
+                                            return prev.map(val => {
+                                                return {
+                                                    ...val, slots: val.slots.map(va => {
+                                                        let slot = { ...va };
+                                                        delete slot.item;
+                                                        return slot
+                                                    })
+                                                };
+                                            })
                                         })
-                                    })
-                                }}
-                            >
-                                Bỏ hết rượu
-                            </Button>
+                                    }}
+                                >
+                                    Bỏ hết rượu
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </>
+                    </>
 
-            }
-            contentClass={'overflow-y-auto space-y-16'}
-            // disabledSave={imageLoading || snapshot_loading}
-            handleClose={handleCloseModal}
-            handleSave={handleSave}
-            isCloseDialogSubmit={false}
-            disableEscapeKeyDown
-            disableBackdropClick
-            open={open}
-            size="xl"
-        >
-            <div className={clsx(prefix && 'flex flex-row', "w-full space-x-8 relative")}>
-                <FuseAnimate animation="transition.slideLeftIn" delay={50}>
-                    <div className={prefix ? 'w-1/3' : 'w-full'}>
-                        <LeftSideContent
-                            data={data}
-                            HandleAddStack={HandleAddStack}
-                            HandleAddSlot={HandleAddSlot}
-                            HandleClickDetail={HandleClickDetail}
-                            HandleDeleteSlot={HandleDeleteSlot}
-                            HandleDeleteStack={HandleDeleteStack}
-                            stackIndex={stackIndex}
-                            slotIndex={slotIndex}
-                            listCheckTemp={listCheckTemp}
-                            setListCheckTemp={setListCheckTemp}
-                            view={view}
-                        />
-                    </div>
-                </FuseAnimate>
-                {prefix && <FuseAnimate animation="transition.slideLeftIn" delay={50}>
-                    <div className="w-2/3 sticky top-0 max-h-320">
-                        <RightSideContent
-                            formik={formik_shelf}
-                            prefix={prefix}
-                            listCheckTemp={listCheckTemp}
-                            setListCheckTemp={setListCheckTemp}
-                        />
-                    </div>
-                </FuseAnimate>}
-            </div>
-        </CmsDialog>
+                }
+                contentClass={'overflow-y-auto space-y-16'}
+                // disabledSave={imageLoading || snapshot_loading}
+                handleClose={handleCloseModal}
+                handleSave={handleSave}
+                isCloseDialogSubmit={false}
+                disableEscapeKeyDown
+                disableBackdropClick
+                open={open}
+                size="xl"
+            >
+                <div className={clsx(prefix && 'flex flex-row', "w-full space-x-8 relative")}>
+                    <FuseAnimate animation="transition.slideLeftIn" delay={50}>
+                        <div className={prefix ? 'w-1/3' : 'w-full'}>
+                            <LeftSideContent
+                                data={data}
+                                HandleAddStack={HandleAddStack}
+                                HandleAddSlot={HandleAddSlot}
+                                HandleClickDetail={HandleClickDetail}
+                                HandleDeleteSlot={HandleDeleteSlot}
+                                HandleDeleteStack={HandleDeleteStack}
+                                stackIndex={stackIndex}
+                                slotIndex={slotIndex}
+                                listCheckTemp={listCheckTemp}
+                                setListCheckTemp={setListCheckTemp}
+                                view={view}
+                            />
+                        </div>
+                    </FuseAnimate>
+                    {prefix && <FuseAnimate animation="transition.slideLeftIn" delay={50}>
+                        <div className="w-2/3 sticky top-0 max-h-320">
+                            <RightSideContent
+                                formik={formik_shelf}
+                                prefix={prefix}
+                                listCheckTemp={listCheckTemp}
+                                setListCheckTemp={setListCheckTemp}
+                            />
+                        </div>
+                    </FuseAnimate>}
+                </div>
+            </CmsDialog>
+        </LayoutCustom>
     )
 
 }
