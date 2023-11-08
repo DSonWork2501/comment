@@ -443,7 +443,7 @@ function OrderView() {
         ),
         unitPR: (
             <div className="text-12">
-                {item?.hhid ? 'Tủ' : 'Chai'}
+                {item?.productorders?.length ? (item.productorders[0].capacity ? 'Tủ' : 'Chai') : 'Chai'}
             </div>
         ),
         right: (
