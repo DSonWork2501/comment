@@ -129,6 +129,7 @@ function CustomerShelfContent() {
         type === 1 && new initColumn({ field: "isexpire", style: { top: type === 1 ? 78 : 0 }, label: "Trạng thái hợp đồng", alignHeader: "center", alignValue: "center", sortable: false }),
         CustomerProductType['wine'].id === search.Type && new initColumn({ field: "qrcode", label: "QRCode", alignHeader: "left", alignValue: "left", sortable: false }),
         new initColumn({ field: "image", style: { top: type === 1 ? 78 : 0 }, label: "Hình ảnh", alignHeader: "left", alignValue: "left", sortable: false }),
+        new initColumn({ field: "drinkcount", style: { top: type === 1 ? 78 : 0 }, label: "Chai đã uống", alignHeader: "right", alignValue: "right", sortable: false }),
     ]
 
     if (loading) {
@@ -203,7 +204,7 @@ function CustomerShelfContent() {
                                         &&
                                         <TableRow>
                                             <TableCell
-                                                colSpan={6}
+                                                colSpan={7}
                                             >
                                                 <div className="flex space-x-32 px-20">
                                                     <div className="flex-1 flex justify-between rounded-4 py-8 px-14 bg-blue-50">

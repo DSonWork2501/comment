@@ -56,6 +56,17 @@ export const customerShelf = {
                 return (thunkAPI.rejectWithValue(error))
             }
         }),
+        reListOrder: createAsyncThunk(`${appName}/${moduleName}/customerShelf/other/reListOrder`, async (params, thunkAPI) => {
+            try {
+                const response = await Connect.live.customer.other.reListOrder(params);
+                const data = await response.data;
+                thunkAPI.dispatch(showMessage({ variant: "success", message: 'Thao tác thành công !' }))
+                return data
+            } catch (error) {
+                thunkAPI.dispatch(showMessage({ variant: "error", message: error.message }))
+                return (thunkAPI.rejectWithValue(error))
+            }
+        }),
         getSummary: createAsyncThunk(`${appName}/${moduleName}/customerShelf/other/getSummary`, async (params, thunkAPI) => {
             try {
                 const response = await Connect.live.customer.other.getSummary(params);
