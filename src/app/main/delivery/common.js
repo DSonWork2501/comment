@@ -1,10 +1,18 @@
 import { groupBy, map } from "lodash";
 
-export const returnListProductByOrderID = (entities, orderID) => {
+export const groupProduct = (productorders) => {
+    return map(groupBy(productorders, 'sku'), (products, sku) => ({
+        ...products[0],
+        //price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
+        numberPR: products.length,
+    }))
+}
+
+export const returnListProductByOrderID = (entities, orderID, name = 'productorder') => {
     let data = [], table = [];
     if (entities?.data?.length) {
         entities.data.forEach(element => {
-            element.productorder.forEach(e => {
+            element[name].forEach(e => {
                 if (parseInt(orderID) === element.id)
                     if (Boolean(element.parentid)) {
                         data.push({
@@ -41,6 +49,32 @@ export const returnListProductByOrderID = (entities, orderID) => {
             ...map(groupedData, (products, sku) => ({
                 ...products[0],
                 price: products.reduce((sum, currentItem) => sum + currentItem.price, 0),
+                numberPR: products.length,
+            }))
+        ];
+    }
+
+    return []
+}
+
+export const returnListProductInCabinet = (dataList, orderID, name = 'productorder') => {
+    let data = [];
+
+    if (dataList?.length) {
+        dataList.forEach(element => {
+            element[name] && JSON.parse(element[name])?.length && JSON.parse(element[name]).forEach(e => {
+                e?.slots?.length && e.slots.forEach(elm => {
+                    data.push(elm.item);
+                })
+
+            })
+        });
+        const groupedData = groupBy(data, 'sku');
+
+        return [
+            ...map(groupedData, (products, sku) => ({
+                ...products[0],
+                price: products.reduce((sum, currentItem) => sum + currentItem.temporaryprice, 0),
                 numberPR: products.length,
             }))
         ];
