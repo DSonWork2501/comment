@@ -94,6 +94,8 @@ const initSearchState = {
     CusID: null,//=> id khách hàng
     Type: "household",//=> loại (household - tủ/ wine- chai rượu)
     Status: null,//=> trạng thái: null- lấy all,1-chưa uống, 2-đã uống
+    pageNumber: 1,
+    rowsPage: 10,
 }
 
 const customerShelfSlice = createSlice({

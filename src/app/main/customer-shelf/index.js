@@ -135,7 +135,7 @@ function CustomerShelfContent() {
     if (loading) {
         return <FuseLoading />
     }
-
+    
     return (
         <LayoutCustom>
             <CmsCardedPage
@@ -150,10 +150,10 @@ function CustomerShelfContent() {
                             isServerSide={true}
                             data={data}
                             search={search}
-                            setSearch={(value) => dispatch(setSearch({ ...search, value }))}
+                            setSearch={(value) => dispatch(setSearch(value))}
                             columns={columns}
                             loading={loading}
-                            pagination={data?.pagination}
+                            pagination={entities?.pagination}
                             upperHead={
                                 <>
                                     {
