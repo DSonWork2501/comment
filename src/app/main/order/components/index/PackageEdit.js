@@ -342,13 +342,13 @@ function FormEdit() {
                             setReList([
                                 {
                                     name: 'Rượu Lẻ',
-                                    slots: [
-                                        {
+                                    slots:values.map(val=>{
+                                        return {
                                             type: 'slot',
                                             isNotShow: true,
-                                            item: values[0]
+                                            item: val
                                         }
-                                    ]
+                                    }) 
                                 }
                             ])
                         } else {
@@ -403,6 +403,8 @@ function FormEdit() {
                 setLoading(false);
                 if (res?.payload?.result && res?.payload?.data?.length && current?.id !== res.payload.data[0]?.id) {
                     const value = res.payload.data[0];
+                    console.log(value);
+
                     generateQRCodeBase64(value?.productorders[0].uniqueid).then(qrcode => {
                         setCurrent({ ...value, qrcode })
                         getWines({ ...value, qrcode })
@@ -882,7 +884,7 @@ function FormEdit() {
                                                                     background: val.number === val.numberReceive ? '#bde0f5' : 'transparent'
                                                                 }}>
                                                                 <img
-                                                                    className='rounded-6 shadow-4'
+                                                                    className='rounded-6 shadow-4 bg-white'
                                                                     style={{ objectFit: 'contain', height: '110px', maxWidth: 150, margin: 'auto' }}
                                                                     src={`${process.env.REACT_APP_BASE_URL}api/product/img/${val?.item?.img}`}
                                                                     alt={`imageforitem${i}`} />

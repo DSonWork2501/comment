@@ -77,6 +77,7 @@ export default {
         customer: {
             other: {
                 reOrder: entity => axios.post(`${baseurl}/order/re-order`, entity),
+                reListOrder: entity => axios.post(`${baseurl}/order/re-list-order`, entity),
                 getSummary: params => axios.get(`${baseurl}/customer/summary-cus-hs`, { params }),
                 getSummaryHousehold: params => axios.get(`${baseurl}/customer/summary-household-cus-hs`, { params }),
             },

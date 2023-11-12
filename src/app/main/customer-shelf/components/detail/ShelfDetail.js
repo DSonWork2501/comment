@@ -1,5 +1,5 @@
-import { CmsButton, CmsButtonProgress, CmsDialog, CmsLabel, } from "@widgets/components"
-import React, { useState } from "react"
+import { CmsAutocomplete, CmsButton, CmsButtonProgress, CmsCheckbox, CmsDialog, CmsLabel, } from "@widgets/components"
+import React, { useMemo, useState } from "react"
 import { keyStore } from "../../common"
 import { useDispatch, useSelector } from "react-redux"
 import clsx from "clsx"
@@ -30,10 +30,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // Ngăn tủ
-function DetailModelContent({ value, setTab, handleChooseUniqueID }) {
+function DetailModelContent({ value, setTab, handleChooseUniqueID, check, setCheck }) {
     const classes = useStyles()
     const slots = value?.slots || []
-
     return (
         <div className="w-full grid border-solid border-2 border-green-500 rounded-4 ">
             <div className="w-full shadow-4 bg-green-500 rounded-2 grid">
@@ -47,14 +46,36 @@ function DetailModelContent({ value, setTab, handleChooseUniqueID }) {
 
                 </div>
                 {slots.map((item, index) => (
-                    <DetailShelfProductContent
-                        data={item}
-                        index={index}
-                        setTab={setTab}
-                        handleChooseUniqueID={handleChooseUniqueID}
-                        key={`DetailShelfProductContent-${index}`}
-                        classes={classes}
-                    />
+                    <div className="flex items-center">
+                        <div>
+                            {
+                                <CmsCheckbox
+                                    key={`box`}
+                                    //checked={Boolean(value.ispacked)}
+                                    //label="Đã Gói"
+                                    disabled={item.item.status !== 2}
+                                    checked={check.includes(item.item.id)}
+                                    onChange={e => {
+                                        setCheck(prev => prev.includes(item.item.id) ? prev.filter(val => val !== item.item.id) : [...prev, item.item.id])
+                                    }}
+                                    name="status"
+                                />
+                            }
+
+                        </div>
+
+                        <div style={{ width: 'calc(100% - 50px)' }}>
+                            <DetailShelfProductContent
+                                data={item}
+                                index={index}
+                                setTab={setTab}
+                                handleChooseUniqueID={handleChooseUniqueID}
+                                key={`DetailShelfProductContent-${index}`}
+                                classes={classes}
+                            />
+                        </div>
+
+                    </div>
                 ))}
             </div>
         </div>
@@ -124,6 +145,14 @@ export const ProductPopup = ({ setTab, handleChooseUniqueID }) => {
 function ShelfDetailContent({ open, handleClose, detail }) {
     const entities = useSelector(store => store[keyStore]?.cusShelf?.detailEntities);
     const [tab, setTab] = useState(null);
+    const [type, setType] = useState(null);
+    const [check, setCheck] = useState([]);
+    const listData = useMemo(() => {
+        if (type) {
+            return entities?.data.map(val => ({ ...val, slots: val.slots.filter(va => va.item.status === type) }))
+        }
+        return entities?.data?.length ? entities.data : []
+    }, [entities, type])
     const dispatch = useDispatch();
 
     const handleDownloadAll = () => {
@@ -221,6 +250,54 @@ function ShelfDetailContent({ open, handleClose, detail }) {
         })
     }
 
+    const handleReFill = () => {
+        const data = [].concat(...listData.map(va => va.slots)).filter(val => val.item.status === 2).filter(val => check.includes(val.item.id)).map(val => val.item)
+            , reData = {
+                olditem: data.map(value => ({
+                    "id": value.id,
+                    "cusid": detail.cusid,
+                    "parentid": detail.id,
+                    "uniqueid": value.uniqueid,
+                    "imei_ord": value.imei_ord,
+                    "name": value.name,
+                    "img": value.img,
+                    "capacity": value.capacity,
+                    "note": value.note,
+                    "qrcode": value.qrcode,
+                    "status": value.status,
+                    "type": value.type
+                })),
+                newitem: data.map(value => ({
+                    "id": 0,
+                    "cusid": detail.cusid,
+                    "parentid": detail.id,
+                    "uniqueid": value.uniqueid,
+                    "imei_ord": 0,
+                    "name": value.name,
+                    "img": value.img,
+                    "capacity": 0,
+                    "note": "",
+                    "qrcode": "",
+                    "status": 1,
+                    "type": "wine"
+                }))
+            };
+
+        alertInformation({
+            text: `Xác nhận thao tác`,
+            data,
+            confirm: async (data) => {
+                try {
+                    const resultAction = await dispatch(customerShelf.other.reListOrder(reData));
+                    unwrapResult(resultAction);
+                    setTab(null);
+                    dispatch(getWine({ cusId: detail.cusid, parentId: detail.id, cms: 1 }))
+                } catch (error) { }
+            },
+        })
+        console.log(data);
+    }
+
     return (
         <CmsDialog
             title="Thông tin chi tiết tủ"
@@ -232,12 +309,65 @@ function ShelfDetailContent({ open, handleClose, detail }) {
                 tab === null
                     ? <FuseAnimateGroup enter={{ animation: 'transition.expandIn' }} className="w-full">
                         <div className="w-full space-y-4">
-                            <div className="text-right">
-                                {entities?.data.length > 0 && <CmsButton className="" variant="outlined" size="small" label="Print All" component={Link} onClick={() => handleDownloadAll()} />}
+                            <div className="flex justify-between">
+                                <div className="flex">
+                                    {
+                                        Boolean(listData.length)
+                                        &&
+                                        <CmsCheckbox
+                                            key={`box`}
+                                            //checked={Boolean(value.ispacked)}
+                                            //label="Đã Gói"
+                                            checked={Boolean(check?.length > 0 && check?.length === [].concat(...listData.map(va => va.slots)).filter(val => val.item.status === 2)?.length)}
+                                            indeterminate={Boolean(check?.length > 0 && check?.length !== [].concat(...listData.map(va => va.slots)).filter(val => val.item.status === 2)?.length)}
+                                            value={false}
+                                            onChange={e => {
+                                                setCheck((prev) => prev?.length ? [] : [].concat(...listData.map(va => va.slots)).filter(val => val.item.status === 2).map(val => val.item.id))
+                                            }}
+                                            name="status"
+                                        />
+                                    }
+
+                                    <CmsAutocomplete
+                                        label="Trạng thái"
+                                        size="small"
+                                        name="option"
+                                        data={[
+                                            {
+                                                id: 1,
+                                                name: 'Chưa uống'
+                                            },
+                                            {
+                                                id: 2,
+                                                name: 'Đã uống'
+                                            }
+                                        ]}
+                                        value={[
+                                            {
+                                                id: 1,
+                                                name: 'Chưa uống'
+                                            },
+                                            {
+                                                id: 2,
+                                                name: 'Đã uống'
+                                            }
+                                        ].find(val => val.id === type)}
+                                        onChange={(event, value) => {
+                                            setType(value?.id)
+                                        }}
+                                        className="w-160 bg-white"
+                                    />
+                                </div>
+                                <div>
+                                    {check.length > 0 && <CmsButton className=" mr-8" variant="contained" size="small" label="ReFill" onClick={() => handleReFill()} />}
+                                    {listData.length > 0 && <CmsButton className="" variant="outlined" size="small" label="Print All" component={Link} onClick={() => handleDownloadAll()} />}
+                                </div>
                             </div>
-                            {entities?.data?.length > 0 ? entities?.data?.map((item, index) => (
+                            {listData?.length > 0 ? listData.map((item, index) => (
                                 <DetailModelContent
                                     value={item}
+                                    check={check}
+                                    setCheck={setCheck}
                                     index={index}
                                     handleChooseUniqueID={handleChooseUniqueID}
                                     setTab={setTab}
