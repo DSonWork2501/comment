@@ -263,12 +263,12 @@ function ShelfDetailContent({ open, handleClose, detail }) {
                     "img": value.img,
                     "capacity": value.capacity,
                     "note": value.note,
-                    "qrcode": value.qrcode,
+                    "qrcode": "",
                     "status": value.status,
                     "type": value.type
                 })),
                 newitem: data.map(value => ({
-                    "id": 0,
+                    "id": value.id,
                     "cusid": detail.cusid,
                     "parentid": value.parentid,
                     "uniqueid": value.uniqueid,
