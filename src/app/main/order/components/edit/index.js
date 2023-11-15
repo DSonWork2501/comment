@@ -23,6 +23,7 @@ import { HomeSubscription } from "app/main/product/model/product/homeSubscriptio
 import { unwrapResult } from "@reduxjs/toolkit";
 import History from "@history";
 import { setStateRedux } from "app/main/product/store/productSlice";
+import { showMessage } from "app/store/fuse/messageSlice";
 
 const TabType = {
     'thongtin': { id: 'thongtin', name: 'Thông tin đơn hàng' },
@@ -47,12 +48,16 @@ function EditOrderContent() {
     }, [dispatch, cusId, orderId])
 
     const handleSaveData = (values) => {
+        if (!Boolean(productorder?.length)) {
+            dispatch(showMessage({ variant: "error", message: "Vui lòng chọn sản phẩm" }))
+            return
+        }
+
         alertInformation({
             text: 'Bạn có muốn lưu thông tin ?',
             data: values,
             confirm: async (item) => {
                 let data = { ...item };
-
                 if (data?.otherName)
                     data.productorder[0].name = data.otherName
 
