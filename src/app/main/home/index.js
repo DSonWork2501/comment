@@ -32,7 +32,7 @@ function HomePage() {
 					</FuseAnimate>
 
 					<Link className="font-medium" to="/">
-						CopyRight @ 2023 
+						CopyRight @ 2023  1.1
 					</Link>
 				</div>
 			</div>
