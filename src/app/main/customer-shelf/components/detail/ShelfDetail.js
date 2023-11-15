@@ -207,7 +207,7 @@ function ShelfDetailContent({ open, handleClose, detail }) {
             "olditem": {
                 "id": oldItem.id,
                 "cusid": detail.cusid,
-                "parentid": detail.id,
+                "parentid": oldItem.parentid,
                 "uniqueid": oldItem.uniqueid,
                 "imei_ord": oldItem.imei_ord,
                 "name": oldItem.name,
@@ -221,7 +221,7 @@ function ShelfDetailContent({ open, handleClose, detail }) {
             "newitem": {
                 "id": 0,
                 "cusid": detail.cusid,
-                "parentid": detail.id,
+                "parentid": value.parentid,
                 "uniqueid": value.uniqueid,
                 "imei_ord": 0,
                 "name": value.skuItem.name,
@@ -256,7 +256,7 @@ function ShelfDetailContent({ open, handleClose, detail }) {
                 olditem: data.map(value => ({
                     "id": value.id,
                     "cusid": detail.cusid,
-                    "parentid": detail.id,
+                    "parentid": value.parentid,
                     "uniqueid": value.uniqueid,
                     "imei_ord": value.imei_ord,
                     "name": value.name,
@@ -270,7 +270,7 @@ function ShelfDetailContent({ open, handleClose, detail }) {
                 newitem: data.map(value => ({
                     "id": 0,
                     "cusid": detail.cusid,
-                    "parentid": detail.id,
+                    "parentid": value.parentid,
                     "uniqueid": value.uniqueid,
                     "imei_ord": 0,
                     "name": value.name,
