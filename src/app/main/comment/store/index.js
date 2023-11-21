@@ -4,45 +4,24 @@ import { showMessage } from 'app/store/fuse/messageSlice'
 import { getErrorMessage } from '@widgets/functions';
 
 const appName = "App";
-const moduleName = "notify";
+const moduleName = "comment";
 
 
-export const notify = {
-    getList: createAsyncThunk(`${appName}/${moduleName}/notification/getList`, async (params, thunkAPI) => {
+export const comment = {
+    getList: createAsyncThunk(`${appName}/${moduleName}/comment/getList`, async (params, thunkAPI) => {
         try {
-            const response = await connect.live.notification.getList(params);
+            const response = await connect.live.comment.getList(params);
+            // console.log("CHECK >>>", response.data.data);
             return response.data
         } catch (error) {
             thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
             return (thunkAPI.rejectWithValue(error))
         }
     }),
-    read: createAsyncThunk(`${appName}/${moduleName}/notification/read`, async (params, thunkAPI) => {
-        try {
-            const response = await connect.live.notification.read(params);
-            return response.data
-        } catch (error) {
-            thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
-            return (thunkAPI.rejectWithValue(error))
-        }
-    }),
-    deleteAll: createAsyncThunk(`${appName}/${moduleName}/notification/deleteAll`, async (params, thunkAPI) => {
-        try {
-            const response = await connect.live.notification.deleteAll(params);
-            return response.data
-        } catch (error) {
-            thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
-            return (thunkAPI.rejectWithValue(error))
-        }
-    }),
+
 }
 
-const initSearchState = {
-    page: 1,
-    limit: 10
-}
-
-const notifySlice = createSlice({
+const commentSlice = createSlice({
     name: `${appName}/${moduleName}`,
     initialState: {
         loading: false,
@@ -50,7 +29,6 @@ const notifySlice = createSlice({
         entity: null,
         error: null,
         selected: null,
-        search: initSearchState,
     },
     reducers: {
         /**
@@ -104,17 +82,6 @@ const notifySlice = createSlice({
         /**
          * Reset search on table
          */
-        resetSearch: {
-            reducer: (state, { payload }) => {
-                return {
-                    ...state,
-                    search: initSearchState
-                }
-            }
-        },
-        /**
-         * Reset search on table
-         */
         setEntities: {
             reducer: (state, { payload }) => {
                 return {
@@ -125,12 +92,12 @@ const notifySlice = createSlice({
         },
     },
     extraReducers: {
-        [notify.getList.pending]: state => ({
+        [comment.getList.pending]: state => ({
             ...state,
             loading: true,
             error: null
         }),
-        [notify.getList.fulfilled]: (state, { payload }) => {
+        [comment.getList.fulfilled]: (state, { payload }) => {
             return {
                 ...state,
                 loading: false,
@@ -138,7 +105,7 @@ const notifySlice = createSlice({
                 error: null
             }
         },
-        [notify.getList.rejected]: (state, { error }) => ({
+        [comment.getList.rejected]: (state, { error }) => ({
             ...state,
             loading: false,
             entities: {
@@ -149,6 +116,6 @@ const notifySlice = createSlice({
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setPosition1, setPosition2, setEntities } = notifySlice.actions;
+export const { setSelected, setSearch, resetSearch, setPosition1, setPosition2, setEntities } = commentSlice.actions;
 
-export default notifySlice.reducer;
+export default commentSlice.reducer;

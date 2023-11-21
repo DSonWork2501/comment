@@ -1,4 +1,4 @@
-export const keyStore = "notify";
+export const keyStore = "comment";
 export function getTimeAgo(currentDate, receivedDate) {
     const timeDifference = currentDate - receivedDate;
     const seconds = Math.floor(timeDifference / 1000);
