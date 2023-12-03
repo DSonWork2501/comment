@@ -1,15 +1,14 @@
-import React from 'react';
-import { faArrowTurnDown, faChevronRight, faFile } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState } from 'react';
 import { Button, Icon } from '@material-ui/core';
 import { CmsDialog, CmsFormikDateTimePicker, CmsFormikTextField } from '@widgets/components';
-import CommentBox from '@widgets/components/CmsComment';
 import { format } from 'date-fns';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
+import CommentBox from '@widgets/components/CmsComment';
+import Comment from './Comment/Comment';
+import Comments from './Comment/Comments';
+import { id } from 'date-fns/locale';
 
-import CommentDetailDialog from './CommentDetailDialog';
-import { useState } from 'react';
 const Filter = ({ onSearch, search, namePage }) => {
 
     const initialValues = {
@@ -108,13 +107,9 @@ const Filter = ({ onSearch, search, namePage }) => {
 }
 
 function CommentDialog({ detail, open, handleClose, title, dataBackend }) {
-    console.log(">>> DATA", dataBackend)
-    const [onDetail, setOnDetail] = useState(false)
+    // console.log(">>> DATA", dataBackend)
     const dateFormat = new Intl.DateTimeFormat("en-us", {
         dateStyle: 'medium',
-    })
-    const timeFormat = new Intl.DateTimeFormat("en-us", {
-        timeStyle: 'short',
     })
 
     // this gives an object with dates as keys
@@ -135,83 +130,101 @@ function CommentDialog({ detail, open, handleClose, title, dataBackend }) {
         };
     });
 
+    const [acitveComment, setActiveComment] = useState(null)
+    const [onDetail, setOnDetail] = useState(false)
+    const [checkRoot, setCheckRoot] = useState(false)
+    const rootComments = dataBackend.filter((el) => el.parentid === 0)
+    const getReplies = (commendId) => {
+        return dataBackend.filter(el =>
+            el.parentid === commendId).sort((a, b) => new Date(a.datecreate).getTime() - new Date(b.datecreate).getTime())
+    }
+    const getRootCommentData = (commentId) => {
+        return dataBackend.filter(el =>
+            el.id === commentId)
+    }
+    const checkRootComment = (comment) => {
+        rootComments.map(el => {
+            if (comment.id === el.id) {
+                setCheckRoot(true)
+            }
+        })
+    }
+    const handleOnDetail = () => {
+        setOnDetail(true)
+    }
+
     return (
         <CmsDialog
             //title={title}
+            setOnDetail={setOnDetail}
+            setActiveComment={setActiveComment}
+            setCheckRoot={setCheckRoot}
+            onDetail={onDetail}
+            detailcomment
             handleClose={handleClose}
             isCloseDialogSubmit={false}
             open={open}
             size="lg"
         >
-            {
-                !onDetail
-                    ?
-                    <>
-                        <Filter search={null} onSearch={() => { }} />
-                        {
-                            groupArrays.map(groupDate => {
-                                return (
-                                    <div className='my-8 text-13' key={groupDate.date}>
-                                        <div>
-                                            <div className='text-center font-600 text-grey-500 mb-8'>
-                                                {/* {console.log("Date :", groupDate.date)} */}
-                                                {dateFormat.format(new Date(groupDate.date))}
-                                            </div>
+            {!onDetail
+                ?
+                <>
+                    <Filter search={null} onSearch={() => { }} />
+                    {
+                        groupArrays.map(groupDate => {
+                            return (
+                                <div className='my-8 text-13' key={groupDate.date}>
+                                    <div>
+                                        <div className='text-center font-600 text-grey-500 mb-8'>
+                                            {dateFormat.format(new Date(groupDate.date))}
                                         </div>
-                                        {groupDate.comments.length > 0 && groupDate.comments.map(el => {
-                                            console.log("Check >>> ", el)
-                                            return (
-                                                <div style={{ background: 'rgb(250,251,252)' }} className='p-8 relative mb-16'>
-                                                    <div className='mb-16 flex justify-between items-center'>
-                                                        <div>
-                                                            Comment
-                                                            <FontAwesomeIcon icon={faChevronRight} className="text-11 text-gray-500 mx-4" /> <FontAwesomeIcon icon={faFile} className="text-13 text-gray-500 mr-8" />
-                                                            {el.type}
-                                                        </div>
-                                                        <div className='mr-8'>
-                                                            <FontAwesomeIcon
-                                                                icon={faArrowTurnDown}
-                                                                className='text-13 text-gray-500 border py-8 px-4 rounded-4 cursor-pointer hover:shadow-2'
-                                                                style={{ transform: 'rotate(90deg)' }} />
-                                                        </div>
-                                                    </div>
-                                                    <div className='flex space-x-4'>
-                                                        <div style={{ width: 28 }}>
-                                                            <img className='rounded-full' style={{ width: 25, margin: 'auto' }} alt='user' src='https://app.startinfinity.com/profile/avatar.svg?name=manhtc&quot' />
-                                                        </div>
-                                                        <div style={{ width: 'calc(100% - 28px)' }}>
-                                                            <div className='mb-8'>
-                                                                <div className='mb-4'>
-                                                                    <b className='cursor-pointer' onClick={() => setOnDetail(true)}>
-                                                                        {el.usercreate}
-                                                                    </b>
-                                                                    <span className='text-12 text-gray-500 ml-4'>
-                                                                        {timeFormat.format(new Date(el.datecreate))}
-                                                                    </span>
-                                                                </div>
-                                                                <div>
-                                                                    {el.comment}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )
-                                        })}
-
                                     </div>
-                                )
-                            })
-                        }
-                    </>
-                    :
-                    <>
-                        <CommentDetailDialog
-                            dataBackend={dataBackend}
-                        />
-                    </>
+                                    {groupDate.comments.length > 0 && groupDate.comments.map(el => {
+                                        return (
+                                            <Comment
+                                                key={el.id}
+                                                // acitveComment={acitveComment}
+                                                setActiveComment={setActiveComment}
+                                                checkRootComment={checkRootComment}
+                                                comment={el}
+                                                handleOnDetail={handleOnDetail}
+                                            />
+                                        )
+                                    })}
+                                </div>
+                            )
+                        })
+                    }
+                </>
+                :
+                < div >
+                    <CommentBox initialText={acitveComment.comment} />
+                    {
+                        checkRoot
+                            ?
+                            <>
+                                <Comments
+                                    replies={getReplies(acitveComment?.id)}
+                                    dataBackend={dataBackend}
+                                    comment={acitveComment}
+                                />
+                            </>
+                            :
+                            <>
+                                <Comments
+                                    replies={getReplies(acitveComment?.parentid)}
+                                    dataBackend={dataBackend}
+                                    comment={getRootCommentData(acitveComment.parentid)[0]}
+                                />
+                            </>
+                    }
+                </div>
             }
-        </CmsDialog>
+            <div className='flex justify-end bg-red-500'>
+                Pagintaion
+            </div>
+
+        </CmsDialog >
     )
 }
 

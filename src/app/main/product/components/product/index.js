@@ -230,7 +230,7 @@ function ProductView() {
                                 search={search}
                                 setFilterOptions={setFilterOptions}
                                 resetSearch={() => dispatch(resetSearch())}
-                                setSearch={(value) => dispatch(setSearch({ ...value, pageNumber: 1 }))}
+                                setSearch={(value) => dispatch(setSearch({ ...value, pageNumber: 10 }))}
                             />
                         }
                         selectedList={selects}

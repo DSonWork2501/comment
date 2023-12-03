@@ -36,14 +36,15 @@ export const baseurl = `${process.env.REACT_APP_API_BASE_URL}/product/img/`
 function CustomerShelfContent() {
     const dispatch = useDispatch()
     const entities = useSelector(store => store[keyStore]?.cusShelf?.entities)
+    console.log("CHECK DATA >>>", entities?.pagination)
     const loading = useSelector(store => store[keyStore]?.cusShelf?.loading)
     const search = useSelector(store => store[keyStore]?.cusShelf?.search)
+    console.log("CHECK SEARCH >>>", useSelector(store => store[keyStore]?.cusShelf?.search))
     const summary = useSelector(store => store[keyStore]?.cusShelf?.summary)
     const summaryHousehold = useSelector(store => store[keyStore]?.cusShelf?.summaryHousehold)
     const params = useParams(), type = parseInt(params.type);
     const [detail, setDetail] = useState(null);
     const [open, setOpen] = useState('')
-
     useEffect(() => {
         if (type)
             dispatch(getShelf({ ...search, Type: Object.values(CustomerProductType).find(val => val.rawID === type)?.id }))
@@ -135,7 +136,7 @@ function CustomerShelfContent() {
     if (loading) {
         return <FuseLoading />
     }
-    
+
     return (
         <LayoutCustom>
             <CmsCardedPage

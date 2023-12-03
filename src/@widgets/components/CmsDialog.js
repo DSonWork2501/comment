@@ -37,6 +37,11 @@ function CmsDialog(props) {
         backdropProps,
         className,
         btnFootComponent,
+        detailcomment,
+        onDetail,
+        setOnDetail,
+        setActiveComment,
+        setCheckRoot,
         ...otherProps
     } = props;
 
@@ -73,6 +78,19 @@ function CmsDialog(props) {
                     {props.children}
                 </DialogContent>
                 <DialogActions>
+                    {detailcomment && onDetail &&
+                        <Button
+                            onClick={() => {
+                                setOnDetail(false)
+                                setActiveComment(null)
+                                setCheckRoot(false)
+                            }}
+                            color="primary"
+                        >
+                            BACk
+                        </Button>
+                    }
+
                     <Button
                         onClick={() => {
                             handleClose()

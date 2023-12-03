@@ -1,30 +1,35 @@
-import React from 'react';
+import React, { memo, useState } from 'react';
 import { faArrowTurnDown, faChevronRight, faFile } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Icon } from '@material-ui/core';
 import { CmsDialog, CmsFormikDateTimePicker, CmsFormikTextField } from '@widgets/components';
 import CommentBox from '@widgets/components/CmsComment';
-import { format } from 'date-fns';
-import { useFormik } from 'formik';
-import { useEffect } from 'react';
-import { useState } from 'react';
 
-function CommentDetailDialog({ dataBackend }) {
-    console.log(dataBackend)
+const Comment = ({ comment, handleOnDetail, setActiveComment, checkRootComment }) => {
+    const [isEdit, setIsEdit] = useState(false)
+    const getComment = comment
+    const timeFormat = new Intl.DateTimeFormat("en-us", {
+        timeStyle: 'short',
+    })
+    const handleClick = () => {
+        handleOnDetail()
+        checkRootComment(getComment)
+        setActiveComment(getComment)
+        setIsEdit(!isEdit)
+    }
+
     return (
-        <div className='my-8 text-13' >
-            <div>
-                <div className='text-center font-600 text-grey-500 mb-8'>
-                </div>
-            </div>
+        <>
             <div style={{ background: 'rgb(250,251,252)' }} className='p-8 relative mb-16'>
                 <div className='mb-16 flex justify-between items-center'>
                     <div>
                         Comment
-                        <FontAwesomeIcon icon={faChevronRight} className="text-11 text-gray-500 mx-4" /> <FontAwesomeIcon icon={faFile} className="text-13 text-gray-500 mr-8" />
+                        <FontAwesomeIcon icon={faChevronRight} className="text-11 text-gray-500 mx-4" />
+                        <FontAwesomeIcon icon={faFile} className="text-13 text-gray-500 mr-8" />
+                        {comment.type}
                     </div>
                     <div className='mr-8'>
                         <FontAwesomeIcon
+                            onClick={() => handleClick()}
                             icon={faArrowTurnDown}
                             className='text-13 text-gray-500 border py-8 px-4 rounded-4 cursor-pointer hover:shadow-2'
                             style={{ transform: 'rotate(90deg)' }} />
@@ -37,19 +42,28 @@ function CommentDetailDialog({ dataBackend }) {
                     <div style={{ width: 'calc(100% - 28px)' }}>
                         <div className='mb-8'>
                             <div className='mb-4'>
-                                <b>
+                                <b className='cursor-pointer' onClick={() => handleClick()}>
+                                    {comment.usercreate}
                                 </b>
                                 <span className='text-12 text-gray-500 ml-4'>
+                                    {timeFormat.format(new Date(comment.datecreate))}
                                 </span>
                             </div>
                             <div>
+                                {comment.comment}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            {/* {
+                isEdit &&
+                (
+                    <CommentBox initialText={comment.comment} />
+                )
+            } */}
+        </>
     )
 }
 
-export default CommentDetailDialog
+export default memo(Comment)

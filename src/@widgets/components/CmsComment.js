@@ -3,10 +3,19 @@ import ReactQuill from "react-quill";
 import "quill-mention";
 import "react-quill/dist/quill.snow.css";
 import { makeStyles } from "@material-ui/core";
+import { ContactSupportOutlined } from "@material-ui/icons";
+import { useSelector } from "react-redux";
+import { keyStore } from "../../app/main/customer/common";
+import reducer from "../../app/main/customer/store";
+import withReducer from "app/store/withReducer";
+import { getList as getAccount, resetSearch, setSearch } from "../../app/main/customer/store/accountSlice";
+import { getList } from '../../app/main/customer/store/customerSlice'
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
     comment: {
-        background:'white',
+        background: 'white',
         "& .ql-mention-list": {
             listStyle: "none",
             margin: 0,
@@ -51,12 +60,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const atValues = [
-    { id: 1, userName: 'manhtc', value: "Trương Công Mạnh", email: 'abc.@gmail.com' },
-    { id: 2, userName: 'manhtc2', value: "Nguyễn Minh Vương", email: 'abc.@gmail.com' },
-    { id: 3, userName: 'manhtc3', value: "Nguyễn lộc", email: 'abc.@gmail.com' },
-    { id: 4, userName: 'manhtc4', value: "Nguyễn lâm", email: 'abc.@gmail.com' },
-];
+let apivalues = []
+
 const hashValues = [
     { id: 3, value: "Fredrik Sundqvist 2" },
     { id: 4, value: "Patrik Sjölin 2" }
@@ -67,10 +72,10 @@ const mentionModuleConfig = {
     mentionDenotationChars: ["@", "#"],
     source: function (searchTerm, renderList, mentionChar) {
         let values;
-
         if (mentionChar === "@") {
-            values = atValues;
-        } else {
+            values = apivalues
+        }
+        else {
             values = hashValues;
         }
 
@@ -104,13 +109,18 @@ const mentionModuleConfig = {
     },
 };
 
-const modules = {
-    mention: mentionModuleConfig
-};
 
-function CommentBox({ onChange }) {
-    const [value, setValue] = React.useState("");
+function CommentBox({ onChange, initialText = '' }) {
+    const dispatch = useDispatch()
+    const entities = useSelector(store => store[keyStore]?.customer?.entities)
+    const getListUser = entities?.data?.map(el => ({ id: el.id, userName: el.name, value: el.name, email: el.email }))
+    const [value, setValue] = React.useState(initialText);
     const classes = useStyles();
+    apivalues = getListUser
+
+    useEffect(() => {
+        dispatch(getList())
+    }, [dispatch])
 
     const handleChange = (content, delta, source, editor) => {
         setValue(content);
@@ -118,6 +128,9 @@ function CommentBox({ onChange }) {
         console.log(editor.getContents());
     };
 
+    const modules = {
+        mention: mentionModuleConfig
+    };
     return (
         <div className={classes.comment}>
             <ReactQuill
@@ -130,4 +143,4 @@ function CommentBox({ onChange }) {
     );
 }
 
-export default CommentBox;
+export default withReducer(keyStore, reducer)(CommentBox);

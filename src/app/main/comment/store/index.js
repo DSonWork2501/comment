@@ -3,23 +3,27 @@ import connect from '@connect';
 import { showMessage } from 'app/store/fuse/messageSlice'
 import { getErrorMessage } from '@widgets/functions';
 
-const appName = "App";
+const appName = "comments";
 const moduleName = "comment";
 
 
 export const comment = {
-    getList: createAsyncThunk(`${appName}/${moduleName}/comment/getList`, async (params, thunkAPI) => {
+    getList: createAsyncThunk(`${appName}/${moduleName}/getList`, async (params, thunkAPI) => {
         try {
             const response = await connect.live.comment.getList(params);
-            // console.log("CHECK >>>", response.data.data);
             return response.data
         } catch (error) {
             thunkAPI.dispatch(showMessage({ variant: "error", message: getErrorMessage(error) }))
             return (thunkAPI.rejectWithValue(error))
         }
     }),
-
 }
+
+const initSearchState = {
+    pageNumber: 1,
+    rowsPage: 10,
+}
+
 
 const commentSlice = createSlice({
     name: `${appName}/${moduleName}`,
@@ -28,6 +32,7 @@ const commentSlice = createSlice({
         entities: null,
         entity: null,
         error: null,
+        search: initSearchState,
         selected: null,
     },
     reducers: {
@@ -43,53 +48,27 @@ const commentSlice = createSlice({
             },
             prepare: item => ({ payload: item })
         },
-        /**
-         * @description position 1
-         */
-        setPosition1: {
-            reducer: (state, { payload }) => {
-                return {
-                    ...state,
-                    position1: payload
-                }
-            },
-            prepare: item => ({ payload: item })
-        },
-        /**
-         * @description position 2
-         */
-        setPosition2: {
-            reducer: (state, { payload }) => {
-                return {
-                    ...state,
-                    position2: payload
-                }
-            },
-            prepare: item => ({ payload: item })
-        },
+
         /**
          * Set search on table
          */
-        setSearch: {
-            reducer: (state, { payload }) => {
-                return {
-                    ...state,
-                    search: payload
-                }
-            },
-            prepare: item => ({ payload: item })
-        },
-        /**
-         * Reset search on table
-         */
-        setEntities: {
-            reducer: (state, { payload }) => {
-                return {
-                    ...state,
-                    entities: payload
-                }
-            }
-        },
+        // setSearch: {
+        //     reducer: (state, { payload }) => {
+        //         return {
+        //             ...state,
+        //             search: payload
+        //         }
+        //     },
+        //     prepare: item => ({ payload: item })
+        // },
+        // resetSearch: {
+        //     reducer: (state, { payload }) => {
+        //         return {
+        //             ...state,
+        //             search: initSearchState
+        //         }
+        //     }
+        // },
     },
     extraReducers: {
         [comment.getList.pending]: state => ({
@@ -116,6 +95,6 @@ const commentSlice = createSlice({
     }
 });
 
-export const { setSelected, setSearch, resetSearch, setPosition1, setPosition2, setEntities } = commentSlice.actions;
+export const { setSelected, setSearch, resetSearch } = commentSlice.actions;
 
 export default commentSlice.reducer;

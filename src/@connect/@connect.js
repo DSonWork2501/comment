@@ -120,6 +120,7 @@ export default {
             getList: params => axios.get(`${baseurl}/location/get-locations`, { params }),
         },
         comment: {
+            // getList: params => axios.get(`${baseurl}/order/get-order`, { params }),
             getList: params => axios.get(`${baseurl}/order/get-comments/comment`, { params }),
         },
         contract: {

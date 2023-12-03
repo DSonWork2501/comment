@@ -32,6 +32,7 @@ function ProductView() {
     const search = useSelector(store => store[keyStore].account.search)
     const loading = useSelector(store => store[keyStore].account.loading)
     const entities = useSelector(store => store[keyStore].account.entities)
+    console.log("CHECK ACCOUNT LIST HERE >>> ", entities)
     const user = useSelector(store => store.auth.user.user)
 
     const [filterOptions, setFilterOptions] = useState(null);

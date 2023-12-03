@@ -16,12 +16,10 @@ import reducer, { comment } from './store';
 // import {Waypoint} from "react-waypoint";
 
 function Comment() {
-    const rawEntities = useSelector(store => store[keyStore].entities?.data);
-    const [openDialog, setOpenDialog] = useState('');
     const dispatch = useDispatch();
-    const handleCloseDialog = () => {
-        setOpenDialog("");
-    }
+    const [openDialog, setOpenDialog] = useState('');
+    const rawEntities = useSelector(store => store[keyStore]?.entities?.data);
+    const search = useSelector(store => store[keyStore]?.search)
 
     const getList = useCallback((search) => {
         dispatch(notify.getList(search));
@@ -29,8 +27,12 @@ function Comment() {
     }, [dispatch]);
 
     useEffect(() => {
-        getList();
-    }, [getList])
+        getList(search);
+    }, [search])
+
+    const handleCloseDialog = () => {
+        setOpenDialog("");
+    }
 
     return (
         <>
@@ -42,7 +44,6 @@ function Comment() {
                     open={openDialog === 'comment'}
                     handleClose={handleCloseDialog}
                     title={'Danh sách comment'}
-                //detail={detail}
                 />
             }
             <IconButton
@@ -58,7 +59,6 @@ function Comment() {
                     <Chat />
                 </Badge>
             </IconButton>
-
         </>
     );
 }

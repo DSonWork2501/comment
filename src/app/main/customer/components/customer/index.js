@@ -68,7 +68,7 @@ function CategoryView() {
 
     return (
         <CmsCardedPage
-            title={'Danh sách sản phẩm'}
+            title={'Danh sách khách hàng 123'}
             subTitle={'Quản lý thông tin sản phẩm'}
             icon="whatshot"
             // leftBottomHeader={leftBottomHeader}
@@ -97,9 +97,9 @@ function CategoryView() {
                         }
                         openFilterOptions={Boolean(filterOptions)}
                     />
-                    <EditCusContent 
+                    <EditCusContent
                         open={open === 'edit'}
-                        handleClose={()=>setOpen('')}
+                        handleClose={() => setOpen('')}
                         handleSave={HandleInsertCusData}
                         email={email}
                     />
